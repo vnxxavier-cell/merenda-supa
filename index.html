@@ -682,9 +682,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       📅 Período Letivo
       <span id="icon-periodo" style="float:right;font-size:16px">▲</span>
     </div>
-    <div id="body-periodo" style="display:block;padding:16px 20px 6px">
-      <!-- Início / Fim -->
-      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+    <div id="body-periodo" style="display:block;padding:16px 20px 16px">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
         <div class="campo" style="margin:0">
           <label>Início do Ano Letivo</label>
           <input type="date" id="cal-inicio" style="min-width:0" onchange="salvarPeriodoLetivo()">
@@ -695,31 +694,22 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <span id="periodo-status" style="font-size:12px;color:var(--txt2);align-self:center"></span>
       </div>
-      <!-- Toggle feriados / sábados -->
-      <div style="margin:0 -20px;border-top:1px solid var(--borda)">
-        <div onclick="toggleDatasEspeciais()" style="padding:10px 20px;cursor:pointer;user-select:none;font-size:13px;font-weight:600;color:var(--txt2)">
-          🚫 Feriados, Recesso e Sábados Letivos
-          <span id="datas-especiais-icon" style="float:right;font-size:16px">▼</span>
-        </div>
-        <div id="datas-especiais-panel" style="display:none;padding:0 20px 14px">
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--laranja);margin-bottom:6px">🚫 Feriado / Recesso</div>
-              <div style="display:flex;gap:6px;margin-bottom:6px">
-                <input type="date" id="add-feriado-input" style="flex:1;min-width:0">
-                <button onclick="adicionarDataEspecial('feriado')" style="padding:4px 10px;background:var(--laranja);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
-              </div>
-              <div id="lista-feriados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
-            </div>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--verde);margin-bottom:6px">✅ Sábados Letivos</div>
-              <div style="display:flex;gap:6px;margin-bottom:6px">
-                <input type="date" id="add-sabado-input" style="flex:1;min-width:0">
-                <button onclick="adicionarDataEspecial('sabado')" style="padding:4px 10px;background:var(--verde);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
-              </div>
-              <div id="lista-sabados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
-            </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;border-top:1px solid var(--borda);padding-top:14px">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--laranja);margin-bottom:6px">🚫 Feriado / Recesso</div>
+          <div style="display:flex;gap:6px;margin-bottom:6px">
+            <input type="date" id="add-feriado-input" style="flex:1;min-width:0">
+            <button onclick="adicionarDataEspecial('feriado')" style="padding:4px 10px;background:var(--laranja);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
           </div>
+          <div id="lista-feriados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--verde);margin-bottom:6px">✅ Sábados Letivos</div>
+          <div style="display:flex;gap:6px;margin-bottom:6px">
+            <input type="date" id="add-sabado-input" style="flex:1;min-width:0">
+            <button onclick="adicionarDataEspecial('sabado')" style="padding:4px 10px;background:var(--verde);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
+          </div>
+          <div id="lista-sabados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
         </div>
       </div>
     </div>
