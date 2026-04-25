@@ -680,9 +680,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <!-- Cabeçalho clicável — padrão igual ao Planejar Cardápio do Ciclo -->
     <div class="card-header" style="background:var(--laranja);cursor:pointer;user-select:none" onclick="togglePeriodo()">
       📅 Período Letivo
-      <span id="icon-periodo" style="float:right;font-size:16px">▲</span>
+      <span id="icon-periodo" style="float:right;font-size:16px">▼</span>
     </div>
-    <div id="body-periodo" style="display:block;padding:16px 20px 16px">
+    <div id="body-periodo" style="display:none;padding:16px 20px 16px">
       <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
         <div class="campo" style="margin:0">
           <label>Início do Ano Letivo</label>
@@ -722,16 +722,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button class="btn btn-primary admin-only" onclick="imprimirPoster()" style="background:#fff; color:var(--verde); border:1.5px solid var(--verde); font-size:12px; padding:6px 12px">🖼 Imprimir Pôster</button>
       <button class="btn btn-primary admin-only" onclick="exportarExcel()" style="background:#fff; color:#217346; border:1.5px solid #217346; font-size:12px; padding:6px 12px">📊 Exportar Excel</button>
     </div>
-    <div style="padding:20px; display:flex; gap:12px; flex-wrap:wrap" id="legenda-ciclos"></div>
+    <div style="padding:14px 20px; display:flex; gap:8px; flex-wrap:wrap" id="legenda-ciclos"></div>
   </div>
 
   <!-- ── PAINEL DE PLANEJAMENTO DE CICLO ── -->
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--verde);cursor:pointer;user-select:none" onclick="togglePlanejador()">
       🗓 Planejar Cardápio do Ciclo
-      <span id="icon-planejador" style="float:right;font-size:16px">▲</span>
+      <span id="icon-planejador" style="float:right;font-size:16px">▼</span>
     </div>
-    <div id="body-planejador" style="display:block;padding:20px">
+    <div id="body-planejador" style="display:none;padding:20px">
 
       <!-- Modo Ciclo -->
       <div id="plan-modo-ciclo">
@@ -4368,13 +4368,14 @@ function renderCardapio(){
   renderListasEspeciais();
   gerarSeletoresPratos();
 
-  const legendaItens = DADOS.ciclos.map((c, i) => ({label: c, cor: CORES_CICLOS[i]}));
-  legenda.innerHTML = legendaItens.map(({label, cor}) => `
-    <div style="display:flex;align-items:center;gap:6px;padding:5px 14px;background:#f8fafc;border-radius:50px;border:1.5px solid ${cor}">
-      <div style="width:9px;height:9px;background:${cor};border-radius:50%;flex-shrink:0"></div>
-      <span style="font-size:11px;font-weight:700;color:#475569">${label}</span>
-    </div>
-  `).join('');
+  // Atalhos dos meses — botões que expandem e rolam até o mês
+  legenda.innerHTML = MESES_DISPLAY.map(mes => {
+    const mesId = `cal-mes-${mes.replace(/\s/g,'')}`;
+    return `<button onclick="irParaMes('${mesId}')"
+      style="padding:5px 14px;background:#f8fafc;border-radius:50px;border:1.5px solid var(--borda);font-size:11px;font-weight:700;color:#475569;cursor:pointer;transition:.12s"
+      onmouseover="this.style.borderColor='var(--azul2)';this.style.color='var(--azul2)'"
+      onmouseout="this.style.borderColor='var(--borda)';this.style.color='#475569'">${mes}</button>`;
+  }).join('');
 
   const pratosOptions = `<option value="">— Recesso / Sem merenda —</option>` +
     PRATOS_LISTA.map(p => {
@@ -4462,9 +4463,9 @@ function renderCardapio(){
       <div class="cal-top" style="cursor:pointer;user-select:none" onclick="toggleMes('${mesId}')">
         <span class="cal-mes-nome">${mesNome}</span>
         <span class="cal-ano">2026</span>
-        <span id="${mesId}-icon" style="margin-left:auto;font-size:16px;padding-left:10px">▲</span>
+        <span id="${mesId}-icon" style="margin-left:auto;font-size:16px;padding-left:10px">▼</span>
       </div>
-      <div id="${mesId}" style="display:block">
+      <div id="${mesId}" style="display:none">
         <div class="cal-body">
           <div class="cal-sidebar">
             <div class="cal-sidebar-label">Cardápio do Mês</div>
@@ -6060,6 +6061,15 @@ function aplicarConfigDia(acao){
   atualizarCiclos();
   fecharPopupDia();
   renderCardapio();
+}
+
+function irParaMes(mesId){
+  const panel = document.getElementById(mesId);
+  const icon  = document.getElementById(mesId + '-icon');
+  if(!panel) return;
+  panel.style.display = 'block';
+  if(icon) icon.textContent = '▲';
+  panel.closest('.cal-month').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function togglePeriodo(){
