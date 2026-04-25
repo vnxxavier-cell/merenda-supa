@@ -676,9 +676,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <h2 class="titulo">📅 Planejamento Anual & Calendário 2026</h2>
 
   <!-- Período letivo -->
-  <div id="banner-periodo" class="card" style="margin-bottom:18px;border-left:4px solid var(--laranja)">
-    <div style="padding:14px 20px 10px 20px">
-      <!-- Linha 1: início/fim + status -->
+  <div id="banner-periodo" class="card" style="margin-bottom:18px">
+    <!-- Cabeçalho clicável — padrão igual ao Planejar Cardápio do Ciclo -->
+    <div class="card-header" style="background:var(--laranja);cursor:pointer;user-select:none" onclick="togglePeriodo()">
+      📅 Período Letivo
+      <span id="icon-periodo" style="float:right;font-size:16px">▲</span>
+    </div>
+    <div id="body-periodo" style="display:block;padding:16px 20px 6px">
+      <!-- Início / Fim -->
       <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
         <div class="campo" style="margin:0">
           <label>Início do Ano Letivo</label>
@@ -690,15 +695,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <span id="periodo-status" style="font-size:12px;color:var(--txt2);align-self:center"></span>
       </div>
-      <!-- Linha 2: toggle + feriados / sábados letivos -->
-      <div style="margin:0 -20px -10px;border-top:1px solid var(--borda)">
+      <!-- Toggle feriados / sábados -->
+      <div style="margin:0 -20px;border-top:1px solid var(--borda)">
         <div onclick="toggleDatasEspeciais()" style="padding:10px 20px;cursor:pointer;user-select:none;font-size:13px;font-weight:600;color:var(--txt2)">
-          📅 Feriados, Recesso e Sábados Letivos
+          🚫 Feriados, Recesso e Sábados Letivos
           <span id="datas-especiais-icon" style="float:right;font-size:16px">▼</span>
         </div>
         <div id="datas-especiais-panel" style="display:none;padding:0 20px 14px">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
-            <!-- Feriados / Recesso -->
             <div>
               <div style="font-size:12px;font-weight:600;color:var(--laranja);margin-bottom:6px">🚫 Feriado / Recesso</div>
               <div style="display:flex;gap:6px;margin-bottom:6px">
@@ -707,7 +711,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
               </div>
               <div id="lista-feriados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
             </div>
-            <!-- Sábados letivos -->
             <div>
               <div style="font-size:12px;font-weight:600;color:var(--verde);margin-bottom:6px">✅ Sábados Letivos</div>
               <div style="display:flex;gap:6px;margin-bottom:6px">
@@ -6067,6 +6070,14 @@ function aplicarConfigDia(acao){
   atualizarCiclos();
   fecharPopupDia();
   renderCardapio();
+}
+
+function togglePeriodo(){
+  const panel = document.getElementById('body-periodo');
+  const icon  = document.getElementById('icon-periodo');
+  const aberto = panel.style.display !== 'none';
+  panel.style.display = aberto ? 'none' : 'block';
+  icon.textContent = aberto ? '▼' : '▲';
 }
 
 function toggleMes(id){
