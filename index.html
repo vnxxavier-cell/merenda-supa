@@ -5830,6 +5830,7 @@ function ir(id){
   if(id==='estoque') renderEstoque();
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); }
+  if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
   atualizarPrintGlobal();
 }
 
