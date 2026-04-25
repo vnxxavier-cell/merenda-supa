@@ -2193,15 +2193,22 @@ async function salvarUsuarioForm(){
   atualizarBadgeAdmin();
 }
 
-function excluirUsuario(id){
+async function excluirUsuario(id){
   const user = USUARIOS.find(u => u.id === id);
   if(!user) return;
   if(!confirm(`Excluir "${user.nome}" e todos os seus dados? Esta ação não pode ser desfeita.`)) return;
-  // Remove todos os dados prefixados do usuário
+  // Remove todos os dados prefixados do usuário no localStorage
   const prefix = 'u_' + id + '_';
   const ls = window._origLS || window.localStorage;
   Object.keys(window.localStorage).filter(k => k.startsWith(prefix))
     .forEach(k => ls.removeItem(k));
+  // Remove dados do usuário no Supabase (escola_dados)
+  if(_supabase){
+    try {
+      await _supabase.from('escola_dados').delete().eq('user_id', id);
+      await _supabase.from('usuarios').delete().eq('id', id);
+    } catch(e){ console.warn('Erro ao excluir do Supabase:', e.message); }
+  }
   USUARIOS = USUARIOS.filter(u => u.id !== id);
   salvarUsuarios();
   renderAdmin();
