@@ -483,6 +483,12 @@ h2.titulo::after{content:'';flex:1;height:2px;background:linear-gradient(to righ
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr)}
 .cal-day{min-height:120px;padding:8px 9px 6px;position:relative;display:flex;flex-direction:column;gap:5px;border-right:1px solid var(--borda);border-bottom:1px solid var(--borda);transition:background .15s}
 .cal-day-num{font-size:13px;font-weight:700;line-height:1;flex-shrink:0;color:inherit;user-select:none}
+.cal-day-num-btn{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 4px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid var(--borda);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:.12s;user-select:none;color:inherit}
+.cal-day-num-btn:hover{background:var(--cinza);box-shadow:0 2px 6px rgba(0,0,0,.18);border-color:#aaa}
+.cal-day-num-btn.btn-feriado{background:#fff0f0;border-color:#f87171;color:#dc2626}
+.cal-day-num-btn.btn-feriado:hover{background:#fee2e2}
+.cal-day-num-btn.btn-sabletivo{background:#eff6ff;border-color:var(--azul2);color:var(--azul2)}
+.cal-day-num-btn.btn-sabletivo:hover{background:#dbeafe}
 .cal-day.day-off{background:#fafafa}
 .cal-day.day-off .cal-day-num{color:#d1d5db}
 .cal-day.day-holiday{background:#fff8f8}
@@ -4412,22 +4418,24 @@ function renderCardapio(){
         const cor = getCorDia(iso, letIdx);
         const curP = getMealByDate(iso);
         const {nome} = curP ? nomeNum(curP) : {nome:''};
-        days += `<div class="cal-day day-school" id="cal-day-${letIdx}" style="cursor:pointer" onclick="abrirPopupDia('${iso}',event)">
-          <span class="cal-day-num">${day}${badge}</span>
+        days += `<div class="cal-day day-school" id="cal-day-${letIdx}" onclick="abrirPopupDia('${iso}',event)">
+          <span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}
           ${curP ? `<div class="cal-event" style="background:${cor}">${nome}</div>` : ''}
         </div>`;
       } else if(isHoliday){
-        days += `<div class="cal-day day-holiday" style="cursor:pointer" onclick="abrirPopupDia('${iso}',event)">
-          <span class="cal-day-num">${day}${badge}</span>
+        days += `<div class="cal-day day-holiday" onclick="abrirPopupDia('${iso}',event)">
+          <span class="cal-day-num-btn btn-feriado" onclick="clicarNumDia('${iso}',event)" title="Remover Feriado/Recesso">${day}</span>${badge}
           <span class="cal-feriado-tag">Feriado/Recesso</span>
         </div>`;
       } else if(dow===6){
+        const sabClass = isSabLetivoDay ? 'btn-sabletivo' : '';
+        const sabTitle = isSabLetivoDay ? 'Remover Sábado Letivo' : 'Marcar como Sábado Letivo';
         const tag = isSabLetivoDay ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--azul2);border-radius:3px;padding:1px 4px;line-height:1.4">SAB.LET.</span>` : '';
-        days += `<div class="cal-day day-off" style="cursor:pointer" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num">${day}${tag}${badge}</span></div>`;
+        days += `<div class="cal-day day-off"><span class="cal-day-num-btn ${sabClass}" onclick="clicarNumDia('${iso}',event)" title="${sabTitle}">${day}</span>${tag}${badge}</div>`;
       } else if(dow===0){
         days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span></div>`;
       } else {
-        days += `<div class="cal-day day-nletivo" style="cursor:pointer" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num">${day}${badge}</span></div>`;
+        days += `<div class="cal-day day-nletivo" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}</div>`;
       }
     }
 
@@ -5871,46 +5879,30 @@ let _calPopupIso = null;
 
 function abrirPopupDia(iso, e){
   e.stopPropagation();
+  // Só abre popup de prato para dias letivos (feriado/sábado são controlados pelo número)
+  const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
+  if(letIdx === -1) return;
+
   _calPopupIso = iso;
   const popup  = document.getElementById('cal-day-popup');
   const titulo = document.getElementById('cal-popup-titulo');
   const sel    = document.getElementById('cal-popup-sel');
   const sabDiv = document.getElementById('cal-popup-sabado');
 
-  const [y,m,d]   = iso.split('-');
-  const dow        = new Date(iso + 'T00:00:00').getDay();
-  const isSat      = dow === 6;
-  const isFeriado  = CAL_CONFIG.feriados.includes(iso);
-  const isSabLet   = CAL_CONFIG.sabados.includes(iso);
-  const letIdx     = DIAS_LETIVOS_ARRAY.indexOf(iso);
-  const curPrato   = letIdx !== -1 ? getMealByDate(iso) : '';
+  const [y,m,d] = iso.split('-');
+  const curPrato = getMealByDate(iso);
 
-  titulo.textContent = `${d}/${m}/${y}`;
+  titulo.textContent = `${d}/${m}/${y} — Prato do dia`;
 
-  // Prato do ciclo para pré-selecionar ao remover feriado
-  const pratoSugerido = isFeriado ? getPratoFromCiclo(iso) : '';
-
-  // Select: feriado + pratos
-  let opts = `<option value="_feriado"${isFeriado?' selected':''}>🔴 Feriado / Recesso</option>`;
-  opts    += `<option value=""${!isFeriado && !curPrato && !pratoSugerido?' selected':''}>— Sem merenda (dia letivo) —</option>`;
+  // Select: apenas pratos (sem opção feriado — isso é feito pelo número)
+  let opts = `<option value=""${!curPrato?' selected':''}>— Sem merenda —</option>`;
   opts    += PRATOS_LISTA.map(p => {
     const {num, nome} = nomeNum(p);
-    const isSelected = (!isFeriado && curPrato===p) || (isFeriado && pratoSugerido===p);
-    return `<option value="${p.replace(/"/g,'&quot;')}"${isSelected?' selected':''}>` +
+    return `<option value="${p.replace(/"/g,'&quot;')}"${curPrato===p?' selected':''}>` +
            `${num?num+' - ':''}${nome}</option>`;
   }).join('');
   sel.innerHTML = opts;
-
-  // Sábado letivo (só para sábados)
-  if(isSat){
-    sabDiv.style.display = '';
-    sabDiv.innerHTML = `<button onclick="aplicarConfigDia('${isSabLet?'rem-sabado':'add-sabado'}')"
-      style="width:100%;text-align:left;padding:6px 8px;border:none;border-radius:6px;cursor:pointer;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;background:${isSabLet?'var(--azul2)':'transparent'};color:${isSabLet?'#fff':'var(--azul2)'}">
-      ${isSabLet ? '❌ Remover Sábado Letivo' : '📗 Marcar como Sábado Letivo'}
-    </button>`;
-  } else {
-    sabDiv.style.display = 'none';
-  }
+  sabDiv.style.display = 'none';
 
   const rect = (e.target||e.currentTarget).getBoundingClientRect();
   popup.style.display = 'block';
@@ -5931,6 +5923,52 @@ document.addEventListener('click', e => {
   const popup = document.getElementById('cal-day-popup');
   if(popup && popup.style.display !== 'none' && !popup.contains(e.target)) fecharPopupDia();
 });
+
+// Clique no número do dia: toggle feriado/recesso (dias úteis) ou sábado letivo (sábados)
+function clicarNumDia(iso, e){
+  e.stopPropagation();
+  const dow = new Date(iso + 'T00:00:00').getDay();
+  if(dow === 0) return; // domingo: sem ação
+
+  if(dow === 6){
+    // Sábado: toggle sábado letivo
+    if(CAL_CONFIG.sabados.includes(iso)){
+      CAL_CONFIG.sabados = CAL_CONFIG.sabados.filter(d => d !== iso);
+    } else {
+      if(!CAL_CONFIG.sabados) CAL_CONFIG.sabados = [];
+      CAL_CONFIG.sabados.push(iso);
+    }
+    salvarCalConfig();
+    _recalcularDias();
+    renderListasEspeciais();
+  } else {
+    // Dia útil: toggle feriado/recesso
+    if(CAL_CONFIG.feriados.includes(iso)){
+      // Remover feriado → vira dia letivo com prato do ciclo
+      CAL_CONFIG.feriados = CAL_CONFIG.feriados.filter(d => d !== iso);
+      if(CAL_CONFIG.feriadosDesc) delete CAL_CONFIG.feriadosDesc[iso];
+      salvarCalConfig();
+      const novosDias = getSchoolDays();
+      DIAS_LETIVOS_ARRAY.length = 0;
+      novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
+      atualizarCiclos();
+      const pratoFinal = getPratoFromCiclo(iso);
+      setMealByDate(iso, pratoFinal);
+      localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+    } else {
+      // Marcar como feriado
+      if(!CAL_CONFIG.feriados) CAL_CONFIG.feriados = [];
+      CAL_CONFIG.feriados.push(iso);
+      salvarCalConfig();
+      const novosDias = getSchoolDays();
+      DIAS_LETIVOS_ARRAY.length = 0;
+      novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
+      atualizarCiclos();
+    }
+    renderListasEspeciais();
+    renderCardapio();
+  }
+}
 
 // Retorna o prato do ciclo configurado para uma data
 function getPratoFromCiclo(iso){
