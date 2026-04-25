@@ -5863,12 +5863,16 @@ function abrirPopupDia(iso, e){
 
   titulo.textContent = `${d}/${m}/${y}`;
 
+  // Prato do ciclo para pré-selecionar ao remover feriado
+  const pratoSugerido = isFeriado ? getPratoFromCiclo(iso) : '';
+
   // Select: feriado + pratos
   let opts = `<option value="_feriado"${isFeriado?' selected':''}>🔴 Feriado / Recesso</option>`;
-  opts    += `<option value=""${!isFeriado && !curPrato?' selected':''}>— Sem merenda (dia letivo) —</option>`;
+  opts    += `<option value=""${!isFeriado && !curPrato && !pratoSugerido?' selected':''}>— Sem merenda (dia letivo) —</option>`;
   opts    += PRATOS_LISTA.map(p => {
     const {num, nome} = nomeNum(p);
-    return `<option value="${p.replace(/"/g,'&quot;')}"${(!isFeriado && curPrato===p)?' selected':''}>` +
+    const isSelected = (!isFeriado && curPrato===p) || (isFeriado && pratoSugerido===p);
+    return `<option value="${p.replace(/"/g,'&quot;')}"${isSelected?' selected':''}>` +
            `${num?num+' - ':''}${nome}</option>`;
   }).join('');
   sel.innerHTML = opts;
@@ -5904,6 +5908,18 @@ document.addEventListener('click', e => {
   if(popup && popup.style.display !== 'none' && !popup.contains(e.target)) fecharPopupDia();
 });
 
+// Retorna o prato do ciclo configurado para uma data
+function getPratoFromCiclo(iso){
+  const calWeekIdx = getCalWeekIdx(iso);
+  const cicloIdx   = Math.floor(calWeekIdx / 5);
+  const weekInCiclo = calWeekIdx % 5;
+  const dayInWeek  = getDayIdx(iso);
+  if(dayInWeek < 0 || dayInWeek > 4) return '';
+  const cicloNome  = `Ciclo ${cicloIdx + 1}`;
+  const plano      = CICLOS_PLANOS[cicloNome] || [];
+  return plano[weekInCiclo * 5 + dayInWeek] || '';
+}
+
 // Chamado pelo select principal do popup (prato ou feriado)
 function aplicarEscolhaDia(valor){
   const iso = _calPopupIso;
@@ -5922,8 +5938,9 @@ function aplicarEscolhaDia(valor){
     DIAS_LETIVOS_ARRAY.length = 0;
     novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
     atualizarCiclos();
-    // Agora define o prato pela posição do dia na semana de calendário
-    setMealByDate(iso, valor);
+    // Se não foi escolhido prato manual, usa o do ciclo configurado
+    const pratoFinal = valor || getPratoFromCiclo(iso);
+    setMealByDate(iso, pratoFinal);
     localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
     const calWkIdx = getCalWeekIdx(iso);
     const cIdx = Math.floor(calWkIdx / 5);
