@@ -1704,9 +1704,15 @@ function salvarUsuarios(){
 // Cria admin padrão se não houver nenhum usuário cadastrado
 (async function bootstrapAdmin(){
   // Tentar carregar usuários do Supabase primeiro
+  const localUsuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
   const supaUsuarios = await _supaSync.loadUsuarios();
   if(supaUsuarios && supaUsuarios.length > 0) {
-    USUARIOS = supaUsuarios;
+    // Mescla: preserva senha_hash local caso o usuário tenha alterado e o Supabase não tenha sido atualizado
+    USUARIOS = supaUsuarios.map(su => {
+      const local = localUsuarios.find(l => l.id === su.id);
+      if(local && local.senha_hash && local.senha_hash !== su.senha_hash) return { ...su, senha_hash: local.senha_hash };
+      return su;
+    });
     localStorage.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
     console.info('Usuários carregados do Supabase:', USUARIOS.length);
     return;
@@ -2241,9 +2247,26 @@ async function salvarSenhaAdmin(){
   if(nova !== confirma){ erro.textContent = 'As senhas não coincidem.'; erro.style.display = ''; return; }
 
   admin.senha_hash = await hashSenha(nova);
-  // Salva localmente e aguarda confirmação do Supabase antes de fechar
-  localStorage.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
-  try { await _supaSync.saveUsuarios(USUARIOS); } catch(e) { console.warn(e); }
+
+  // Salva no localStorage real (bypassa proxy)
+  const ls = window._origLS || localStorage;
+  ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
+
+  // Salva diretamente no Supabase com update explícito
+  if(_supabase){
+    try {
+      const { error } = await _supabase
+        .from('usuarios')
+        .update({ senha_hash: admin.senha_hash })
+        .eq('id', admin.id);
+      if(error) throw error;
+    } catch(e){
+      console.warn('Supabase senha update error:', e.message);
+      erro.textContent = 'Atenção: senha salva localmente mas falhou no servidor. Tente novamente.';
+      erro.style.display = '';
+    }
+  }
+
   document.getElementById('overlay-senha-admin').classList.remove('aberto');
   alert('✅ Senha alterada com sucesso!');
 }
