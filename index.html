@@ -4464,24 +4464,28 @@ function renderCardapio(){
       }
     }
 
+    const mesId = `cal-mes-${mesNome.replace(/\s/g,'')}`;
     html += `<div class="cal-month">
-      <div class="cal-top">
+      <div class="cal-top" style="cursor:pointer;user-select:none" onclick="toggleMes('${mesId}')">
         <span class="cal-mes-nome">${mesNome}</span>
         <span class="cal-ano">2026</span>
+        <span id="${mesId}-icon" style="margin-left:auto;font-size:16px;padding-left:10px">▲</span>
       </div>
-      <div class="cal-body">
-        <div class="cal-sidebar">
-          <div class="cal-sidebar-label">Cardápio do Mês</div>
-          ${sidebarItems}
+      <div id="${mesId}" style="display:block">
+        <div class="cal-body">
+          <div class="cal-sidebar">
+            <div class="cal-sidebar-label">Cardápio do Mês</div>
+            ${sidebarItems}
+          </div>
+          <div class="cal-main">
+            <div class="cal-wk-hdr">${WK.map(d=>`<span>${d}</span>`).join('')}</div>
+            <div class="cal-days">${days}</div>
+          </div>
         </div>
-        <div class="cal-main">
-          <div class="cal-wk-hdr">${WK.map(d=>`<span>${d}</span>`).join('')}</div>
-          <div class="cal-days">${days}</div>
+        <div class="cal-footer">
+          <span class="cal-footer-label">Importante</span>
+          <span class="cal-footer-text">—</span>
         </div>
-      </div>
-      <div class="cal-footer">
-        <span class="cal-footer-label">Importante</span>
-        <span class="cal-footer-text">—</span>
       </div>
     </div>`;
   }
@@ -6063,6 +6067,15 @@ function aplicarConfigDia(acao){
   atualizarCiclos();
   fecharPopupDia();
   renderCardapio();
+}
+
+function toggleMes(id){
+  const panel = document.getElementById(id);
+  const icon  = document.getElementById(id + '-icon');
+  if(!panel) return;
+  const aberto = panel.style.display !== 'none';
+  panel.style.display = aberto ? 'none' : 'block';
+  if(icon) icon.textContent = aberto ? '▼' : '▲';
 }
 
 function toggleDatasEspeciais(){
