@@ -3710,7 +3710,10 @@ function getDayIdx(iso) {
 // Lê o prato de uma data pelo dia-da-semana real (não pelo índice sequencial)
 function getMealByDate(iso) {
   const dayIdx = getDayIdx(iso);
-  if(dayIdx < 0 || dayIdx > 4) return '';
+  if(dayIdx < 0) return '';
+  // Sábado letivo: prato armazenado separadamente
+  if(dayIdx === 5) return (CAL_CONFIG.sabadosPratos || {})[iso] || '';
+  if(dayIdx > 4) return '';
   const calWeekIdx = getCalWeekIdx(iso);
   const mesIdx = Math.min(Math.floor(calWeekIdx / 4), MESES_NOMES.length - 1);
   const semIdx = calWeekIdx % 4;
@@ -3721,7 +3724,15 @@ function getMealByDate(iso) {
 // Escreve o prato de uma data pelo dia-da-semana real
 function setMealByDate(iso, novoPrato) {
   const dayIdx = getDayIdx(iso);
-  if(dayIdx < 0 || dayIdx > 4) return;
+  if(dayIdx < 0) return;
+  // Sábado letivo: prato armazenado separadamente
+  if(dayIdx === 5){
+    if(!CAL_CONFIG.sabadosPratos) CAL_CONFIG.sabadosPratos = {};
+    CAL_CONFIG.sabadosPratos[iso] = novoPrato;
+    salvarCalConfig();
+    return;
+  }
+  if(dayIdx > 4) return;
   const calWeekIdx = getCalWeekIdx(iso);
   const mesIdx = Math.min(Math.floor(calWeekIdx / 4), MESES_NOMES.length - 1);
   const semIdx = calWeekIdx % 4;
@@ -4421,8 +4432,11 @@ function renderCardapio(){
         const cor = getCorDia(iso, letIdx);
         const curP = getMealByDate(iso);
         const {nome} = curP ? nomeNum(curP) : {nome:''};
+        const isSabLetivo = dow === 6;
+        const numBtnClass = isSabLetivo ? 'cal-day-num-btn btn-sabletivo' : 'cal-day-num-btn';
+        const numBtnTitle = isSabLetivo ? 'Remover Sábado Letivo' : 'Marcar como Feriado/Recesso';
         days += `<div class="cal-day day-school" id="cal-day-${letIdx}" onclick="abrirPopupDia('${iso}',event)">
-          <span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}
+          <span class="${numBtnClass}" onclick="clicarNumDia('${iso}',event)" title="${numBtnTitle}">${day}</span>${badge}
           ${curP ? `<div class="cal-event" style="background:${cor}">${nome}</div>` : ''}
         </div>`;
       } else if(isHoliday){
@@ -5979,7 +5993,7 @@ function getPratoFromCiclo(iso){
   const cicloIdx   = Math.floor(calWeekIdx / 5);
   const weekInCiclo = calWeekIdx % 5;
   const dayInWeek  = getDayIdx(iso);
-  if(dayInWeek < 0 || dayInWeek > 4) return '';
+  if(dayInWeek < 0 || dayInWeek > 5) return '';
   const cicloNome  = `Ciclo ${cicloIdx + 1}`;
   const plano      = CICLOS_PLANOS[cicloNome] || [];
   return plano[weekInCiclo * 5 + dayInWeek] || '';
