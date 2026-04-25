@@ -690,25 +690,32 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <span id="periodo-status" style="font-size:12px;color:var(--txt2);align-self:center"></span>
       </div>
-      <!-- Linha 2: feriados / recesso / sábados letivos -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;border-top:1px solid var(--borda);padding-top:12px">
-        <!-- Feriados / Recesso -->
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--laranja);margin-bottom:6px">🚫 Feriado / Recesso</div>
-          <div style="display:flex;gap:6px;margin-bottom:6px">
-            <input type="date" id="add-feriado-input" style="flex:1;min-width:0">
-            <button onclick="adicionarDataEspecial('feriado')" style="padding:4px 10px;background:var(--laranja);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
+      <!-- Linha 2: toggle + feriados / sábados letivos -->
+      <div style="border-top:1px solid var(--borda);padding-top:10px">
+        <button onclick="toggleDatasEspeciais(this)" style="background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--txt2);display:flex;align-items:center;gap:6px;padding:0">
+          <span id="datas-especiais-icon">▶</span> Feriados, Recesso e Sábados Letivos
+        </button>
+        <div id="datas-especiais-panel" style="display:none;margin-top:12px;display:none">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+            <!-- Feriados / Recesso -->
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--laranja);margin-bottom:6px">🚫 Feriado / Recesso</div>
+              <div style="display:flex;gap:6px;margin-bottom:6px">
+                <input type="date" id="add-feriado-input" style="flex:1;min-width:0">
+                <button onclick="adicionarDataEspecial('feriado')" style="padding:4px 10px;background:var(--laranja);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
+              </div>
+              <div id="lista-feriados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+            </div>
+            <!-- Sábados letivos -->
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--verde);margin-bottom:6px">✅ Sábados Letivos</div>
+              <div style="display:flex;gap:6px;margin-bottom:6px">
+                <input type="date" id="add-sabado-input" style="flex:1;min-width:0">
+                <button onclick="adicionarDataEspecial('sabado')" style="padding:4px 10px;background:var(--verde);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
+              </div>
+              <div id="lista-sabados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+            </div>
           </div>
-          <div id="lista-feriados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
-        </div>
-        <!-- Sábados letivos -->
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--verde);margin-bottom:6px">✅ Sábados Letivos</div>
-          <div style="display:flex;gap:6px;margin-bottom:6px">
-            <input type="date" id="add-sabado-input" style="flex:1;min-width:0">
-            <button onclick="adicionarDataEspecial('sabado')" style="padding:4px 10px;background:var(--verde);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
-          </div>
-          <div id="lista-sabados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
         </div>
       </div>
     </div>
@@ -6055,6 +6062,14 @@ function aplicarConfigDia(acao){
   atualizarCiclos();
   fecharPopupDia();
   renderCardapio();
+}
+
+function toggleDatasEspeciais(btn){
+  const panel = document.getElementById('datas-especiais-panel');
+  const icon  = document.getElementById('datas-especiais-icon');
+  const aberto = panel.style.display !== 'none';
+  panel.style.display = aberto ? 'none' : 'block';
+  icon.textContent = aberto ? '▶' : '▼';
 }
 
 function salvarPeriodoLetivo(){
