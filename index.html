@@ -691,11 +691,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <span id="periodo-status" style="font-size:12px;color:var(--txt2);align-self:center"></span>
       </div>
       <!-- Linha 2: toggle + feriados / sábados letivos -->
-      <div style="border-top:1px solid var(--borda);padding-top:10px">
-        <button onclick="toggleDatasEspeciais(this)" style="background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--txt2);display:flex;align-items:center;gap:6px;padding:0">
-          <span id="datas-especiais-icon">▶</span> Feriados, Recesso e Sábados Letivos
-        </button>
-        <div id="datas-especiais-panel" style="display:none;margin-top:12px;display:none">
+      <div style="margin:0 -20px -10px;border-top:1px solid var(--borda)">
+        <div onclick="toggleDatasEspeciais()" style="padding:10px 20px;cursor:pointer;user-select:none;font-size:13px;font-weight:600;color:var(--txt2)">
+          📅 Feriados, Recesso e Sábados Letivos
+          <span id="datas-especiais-icon" style="float:right;font-size:16px">▼</span>
+        </div>
+        <div id="datas-especiais-panel" style="display:none;padding:0 20px 14px">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
             <!-- Feriados / Recesso -->
             <div>
@@ -6064,12 +6065,12 @@ function aplicarConfigDia(acao){
   renderCardapio();
 }
 
-function toggleDatasEspeciais(btn){
+function toggleDatasEspeciais(){
   const panel = document.getElementById('datas-especiais-panel');
   const icon  = document.getElementById('datas-especiais-icon');
   const aberto = panel.style.display !== 'none';
   panel.style.display = aberto ? 'none' : 'block';
-  icon.textContent = aberto ? '▶' : '▼';
+  icon.textContent = aberto ? '▼' : '▲';
 }
 
 function salvarPeriodoLetivo(){
