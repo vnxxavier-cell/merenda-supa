@@ -3726,9 +3726,12 @@ function setMealByDate(iso, novoPrato) {
   const mesIdx = Math.min(Math.floor(calWeekIdx / 4), MESES_NOMES.length - 1);
   const semIdx = calWeekIdx % 4;
   const mesNome = MESES_NOMES[mesIdx];
-  if(DADOS.cardapio[mesNome]?.[semIdx]) {
-    DADOS.cardapio[mesNome][semIdx].dias[dayIdx] = novoPrato;
+  // Cria o slot se não existir (ex: dia era feriado e nunca teve slot inicializado)
+  if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
+  if(!DADOS.cardapio[mesNome][semIdx]){
+    DADOS.cardapio[mesNome][semIdx] = { dias: ['','','','',''] };
   }
+  DADOS.cardapio[mesNome][semIdx].dias[dayIdx] = novoPrato;
 }
 
 function getMealByLetIdx(letIdx) {
