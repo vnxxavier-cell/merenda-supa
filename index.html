@@ -5969,8 +5969,10 @@ function clicarNumDia(iso, e){
       DIAS_LETIVOS_ARRAY.length = 0;
       novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
       atualizarCiclos();
-      const pratoFinal = getPratoFromCiclo(iso);
-      setMealByDate(iso, pratoFinal);
+      // Prato original ainda está em DADOS.cardapio; só usa ciclo se não houver nada salvo
+      const pratoExistente = getMealByDate(iso);
+      const pratoFinal = pratoExistente || getPratoFromCiclo(iso);
+      if(pratoFinal) setMealByDate(iso, pratoFinal);
       localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
     } else {
       // Marcar como feriado
@@ -6017,8 +6019,9 @@ function aplicarEscolhaDia(valor){
     DIAS_LETIVOS_ARRAY.length = 0;
     novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
     atualizarCiclos();
-    // Se não foi escolhido prato manual, usa o do ciclo configurado
-    const pratoFinal = valor || getPratoFromCiclo(iso);
+    // Prioridade: prato manual selecionado > prato já salvo no dia > prato do ciclo
+    const pratoExistente = getMealByDate(iso);
+    const pratoFinal = valor || pratoExistente || getPratoFromCiclo(iso);
     setMealByDate(iso, pratoFinal);
     localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
     const calWkIdx = getCalWeekIdx(iso);
