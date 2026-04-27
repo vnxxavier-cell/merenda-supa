@@ -502,6 +502,12 @@ h2.titulo::after{content:'';flex:1;height:2px;background:linear-gradient(to righ
 .cal-meal-empty{font-size:10px;color:#d1d5db;font-weight:600;flex:1;display:flex;align-items:center;gap:3px}
 .cal-sel{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-family:'Sora',sans-serif;font-size:12px}
 /* Rodapé */
+.cal-semanas-list{border-top:1px solid var(--borda);padding:10px 16px;background:#f8fafc;display:flex;flex-direction:column;gap:6px}
+.cal-semana-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cal-sem-label{font-size:12px;font-weight:600;color:#475569;flex:1;min-width:160px}
+.cal-sem-btn{padding:4px 10px;border-radius:6px;border:none;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.cal-sem-btn-print{background:#1D4ED8;color:#fff}.cal-sem-btn-print:hover{background:#1e3a8a}
+.cal-sem-btn-xls{background:#fff;color:#217346;border:1.5px solid #217346!important}.cal-sem-btn-xls:hover{background:#f0fdf4}
 .cal-footer{border-top:1px solid var(--borda);padding:10px 20px;background:#fafbfd;display:flex;align-items:center;gap:10px}
 .cal-footer-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--txt2);white-space:nowrap}
 .cal-footer-text{font-size:10px;color:#94a3b8;font-style:italic}
@@ -766,7 +772,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 ══════════════════════════════════════════════════════ -->
 <div id="pg-mercado" class="pagina ativa">
   <h2 class="titulo">🛒 Ordens de Fornecimento</h2>
-  <div class="seletor-bar">
+  <div id="merc-preview-bar" style="display:none;align-items:center;gap:12px;padding:12px 0 16px;flex-wrap:wrap">
+    <button class="btn" style="background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1;font-weight:700" onclick="voltarDaPreview()">← Voltar ao Calendário</button>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
+    <button class="btn no-print" onclick="exportarExcelMercado()" style="background:#fff;color:#217346;border:1.5px solid #217346;font-weight:700">📊 Exportar Excel</button>
+  </div>
+  <div class="seletor-bar" id="merc-seletor-bar">
     <div style="display:flex;gap:16px;flex-wrap:wrap">
       <div class="campo">
         <label>Ciclo</label>
@@ -4357,6 +4368,93 @@ function exportarExcelMercado(){
   URL.revokeObjectURL(url);
 }
 
+function getCicloParaSemana(mondayIso){
+  const w = SEMANAS_CAL.find(x => x.monday === mondayIso);
+  if(!w || !w.ciclos.length) return null;
+  return `Ciclo ${w.ciclos[0] + 1}`;
+}
+
+function exportarExcelSemanaCal(mondayIso){
+  const ciclo    = getCicloParaSemana(mondayIso) || '';
+  const w        = SEMANAS_CAL.find(x => x.monday === mondayIso);
+  const primeiro = w ? w.days[0] : mondayIso;
+  const ultimo   = w ? w.days[w.days.length - 1] : mondayIso;
+  const semLabel = `${fmtDataCurta(primeiro)} – ${fmtDataCurta(ultimo)}`;
+  const escola   = localStorage.getItem('merenda_escola') || 'E.E. Eliazar José Rodrigues';
+  const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
+
+  const esc  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const cell = (val, sid, type='String') => `<Cell ss:StyleID="${sid}"><Data ss:Type="${type}">${esc(val)}</Data></Cell>`;
+  const cellM= (val, sid, span) => `<Cell ss:StyleID="${sid}" ss:MergeAcross="${span}"><Data ss:Type="String">${esc(val)}</Data></Cell>`;
+  const brd  = (c,w=1) => `<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="${w}" ss:Color="${c}"/></Borders>`;
+  const styles = `<Styles>
+<Style ss:ID="Default"/>
+<Style ss:ID="sTit"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="13" ss:Color="#1A3A6B"/></Style>
+<Style ss:ID="sSub"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Size="10" ss:Color="#666666"/></Style>
+<Style ss:ID="sAF"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/><Interior ss:Color="#1E6B3C" ss:Pattern="Solid"/></Style>
+<Style ss:ID="sMC"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/><Interior ss:Color="#D4650A" ss:Pattern="Solid"/></Style>
+<Style ss:ID="sHC"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
+<Style ss:ID="sHL"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
+<Style ss:ID="sHR"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
+<Style ss:ID="sNum"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Size="10" ss:Color="#999999"/></Style>
+<Style ss:ID="sIng"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Size="11"/></Style>
+<Style ss:ID="sQty"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Bold="1" ss:Size="11" ss:Name="Courier New"/></Style>
+</Styles>`;
+  const buildWorksheet = (items, nome, hdrSid) => {
+    const rows = [];
+    rows.push(`<Row ss:Height="22">${cellM(escola,'sTit',2)}</Row>`);
+    rows.push(`<Row ss:Height="16">${cellM('ORDEM DE FORNECIMENTO - '+ciclo+' - '+semLabel,'sSub',2)}</Row>`);
+    rows.push(`<Row ss:Height="6"/>`);
+    rows.push(`<Row ss:Height="24">${cellM(nome,hdrSid,2)}</Row>`);
+    rows.push(`<Row ss:Height="20">${cell('N','sHC')}${cell('INGREDIENTE','sHL')}${cell('A COMPRAR','sHR')}</Row>`);
+    items.forEach((it, i) => {
+      const { arred } = arredondarEmb(it.nomeBase, it.comprar);
+      rows.push(`<Row ss:Height="18">${cell(i+1,'sNum','Number')}${cell(it.nomeBase,'sIng')}${cell(fmtEsp(it.nomeBase,arred),'sQty')}</Row>`);
+    });
+    return `<Worksheet ss:Name="${esc(nome)}"><Table><Column ss:Width="36"/><Column ss:Width="210"/><Column ss:Width="95"/>\n${rows.join('\n')}\n</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><Print><FitWidth>1</FitWidth><Orientation>Portrait</Orientation><PaperSizeIndex>9</PaperSizeIndex></Print></WorksheetOptions></Worksheet>`;
+  };
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n${styles}\n${buildWorksheet(af_items,'Agricultura Familiar','sAF')}\n${buildWorksheet(mc_items,'Mercado Convencional','sMC')}\n</Workbook>`;
+  const blob = new Blob(['﻿'+xml], {type:'application/vnd.ms-excel;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `ordem_${mondayIso}.xls`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+let PREVIEW_RETURN_MES = null;
+
+function irParaImprimirSemana(mondayIso, mesId){
+  const ciclo = getCicloParaSemana(mondayIso);
+  if(!ciclo){ alert('Semana sem ciclo configurado.'); return; }
+  PREVIEW_RETURN_MES = mesId || null;
+  ir('mercado');
+  const selMes = document.getElementById('sel-mes-merc');
+  if(selMes){ selMes.value = ciclo; populateSemanasMerc(ciclo); }
+  const selSem = document.getElementById('sel-sem-merc');
+  if(selSem){ selSem.value = mondayIso; }
+  renderMercado();
+  document.getElementById('merc-seletor-bar').style.display = 'none';
+  document.getElementById('merc-preview-bar').style.display = 'flex';
+}
+
+function voltarDaPreview(){
+  document.getElementById('merc-preview-bar').style.display = 'none';
+  document.getElementById('merc-seletor-bar').style.display = '';
+  ir('cardapio');
+  if(PREVIEW_RETURN_MES){
+    const panel = document.getElementById(PREVIEW_RETURN_MES);
+    const icon  = document.getElementById(PREVIEW_RETURN_MES + '-icon');
+    if(panel && panel.style.display === 'none'){
+      panel.style.display = 'block';
+      if(icon) icon.textContent = '▲';
+    }
+    setTimeout(() => {
+      document.getElementById(PREVIEW_RETURN_MES)?.closest('.cal-month')?.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 100);
+    PREVIEW_RETURN_MES = null;
+  }
+}
+
 function renderCardapio(){
   const grid = document.getElementById('grid-calendario');
   const legenda = document.getElementById('legenda-ciclos');
@@ -4396,25 +4494,9 @@ function renderCardapio(){
 
   for(let m = 1; m < 12; m++){
     const mesNome = MESES_DISPLAY[m-1];
+    const mesId = `cal-mes-${mesNome.replace(/\s/g,'')}`;
     const firstDow = new Date(2026, m, 1).getDay();
     const daysInMonth = new Date(2026, m+1, 0).getDate();
-
-    // Coleta pratos únicos do mês para a sidebar
-    const mealsMap = new Map();
-    for(let day=1; day<=daysInMonth; day++){
-      const iso = new Date(2026, m, day).toISOString().split('T')[0];
-      const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
-      if(letIdx !== -1){
-        const cor = getCorDia(iso, letIdx);
-        const curP = getMealByDate(iso) || getPratoFromCiclo(iso);
-        if(curP && !mealsMap.has(curP)) mealsMap.set(curP, cor);
-      }
-    }
-    const sidebarItems = mealsMap.size
-      ? [...mealsMap.entries()].map(([p, cor]) =>
-          `<div class="cal-sidebar-item" style="background:${cor}">${nomeNum(p).nome}</div>`
-        ).join('')
-      : '<div class="cal-sidebar-empty">Nenhum prato definido</div>';
 
     // Monta células do calendário
     let days = '';
@@ -4458,13 +4540,22 @@ function renderCardapio(){
         const tag = isSabLetivoDay ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--azul2);border-radius:3px;padding:1px 4px;line-height:1.4">SAB.LET.</span>` : '';
         days += `<div class="cal-day day-off"><span class="cal-day-num-btn ${sabClass}" onclick="clicarNumDia('${iso}',event)" title="${sabTitle}">${day}</span>${tag}${badge}</div>`;
       } else if(dow===0){
-        days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span></div>`;
+        const nextDate = new Date(2026, m, day + 1);
+        const mondayIso = nextDate.toISOString().split('T')[0];
+        const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
+        const semana = semanaIdx >= 0 ? SEMANAS_CAL[semanaIdx] : null;
+        const botoesWeek = semana ? `
+          <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+            <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
+            <button class="cal-sem-btn cal-sem-btn-print" onclick="irParaImprimirSemana('${mondayIso}','${mesId}');event.stopPropagation()" title="Imprimir lista de mercado">🖨️ Imprimir</button>
+            <button class="cal-sem-btn cal-sem-btn-xls" onclick="exportarExcelSemanaCal('${mondayIso}');event.stopPropagation()" title="Exportar Excel">📊 Excel</button>
+          </div>` : '';
+        days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
       } else {
         days += `<div class="cal-day day-nletivo" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}</div>`;
       }
     }
 
-    const mesId = `cal-mes-${mesNome.replace(/\s/g,'')}`;
     html += `<div class="cal-month">
       <div class="cal-top" style="cursor:pointer;user-select:none" onclick="toggleMes('${mesId}')">
         <span class="cal-mes-nome">${mesNome}</span>
@@ -4473,10 +4564,6 @@ function renderCardapio(){
       </div>
       <div id="${mesId}" style="display:none">
         <div class="cal-body">
-          <div class="cal-sidebar">
-            <div class="cal-sidebar-label">Cardápio do Mês</div>
-            ${sidebarItems}
-          </div>
           <div class="cal-main">
             <div class="cal-wk-hdr">${WK.map(d=>`<span>${d}</span>`).join('')}</div>
             <div class="cal-days">${days}</div>
@@ -4837,33 +4924,18 @@ function diffFicha(prato){
 
 function renderFichas(filtro=''){
   const grid = document.getElementById('grid-fichas');
-  // Coletar pratos usados no planejamento
-  const pratosNoPlano = new Set(
-    Object.values(CICLOS_PLANOS).flat().filter(p => p)
-  );
-
   let pratos = Object.keys(DADOS.ficha).filter(p=>!filtro||p.toLowerCase().includes(filtro.toLowerCase()));
-  // Pratos do planejamento sobem ao topo
-  pratos.sort((a, b) => {
-    const aNo = pratosNoPlano.has(a) ? 0 : 1;
-    const bNo = pratosNoPlano.has(b) ? 0 : 1;
-    return aNo - bNo;
-  });
+  pratos.sort((a, b) => a.localeCompare(b));
 
   grid.innerHTML = pratos.map(p=>{
     const {num,nome}=nomeNum(p);
     const ings = DADOS.ficha[p];
     const totalPer = ings.reduce((a,b)=>a+b.g,0);
     const modificado = pratoModificado(p);
-    const noPlano = pratosNoPlano.has(p);
     const pratoEnc = p.replace(/'/g,"\\'");
     const diff = modificado ? diffFicha(p) : null;
-    const cardBorder = noPlano
-      ? 'border:2px solid var(--verde)'
-      : modificado ? 'border:2px solid #f59e0b' : '';
-    const headerExtra = noPlano
-      ? 'background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#14532d;font-weight:700'
-      : modificado ? 'background:linear-gradient(135deg,#fffbeb,#fef3c7)' : '';
+    const cardBorder = modificado ? 'border:2px solid #f59e0b' : '';
+    const headerExtra = modificado ? 'background:linear-gradient(135deg,#fffbeb,#fef3c7)' : '';
     let diffResumo = '';
     if(diff){
       const partes = [];
@@ -4876,7 +4948,6 @@ function renderFichas(filtro=''){
     <div class="card" style="cursor:pointer;${cardBorder}" onclick="abrirFicha('${pratoEnc}')">
       <div class="card-header" style="padding:12px 16px;${headerExtra}">
         <span style="font-size:20px;font-weight:800;opacity:.4;margin-right:8px">${num}</span>${nome}
-        ${noPlano ? `<span style="margin-left:8px;font-size:10px;font-weight:700;background:var(--verde);color:#fff;border-radius:10px;padding:2px 8px;vertical-align:middle">📅 No Planejamento</span>` : ''}
         ${modificado ? `<span style="margin-left:8px;font-size:10px;font-weight:700;background:#f59e0b;color:#fff;border-radius:10px;padding:2px 8px;vertical-align:middle">✏ Modificado</span>` : ''}
       </div>
       <div style="padding:12px 16px">
@@ -6228,6 +6299,9 @@ function gerarSeletoresPratos(){
     }
     const cur = plano[i] || '';
     const {num: curNum} = cur ? nomeNum(cur) : {num:''};
+    const btnFicha = cur
+      ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${i})" style="flex-shrink:0;padding:7px 9px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;font-size:14px;line-height:1">📋</button>`
+      : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:7px 9px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;font-size:14px;line-height:1;opacity:.4">📋</button>`;
     items.push(`<div style="background:var(--cinza);border-radius:8px;padding:10px">
       <div style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Prato ${i+1}</div>
       <div style="display:flex;gap:6px;align-items:center">
@@ -6238,9 +6312,10 @@ function gerarSeletoresPratos(){
           onkeydown="if(event.key==='Enter'){this.blur();}">
         <select class="plan-sel" data-idx="${i}"
           style="flex:1;min-width:0;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 8px;border:2px solid var(--borda);border-radius:6px;color:var(--azul);background:#fff;outline:none"
-          onchange="planSelecionarPorSelect(this)">
+          onchange="planSelecionarPorSelect(this);atualizarBtnFicha(${i})">
           ${opts.replace(`value="${cur}"`, `value="${cur}" selected`)}
         </select>
+        <span id="btn-ficha-${i}">${btnFicha}</span>
       </div>
     </div>`);
   }
@@ -6275,6 +6350,20 @@ function salvarPlanoTemp(){
   const ciclo = document.getElementById('plan-ciclo').value;
   CICLOS_PLANOS[ciclo] = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value);
   localStorage.setItem('merenda_ciclos_planos', JSON.stringify(CICLOS_PLANOS));
+}
+
+function abrirFichaPlano(idx){
+  const sel = document.querySelector(`.plan-sel[data-idx="${idx}"]`);
+  if(sel && sel.value) abrirFicha(sel.value);
+}
+
+function atualizarBtnFicha(idx){
+  const sel = document.querySelector(`.plan-sel[data-idx="${idx}"]`);
+  const wrap = document.getElementById(`btn-ficha-${idx}`);
+  if(!sel || !wrap) return;
+  wrap.innerHTML = sel.value
+    ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${idx})" style="flex-shrink:0;padding:7px 9px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;font-size:14px;line-height:1">📋</button>`
+    : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:7px 9px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;font-size:14px;line-height:1;opacity:.4">📋</button>`;
 }
 
 function carregarPlanoCiclo(){
