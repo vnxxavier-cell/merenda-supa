@@ -612,9 +612,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
     <div class="login-erro" id="login-erro"></div>
     <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
-    <div style="text-align:center;margin-top:14px">
-      <button type="button" onclick="resetarAdmin()" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;text-decoration:underline">Resetar senha do admin para admin123</button>
-    </div>
   </div>
 </div>
 
@@ -1797,28 +1794,6 @@ async function autenticar(login, senha){
   const hoje = new Date().toISOString().split('T')[0];
   if(user.data_expiracao && user.data_expiracao < hoje) return { ok: false, motivo: 'expirado', user };
   return { ok: true, user };
-}
-
-async function resetarAdmin(){
-  if(!confirm('Resetar a senha do admin para "admin123" e entrar?')) return;
-  const hash = await hashSenha('admin123');
-  const adminUser = {
-    id: 'usr_admin',
-    nome: 'Administrador',
-    login: 'admin',
-    senha_hash: hash,
-    role: 'admin',
-    data_expiracao: null,
-    data_criacao: new Date().toISOString().split('T')[0],
-    ativo: true,
-    renovacao_solicitada: false
-  };
-  localStorage.setItem('merenda_usuarios', JSON.stringify([adminUser]));
-  USUARIOS = [adminUser];
-  try { _supaSync.saveUsuarios([adminUser]); } catch(e){}
-  document.getElementById('login-input').value = 'admin';
-  document.getElementById('senha-input').value = 'admin123';
-  await fazerLogin();
 }
 
 function logout(){
