@@ -1800,24 +1800,25 @@ async function autenticar(login, senha){
 }
 
 async function resetarAdmin(){
-  if(!confirm('Resetar a senha do admin para "admin123"?')) return;
+  if(!confirm('Resetar a senha do admin para "admin123" e entrar?')) return;
   const hash = await hashSenha('admin123');
-  let usuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
-  const admin = usuarios.find(u => u.role === 'admin');
-  if(admin){
-    admin.senha_hash = hash;
-    admin.ativo = true;
-    admin.data_expiracao = null;
-  } else {
-    usuarios = [{ id:'usr_admin', nome:'Administrador', login:'admin', senha_hash: hash, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false }];
-  }
-  localStorage.setItem('merenda_usuarios', JSON.stringify(usuarios));
-  USUARIOS = usuarios;
-  _supaSync.saveUsuarios(usuarios);
+  const adminUser = {
+    id: 'usr_admin',
+    nome: 'Administrador',
+    login: 'admin',
+    senha_hash: hash,
+    role: 'admin',
+    data_expiracao: null,
+    data_criacao: new Date().toISOString().split('T')[0],
+    ativo: true,
+    renovacao_solicitada: false
+  };
+  localStorage.setItem('merenda_usuarios', JSON.stringify([adminUser]));
+  USUARIOS = [adminUser];
+  try { _supaSync.saveUsuarios([adminUser]); } catch(e){}
   document.getElementById('login-input').value = 'admin';
   document.getElementById('senha-input').value = 'admin123';
-  document.getElementById('login-erro').textContent = '✅ Senha resetada. Clique em Entrar.';
-  document.getElementById('login-erro').style.color = 'var(--verde)';
+  await fazerLogin();
 }
 
 function logout(){
