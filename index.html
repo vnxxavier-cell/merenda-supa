@@ -780,7 +780,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="seletor-bar" id="merc-seletor-bar">
     <div style="display:flex;gap:16px;flex-wrap:wrap">
       <div class="campo">
-        <label>Ciclo</label>
+        <label>Mês</label>
         <select id="sel-mes-merc" onchange="mudarCicloMerc(this.value)"></select>
       </div>
       <div class="campo">
@@ -3659,7 +3659,7 @@ function atualizarCiclos(){
   DADOS.ciclos = Array.from({length: n}, (_, i) => `Ciclo ${i+1}`);
   CORES_CICLOS = Array.from({length: n}, (_, i) => CORES_CICLOS_BASE[i % CORES_CICLOS_BASE.length]);
   // Re-popula selects de ciclo
-  ['sel-mes-merc','sel-mes-card','plan-ciclo','sel-mes-gastos','prep-ciclo'].forEach(id => {
+  ['sel-mes-card','plan-ciclo','sel-mes-gastos','prep-ciclo'].forEach(id => {
     const s = document.getElementById(id);
     if(!s) return;
     const cur = s.value;
@@ -3674,8 +3674,11 @@ function atualizarCiclos(){
   // Reconstrói semanas de calendário e repopula selector do Mercado
   if(typeof buildCalendarWeeks === 'function') {
     SEMANAS_CAL = buildCalendarWeeks();
-    const cicloMerc = document.getElementById('sel-mes-merc')?.value || 'Ciclo 1';
-    populateSemanasMerc(cicloMerc);
+    if(typeof populateMesesMerc === 'function'){
+      populateMesesMerc();
+      const mesMerc = document.getElementById('sel-mes-merc')?.value;
+      if(mesMerc) populateSemanasMerc(mesMerc);
+    }
   }
 }
 atualizarCiclos();
@@ -3805,23 +3808,39 @@ function getCalWeekDiasAndDatas(mondayIso) {
   return { dias, datas };
 }
 
-function populateSemanasMerc(cicloStr) {
+function populateMesesMerc(){
+  const sel = document.getElementById('sel-mes-merc');
+  if(!sel) return;
+  const mesesSet = new Set();
+  SEMANAS_CAL.forEach(w => {
+    const mesIdx = new Date(w.monday + 'T00:00:00').getMonth() - 1;
+    if(mesIdx >= 0 && mesIdx < MESES_NOMES.length) mesesSet.add(MESES_NOMES[mesIdx]);
+  });
+  const meses = MESES_NOMES.filter(m => mesesSet.has(m));
+  const cur = sel.value;
+  sel.innerHTML = meses.map(m => `<option value="${m}">${m}</option>`).join('');
+  if(cur && meses.includes(cur)) sel.value = cur;
+  else if(meses.length) sel.value = meses[0];
+}
+
+function populateSemanasMerc(mesNome) {
   const sel = document.getElementById('sel-sem-merc');
   if(!sel) return;
-  const cIdx  = parseInt(cicloStr.split(' ')[1]) - 1;
-  const weeks = SEMANAS_CAL.filter(w => w.ciclos.includes(cIdx));
-  const cur   = sel.value;
+  const weeks = SEMANAS_CAL.filter(w => {
+    const mesIdx = new Date(w.monday + 'T00:00:00').getMonth() - 1;
+    return mesIdx >= 0 && mesIdx < MESES_NOMES.length && MESES_NOMES[mesIdx] === mesNome;
+  });
+  const cur = sel.value;
   sel.innerHTML = weeks.map((w, i) => {
     const first = w.days[0];
     const last  = w.days[w.days.length - 1];
-    const crossMark = w.ciclos.length > 1 ? ' ⚡' : '';
-    return `<option value="${w.monday}">Semana ${i+1}  (${fmtDataCurta(first)} – ${fmtDataCurta(last)})${crossMark}</option>`;
+    return `<option value="${w.monday}">Semana ${i+1}  (${fmtDataCurta(first)} – ${fmtDataCurta(last)})</option>`;
   }).join('');
   if(cur && weeks.find(w => w.monday === cur)) sel.value = cur;
 }
 
-function mudarCicloMerc(cicloStr) {
-  populateSemanasMerc(cicloStr);
+function mudarCicloMerc(mesStr) {
+  populateSemanasMerc(mesStr);
   renderMercado();
 }
 
@@ -3866,12 +3885,11 @@ function sincronizarSeletores(ciclo, sem, skipRender = false){
   const titleGlobal = document.getElementById('print-title-global');
   if(titleGlobal) titleGlobal.textContent = ` — ${ciclo.toUpperCase()} — SEMANA ${sem}`;
 
-  ['sel-mes-merc', 'sel-mes-card', 'plan-ciclo'].forEach(id=>{
+  ['sel-mes-card', 'plan-ciclo'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.value = ciclo;
   });
-  // Mercado: semana é monday-ISO calculado a partir da semana de calendário
-  populateSemanasMerc(ciclo);
+  // Mercado: seleciona mês e semana a partir do ciclo+semana
   if(DIAS_LETIVOS_ARRAY.length) {
     const cIdx = parseInt(ciclo.split(' ')[1]) - 1;
     const globalWeekIdx = cIdx * 5 + (sem - 1);
@@ -3879,6 +3897,10 @@ function sincronizarSeletores(ciclo, sem, skipRender = false){
     const weekStart = new Date(firstMon + 'T00:00:00');
     weekStart.setDate(weekStart.getDate() + globalWeekIdx * 7);
     const mondayIso = weekStart.toISOString().split('T')[0];
+    const mesIdx = weekStart.getMonth() - 1;
+    const mesNome = (mesIdx >= 0 && mesIdx < MESES_NOMES.length) ? MESES_NOMES[mesIdx] : (MESES_NOMES[0] || '');
+    const selMes = document.getElementById('sel-mes-merc');
+    if(selMes){ selMes.value = mesNome; populateSemanasMerc(mesNome); }
     const selSem = document.getElementById('sel-sem-merc');
     if(selSem) selSem.value = mondayIso;
   }
@@ -3940,7 +3962,9 @@ function init(){
   }
 
   SEMANAS_CAL = buildCalendarWeeks();
-  populateSemanasMerc('Ciclo 1');
+  populateMesesMerc();
+  const firstMes = document.getElementById('sel-mes-merc')?.value;
+  if(firstMes) populateSemanasMerc(firstMes);
   sincronizarSeletores('Ciclo 1', 1);
   renderFichas();
   renderIngredientes();
@@ -4375,8 +4399,10 @@ function getCicloParaSemana(mondayIso){
 }
 
 function exportarExcelSemanaCal(mondayIso){
-  const ciclo    = getCicloParaSemana(mondayIso) || '';
   const w        = SEMANAS_CAL.find(x => x.monday === mondayIso);
+  const _d       = new Date(mondayIso + 'T00:00:00');
+  const _mesIdx  = _d.getMonth() - 1;
+  const ciclo    = (_mesIdx >= 0 && _mesIdx < MESES_NOMES.length) ? MESES_NOMES[_mesIdx] : '';
   const primeiro = w ? w.days[0] : mondayIso;
   const ultimo   = w ? w.days[w.days.length - 1] : mondayIso;
   const semLabel = `${fmtDataCurta(primeiro)} – ${fmtDataCurta(ultimo)}`;
@@ -4424,13 +4450,16 @@ function exportarExcelSemanaCal(mondayIso){
 let PREVIEW_RETURN_MES = null;
 
 function irParaImprimirSemana(mondayIso, mesId){
-  const ciclo = getCicloParaSemana(mondayIso);
-  if(!ciclo){ alert('Semana sem ciclo configurado.'); return; }
+  if(!SEMANAS_CAL.find(x => x.monday === mondayIso)){ alert('Semana sem dados configurados.'); return; }
   PREVIEW_RETURN_MES = mesId || null;
 
-  // Atualiza seletores ANTES de trocar de aba para que renderMercado use os valores corretos
+  // Encontra o mês do Monday e atualiza seletores ANTES de trocar de aba
+  const d = new Date(mondayIso + 'T00:00:00');
+  const mesIdx = d.getMonth() - 1;
+  const mesNome = (mesIdx >= 0 && mesIdx < MESES_NOMES.length) ? MESES_NOMES[mesIdx] : null;
+  if(!mesNome){ alert('Semana sem mês configurado.'); return; }
   const selMes = document.getElementById('sel-mes-merc');
-  if(selMes){ selMes.value = ciclo; populateSemanasMerc(ciclo); }
+  if(selMes){ selMes.value = mesNome; populateSemanasMerc(mesNome); }
   const selSem = document.getElementById('sel-sem-merc');
   if(selSem){ selSem.value = mondayIso; }
 
