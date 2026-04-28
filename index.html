@@ -4427,12 +4427,25 @@ function irParaImprimirSemana(mondayIso, mesId){
   const ciclo = getCicloParaSemana(mondayIso);
   if(!ciclo){ alert('Semana sem ciclo configurado.'); return; }
   PREVIEW_RETURN_MES = mesId || null;
-  ir('mercado');
+
+  // Atualiza seletores ANTES de trocar de aba para que renderMercado use os valores corretos
   const selMes = document.getElementById('sel-mes-merc');
   if(selMes){ selMes.value = ciclo; populateSemanasMerc(ciclo); }
   const selSem = document.getElementById('sel-sem-merc');
   if(selSem){ selSem.value = mondayIso; }
+
+  // Troca de aba sem depender de event.currentTarget
+  document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('ativo'));
+  const pg = document.getElementById('pg-mercado');
+  if(pg) pg.classList.add('ativa');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if((t.getAttribute('onclick') || '').includes("'mercado'")) t.classList.add('ativo');
+  });
+
   renderMercado();
+  atualizarPrintGlobal();
+
   document.getElementById('merc-seletor-bar').style.display = 'none';
   document.getElementById('merc-preview-bar').style.display = 'flex';
 }
