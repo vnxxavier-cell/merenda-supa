@@ -1719,41 +1719,37 @@ function salvarUsuarios(){
   _supaSync.saveUsuarios(USUARIOS);
 }
 
-// Cria admin padrão se não houver nenhum usuário cadastrado
+// Garante que o admin sempre pode acessar com login=admin senha=admin
 (async function bootstrapAdmin(){
-  // Tentar carregar usuários do Supabase primeiro
-  const localUsuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
-  const supaUsuarios = await _supaSync.loadUsuarios();
-  if(supaUsuarios && supaUsuarios.length > 0) {
-    // Mescla: preserva senha_hash local caso o usuário tenha alterado e o Supabase não tenha sido atualizado
-    USUARIOS = supaUsuarios.map(su => {
-      const local = localUsuarios.find(l => l.id === su.id);
-      if(local && local.senha_hash && local.senha_hash !== su.senha_hash) return { ...su, senha_hash: local.senha_hash };
-      return su;
-    });
-    localStorage.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
-    console.info('Usuários carregados do Supabase:', USUARIOS.length);
-    return;
-  }
-  const existentes = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
-  if(existentes.length > 0) return;
-  const hash = await hashSenha('admin123');
-  const adminUser = {
+  const hashAdmin = await hashSenha('admin');
+  const adminBase = {
     id: 'usr_admin',
     nome: 'Administrador',
     login: 'admin',
-    senha_hash: hash,
+    senha_hash: hashAdmin,
     role: 'admin',
     data_expiracao: null,
     data_criacao: new Date().toISOString().split('T')[0],
     ativo: true,
     renovacao_solicitada: false
   };
-  localStorage.setItem('merenda_usuarios', JSON.stringify([adminUser]));
-  USUARIOS = [adminUser];
-  // Salva admin no Supabase
-  _supaSync.saveUsuarios(USUARIOS);
-  console.info('Admin padrão criado: login=admin, senha=admin123');
+
+  // Carrega do Supabase e mescla com local
+  const localUsuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
+  const supaUsuarios = await _supaSync.loadUsuarios();
+  let usuarios = (supaUsuarios && supaUsuarios.length > 0) ? supaUsuarios : localUsuarios;
+
+  // Garante que existe um admin com a senha correta
+  const adminIdx = usuarios.findIndex(u => u.role === 'admin' || u.login === 'admin');
+  if(adminIdx >= 0){
+    usuarios[adminIdx] = { ...usuarios[adminIdx], senha_hash: hashAdmin, ativo: true, data_expiracao: null, renovacao_solicitada: false };
+  } else {
+    usuarios = [adminBase, ...usuarios];
+  }
+
+  localStorage.setItem('merenda_usuarios', JSON.stringify(usuarios));
+  USUARIOS = usuarios;
+  try { _supaSync.saveUsuarios(usuarios); } catch(e){}
 })();
 
 function setupStorageProxy(userId){
