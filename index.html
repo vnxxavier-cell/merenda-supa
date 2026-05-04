@@ -1653,16 +1653,28 @@ function salvarUsuarios(){
   _supaSync.saveUsuarios(USUARIOS);
 }
 
-// Garante acesso imediato do admin usando hash pré-computado (sem await)
+// Garante acesso imediato dos perfis fixos usando hashes pré-computados (sem await)
 (function(){
-  const HASH_ADMIN = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+  const HASH_ELIAZAR = '2f232dfb17aca930c5f53b26d0683b87733998fd83a49c7dcc5f1757c07d771c'; // cardapioeliazar
+  const HASH_ADMIN   = '7277dd278012ebd6ffd704ac76250633ef43c519a4e940be603c978aaa663583'; // rede321
   let usuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
-  const adminIdx = usuarios.findIndex(u => u.role === 'admin' || u.login === 'admin');
-  if(adminIdx >= 0){
-    usuarios[adminIdx] = { ...usuarios[adminIdx], senha_hash: HASH_ADMIN, ativo: true, data_expiracao: null, renovacao_solicitada: false };
+
+  // Perfil Eliazar — mantém id:usr_admin para preservar todos os dados já salvos
+  const eliazarIdx = usuarios.findIndex(u => u.id === 'usr_admin' || u.login === 'admin' || u.login === 'Eliazar');
+  if(eliazarIdx >= 0){
+    usuarios[eliazarIdx] = { ...usuarios[eliazarIdx], id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'admin', ativo: true, data_expiracao: null, renovacao_solicitada: false };
   } else {
-    usuarios = [{ id:'usr_admin', nome:'Administrador', login:'admin', senha_hash: HASH_ADMIN, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false }, ...usuarios];
+    usuarios.unshift({ id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false });
   }
+
+  // Perfil Admin — id distinto, começa sem dados de escola
+  const adminIdx = usuarios.findIndex(u => u.id === 'usr_admin_rede' || u.login === 'Admin');
+  if(adminIdx >= 0){
+    usuarios[adminIdx] = { ...usuarios[adminIdx], id:'usr_admin_rede', nome:'Administrador', login:'Admin', senha_hash: HASH_ADMIN, role:'admin', ativo: true, data_expiracao: null, renovacao_solicitada: false };
+  } else {
+    usuarios.push({ id:'usr_admin_rede', nome:'Administrador', login:'Admin', senha_hash: HASH_ADMIN, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false });
+  }
+
   localStorage.setItem('merenda_usuarios', JSON.stringify(usuarios));
   USUARIOS = usuarios;
 })();
@@ -2235,8 +2247,8 @@ async function salvarSenhaAdmin(){
   const erro     = document.getElementById('admin-senha-erro');
   erro.style.display = 'none';
 
-  const admin = USUARIOS.find(u => u.role === 'admin');
-  if(!admin){ erro.textContent = 'Usuário admin não encontrado.'; erro.style.display = ''; return; }
+  const admin = USUARIOS.find(u => u.id === window._SESSAO?.user_id);
+  if(!admin){ erro.textContent = 'Sessão inválida. Faça login novamente.'; erro.style.display = ''; return; }
 
   const hashAtual = await hashSenha(atual);
   if(hashAtual !== admin.senha_hash){ erro.textContent = 'Senha atual incorreta.'; erro.style.display = ''; return; }
@@ -2750,7 +2762,7 @@ function abrirAssociacaoFornecedores(nome, btn){
       <label style="display:flex;align-items:center;gap:10px;font-size:13px;padding:5px 0;cursor:pointer;border-bottom:1px solid #f1f5f9">
         <input type="checkbox" ${ids.includes(f.id)?'checked':''} onchange="toggleIngFornecedor('${nome.replace(/'/g,"\\'")}','${f.id}',this.checked)"
           style="width:15px;height:15px;cursor:pointer;accent-color:var(--azul)">
-        <span>${f.nome}</span>
+        <span style="color:var(--azul);font-weight:600">${f.nome}</span>
       </label>`).join('')}
     <div style="text-align:right;margin-top:10px">
       <button onclick="document.getElementById('forn-assoc-popup')?.remove()"
