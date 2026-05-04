@@ -1662,9 +1662,9 @@ function salvarUsuarios(){
   // Perfil Eliazar — mantém id:usr_admin para preservar todos os dados já salvos
   const eliazarIdx = usuarios.findIndex(u => u.id === 'usr_admin' || u.login === 'admin' || u.login === 'Eliazar');
   if(eliazarIdx >= 0){
-    usuarios[eliazarIdx] = { ...usuarios[eliazarIdx], id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'admin', ativo: true, data_expiracao: null, renovacao_solicitada: false };
+    usuarios[eliazarIdx] = { ...usuarios[eliazarIdx], id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'escola', ativo: true, data_expiracao: null, renovacao_solicitada: false };
   } else {
-    usuarios.unshift({ id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false });
+    usuarios.unshift({ id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'escola', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false });
   }
 
   // Perfil Admin — id distinto, começa sem dados de escola
@@ -1951,9 +1951,9 @@ function atualizarNavAuth(){
   if(mobileNomeEl) mobileNomeEl.textContent = sess.nome;
   const adminBtn = document.getElementById('nav-btn-admin');
   if(adminBtn) adminBtn.style.display = sess.role === 'admin' ? '' : 'none';
-  // Mostra/oculta elementos exclusivos do admin
+  // admin-only: visível para admin e escola (funcionalidades escolares); oculto apenas para perfis sem dados
   document.querySelectorAll('.admin-only').forEach(el => {
-    el.style.display = sess.role === 'admin' ? '' : 'none';
+    el.style.display = (sess.role === 'admin' || sess.role === 'escola') ? '' : 'none';
   });
   atualizarBadgeAdmin();
 }
