@@ -1845,6 +1845,8 @@ function mostrarTelaLogin(opts){
 }
 
 function migrarDadosLocais(userId){
+  // Migração apenas para usr_admin — único perfil com dados históricos sem prefixo
+  if(userId !== 'usr_admin') return;
   if(!window._origLS) return;
   const prefix = 'u_' + userId + '_';
   const chaves = [
