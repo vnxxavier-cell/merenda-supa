@@ -1689,13 +1689,9 @@ function salvarUsuarios(){
         const local = localUsuarios.find(l => l.id === su.id);
         return local ? { ...su, ...local } : su;
       });
-      // Garante que perfis fixos locais não sejam perdidos na mesclagem com Supabase
-      const IDS_FIXOS = ['usr_admin', 'usr_admin_rede'];
-      IDS_FIXOS.forEach(fixId => {
-        if(!merged.some(u => u.id === fixId)){
-          const local = localUsuarios.find(u => u.id === fixId);
-          if(local) merged.push(local);
-        }
+      // Garante que usuários locais não estejam no Supabase ainda (sync pendente) não sejam perdidos
+      localUsuarios.forEach(lu => {
+        if(!merged.some(u => u.id === lu.id)) merged.push(lu);
       });
       localStorage.setItem('merenda_usuarios', JSON.stringify(merged));
       USUARIOS = merged;
@@ -2080,12 +2076,9 @@ async function abrirAdmin(){
       const local = localAtual.find(l => l.id === su.id);
       return local ? { ...su, ...local } : su;
     });
-    // Garante que perfis fixos locais estejam presentes
-    ['usr_admin','usr_admin_rede'].forEach(fixId => {
-      if(!merged.some(u => u.id === fixId)){
-        const local = localAtual.find(u => u.id === fixId);
-        if(local) merged.push(local);
-      }
+    // Garante que usuários locais com sync pendente não sejam perdidos
+    localAtual.forEach(lu => {
+      if(!merged.some(u => u.id === lu.id)) merged.push(lu);
     });
     USUARIOS = merged;
     const ls = window._origLS || localStorage;
