@@ -2074,8 +2074,22 @@ async function abrirAdmin(){
   if(tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px">Carregando...</td></tr>';
   const fresh = await _supaSync.loadUsuarios();
   if(fresh && fresh.length > 0){
-    USUARIOS = fresh;
-    localStorage.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
+    // Mescla preservando valores locais (bootstrap tem prioridade sobre Supabase)
+    const localAtual = JSON.parse((window._origLS || localStorage).getItem('merenda_usuarios') || '[]');
+    const merged = fresh.map(su => {
+      const local = localAtual.find(l => l.id === su.id);
+      return local ? { ...su, ...local } : su;
+    });
+    // Garante que perfis fixos locais estejam presentes
+    ['usr_admin','usr_admin_rede'].forEach(fixId => {
+      if(!merged.some(u => u.id === fixId)){
+        const local = localAtual.find(u => u.id === fixId);
+        if(local) merged.push(local);
+      }
+    });
+    USUARIOS = merged;
+    const ls = window._origLS || localStorage;
+    ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
   }
   renderAdmin();
 }
@@ -2102,7 +2116,7 @@ function renderAdmin(){
   // Tabela de usuários
   const tbody = document.getElementById('tbody-usuarios');
   if(!tbody) return;
-  const escolasOnly = USUARIOS.filter(u => u.role !== 'admin');
+  const escolasOnly = USUARIOS.filter(u => u.id !== window._SESSAO?.user_id);
   if(!escolasOnly.length){
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">Nenhuma escola cadastrada.</td></tr>';
     return;
