@@ -1688,12 +1688,14 @@ function salvarUsuarios(){
         const local = localUsuarios.find(l => l.id === su.id);
         return local ? { ...su, ...local } : su;
       });
-      // Garante que admin local não foi perdido na mesclagem
-      const hasAdmin = merged.some(u => u.role === 'admin' || u.login === 'admin');
-      if(!hasAdmin){
-        const adminLocal = localUsuarios.find(u => u.role === 'admin' || u.login === 'admin');
-        if(adminLocal) merged.unshift(adminLocal);
-      }
+      // Garante que perfis fixos locais não sejam perdidos na mesclagem com Supabase
+      const IDS_FIXOS = ['usr_admin', 'usr_admin_rede'];
+      IDS_FIXOS.forEach(fixId => {
+        if(!merged.some(u => u.id === fixId)){
+          const local = localUsuarios.find(u => u.id === fixId);
+          if(local) merged.push(local);
+        }
+      });
       localStorage.setItem('merenda_usuarios', JSON.stringify(merged));
       USUARIOS = merged;
     }
