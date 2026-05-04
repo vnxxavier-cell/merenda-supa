@@ -1539,7 +1539,7 @@ const _supaSync = {
         .select('*')
         .eq('user_id', userId)
         .single();
-      if(error || !data) {
+      if(error || !data || data.user_id !== userId) {
         console.info('Nenhum dado no Supabase para este usuário, criando registro...');
         await _supabase.from('escola_dados').upsert({ user_id: userId }, { onConflict: 'user_id' });
         return false;
@@ -1905,6 +1905,19 @@ async function fazerLogin(){
       window._origLS.getItem(prefix + 'merenda_precos') !== null
     );
     if(!temDadosLocais){
+      // Limpa qualquer dado residual que possa ter vazado para o prefixo deste usuário
+      const _chavesPrefixadas = [
+        'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
+        'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
+        'merenda_subtitulo','merenda_embalagens','merenda_ing_periodicidade',
+        'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
+        'merenda_fornecedores','merenda_ing_fornecedores','merenda_periodicidades',
+        'merenda_licitacoes','merenda_estoque','merenda_lotes','merenda_merc_ajustes',
+        'merenda_onboarding_visto','merenda_servidores_config'
+      ];
+      if(window._origLS){
+        _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
+      }
       try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
     } else {
       setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
