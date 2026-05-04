@@ -1904,20 +1904,27 @@ async function fazerLogin(){
       window._origLS.getItem(prefix + 'merenda_niveis') !== null ||
       window._origLS.getItem(prefix + 'merenda_precos') !== null
     );
-    if(!temDadosLocais){
-      // Limpa qualquer dado residual que possa ter vazado para o prefixo deste usuário
-      const _chavesPrefixadas = [
-        'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
-        'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
-        'merenda_subtitulo','merenda_embalagens','merenda_ing_periodicidade',
-        'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
-        'merenda_fornecedores','merenda_ing_fornecedores','merenda_periodicidades',
-        'merenda_licitacoes','merenda_estoque','merenda_lotes','merenda_merc_ajustes',
-        'merenda_onboarding_visto','merenda_servidores_config'
-      ];
-      if(window._origLS){
-        _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
-      }
+    const _chavesPrefixadas = [
+      'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
+      'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
+      'merenda_subtitulo','merenda_embalagens','merenda_ing_periodicidade',
+      'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
+      'merenda_fornecedores','merenda_ing_fornecedores','merenda_periodicidades',
+      'merenda_licitacoes','merenda_estoque','merenda_lotes','merenda_merc_ajustes',
+      'merenda_onboarding_visto','merenda_servidores_config'
+    ];
+    if(res.user.nova_conta){
+      // Primeiro login de conta nova: apaga tudo local + Supabase para garantir estado limpo
+      if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
+      if(_supabase){ try { await _supabase.from('escola_dados').delete().eq('user_id', res.user.id); } catch(e){} }
+      // Marca conta como inicializada
+      res.user.nova_conta = false;
+      const _ls = window._origLS || localStorage;
+      _ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS.map(u => u.id === res.user.id ? {...u, nova_conta: false} : u)));
+      if(_supabase){ try { await _supabase.from('usuarios').update({ nova_conta: false }).eq('id', res.user.id); } catch(e){} }
+    } else if(!temDadosLocais){
+      // Sem dados locais mas conta já existente: limpa resíduos e tenta carregar do Supabase
+      if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
       try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
     } else {
       setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
@@ -2225,7 +2232,8 @@ async function salvarUsuarioForm(){
       data_expiracao: exp || null,
       data_criacao: new Date().toISOString().split('T')[0],
       ativo,
-      renovacao_solicitada: false
+      renovacao_solicitada: false,
+      nova_conta: true
     });
   }
   salvarUsuarios();
