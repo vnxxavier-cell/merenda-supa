@@ -9,6 +9,7 @@
 :root {
   --azul:    #1A3A6B;
   --azul2:   #2E75B6;
+  --nav-bg:  #1B4332;
   --verde:   #1E6B3C;
   --verde2:  #27AE60;
   --amarelo: #F2A900;
@@ -26,7 +27,7 @@ html{overflow-x:hidden}
 body{font-family:'Sora',sans-serif;background:#EEF2F8;color:var(--txt);min-height:100vh;display:flex;align-items:stretch;overflow-x:hidden}
 
 /* ── NAV ── */
-nav{background:var(--azul);width:260px;min-width:260px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0}
+nav{background:var(--nav-bg);width:260px;min-width:260px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0}
 .nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 24px 32px;letter-spacing:.02em;line-height:1.4}
 .nav-brand span{display:block;color:var(--amarelo);font-size:12px;margin-top:4px}
 .nav-tabs{display:flex;flex-direction:column;gap:4px;width:100%}
@@ -127,7 +128,7 @@ tbody tr:hover td{background:#f0f5fc}
   .mobile-topbar{
     display:flex;align-items:center;gap:12px;
     position:fixed;top:0;left:0;right:0;z-index:300;
-    background:var(--azul);color:#fff;height:56px;
+    background:var(--nav-bg);color:#fff;height:56px;
     padding:0 16px;box-shadow:0 2px 8px rgba(0,0,0,.2);
   }
   .mobile-titulo{font-weight:700;font-size:15px;color:#fff}
@@ -240,103 +241,51 @@ tbody tr:hover td{background:#f0f5fc}
   .print-assinatura .assinatura-linha{border-top:1.5px solid #000;padding-top:6px;margin-top:3cm;font-size:10pt;font-weight:700;color:#000}
   .print-assinatura .assinatura-cargo{font-size:8.5pt;color:#555;margin-top:2px}
   .print-footer{position:fixed;bottom:8mm;left:0;right:0;font-size:7.5pt;color:#aaa;text-align:center;border-top:0.5px solid #ddd;padding-top:3px}
-  /* ══ MERCADO — impressão ══ */
-  /* layout: cada forn-page em bloco, quebra de página entre eles */
+  /* ══ MERCADO — impressão formal ══ */
   .forn-grid{display:block!important;width:100%!important}
-  .forn-grid .forn-page{display:block!important;page-break-after:always;padding:0;margin:0}
-  .forn-grid .forn-page:last-child{page-break-after:auto}
+  .forn-page{display:block!important;page-break-after:always;padding:0;margin:0}
+  .forn-page:last-child{page-break-after:auto}
+  .forn-page .no-print{display:none!important}
 
-  /* cabeçalho da folha (escola + subtítulo) */
-  .forn-grid .forn-page .print-header{
-    display:flex!important;align-items:center;gap:12px;
-    border-bottom:2.5px solid #1A3A6B;padding-bottom:8px;margin-bottom:10px
-  }
-  .forn-grid .forn-page .print-header .ph-img{max-height:60px;max-width:140px;object-fit:contain;flex-shrink:0}
-  .forn-grid .forn-page .print-header .ph-texto{flex:1}
-  .forn-grid .forn-page .print-header .ph-escola{font-size:13pt;font-weight:800;color:#1A3A6B;line-height:1.2}
-  .forn-grid .forn-page .print-header .ph-subtitulo{font-size:8pt;color:#555;margin-top:2px}
+  /* timbre */
+  .forn-timbre{text-align:center;margin-bottom:10px}
+  .forn-timbre img{max-height:80px;max-width:220px;object-fit:contain}
 
-  /* título ORDEM DE FORNECIMENTO */
-  .forn-grid .print-title{
-    font-size:11pt;font-weight:700;text-align:center;letter-spacing:.06em;
-    text-transform:uppercase;color:#1A3A6B;margin:0 0 10px;padding:4px 0
+  /* título */
+  .forn-titulo{
+    text-align:center;font-size:13pt;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;color:#1A3A6B;
+    border-bottom:2px solid #1A3A6B;padding-bottom:8px;margin-bottom:12px
   }
 
-  /* card: sem sombra, borda fina */
-  .forn-grid .card{
-    box-shadow:none!important;border:none!important;
-    border-radius:0!important;overflow:visible!important;
-    break-inside:auto!important;margin:0!important;padding:0!important
-  }
+  /* linha de info: Fornecedor + Data */
+  .forn-info{display:flex;gap:40px;font-size:10pt;margin-bottom:12px;flex-wrap:wrap}
+  .forn-info span strong{color:#1A3A6B}
 
-  /* cabeçalho do card (AF verde / MC laranja) */
-  .forn-grid .card-header{
-    display:block!important;padding:7px 12px!important;
-    font-size:10.5pt!important;font-weight:700!important;
-    border-radius:0!important;letter-spacing:.03em
+  /* tabela formal */
+  .forn-tabela{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:0}
+  .forn-tabela thead tr{background:#1A3A6B;color:#fff}
+  .forn-tabela thead th{
+    padding:7px 10px;border:1px solid #1A3A6B;
+    font-weight:700;text-transform:uppercase;font-size:9pt;letter-spacing:.04em
   }
-  .forn-grid .card-header.verde{background:#1E6B3C!important;color:#fff!important}
-  .forn-grid .card-header.laranja{background:#D4650A!important;color:#fff!important}
+  .forn-tabela thead th:nth-child(1){width:42px;text-align:center}
+  .forn-tabela thead th:nth-child(3){width:80px;text-align:right}
+  .forn-tabela thead th:nth-child(4){width:50px;text-align:center}
+  .forn-tabela tbody td{padding:6px 10px;border:1px solid #C8D0DC;vertical-align:middle}
+  .forn-tabela tbody tr:nth-child(even) td{background:#F5F8FD}
+  .forn-tabela td:nth-child(1){text-align:center;color:#888;font-size:9pt}
+  .forn-tabela td:nth-child(3){text-align:right;font-family:'DM Mono',monospace;font-weight:700}
+  .forn-tabela td:nth-child(4){text-align:center}
 
-  /* tabela: limpa, sem zebra, só linhas horizontais */
-  .forn-grid table{
-    width:100%!important;margin:0!important;
-    border-collapse:collapse!important;
-    font-size:10pt!important;font-weight:400!important;color:#000!important;
-    table-layout:fixed
+  /* assinatura */
+  .forn-assinatura{margin-top:28mm;text-align:center;page-break-inside:avoid}
+  .forn-assinatura-linha{
+    display:inline-block;width:280px;
+    border-top:1.5px solid #000;padding-top:6px;margin-top:0;
+    font-size:10pt;font-weight:700;color:#000
   }
-
-  /* cabeçalho da tabela */
-  .forn-grid table thead{display:table-header-group!important}
-  .forn-grid table thead tr{background:#F0F3F8!important}
-  .forn-grid table thead th{
-    background:#F0F3F8!important;color:#1A3A6B!important;
-    font-size:8pt!important;font-weight:700!important;
-    text-transform:uppercase!important;letter-spacing:.05em!important;
-    padding:7px 10px!important;text-align:left!important;
-    border-top:1.5px solid #C5D0E0!important;
-    border-bottom:1.5px solid #C5D0E0!important;
-    border-left:none!important;border-right:none!important
-  }
-
-  /* linhas do corpo */
-  .forn-grid table tbody td{
-    padding:6px 10px!important;vertical-align:middle!important;
-    color:#000!important;background:#fff!important;
-    border-top:none!important;border-left:none!important;border-right:none!important;
-    border-bottom:0.75px solid #D8DEE8!important
-  }
-  .forn-grid table tbody tr:last-child td{border-bottom:none!important}
-
-  /* col 1 — Nº: estreita, centralizada */
-  .forn-grid table th:nth-child(1),.forn-grid table td:nth-child(1){
-    width:38px!important;text-align:center!important;color:#888!important;font-weight:400!important
-  }
-  /* col 2 — Ingrediente: larga */
-  .forn-grid table th:nth-child(2),.forn-grid table td:nth-child(2){
-    text-align:left!important;font-weight:500!important
-  }
-  /* col 6 — A Comprar (print-only): estreita, direita, monospace */
-  .forn-grid table th:nth-child(6),.forn-grid table td:nth-child(6){
-    display:table-cell!important;
-    width:80px!important;text-align:right!important;
-    font-family:'DM Mono',monospace!important;
-    font-weight:700!important;font-size:10pt!important;
-    white-space:nowrap!important;color:#000!important
-  }
-
-  /* oculta colunas de tela e controles */
-  .forn-grid table th:nth-child(3),.forn-grid table td:nth-child(3),
-  .forn-grid table th:nth-child(4),.forn-grid table td:nth-child(4),
-  .forn-grid table th:nth-child(5),.forn-grid table td:nth-child(5){display:none!important}
-  .forn-grid input,.forn-grid button,
-  .forn-grid .hover-info,.forn-grid .emb-btn,.forn-grid .btn-swap{display:none!important}
-
-  /* assinatura centralizada */
-  .forn-grid .forn-page .print-assinatura{
-    display:flex!important;justify-content:center;
-    margin-top:24mm;page-break-inside:avoid
-  }
+  .forn-assinatura-cargo{font-size:9pt;color:#555;margin-top:4px}
 }
 
 .select-prato {
@@ -396,8 +345,8 @@ tr:hover .hover-info{display:block}
 .filtro-input:focus{border-color:var(--azul2)}
 
 /* ── AF / MC TAGS ── */
-.tag-af{background:#d4edda;color:#1E6B3C;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700}
-.tag-mc{background:#cce5ff;color:#1A3A6B;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700}
+.tag-af{background:#d4edda;color:#1E6B3C;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}
+.tag-mc{background:#cce5ff;color:#1A3A6B;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}
 
 /* ── Estoque ── */
 .est-progress{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-top:4px}
@@ -772,10 +721,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 ══════════════════════════════════════════════════════ -->
 <div id="pg-mercado" class="pagina ativa">
   <h2 class="titulo">🛒 Ordens de Fornecimento</h2>
-  <div id="merc-preview-bar" style="display:none;align-items:center;gap:12px;padding:12px 0 16px;flex-wrap:wrap">
-    <button class="btn" style="background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1;font-weight:700" onclick="voltarDaPreview()">← Voltar ao Calendário</button>
-    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
-    <button class="btn no-print" onclick="exportarExcelMercado()" style="background:#fff;color:#217346;border:1.5px solid #217346;font-weight:700">📊 Exportar Excel</button>
+  <div id="merc-preview-bar" class="no-print" style="display:none;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--azul2,#3b82f6);box-shadow:0 2px 8px rgba(0,0,0,.10)">
+    <button class="btn" style="background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc;font-weight:700;font-size:14px" onclick="voltarDaPreview()">← Voltar ao Calendário</button>
+    <button class="btn btn-primary" onclick="validarEImprimir()">🖨️ Imprimir</button>
+    <button class="btn" onclick="exportarExcelMercado()" style="background:#fff;color:#217346;border:1.5px solid #217346;font-weight:700">📊 Exportar Excel</button>
   </div>
   <div class="seletor-bar" id="merc-seletor-bar">
     <div style="display:flex;gap:16px;flex-wrap:wrap">
@@ -788,10 +737,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <select id="sel-sem-merc" onchange="renderMercado()" style="min-width:220px"></select>
       </div>
     </div>
-    <div id="niveis-summary-merc" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
-    <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir</button>
-    <button class="btn no-print" onclick="exportarExcelMercado()" style="background:#fff;color:#217346;border:1.5px solid #217346;font-weight:700">📊 Exportar Excel</button>
-    <button class="btn btn-verde no-print" onclick="registrarOrdemExpedida()">📋 Registrar Ordem Expedida</button>
+    <button class="btn btn-primary no-print" onclick="validarEImprimir()">🖨 Imprimir</button>
+    <button class="btn btn-primary no-print" onclick="exportarExcelMercado()">📊 Exportar Excel</button>
+    <button class="btn btn-primary no-print" onclick="registrarOrdemExpedida()">📋 Registrar Ordem</button>
+    <button class="btn btn-primary no-print" onclick="irParaPlanejamento()">← Planejamento</button>
   </div>
 
   <div class="stats-grid" id="stats-merc"></div>
@@ -822,48 +771,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
   </div>
 
-  <div class="forn-grid">
-    <div class="forn-page">
-      <div class="print-only print-header print-header-merc" style="display:none">
-        <img class="ph-img" src="" alt="" style="display:none">
-        <div class="ph-texto">
-          <div class="ph-escola"></div>
-          <div class="ph-subtitulo"></div>
-        </div>
-      </div>
-      <div class="print-only print-title print-title-merc">ORDEM DE FORNECIMENTO</div>
-      <div class="card">
-        <div class="card-header verde">🌱 Agricultura Familiar</div>
-        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th class="num no-print">Necessidade</th><th class="num no-print">Estoque</th><th class="num no-print">A Comprar</th><th class="num print-only">A Comprar</th></tr></thead>
-        <tbody id="tbody-af"></tbody></table>
-      </div>
-      <div class="print-only print-assinatura print-assinatura-merc" style="display:none">
-        <div class="assinatura-bloco">
-          <div class="assinatura-linha pa-nome"></div>
-          <div class="assinatura-cargo pa-cargo">Diretor(a) Escolar</div>
-        </div>
-      </div>
-    </div>
-    <div class="forn-page">
-      <div class="print-only print-header print-header-merc" style="display:none">
-        <img class="ph-img" src="" alt="" style="display:none">
-        <div class="ph-texto">
-          <div class="ph-escola"></div>
-          <div class="ph-subtitulo"></div>
-        </div>
-      </div>
-      <div class="print-only print-title print-title-merc">ORDEM DE FORNECIMENTO</div>
-      <div class="card">
-        <div class="card-header laranja">🏪 Mercado Convencional</div>
-        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th class="num no-print">Necessidade</th><th class="num no-print">Estoque</th><th class="num no-print">A Comprar</th><th class="num print-only">A Comprar</th></tr></thead>
-        <tbody id="tbody-mc"></tbody></table>
-      </div>
-      <div class="print-only print-assinatura print-assinatura-merc" style="display:none">
-        <div class="assinatura-bloco">
-          <div class="assinatura-linha pa-nome"></div>
-          <div class="assinatura-cargo pa-cargo">Diretor(a) Escolar</div>
-        </div>
-      </div>
+  <div class="forn-grid" id="forn-grid-dinamico"></div>
+</div>
+
+<!-- Modal: ingredientes sem fornecedor -->
+<div id="modal-sem-forn" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:28px 28px 20px;max-width:520px;width:94%;box-shadow:0 8px 40px rgba(0,0,0,.22);max-height:85vh;overflow-y:auto">
+    <div style="font-size:16px;font-weight:800;color:#1A3A6B;margin-bottom:6px">Ingredientes sem fornecedor</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:18px">Associe cada ingrediente a um fornecedor antes de imprimir.</div>
+    <div id="modal-sem-forn-lista"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;border-top:1px solid #f1f5f9;padding-top:16px">
+      <button onclick="document.getElementById('modal-sem-forn').style.display='none'"
+        style="background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700">Cancelar</button>
+      <button onclick="salvarAssocModalEImprimir()"
+        style="background:var(--azul);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700">Salvar e Imprimir</button>
     </div>
   </div>
 </div>
@@ -919,13 +840,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+  <!-- Fornecedores -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header" style="background:var(--azul)">🏢 Fornecedores Cadastrados</div>
+    <div style="padding:16px">
+      <p style="font-size:12px;color:var(--txt2);margin-bottom:14px">Cadastre os fornecedores. Para associar um fornecedor a um ingrediente, clique em 🏢 na linha do ingrediente abaixo.</p>
+      <table style="margin-bottom:12px">
+        <thead><tr><th>Nome</th><th></th></tr></thead>
+        <tbody id="tbody-forn-cadastro"></tbody>
+      </table>
+      <button class="btn btn-outline btn-sm" onclick="adicionarFornecedorCadastro()">+ Adicionar fornecedor</button>
+    </div>
+  </div>
+
+  <div class="card" style="overflow:visible">
+    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;border-radius:var(--r) var(--r) 0 0">
       <span>Lista de Ingredientes <span style="font-weight:400;font-size:12px;opacity:.8" id="cnt-ings"></span></span>
       <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis">💾 Salvar embalagens como padrão</button>
     </div>
     <table>
-      <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Fornecedor</th><th class="num" title="Tamanho do pacote comercial (ex: 1, 5). Deixe 0 para não arredondar.">Embalagem</th><th class="num">Preço</th></tr></thead>
+      <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Tipo</th><th>Periodicidade</th><th title="Fornecedores associados">🏢</th><th class="num" title="Tamanho do pacote comercial (ex: 1, 5). Deixe 0 para não arredondar.">Embalagem</th><th class="num">Preço</th></tr></thead>
       <tbody id="tbody-ings"></tbody>
     </table>
   </div>
@@ -1719,37 +1653,39 @@ function salvarUsuarios(){
   _supaSync.saveUsuarios(USUARIOS);
 }
 
-// Garante que o admin sempre pode acessar com login=admin senha=admin
-(async function bootstrapAdmin(){
-  const hashAdmin = await hashSenha('admin');
-  const adminBase = {
-    id: 'usr_admin',
-    nome: 'Administrador',
-    login: 'admin',
-    senha_hash: hashAdmin,
-    role: 'admin',
-    data_expiracao: null,
-    data_criacao: new Date().toISOString().split('T')[0],
-    ativo: true,
-    renovacao_solicitada: false
-  };
-
-  // Carrega do Supabase e mescla com local
-  const localUsuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
-  const supaUsuarios = await _supaSync.loadUsuarios();
-  let usuarios = (supaUsuarios && supaUsuarios.length > 0) ? supaUsuarios : localUsuarios;
-
-  // Garante que existe um admin com a senha correta
+// Garante acesso imediato do admin usando hash pré-computado (sem await)
+(function(){
+  const HASH_ADMIN = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+  let usuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
   const adminIdx = usuarios.findIndex(u => u.role === 'admin' || u.login === 'admin');
   if(adminIdx >= 0){
-    usuarios[adminIdx] = { ...usuarios[adminIdx], senha_hash: hashAdmin, ativo: true, data_expiracao: null, renovacao_solicitada: false };
+    usuarios[adminIdx] = { ...usuarios[adminIdx], senha_hash: HASH_ADMIN, ativo: true, data_expiracao: null, renovacao_solicitada: false };
   } else {
-    usuarios = [adminBase, ...usuarios];
+    usuarios = [{ id:'usr_admin', nome:'Administrador', login:'admin', senha_hash: HASH_ADMIN, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false }, ...usuarios];
   }
-
   localStorage.setItem('merenda_usuarios', JSON.stringify(usuarios));
   USUARIOS = usuarios;
-  try { _supaSync.saveUsuarios(usuarios); } catch(e){}
+})();
+// Sincroniza com Supabase sem sobrescrever a senha local
+(async function(){
+  try {
+    const supaUsuarios = await _supaSync.loadUsuarios();
+    if(supaUsuarios && supaUsuarios.length > 0){
+      const localUsuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
+      const merged = supaUsuarios.map(su => {
+        const local = localUsuarios.find(l => l.id === su.id);
+        return local ? { ...su, ...local } : su;
+      });
+      // Garante que admin local não foi perdido na mesclagem
+      const hasAdmin = merged.some(u => u.role === 'admin' || u.login === 'admin');
+      if(!hasAdmin){
+        const adminLocal = localUsuarios.find(u => u.role === 'admin' || u.login === 'admin');
+        if(adminLocal) merged.unshift(adminLocal);
+      }
+      localStorage.setItem('merenda_usuarios', JSON.stringify(merged));
+      USUARIOS = merged;
+    }
+  } catch(e){}
 })();
 
 function setupStorageProxy(userId){
@@ -1815,8 +1751,10 @@ function recarregarDados(){
   LOTES              = JSON.parse(localStorage.getItem('merenda_lotes') || '{}');
   ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque') || '{}');
   MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
-  PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || PERIODICIDADES;
-  ING_PERIODICIDADE  = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
+  PERIODICIDADES          = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || PERIODICIDADES;
+  ING_PERIODICIDADE       = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
+  FORNECEDORES_CADASTRO   = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
+  ING_FORNECEDORES        = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
   Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
   SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas') || '[]');
   // Aplicar unidades customizadas
@@ -1895,6 +1833,27 @@ function mostrarTelaLogin(opts){
   };
 }
 
+function migrarDadosLocais(userId){
+  if(!window._origLS) return;
+  const prefix = 'u_' + userId + '_';
+  const chaves = [
+    'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
+    'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
+    'merenda_subtitulo','merenda_embalagens','merenda_ing_periodicidade',
+    'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo'
+  ];
+  let n = 0;
+  chaves.forEach(k => {
+    const semPrefix = window._origLS.getItem(k);
+    const comPrefix = window._origLS.getItem(prefix + k);
+    if(semPrefix !== null && comPrefix === null){
+      window._origLS.setItem(prefix + k, semPrefix);
+      n++;
+    }
+  });
+  if(n > 0) console.info(`Migração: ${n} chave(s) copiadas para o perfil do usuário`);
+}
+
 async function fazerLogin(){
   const btn = document.getElementById('login-btn');
   const erro = document.getElementById('login-erro');
@@ -1903,6 +1862,7 @@ async function fazerLogin(){
   if(!login || !senha){ erro.textContent = 'Preencha login e senha.'; return; }
   btn.disabled = true; btn.textContent = 'Entrando…';
   erro.textContent = '';
+  let _step = 'autenticar';
   try {
     const res = await autenticar(login, senha);
     if(!res.ok){
@@ -1913,25 +1873,48 @@ async function fazerLogin(){
       btn.disabled = false; btn.textContent = 'Entrar';
       return;
     }
-    // Login bem-sucedido
+    // Login bem-sucedido — inicializar tudo antes de esconder a tela de login
+    _step = 'sessao';
     const sessao = { user_id: res.user.id, nome: res.user.nome, role: res.user.role, login_at: new Date().toISOString() };
     sessionStorage.setItem('merenda_sessao', JSON.stringify(sessao));
     window._SESSAO = sessao;
     window._AUTH_BLOCKED = false;
+    _step = 'proxy';
     setupStorageProxy(res.user.id);
-    // Carregar dados do Supabase antes de renderizar
+    _step = 'migrar';
+    migrarDadosLocais(res.user.id);
     btn.textContent = 'Sincronizando…';
-    try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
+    _step = 'sync';
+    const prefix = 'u_' + res.user.id + '_';
+    const temDadosLocais = window._origLS && (
+      window._origLS.getItem(prefix + 'merenda_cal_config') !== null ||
+      window._origLS.getItem(prefix + 'merenda_niveis') !== null ||
+      window._origLS.getItem(prefix + 'merenda_precos') !== null
+    );
+    if(!temDadosLocais){
+      try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
+    } else {
+      setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
+    }
+    _step = 'recarregarDados';
     recarregarDados();
+    _step = 'ocultarLogin';
     document.getElementById('login-screen').classList.add('oculto');
+    _step = 'atualizarNav';
     atualizarNavAuth();
+    _step = 'init';
     init();
+    _step = 'gerarSeletores';
     gerarSeletoresPratos();
+    _step = 'carregarConfig';
     carregarConfig();
+    _step = 'alertaExpiracao';
     renderAlertaExpiracao();
   } catch(e){
-    erro.textContent = 'Erro inesperado. Tente novamente.';
+    erro.textContent = `Erro em [${_step}]: ${e.message || e}`;
     btn.disabled = false; btn.textContent = 'Entrar';
+    document.getElementById('login-screen')?.classList.remove('oculto');
+    console.error('fazerLogin erro em ' + _step + ':', e);
   }
   // Fora do try-catch para garantir execução mesmo se algo acima falhar
   setTimeout(verificarOnboarding, 200);
@@ -2565,7 +2548,7 @@ function trocarFornecedor(nome){
 }
 
 const CORES_CICLOS_BASE = [
-  '#c7d2fe','#bfdbfe','#a5f3fc','#99f6e4',
+  '#c7d2fe','#a5f3fc','#99f6e4',
   '#a7f3d0','#fed7aa','#fecaca','#ddd6fe',
   '#fde68a','#fbcfe8','#d1fae5','#e0e7ff'
 ];
@@ -2658,6 +2641,147 @@ let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades
 let ING_PERIODICIDADE  = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
 function salvarIngPeriodicidade(){ localStorage.setItem('merenda_ing_periodicidade', JSON.stringify(ING_PERIODICIDADE)); }
+
+// ── Fornecedores cadastrados ───────────────────────────
+let FORNECEDORES_CADASTRO = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
+(function migrarIngForn(){
+  // Migra formato antigo { nome: [ids] } → { nome: id }
+  const raw = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
+  const migrado = {};
+  Object.entries(raw).forEach(([k,v]) => { migrado[k] = Array.isArray(v) ? (v[0]||'') : (v||''); });
+  localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(migrado));
+})();
+let ING_FORNECEDORES = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
+function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
+function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
+function setIngFornecedor(nome, fornId){
+  if(fornId) ING_FORNECEDORES[nome] = fornId;
+  else delete ING_FORNECEDORES[nome];
+  salvarIngFornecedores();
+}
+
+function renderFornecedoresCadastro(){
+  const tbody = document.getElementById('tbody-forn-cadastro');
+  if(!tbody) return;
+  tbody.innerHTML = FORNECEDORES_CADASTRO.length ? FORNECEDORES_CADASTRO.map((f,i) => {
+    const cor = f.cor || CORES_CICLOS_BASE[i % CORES_CICLOS_BASE.length];
+    return `<tr>
+    <td style="display:flex;align-items:center;gap:8px;border:none">
+      <span onclick="abrirPaletaForn(${i},this)" title="Alterar cor"
+        style="width:22px;height:22px;border-radius:50%;background:${cor};border:1.5px solid #94a3b8;cursor:pointer;display:inline-block;flex-shrink:0"></span>
+      <input type="text" value="${f.nome.replace(/"/g,'&quot;')}" onchange="FORNECEDORES_CADASTRO[${i}].nome=this.value;salvarFornecedoresCadastro()"
+        style="font-family:'Sora',sans-serif;font-size:13px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;width:200px">
+    </td>
+    <td><button onclick="removerFornecedorCadastro(${i})"
+      style="background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px">✕</button></td>
+  </tr>`;
+  }).join('') : '<tr><td colspan="2" style="text-align:center;color:#aaa;padding:16px;font-size:13px">Nenhum fornecedor cadastrado.</td></tr>';
+}
+
+function abrirPaletaForn(idx, btn){
+  document.querySelectorAll('.forn-paleta').forEach(el => el.remove());
+  const corAtual = FORNECEDORES_CADASTRO[idx].cor || CORES_CICLOS_BASE[idx % CORES_CICLOS_BASE.length];
+  const pal = document.createElement('div');
+  pal.className = 'forn-paleta';
+  pal.style.cssText = 'position:fixed;background:#fff;border:1.5px solid var(--borda);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.18);padding:10px;display:flex;flex-wrap:wrap;gap:8px;width:168px;z-index:9999';
+  pal.innerHTML = CORES_CICLOS_BASE.map(c =>
+    `<span onclick="selecionarCorForn(${idx},'${c}')"
+      style="width:26px;height:26px;border-radius:50%;background:${c};cursor:pointer;border:${corAtual===c?'3px solid #1B4332':'1.5px solid #94a3b8'};box-sizing:border-box;transition:.15s"></span>`
+  ).join('');
+  const rect = btn.getBoundingClientRect();
+  pal.style.top  = Math.min(rect.bottom + 6, window.innerHeight - 120) + 'px';
+  pal.style.left = rect.left + 'px';
+  document.body.appendChild(pal);
+  setTimeout(() => {
+    document.addEventListener('click', function _close(e){
+      if(!pal.contains(e.target) && e.target !== btn){ pal.remove(); document.removeEventListener('click', _close); }
+    });
+  }, 0);
+}
+
+function selecionarCorForn(idx, cor){
+  FORNECEDORES_CADASTRO[idx].cor = cor;
+  salvarFornecedoresCadastro();
+  document.querySelectorAll('.forn-paleta').forEach(el => el.remove());
+  renderFornecedoresCadastro();
+  renderMercado();
+}
+
+function adicionarFornecedorCadastro(){
+  const defaultCor = CORES_CICLOS_BASE[FORNECEDORES_CADASTRO.length % CORES_CICLOS_BASE.length];
+  FORNECEDORES_CADASTRO.push({ id:'forn_'+Date.now(), nome:'Novo Fornecedor', cor: defaultCor });
+  salvarFornecedoresCadastro();
+  renderFornecedoresCadastro();
+  renderIngredientes();
+}
+
+function removerFornecedorCadastro(idx){
+  if(!confirm('Remover este fornecedor?')) return;
+  const id = FORNECEDORES_CADASTRO[idx].id;
+  FORNECEDORES_CADASTRO.splice(idx,1);
+  Object.keys(ING_FORNECEDORES).forEach(k => {
+    if(ING_FORNECEDORES[k] === id) delete ING_FORNECEDORES[k];
+  });
+  salvarFornecedoresCadastro();
+  salvarIngFornecedores();
+  renderFornecedoresCadastro();
+  renderIngredientes();
+}
+
+function abrirAssociacaoFornecedores(nome, btn){
+  const existing = document.getElementById('forn-assoc-popup');
+  if(existing){
+    const cur = existing.getAttribute('data-ing');
+    existing.remove();
+    if(cur === nome) return;
+  }
+  if(!FORNECEDORES_CADASTRO.length){
+    alert('Nenhum fornecedor cadastrado. Adicione fornecedores na seção acima.');
+    return;
+  }
+  const ids = ING_FORNECEDORES[nome] || [];
+  const popup = document.createElement('div');
+  popup.id = 'forn-assoc-popup';
+  popup.setAttribute('data-ing', nome);
+  popup.style.cssText = 'position:fixed;background:#fff;border:1.5px solid var(--borda);border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.18);padding:14px 16px;z-index:9999;min-width:230px';
+  popup.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">Fornecedores — ${nome}</div>
+    ${FORNECEDORES_CADASTRO.map(f => `
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;padding:5px 0;cursor:pointer;border-bottom:1px solid #f1f5f9">
+        <input type="checkbox" ${ids.includes(f.id)?'checked':''} onchange="toggleIngFornecedor('${nome.replace(/'/g,"\\'")}','${f.id}',this.checked)"
+          style="width:15px;height:15px;cursor:pointer;accent-color:var(--azul)">
+        <span>${f.nome}</span>
+      </label>`).join('')}
+    <div style="text-align:right;margin-top:10px">
+      <button onclick="document.getElementById('forn-assoc-popup')?.remove()"
+        style="background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1;border-radius:6px;padding:4px 14px;cursor:pointer;font-size:12px;font-weight:700">Fechar</button>
+    </div>`;
+  const rect = btn.getBoundingClientRect();
+  popup.style.top  = Math.min(rect.bottom + 6, window.innerHeight - 280) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 260) + 'px';
+  document.body.appendChild(popup);
+  setTimeout(() => {
+    document.addEventListener('click', function _close(e){
+      if(!popup.contains(e.target) && e.target !== btn){ popup.remove(); document.removeEventListener('click',_close); }
+    });
+  }, 0);
+}
+
+function toggleIngFornecedor(nome, fornId, checked){
+  if(!ING_FORNECEDORES[nome]) ING_FORNECEDORES[nome] = [];
+  if(checked){ if(!ING_FORNECEDORES[nome].includes(fornId)) ING_FORNECEDORES[nome].push(fornId); }
+  else { ING_FORNECEDORES[nome] = ING_FORNECEDORES[nome].filter(id => id !== fornId); }
+  salvarIngFornecedores();
+  // Atualiza botão na tabela sem re-renderizar tudo
+  const b = document.querySelector(`[data-forn-ing="${nome.replace(/"/g,'&quot;')}"]`);
+  if(b){
+    const count = (ING_FORNECEDORES[nome]||[]).filter(id => FORNECEDORES_CADASTRO.find(f => f.id===id)).length;
+    b.textContent = count > 0 ? `🏢 ${count}` : '🏢';
+    b.style.background = count > 0 ? '#e0f2fe' : '#f8fafc';
+    b.style.color       = count > 0 ? '#0369a1' : '#94a3b8';
+    b.style.borderColor = count > 0 ? '#7dd3fc' : 'var(--borda)';
+  }
+}
 function salvarServidoresConfig(){ localStorage.setItem('merenda_servidores_config', JSON.stringify(SERVIDORES_CONFIG)); }
 
 // Inicializar estoque zero para ingredientes ainda sem valor salvo
@@ -2908,6 +3032,8 @@ function removerPeriodicidade(idx){
   Object.keys(ING_PERIODICIDADE).forEach(ing => {
     if(ING_PERIODICIDADE[ing] === id) delete ING_PERIODICIDADE[ing];
   });
+  salvarPeriodicidades();
+  salvarIngPeriodicidade();
   renderPeriodicidades();
 }
 
@@ -3645,6 +3771,7 @@ function getSchoolDays() {
 
 let DIAS_LETIVOS_ARRAY = getSchoolDays();
 let SEMANAS_CAL = []; // preenchido por buildCalendarWeeks() após sua definição
+const MESES_NOMES = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
 function atualizarCiclos(){
   let n = 8;
@@ -3845,7 +3972,6 @@ function fmtDataCurta(iso) {
   return `${d}/${m}`;
 }
 
-const MESES_NOMES = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 function getWeekData(weekIndex) {
   const mesIdx = Math.min(Math.floor(weekIndex / 4), 10);
   const semIdx = weekIndex % 4;
@@ -4339,6 +4465,72 @@ ${rows.join('\n')}
   URL.revokeObjectURL(url);
 }
 
+function _gerarXmlFornecedores(escola, label, af_items, mc_items, mondayIso){
+  const todosItens = [...af_items, ...mc_items];
+  const grupos = {};
+  const semForn = [];
+  todosItens.forEach(it => {
+    const fid  = ING_FORNECEDORES[it.nomeBase];
+    const forn = fid && FORNECEDORES_CADASTRO.find(f => f.id === fid);
+    if(forn){ if(!grupos[fid]) grupos[fid] = []; grupos[fid].push(it); }
+    else semForn.push(it);
+  });
+
+  const esc  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const cell = (val,sid,type='String') => `<Cell ss:StyleID="${sid}"><Data ss:Type="${type}">${esc(val)}</Data></Cell>`;
+  const cellM= (val,sid,span) => `<Cell ss:StyleID="${sid}" ss:MergeAcross="${span}"><Data ss:Type="String">${esc(val)}</Data></Cell>`;
+  const brd  = (c,w=1) => `<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="${w}" ss:Color="${c}"/></Borders>`;
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const styles = `<Styles>
+<Style ss:ID="Default"/>
+<Style ss:ID="sTit"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="14" ss:Color="#1A3A6B"/></Style>
+<Style ss:ID="sOrdem"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="12" ss:Color="#1A3A6B"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#1A3A6B"/></Borders></Style>
+<Style ss:ID="sLabel"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="10" ss:Color="#1A3A6B"/></Style>
+<Style ss:ID="sVal"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Size="10"/></Style>
+<Style ss:ID="sH"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="10" ss:Color="#FFFFFF"/><Interior ss:Color="#1A3A6B" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1A3A6B"/></Borders></Style>
+<Style ss:ID="sHL"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="10" ss:Color="#FFFFFF"/><Interior ss:Color="#1A3A6B" ss:Pattern="Solid"/></Style>
+<Style ss:ID="sHR"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="10" ss:Color="#FFFFFF"/><Interior ss:Color="#1A3A6B" ss:Pattern="Solid"/></Style>
+<Style ss:ID="sNum"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10" ss:Color="#888888"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/></Borders></Style>
+<Style ss:ID="sIng"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Size="11"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/></Borders></Style>
+<Style ss:ID="sQty"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="11" ss:Name="Courier New"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/></Borders></Style>
+<Style ss:ID="sUn"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#C8D0DC"/></Borders></Style>
+<Style ss:ID="sSig"><Alignment ss:Horizontal="Center" ss:Vertical="Bottom"/><Font ss:Size="10" ss:Color="#000000"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/></Borders></Style>
+<Style ss:ID="sSigLabel"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="9" ss:Color="#555555"/></Style>
+</Styles>`;
+
+  const _xSemIdx  = mondayIso ? SEMANAS_CAL.findIndex(w => w.monday === mondayIso) : -1;
+  const _xNumOrdem = String(_xSemIdx >= 0 ? _xSemIdx + 1 : 1).padStart(2, '0');
+
+  const buildSheet = (items, nome) => {
+    const sheetName = nome.substring(0,31);
+    const rows = [];
+    rows.push(`<Row ss:Height="26">${cellM(escola,'sTit',3)}</Row>`);
+    rows.push(`<Row ss:Height="8"/>`);
+    rows.push(`<Row ss:Height="22">${cellM('ORDEM DE FORNECIMENTO Nº '+_xNumOrdem,'sOrdem',3)}</Row>`);
+    rows.push(`<Row ss:Height="8"/>`);
+    rows.push(`<Row ss:Height="18">${cell('Fornecedor:','sLabel')}${cellM(nome,'sVal',2)}</Row>`);
+    rows.push(`<Row ss:Height="16">${cell('Data:','sLabel')}${cellM(hoje,'sVal',2)}</Row>`);
+    rows.push(`<Row ss:Height="10"/>`);
+    rows.push(`<Row ss:Height="22">${cell('ITEM','sH')}${cell('DESCRIÇÃO','sHL')}${cell('QTD','sHR')}${cell('UN','sH')}</Row>`);
+    items.forEach((it,i) => {
+      const {arred} = arredondarEmb(it.nomeBase, it.comprar);
+      const qtd = typeof arred === 'number' ? arred : parseFloat(arred) || arred;
+      rows.push(`<Row ss:Height="18">${cell(i+1,'sNum','Number')}${cell(it.nomeBase,'sIng')}${cell(qtd,'sQty','Number')}${cell(it.unid,'sUn')}</Row>`);
+    });
+    rows.push(`<Row ss:Height="50"/>`);
+    rows.push(`<Row ss:Height="18">${cellM(' ','sSig',3)}</Row>`);
+    rows.push(`<Row ss:Height="14">${cellM('Diretor(a) da Unidade Escolar','sSigLabel',3)}</Row>`);
+    return `<Worksheet ss:Name="${esc(sheetName)}"><Table><Column ss:Width="40"/><Column ss:Width="210"/><Column ss:Width="80"/><Column ss:Width="50"/>\n${rows.join('\n')}\n</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><Print><FitWidth>1</FitWidth><Orientation>Portrait</Orientation><PaperSizeIndex>9</PaperSizeIndex></Print></WorksheetOptions></Worksheet>`;
+  };
+
+  const sheets = [];
+  FORNECEDORES_CADASTRO.forEach(f => { if(grupos[f.id]?.length) sheets.push(buildSheet(grupos[f.id], f.nome)); });
+  if(semForn.length) sheets.push(buildSheet(semForn, 'Sem Fornecedor'));
+  if(!sheets.length) sheets.push(buildSheet(todosItens, 'Todos os Itens'));
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n${styles}\n${sheets.join('\n')}\n</Workbook>`;
+}
+
 function exportarExcelMercado(){
   const ciclo     = document.getElementById('sel-mes-merc').value;
   const mondayIso = document.getElementById('sel-sem-merc').value;
@@ -4346,41 +4538,7 @@ function exportarExcelMercado(){
   const escola    = localStorage.getItem('merenda_escola') || 'E.E. Eliazar José Rodrigues';
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
 
-  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const cell = (val, sid, type='String') => `<Cell ss:StyleID="${sid}"><Data ss:Type="${type}">${esc(val)}</Data></Cell>`;
-  const cellM = (val, sid, span) => `<Cell ss:StyleID="${sid}" ss:MergeAcross="${span}"><Data ss:Type="String">${esc(val)}</Data></Cell>`;
-  const brd = (c,w=1) => `<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="${w}" ss:Color="${c}"/></Borders>`;
-
-  const styles = `<Styles>
-<Style ss:ID="Default"/>
-<Style ss:ID="sTit"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="13" ss:Color="#1A3A6B"/></Style>
-<Style ss:ID="sSub"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Size="10" ss:Color="#666666"/></Style>
-<Style ss:ID="sAF"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/><Interior ss:Color="#1E6B3C" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sMC"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/><Interior ss:Color="#D4650A" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sHC"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sHL"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sHR"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sNum"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Size="10" ss:Color="#999999"/></Style>
-<Style ss:ID="sIng"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Size="11"/></Style>
-<Style ss:ID="sQty"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Bold="1" ss:Size="11" ss:Name="Courier New"/></Style>
-</Styles>`;
-
-  const buildWorksheet = (items, nome, hdrSid) => {
-    const rows = [];
-    rows.push(`<Row ss:Height="22">${cellM(escola,'sTit',2)}</Row>`);
-    rows.push(`<Row ss:Height="16">${cellM('ORDEM DE FORNECIMENTO - '+ciclo+' - '+semLabel,'sSub',2)}</Row>`);
-    rows.push(`<Row ss:Height="6"/>`);
-    rows.push(`<Row ss:Height="24">${cellM(nome,hdrSid,2)}</Row>`);
-    rows.push(`<Row ss:Height="20">${cell('N','sHC')}${cell('INGREDIENTE','sHL')}${cell('A COMPRAR','sHR')}</Row>`);
-    items.forEach((it, i) => {
-      const { arred } = arredondarEmb(it.nomeBase, it.comprar);
-      rows.push(`<Row ss:Height="18">${cell(i+1,'sNum','Number')}${cell(it.nomeBase,'sIng')}${cell(fmtEsp(it.nomeBase,arred),'sQty')}</Row>`);
-    });
-    return `<Worksheet ss:Name="${esc(nome)}"><Table><Column ss:Width="36"/><Column ss:Width="210"/><Column ss:Width="95"/>\n${rows.join('\n')}\n</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><Print><FitWidth>1</FitWidth><Orientation>Portrait</Orientation><PaperSizeIndex>9</PaperSizeIndex></Print></WorksheetOptions></Worksheet>`;
-  };
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n${styles}\n${buildWorksheet(af_items,'Agricultura Familiar','sAF')}\n${buildWorksheet(mc_items,'Mercado Convencional','sMC')}\n</Workbook>`;
-
+  const xml = _gerarXmlFornecedores(escola, ciclo + ' - ' + semLabel, af_items, mc_items, mondayIso);
   const blob = new Blob(['\uFEFF'+xml], {type:'application/vnd.ms-excel;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -4405,37 +4563,7 @@ function exportarExcelSemanaCal(mondayIso){
   const escola   = localStorage.getItem('merenda_escola') || 'E.E. Eliazar José Rodrigues';
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
 
-  const esc  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const cell = (val, sid, type='String') => `<Cell ss:StyleID="${sid}"><Data ss:Type="${type}">${esc(val)}</Data></Cell>`;
-  const cellM= (val, sid, span) => `<Cell ss:StyleID="${sid}" ss:MergeAcross="${span}"><Data ss:Type="String">${esc(val)}</Data></Cell>`;
-  const brd  = (c,w=1) => `<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="${w}" ss:Color="${c}"/></Borders>`;
-  const styles = `<Styles>
-<Style ss:ID="Default"/>
-<Style ss:ID="sTit"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="13" ss:Color="#1A3A6B"/></Style>
-<Style ss:ID="sSub"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Size="10" ss:Color="#666666"/></Style>
-<Style ss:ID="sAF"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/><Interior ss:Color="#1E6B3C" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sMC"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/><Interior ss:Color="#D4650A" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sHC"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sHL"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sHR"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/>${brd('#C5D0E0',2)}<Font ss:Bold="1" ss:Size="9" ss:Color="#1A3A6B"/><Interior ss:Color="#EEF2F8" ss:Pattern="Solid"/></Style>
-<Style ss:ID="sNum"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Size="10" ss:Color="#999999"/></Style>
-<Style ss:ID="sIng"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Size="11"/></Style>
-<Style ss:ID="sQty"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/>${brd('#E2E8F0')}<Font ss:Bold="1" ss:Size="11" ss:Name="Courier New"/></Style>
-</Styles>`;
-  const buildWorksheet = (items, nome, hdrSid) => {
-    const rows = [];
-    rows.push(`<Row ss:Height="22">${cellM(escola,'sTit',2)}</Row>`);
-    rows.push(`<Row ss:Height="16">${cellM('ORDEM DE FORNECIMENTO - '+ciclo+' - '+semLabel,'sSub',2)}</Row>`);
-    rows.push(`<Row ss:Height="6"/>`);
-    rows.push(`<Row ss:Height="24">${cellM(nome,hdrSid,2)}</Row>`);
-    rows.push(`<Row ss:Height="20">${cell('N','sHC')}${cell('INGREDIENTE','sHL')}${cell('A COMPRAR','sHR')}</Row>`);
-    items.forEach((it, i) => {
-      const { arred } = arredondarEmb(it.nomeBase, it.comprar);
-      rows.push(`<Row ss:Height="18">${cell(i+1,'sNum','Number')}${cell(it.nomeBase,'sIng')}${cell(fmtEsp(it.nomeBase,arred),'sQty')}</Row>`);
-    });
-    return `<Worksheet ss:Name="${esc(nome)}"><Table><Column ss:Width="36"/><Column ss:Width="210"/><Column ss:Width="95"/>\n${rows.join('\n')}\n</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><Print><FitWidth>1</FitWidth><Orientation>Portrait</Orientation><PaperSizeIndex>9</PaperSizeIndex></Print></WorksheetOptions></Worksheet>`;
-  };
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n${styles}\n${buildWorksheet(af_items,'Agricultura Familiar','sAF')}\n${buildWorksheet(mc_items,'Mercado Convencional','sMC')}\n</Workbook>`;
+  const xml  = _gerarXmlFornecedores(escola, ciclo + ' - ' + semLabel, af_items, mc_items, mondayIso);
   const blob = new Blob(['﻿'+xml], {type:'application/vnd.ms-excel;charset=utf-8'});
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -4478,19 +4606,43 @@ function irParaImprimirSemana(mondayIso, mesId){
 function voltarDaPreview(){
   document.getElementById('merc-preview-bar').style.display = 'none';
   document.getElementById('merc-seletor-bar').style.display = '';
-  ir('cardapio');
-  if(PREVIEW_RETURN_MES){
-    const panel = document.getElementById(PREVIEW_RETURN_MES);
-    const icon  = document.getElementById(PREVIEW_RETURN_MES + '-icon');
-    if(panel && panel.style.display === 'none'){
-      panel.style.display = 'block';
-      if(icon) icon.textContent = '▲';
-    }
+
+  // Troca de aba sem depender de event.currentTarget
+  document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('ativo'));
+  const pg = document.getElementById('pg-cardapio');
+  if(pg) pg.classList.add('ativa');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if((t.getAttribute('onclick') || '').includes("'cardapio'")) t.classList.add('ativo');
+  });
+  renderCardapio();
+
+  // Reabre e rola até o mês que o usuário estava visualizando
+  const mesAlvo = PREVIEW_RETURN_MES;
+  PREVIEW_RETURN_MES = null;
+  if(mesAlvo){
+    // Aguarda renderCardapio terminar antes de expandir e rolar
     setTimeout(() => {
-      document.getElementById(PREVIEW_RETURN_MES)?.closest('.cal-month')?.scrollIntoView({behavior:'smooth', block:'start'});
-    }, 100);
-    PREVIEW_RETURN_MES = null;
+      const panel = document.getElementById(mesAlvo);
+      const icon  = document.getElementById(mesAlvo + '-icon');
+      if(panel && panel.style.display === 'none'){
+        panel.style.display = 'block';
+        if(icon) icon.textContent = '▲';
+      }
+      panel?.closest('.cal-month')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
   }
+}
+
+function irParaPlanejamento(){
+  document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('ativo'));
+  const pg = document.getElementById('pg-cardapio');
+  if(pg) pg.classList.add('ativa');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if((t.getAttribute('onclick') || '').includes("'cardapio'")) t.classList.add('ativo');
+  });
+  renderCardapio();
 }
 
 function renderCardapio(){
@@ -4804,64 +4956,212 @@ function renderMercado(){
   }).filter(Boolean).join('');
 
   const { af_items, mc_items, totalKg } = getItensMercado(ciclo, mondayIso);
+  const todosItens = [...af_items, ...mc_items];
 
   // Stats
   const pratosCont = dias.filter(p=>p).length;
   const statsEl = document.getElementById('stats-merc');
   if(statsEl) statsEl.innerHTML = `
     <div class="stat"><div class="stat-val">${pratosCont}</div><div class="stat-lbl">Pratos na semana</div></div>
-    <div class="stat verde"><div class="stat-val">${totalAlunos}</div><div class="stat-lbl">Total de Alunos</div></div>
-    <div class="stat amarelo"><div class="stat-val">${af_items.length+mc_items.length}</div><div class="stat-lbl">Itens a comprar</div></div>
+    <div class="stat verde"><div class="stat-val">${totalAlunos}</div><div class="stat-lbl">Total de Alunos</div><div id="niveis-summary-merc" style="margin-top:6px"></div></div>
+    <div class="stat amarelo"><div class="stat-val">${todosItens.length}</div><div class="stat-lbl">Itens a comprar</div></div>
     <div class="stat laranja"><div class="stat-val">${totalKg.toFixed(0)} kg</div><div class="stat-lbl">Volume total</div></div>`;
+  atualizarResumoNivelMerc();
 
-  const inputStyle = `width:80px;text-align:right;padding:3px 6px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--azul2)`;
-  const renderRows = (items, af) => items.length===0
-    ? `<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px">Nenhum item necessário</td></tr>`
-    : items.map((it,i)=>{
+  // Agrupar por fornecedor
+  const grupos = {}; // { forn_id: [items] }
+  const semForn = [];
+  todosItens.forEach(it => {
+    const fid = ING_FORNECEDORES[it.nomeBase];
+    const forn = fid && FORNECEDORES_CADASTRO.find(f => f.id === fid);
+    if(forn){ if(!grupos[fid]) grupos[fid] = []; grupos[fid].push(it); }
+    else semForn.push(it);
+  });
+
+  const _sub    = _subtitulo;
+  const imgHtml = _imgData ? `<img class="ph-img" src="${_imgData}" style="max-height:60px;max-width:140px;object-fit:contain;flex-shrink:0">` : '';
+
+  const inputStyle = `width:72px;text-align:right;padding:3px 5px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--azul2)`;
+
+  const buildRows = (items, fornId) => items.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">Nenhum item</td></tr>`
+    : items.map((it,i) => {
         const {arred, nPacotes} = arredondarEmb(it.nomeBase, it.comprar);
         const embTamanho = EMBALAGENS[it.nomeBase];
-        const foiArredondado = nPacotes !== null && arred !== it.comprar;
-        const pacoteInfo = nPacotes
-          ? `<div class="hover-info no-print" style="font-size:10px;color:#666;margin-top:2px">${nPacotes} pct × ${embTamanho} ${it.unid}</div>`
-          : '';
-        const exatoInfo = foiArredondado
-          ? `<div class="hover-info no-print" style="font-size:10px;color:#aaa">exato: ${fmtEsp(it.nomeBase,it.comprar)}</div>`
-          : '';
-        const nomeEnc = it.nomeBase.replace(/'/g,"\\'");
-        const unidLabel = it.unid;
+        const foiArred = nPacotes !== null && arred !== it.comprar;
+        const pacInfo = nPacotes ? `<div class="hover-info no-print" style="font-size:10px;color:#666;margin-top:2px">${nPacotes} pct × ${embTamanho} ${it.unid}</div>` : '';
+        const exInfo  = foiArred ? `<div class="hover-info no-print" style="font-size:10px;color:#aaa">exato: ${fmtEsp(it.nomeBase,it.comprar)}</div>` : '';
+        const enc     = it.nomeBase.replace(/'/g,"\\'");
+        const tipoTag = isAF(it.nomeBase)
+          ? `<span class="tag-af" style="font-size:10px;padding:2px 5px">🌱 AF</span>`
+          : `<span class="tag-mc" style="font-size:10px;padding:2px 5px">🏪 MC</span>`;
         return `<tr>
           <td style="text-align:center;font-weight:700;color:#666">${i+1}</td>
-          <td>
-            <div style="display:flex;align-items:center;gap:8px">
-              <b>${it.displayNome}</b>
-              <button class="btn-swap no-print" onclick="trocarFornecedor('${nomeEnc}')">🔁 Mover</button>
-            </div>
-          </td>
+          <td><b>${it.displayNome}</b></td>
+          <td>${tipoTag}</td>
           <td class="num no-print" style="color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)}</td>
           <td class="num no-print" style="color:var(--verde2)">${fmtEsp(it.nomeBase,it.est)}</td>
           <td class="num no-print" style="white-space:nowrap">
-            <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+            <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end">
               <input type="number" min="0" step="0.01" value="${arred}" style="${inputStyle}"
-                onchange="ajustarQtdMerc('${nomeEnc}',this.value,${it.extra?'true':'false'})">
-              <span style="font-size:11px;color:var(--txt2)">${unidLabel}</span>
+                onchange="ajustarQtdMerc('${enc}',this.value,${it.extra?'true':'false'})">
+              <span style="font-size:11px;color:var(--txt2)">${it.unid}</span>
               <button class="emb-btn no-print" style="color:#e74c3c;border-color:#e74c3c;padding:2px 6px"
-                onclick="removerItemMerc('${nomeEnc}',${it.extra?'true':'false'})">✕</button>
-            </div>
-            ${pacoteInfo}${exatoInfo}
+                onclick="removerItemMerc('${enc}',${it.extra?'true':'false'})">✕</button>
+              <button class="emb-btn no-print" style="color:#0369a1;border-color:#7dd3fc;padding:2px 6px"
+                onclick="adicionarItemMercForn('${enc}',this)" title="Trocar fornecedor">🏢</button>
+            </div>${pacInfo}${exInfo}
           </td>
           <td class="print-only" style="text-align:right;white-space:nowrap">
             <b style="color:var(--azul2)">${fmtEsp(it.nomeBase,arred)}</b>
           </td>
-        </tr>`}).join('');
+        </tr>`;
+      }).join('');
 
-  const addRowAF = `<tr class="no-print"><td colspan="5" style="padding:6px 8px">
-    <button class="btn btn-outline btn-sm" onclick="adicionarItemMerc(true)" style="width:100%;font-size:11px">+ Adicionar item (Agricultura Familiar)</button>
-  </td></tr>`;
-  const addRowMC = `<tr class="no-print"><td colspan="5" style="padding:6px 8px">
-    <button class="btn btn-outline btn-sm" onclick="adicionarItemMerc(false)" style="width:100%;font-size:11px">+ Adicionar item (Mercado Convencional)</button>
-  </td></tr>`;
-  document.getElementById('tbody-af').innerHTML = renderRows(af_items, true)  + addRowAF;
-  document.getElementById('tbody-mc').innerHTML = renderRows(mc_items, false) + addRowMC;
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const _semIdx  = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
+  const _numOrdem = String(_semIdx >= 0 ? _semIdx + 1 : 1).padStart(2, '0');
+
+  const buildPage = (titulo, info, items, fornId, cor) => {
+    const hdrBg  = cor || '#1A3A6B';
+    const hdrTxt = cor ? '#1A3A6B' : '#fff';
+    const hdrBorder = cor ? `border-bottom:2px solid #1A3A6B` : '';
+
+    const printRows = items.map((it,i) => {
+      const {arred} = arredondarEmb(it.nomeBase, it.comprar);
+      const qtd = typeof arred === 'number'
+        ? arred.toLocaleString('pt-BR', {maximumFractionDigits:3})
+        : arred;
+      return `<tr>
+        <td>${i+1}</td>
+        <td>${it.displayNome}</td>
+        <td>${qtd}</td>
+        <td>${it.unid}</td>
+      </tr>`;
+    }).join('');
+
+    return `<div class="forn-page">
+      <!-- impressão formal -->
+      <div class="print-only forn-print-doc">
+        ${imgHtml ? `<div class="forn-timbre">${imgHtml}</div>` : ''}
+        <div class="forn-titulo">ORDEM DE FORNECIMENTO Nº ${_numOrdem}</div>
+        <div class="forn-info">
+          <span><strong>Fornecedor:</strong> ${titulo}</span>
+          <span><strong>Data:</strong> ${hoje}</span>
+        </div>
+        <table class="forn-tabela">
+          <thead><tr><th>ITEM</th><th>DESCRIÇÃO</th><th>QTD</th><th>UN</th></tr></thead>
+          <tbody>${printRows}</tbody>
+        </table>
+        <div class="forn-assinatura">
+          <div class="forn-assinatura-linha">${_diretor || '________________________'}</div>
+          <div class="forn-assinatura-cargo">${_cargo}</div>
+        </div>
+      </div>
+      <!-- tela interativa -->
+      <div class="card no-print">
+        <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
+          <div style="font-size:14px;font-weight:700">${titulo}</div>
+        </div>
+        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Tipo</th><th class="num">Necessidade</th><th class="num">Estoque</th><th class="num">A Comprar</th></tr></thead>
+        <tbody>${buildRows(items, fornId)}</tbody></table>
+      </div>
+    </div>`;
+  };
+
+  let html = '';
+  FORNECEDORES_CADASTRO.forEach((f, i) => {
+    const items = grupos[f.id];
+    if(!items || items.length === 0) return;
+    const cor = f.cor || CORES_CICLOS_BASE[i % CORES_CICLOS_BASE.length];
+    html += buildPage(f.nome, '', items, f.id, cor);
+  });
+  if(semForn.length > 0) html += buildPage('Sem Fornecedor Definido', '', semForn, '');
+  if(!html) html = `<div style="text-align:center;padding:48px;color:#aaa;font-size:14px">Nenhum item a comprar nesta semana.</div>`;
+
+  document.getElementById('forn-grid-dinamico').innerHTML = html;
+}
+
+function adicionarItemMercForn(nomeBase, btn){
+  if(!FORNECEDORES_CADASTRO.length){
+    alert('Nenhum fornecedor cadastrado. Adicione fornecedores na aba Ingredientes.');
+    return;
+  }
+  const tr = btn.closest('tr');
+  if(tr.querySelector('.forn-add-sel')) return;
+
+  const currentFornId = ING_FORNECEDORES[nomeBase] || '';
+  const enc = nomeBase.replace(/'/g, "\\'");
+
+  const options = [
+    `<option value="">— sem fornecedor —</option>`,
+    ...FORNECEDORES_CADASTRO.map(f =>
+      `<option value="${f.id}" ${currentFornId === f.id ? 'selected' : ''}>${f.nome}</option>`)
+  ].join('');
+
+  tr.innerHTML = `<td colspan="7" style="padding:6px 8px">
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:700;color:var(--azul);min-width:80px">${nomeBase}</span>
+      <select class="forn-add-sel" style="flex:1;min-width:140px;padding:4px 6px;font-size:12px;border:1.5px solid #93c5fd;border-radius:6px">
+        ${options}
+      </select>
+      <button class="btn btn-sm" style="background:#1A3A6B;color:#fff;font-size:11px"
+        onclick="confirmarAddItemForn('${enc}',this)">Salvar</button>
+      <button class="btn btn-outline btn-sm" style="font-size:11px" onclick="renderMercado()">✕</button>
+    </div>
+  </td>`;
+}
+
+function confirmarAddItemForn(nomeBase, btn){
+  const sel = btn.closest('td').querySelector('.forn-add-sel');
+  const fornId = sel?.value || null;
+  setIngFornecedor(nomeBase, fornId);
+  renderMercado();
+}
+
+function validarEImprimir(){
+  const ciclo     = document.getElementById('sel-mes-merc').value;
+  const mondayIso = document.getElementById('sel-sem-merc').value;
+  const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
+  const semForn = [...af_items, ...mc_items].filter(it => {
+    const fid = ING_FORNECEDORES[it.nomeBase];
+    return !fid || !FORNECEDORES_CADASTRO.find(f => f.id === fid);
+  });
+  if(semForn.length === 0){ window.print(); return; }
+  if(FORNECEDORES_CADASTRO.length === 0){
+    if(confirm('Nenhum fornecedor cadastrado. Deseja imprimir mesmo assim?')) window.print();
+    return;
+  }
+  const lista = document.getElementById('modal-sem-forn-lista');
+  lista.innerHTML = semForn.map(it => {
+    const enc = it.nomeBase.replace(/"/g,'&quot;');
+    const tipoTag = isAF(it.nomeBase) ? '🌱 AF' : '🏪 MC';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9">
+      <span style="flex:1;font-size:13px;font-weight:600">${it.displayNome} <span style="font-size:11px;color:#94a3b8">${tipoTag}</span></span>
+      <select data-modal-ing="${enc}"
+        style="font-family:'Sora',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:150px">
+        <option value="">— Selecione —</option>
+        ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+  document.getElementById('modal-sem-forn').style.display = 'flex';
+}
+
+function salvarAssocModalEImprimir(){
+  const sels = document.querySelectorAll('#modal-sem-forn-lista [data-modal-ing]');
+  let ok = true;
+  sels.forEach(sel => {
+    if(!sel.value){ ok = false; sel.style.borderColor='#ef4444'; return; }
+    sel.style.borderColor = '';
+    ING_FORNECEDORES[sel.getAttribute('data-modal-ing')] = sel.value;
+  });
+  if(!ok){ alert('Selecione um fornecedor para todos os ingredientes.'); return; }
+  salvarIngFornecedores();
+  document.getElementById('modal-sem-forn').style.display = 'none';
+  renderMercado();
+  renderIngredientes();
+  window.print();
 }
 
 // ══════════════════════════════════════════════════════
@@ -5464,9 +5764,23 @@ function renderIngredientes(filtro=''){
           ${!UNIDADES_COMUNS.includes(d.unidade)?`<option value="${d.unidade}" selected>${d.unidade}</option>`:''}
         </select>
       </td>
-      <td style="cursor:pointer" onclick="trocarFornecedor('${nome.replace(/'/g,"\\'")}')" title="Clique para mudar para ${isAF(nome)?'Mercado Convencional':'Agricultura Familiar'}">
-        ${isAF(nome)?'<span class="tag-af">🌱 Agricultura Familiar</span>':'<span class="tag-mc">🏪 Mercado Convencional</span>'}
-        <button class="btn-swap no-print" style="margin-left:8px">🔁 Alterar</button>
+      <td style="white-space:nowrap;cursor:pointer" onclick="trocarFornecedor('${nome.replace(/'/g,"\\'")}')" title="Clique para mudar para ${isAF(nome)?'Mercado Convencional':'Agricultura Familiar'}">
+        ${isAF(nome)?'<span class="tag-af">🌱 AF</span>':'<span class="tag-mc">🏪 MC</span>'}
+        <button class="btn-swap no-print" style="margin-left:6px" title="Alterar fornecedor">🔁</button>
+      </td>
+      <td>
+        <select onchange="aplicarPeriodicidadeIngrediente('${nome.replace(/'/g,"\\'")}',this.value)"
+          style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid var(--borda);border-radius:6px;background:#f8fafc;width:90px">
+          <option value="">—</option>
+          ${PERIODICIDADES.map(p=>`<option value="${p.id}" ${(ING_PERIODICIDADE[nome]||'')=== p.id?'selected':''}>${p.nome}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select onchange="setIngFornecedor('${nome.replace(/'/g,"\\'")}',this.value)"
+          style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_FORNECEDORES[nome]?'#7dd3fc':'var(--borda)'};border-radius:6px;background:${ING_FORNECEDORES[nome]?'#e0f2fe':'#f8fafc'};width:110px;color:${ING_FORNECEDORES[nome]?'#0369a1':'#94a3b8'}">
+          <option value="">— Fornecedor —</option>
+          ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}" ${ING_FORNECEDORES[nome]===f.id?'selected':''}>${f.nome}</option>`).join('')}
+        </select>
       </td>
       <td data-emb-nome="${nome}">${renderEmbBotoes(nome, d.unidade)}</td>
       <td class="num">
@@ -5571,7 +5885,7 @@ function ir(id){
   if(id==='estoque') renderEstoque();
   if(id==='licitacoes') renderLicitacoes();
   if(id==='preparo') renderPreparo();
-  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); }
+  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   // Esconder header/assinatura global quando mercado ativo (tem os próprios)
   atualizarPrintGlobal();
 }
@@ -5766,15 +6080,13 @@ function atualizarResumoNivelMerc(){
   if(!el) return;
   const ativos = NIVEIS_CONFIG.filter(n => n.ativo && n.alunos > 0);
   if(ativos.length === 0){
-    el.innerHTML = '<span style="font-size:12px;color:#aaa;font-style:italic">Nenhum nível configurado — usando 200 alunos (padrão)</span>';
+    el.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.6);font-style:italic">200 alunos (padrão)</span>';
     return;
   }
   el.innerHTML = ativos.map(nivel => {
     const meta = NIVEIS_DISPONIVEIS.find(n => n.id === nivel.id);
-    return `<span style="background:#eef5ff;border:1.5px solid var(--borda);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:var(--azul)">
-      ${meta.nome}: <span style="color:var(--azul2)">${nivel.alunos}</span> alunos
-    </span>`;
-  }).join('');
+    return `<span style="font-size:10px;font-weight:600;color:rgba(255,255,255,.85)">${meta.nome}: <b style="color:#fff">${nivel.alunos}</b></span>`;
+  }).join('<span style="color:rgba(255,255,255,.4);margin:0 4px">·</span>');
 }
 
 function renderNiveis(){
@@ -5933,17 +6245,22 @@ function atualizarPreviews(){
   } else {
     prevHeaderImg.style.display = 'none';
   }
-  document.getElementById('preview-escola').textContent = escola;
-  document.getElementById('preview-subtitulo').textContent = subtitulo;
+  const prevEscola = document.getElementById('preview-escola');
+  if(prevEscola) prevEscola.textContent = escola;
+  const prevSub = document.getElementById('preview-subtitulo');
+  if(prevSub) prevSub.textContent = subtitulo;
   const sigText = diretor ? diretor : '________________________';
-  document.getElementById('preview-sig').innerHTML = sigText + '<br><small style="font-weight:400;color:#666">' + cargo + '</small>';
+  const prevSig = document.getElementById('preview-sig');
+  if(prevSig) prevSig.innerHTML = sigText + '<br><small style="font-weight:400;color:#666">' + cargo + '</small>';
 
-  document.getElementById('print-header-img').src = imgData || '';
-  document.getElementById('print-header-img').style.display = imgData ? 'block' : 'none';
+  const phImg = document.getElementById('print-header-img');
+  if(phImg){ phImg.src = imgData || ''; phImg.style.display = imgData ? 'block' : 'none'; }
 
   // Print signature
-  document.getElementById('print-diretor-nome').textContent = diretor || '________________________';
-  document.getElementById('print-diretor-cargo').textContent = cargo;
+  const pdn = document.getElementById('print-diretor-nome');
+  if(pdn) pdn.textContent = diretor || '________________________';
+  const pdc = document.getElementById('print-diretor-cargo');
+  if(pdc) pdc.textContent = cargo;
 
   // Mercado per-page headers and signatures
   document.querySelectorAll('.print-header-merc').forEach(el => {
@@ -6004,7 +6321,7 @@ function ir(id){
   if(id==='admin') abrirAdmin();
   if(id==='estoque') renderEstoque();
   if(id==='licitacoes') renderLicitacoes();
-  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); }
+  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
   atualizarPrintGlobal();
 }
