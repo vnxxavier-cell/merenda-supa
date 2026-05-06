@@ -1883,11 +1883,6 @@ async function fazerLogin(){
     btn.textContent = 'Sincronizando…';
     _step = 'sync';
     const prefix = 'u_' + res.user.id + '_';
-    const temDadosLocais = window._origLS && (
-      window._origLS.getItem(prefix + 'merenda_cal_config') !== null ||
-      window._origLS.getItem(prefix + 'merenda_niveis') !== null ||
-      window._origLS.getItem(prefix + 'merenda_precos') !== null
-    );
     const _chavesPrefixadas = [
       'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
       'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
@@ -1898,6 +1893,14 @@ async function fazerLogin(){
       'merenda_onboarding_visto','merenda_servidores_config'
     ];
     const _isPerfilFixo = res.user.id === 'usr_admin' || res.user.id === 'usr_admin_rede';
+    // Considera que há dados locais se QUALQUER chave prefixada existir
+    const temDadosLocais = _isPerfilFixo
+      ? (window._origLS && _chavesPrefixadas.some(k => window._origLS.getItem(prefix + k) !== null))
+      : (window._origLS && (
+          window._origLS.getItem(prefix + 'merenda_cal_config') !== null ||
+          window._origLS.getItem(prefix + 'merenda_niveis') !== null ||
+          window._origLS.getItem(prefix + 'merenda_precos') !== null
+        ));
     if(res.user.nova_conta && !_isPerfilFixo){
       // Primeiro login de conta nova: apaga tudo local + Supabase para garantir estado limpo
       if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
@@ -1908,8 +1911,8 @@ async function fazerLogin(){
       _ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS.map(u => u.id === res.user.id ? {...u, nova_conta: false} : u)));
       if(_supabase){ try { await _supabase.from('usuarios').update({ nova_conta: false }).eq('id', res.user.id); } catch(e){} }
     } else if(!temDadosLocais){
-      // Sem dados locais mas conta já existente: limpa resíduos e tenta carregar do Supabase
-      if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
+      // Sem dados locais: para perfis fixos só carrega do Supabase (sem apagar); para outros limpa resíduos antes
+      if(!_isPerfilFixo && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
       try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
     } else {
       setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
@@ -6433,6 +6436,7 @@ function ir(id){
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
+  if(id==='preparo') renderPreparo();
   atualizarPrintGlobal();
 }
 
