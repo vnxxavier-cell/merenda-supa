@@ -1237,22 +1237,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div id="pg-preparo" class="pagina">
   <h2 class="titulo">🍳 Guia de Preparo por Fase de Ensino</h2>
   <div class="seletor-bar">
-    <div style="display:flex;gap:8px">
-      <div class="campo">
-        <label>Ciclo</label>
-        <select id="prep-ciclo" onchange="renderPreparo()"></select>
-      </div>
-      <div class="campo">
-        <label>Semana</label>
-        <select id="prep-semana" onchange="renderPreparo()">
-          <option value="1">Semana 1</option>
-          <option value="2">Semana 2</option>
-          <option value="3">Semana 3</option>
-          <option value="4">Semana 4</option>
-          <option value="5">Semana 5</option>
-        </select>
-      </div>
-    </div>
     <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir Guia</button>
   </div>
   <div id="prep-conteudo"></div>
@@ -1295,10 +1279,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
               <tr>
                 <th>Ingrediente</th>
                 <th>Un.</th>
-                <th class="num">Qtd/semana</th>
                 <th class="num">Qtd Edital</th>
                 <th class="num">Preço Unit.</th>
                 <th class="num">Subtotal</th>
+                <th style="width:32px"></th>
               </tr>
             </thead>
             <tbody id="tbody-calc"></tbody>
@@ -1663,17 +1647,17 @@ function salvarUsuarios(){
   // Perfil Eliazar — mantém id:usr_admin para preservar todos os dados já salvos
   const eliazarIdx = usuarios.findIndex(u => u.id === 'usr_admin' || u.login === 'admin' || u.login === 'Eliazar');
   if(eliazarIdx >= 0){
-    usuarios[eliazarIdx] = { ...usuarios[eliazarIdx], id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'escola', ativo: true, data_expiracao: null, renovacao_solicitada: false };
+    usuarios[eliazarIdx] = { ...usuarios[eliazarIdx], id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'escola', ativo: true, data_expiracao: null, renovacao_solicitada: false, nova_conta: false };
   } else {
-    usuarios.unshift({ id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'escola', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false });
+    usuarios.unshift({ id:'usr_admin', nome:'Escola Eliazar', login:'Eliazar', senha_hash: HASH_ELIAZAR, role:'escola', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false, nova_conta: false });
   }
 
   // Perfil Admin — id distinto, começa sem dados de escola
   const adminIdx = usuarios.findIndex(u => u.id === 'usr_admin_rede' || u.login === 'Admin');
   if(adminIdx >= 0){
-    usuarios[adminIdx] = { ...usuarios[adminIdx], id:'usr_admin_rede', nome:'Administrador', login:'Admin', senha_hash: HASH_ADMIN, role:'admin', ativo: true, data_expiracao: null, renovacao_solicitada: false };
+    usuarios[adminIdx] = { ...usuarios[adminIdx], id:'usr_admin_rede', nome:'Administrador', login:'Admin', senha_hash: HASH_ADMIN, role:'admin', ativo: true, data_expiracao: null, renovacao_solicitada: false, nova_conta: false };
   } else {
-    usuarios.push({ id:'usr_admin_rede', nome:'Administrador', login:'Admin', senha_hash: HASH_ADMIN, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false });
+    usuarios.push({ id:'usr_admin_rede', nome:'Administrador', login:'Admin', senha_hash: HASH_ADMIN, role:'admin', data_expiracao: null, data_criacao: new Date().toISOString().split('T')[0], ativo: true, renovacao_solicitada: false, nova_conta: false });
   }
 
   localStorage.setItem('merenda_usuarios', JSON.stringify(usuarios));
@@ -1913,7 +1897,8 @@ async function fazerLogin(){
       'merenda_licitacoes','merenda_estoque','merenda_lotes','merenda_merc_ajustes',
       'merenda_onboarding_visto','merenda_servidores_config'
     ];
-    if(res.user.nova_conta){
+    const _isPerfilFixo = res.user.id === 'usr_admin' || res.user.id === 'usr_admin_rede';
+    if(res.user.nova_conta && !_isPerfilFixo){
       // Primeiro login de conta nova: apaga tudo local + Supabase para garantir estado limpo
       if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
       if(_supabase){ try { await _supabase.from('escola_dados').delete().eq('user_id', res.user.id); } catch(e){} }
@@ -2682,9 +2667,11 @@ if(SERVIDORES_CONFIG.acucar_g_por_serv === undefined) SERVIDORES_CONFIG.acucar_g
 
 // Periodicidades de entrega
 let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || [
-  { id: 'per_1', nome: 'Semanal',    semanas: 1 },
-  { id: 'per_2', nome: 'Quinzenal',  semanas: 2 },
-  { id: 'per_5', nome: 'Por ciclo',  semanas: 5 },
+  { id: 'per_1', nome: 'Semanal',         semanas: 1 },
+  { id: 'per_2', nome: 'Quinzenal',       semanas: 2 },
+  { id: 'per_3', nome: 'Tricosseminal',   semanas: 3 },
+  { id: 'per_4', nome: 'Mensal',          semanas: 4 },
+  { id: 'per_5', nome: 'Por ciclo',       semanas: 5 },
 ];
 let ING_PERIODICIDADE  = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
@@ -3368,6 +3355,8 @@ function calcularPorOrcamento(orcamento){
 }
 
 function abrirCalculadora(){
+  window._calcManualQtd = null;
+  window._calcResultado  = null;
   document.getElementById('calc-orcamento').value = '';
   document.getElementById('calc-resultado').style.display = 'none';
   document.getElementById('calc-vazio').style.display = '';
@@ -3424,75 +3413,137 @@ function executarCalculadora(){
       <span class="lab">custo estimado do edital</span>
     </div>`;
 
-  // Tabela
-  const arredondarQtd = (q, ing) => {
+  // Inicializa estado editável com quantidades arredondadas
+  const _arredCalc = (q, ing) => {
     const emb = EMBALAGENS[ing] || 0;
-    if(emb > 0) return Math.ceil(q / emb) * emb; // arredonda para múltiplo da embalagem
-    if(q >= 10)  return Math.ceil(q);
-    if(q >= 1)   return Math.round(q * 2) / 2;
+    if(emb > 0) return Math.ceil(q / emb) * emb;
+    if(q >= 10) return Math.ceil(q);
+    if(q >= 1)  return Math.round(q * 2) / 2;
     return Math.round(q * 10) / 10;
   };
-  const fmtQtd = (q, ing) => {
-    const v = arredondarQtd(q, ing);
-    return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1).replace('.',',');
-  };
-  let custoTotal = 0;
-  const rows = Object.entries(r.qtdEdital)
-    .filter(([, qtd]) => qtd > 0.001)
-    .sort((a,b) => a[0].localeCompare(b[0]))
-    .map(([ing, qtd]) => {
-      const un   = DADOS.ingredientes[ing]?.unidade || 'kg';
-      const p    = r.precos[ing] || 0;
-      const qtdArred = arredondarQtd(qtd, ing);
-      const sub  = qtdArred * p;
-      custoTotal += sub;
-      const semQtd = (r.qtdSemanal[ing] || 0).toFixed(3).replace('.',',');
-      const edQtd  = fmtQtd(qtd, ing);
-      const precStr = p ? 'R$ ' + p.toFixed(2).replace('.',',') : '<span style="color:#aaa">—</span>';
-      const subStr  = sub > 0 ? 'R$ ' + sub.toFixed(2).replace('.',',') : '<span style="color:#aaa">—</span>';
-      return `<tr>
-        <td><b>${ing}</b></td>
-        <td style="color:var(--txt2)">${un}</td>
-        <td class="num" style="color:var(--txt2)">${semQtd}</td>
-        <td class="num" style="font-weight:700">${edQtd}</td>
-        <td class="num">${precStr}</td>
-        <td class="num">${subStr}</td>
-      </tr>`;
-    }).join('');
-
-  document.getElementById('tbody-calc').innerHTML = rows +
-    `<tr style="background:#f8faff;font-weight:700">
-      <td colspan="5" style="text-align:right">Total estimado</td>
-      <td class="num" style="color:var(--azul)">R$ ${custoTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
-    </tr>`;
-
+  window._calcResultado = r;
+  window._calcManualQtd = {};
+  Object.entries(r.qtdEdital).forEach(([ing, qtd]) => {
+    if(qtd > 0.001) window._calcManualQtd[ing] = _arredCalc(qtd, ing);
+  });
+  renderTabelaCalc();
   vazioEl.style.display = 'none';
   resEl.style.display = '';
-
-  // Armazenar resultado para uso em aplicarQuantidadesCalculadora
-  window._calcResultado = r;
 }
 
 function aplicarQuantidadesCalculadora(){
   const r = window._calcResultado;
-  if(!r) return;
-  const itens = Object.entries(r.qtdEdital)
-    .filter(([nome, qtd]) => qtd > 0.001 && DADOS.ingredientes[nome])
-    .map(([nome, qtd]) => {
-      const emb = EMBALAGENS[nome] || 0;
-      const qtdArred = emb > 0
-        ? Math.ceil(qtd / emb) * emb
-        : qtd >= 10 ? Math.ceil(qtd) : qtd >= 1 ? Math.round(qtd * 2) / 2 : Math.round(qtd * 10) / 10;
-      return {
-        ingrediente:    nome,
-        qtd_contratada: qtdArred,
-        preco_unitario: r.precos[nome] || 0
-      };
-    });
+  if(!r || !window._calcManualQtd) return;
+  const itens = Object.entries(window._calcManualQtd)
+    .filter(([nome, qtd]) => qtd > 0 && DADOS.ingredientes[nome])
+    .map(([nome, qtd]) => ({
+      ingrediente:    nome,
+      qtd_contratada: qtd,
+      preco_unitario: r.precos[nome] || 0
+    }));
   fecharCalculadora();
-  abrirNovaLicitacao();   // internamente zera _licItens — deve ser chamado antes
-  _licItens = itens;      // restaura os itens calculados após o reset
-  renderTbodyLicItens();  // renderiza com os dados da calculadora
+  abrirNovaLicitacao();
+  _licItens = itens;
+  renderTbodyLicItens();
+}
+
+function renderTabelaCalc(){
+  const r = window._calcResultado;
+  if(!r || !window._calcManualQtd) return;
+  const ingUsados   = new Set(Object.keys(window._calcManualQtd));
+  const disponiveis = Object.keys(DADOS.ingredientes || {}).sort().filter(i => !ingUsados.has(i));
+  window._calcIngMap = {};
+  let idx = 0, custoTotal = 0;
+  const rows = Object.entries(window._calcManualQtd)
+    .filter(([, qtd]) => qtd > 0)
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .map(([ing, qtd]) => {
+      const un  = DADOS.ingredientes[ing]?.unidade || 'kg';
+      const p   = r.precos[ing] || 0;
+      const sub = qtd * p;
+      custoTotal += sub;
+      const precStr = p ? 'R$ ' + p.toFixed(2).replace('.',',') : '<span style="color:#aaa">—</span>';
+      const subStr  = sub > 0 ? 'R$ ' + sub.toFixed(2).replace('.',',') : '<span style="color:#aaa">—</span>';
+      const ingEsc  = ing.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const ri = idx++;
+      window._calcIngMap[ing] = { idx: ri, preco: p };
+      return `<tr>
+        <td><b>${ing}</b></td>
+        <td style="color:var(--txt2)">${un}</td>
+        <td class="num"><input type="number" value="${qtd}" min="0" step="0.01"
+          oninput="calcAtualizarQtd('${ingEsc}',this.value)"
+          style="width:78px;text-align:right;border:1px solid #ddd;border-radius:4px;padding:2px 5px;font-size:13px"></td>
+        <td class="num">${precStr}</td>
+        <td class="num" id="calc-sub-${ri}">${subStr}</td>
+        <td style="text-align:center;padding:2px">
+          <button onclick="calcRemoverItem('${ingEsc}')"
+            style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:15px;line-height:1;padding:2px 5px" title="Remover">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+  const optsAdd = disponiveis.map(i => `<option value="${i.replace(/"/g,'&quot;')}">${i}</option>`).join('');
+  document.getElementById('tbody-calc').innerHTML = rows +
+    `<tr>
+      <td colspan="6" style="padding:5px 8px;border-top:2px dashed #e0e7ff">
+        <div style="display:flex;gap:6px;align-items:center">
+          <select id="calc-add-ing" style="flex:1;font-size:12px;padding:3px 5px;border:1px solid #ddd;border-radius:4px">
+            <option value="">Adicionar ingrediente…</option>
+            ${optsAdd}
+          </select>
+          <input type="number" id="calc-add-qty" placeholder="Qtd" min="0" step="0.01"
+            style="width:68px;font-size:12px;padding:3px 5px;border:1px solid #ddd;border-radius:4px">
+          <button onclick="calcAdicionarItem()"
+            style="font-size:12px;padding:3px 10px;background:var(--azul);color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap">+ Adicionar</button>
+        </div>
+      </td>
+    </tr>
+    <tr style="background:#f8faff;font-weight:700">
+      <td colspan="5" style="text-align:right">Total estimado</td>
+      <td class="num" id="calc-total" style="color:var(--azul)">R$ ${custoTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+    </tr>`;
+}
+
+function calcAtualizarQtd(ing, val){
+  if(!window._calcManualQtd || !window._calcIngMap) return;
+  const n = parseFloat(String(val).replace(',','.')) || 0;
+  if(n <= 0) delete window._calcManualQtd[ing];
+  else window._calcManualQtd[ing] = n;
+  const info = window._calcIngMap[ing];
+  if(info){
+    const sub = n * info.preco;
+    const subEl = document.getElementById('calc-sub-' + info.idx);
+    if(subEl) subEl.innerHTML = sub > 0 ? 'R$ ' + sub.toFixed(2).replace('.',',') : '<span style="color:#aaa">—</span>';
+  }
+  calcAtualizarTotal();
+}
+
+function calcAtualizarTotal(){
+  const r = window._calcResultado;
+  let total = 0;
+  Object.entries(window._calcManualQtd || {}).forEach(([ing, qtd]) => {
+    total += (qtd || 0) * (r?.precos[ing] || 0);
+  });
+  const el = document.getElementById('calc-total');
+  if(el) el.textContent = 'R$ ' + total.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+function calcRemoverItem(ing){
+  if(!window._calcManualQtd) return;
+  delete window._calcManualQtd[ing];
+  renderTabelaCalc();
+}
+
+function calcAdicionarItem(){
+  const r = window._calcResultado;
+  if(!r || !window._calcManualQtd) return;
+  const ingEl = document.getElementById('calc-add-ing');
+  const qtyEl = document.getElementById('calc-add-qty');
+  const ing = ingEl?.value?.trim();
+  const qty = parseFloat((qtyEl?.value || '').replace(',','.')) || 0;
+  if(!ing){ alert('Selecione um ingrediente.'); return; }
+  if(qty <= 0){ alert('Informe uma quantidade maior que zero.'); return; }
+  window._calcManualQtd[ing] = qty;
+  renderTabelaCalc();
 }
 
 function abrirNovaLicitacao(){
@@ -3830,7 +3881,7 @@ function atualizarCiclos(){
   DADOS.ciclos = Array.from({length: n}, (_, i) => `Ciclo ${i+1}`);
   CORES_CICLOS = Array.from({length: n}, (_, i) => CORES_CICLOS_BASE[i % CORES_CICLOS_BASE.length]);
   // Re-popula selects de ciclo
-  ['sel-mes-card','plan-ciclo','sel-mes-gastos','prep-ciclo'].forEach(id => {
+  ['sel-mes-card','plan-ciclo','sel-mes-gastos'].forEach(id => {
     const s = document.getElementById(id);
     if(!s) return;
     const cur = s.value;
@@ -6009,37 +6060,32 @@ function renderGastos(){
 
 
 function renderPreparo(){
-  const ciclo = document.getElementById('prep-ciclo').value;
-  const semSel = parseInt(document.getElementById('prep-semana').value);
-  const weekIdx = getWeekIndex(ciclo, semSel);
-  const weekData = getWeekData(weekIdx);
-  const dias = weekData ? weekData.dias : ["","","","",""];
-  const datas = obterDatasDoCiclo(parseInt(ciclo.split(' ')[1])-1, semSel-1);
-
   const ativos = NIVEIS_CONFIG.filter(n => n.ativo && n.alunos > 0);
   const nivelAtivo = ativos.length > 0 ? ativos : [{id:'f2', alunos:200, ativo:true}];
-  const diasNomes = ['Segunda','Terça','Quarta','Quinta','Sexta'];
 
-  let html = '';
+  // Coleta pratos presentes em qualquer semana do planejamento
+  const pratosNoPlanejamento = new Set();
+  Object.values(DADOS.cardapio || {}).forEach(semanas => {
+    (semanas || []).forEach(semana => {
+      (semana?.dias || []).forEach(p => { if(p) pratosNoPlanejamento.add(p); });
+    });
+  });
 
-  dias.forEach((prato, dIdx) => {
-    const dataFmt = datas[dIdx] ? fmtDataCurta(datas[dIdx]) : `Dia ${dIdx+1}`;
-    const diaNome = diasNomes[dIdx] || `Dia ${dIdx+1}`;
+  const todosPratos = Object.keys(DADOS.ficha || {});
+  if(!todosPratos.length){
+    document.getElementById('prep-conteudo').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#aaa">Nenhuma ficha técnica cadastrada. Cadastre pratos na aba Ingredientes.</div>';
+    return;
+  }
 
-    if(!prato || !DADOS.ficha[prato]){
-      html += `<div class="card" style="margin-bottom:16px">
-        <div class="card-header" style="background:var(--txt2)">
-          ${diaNome} — ${dataFmt}
-          <span style="font-weight:400;font-size:12px;opacity:.8">Recesso / Sem prato</span>
-        </div>
-      </div>`;
-      return;
-    }
+  // Pratos do planejamento primeiro, depois os demais — cada grupo em ordem alfabética
+  const noPlano      = todosPratos.filter(p =>  pratosNoPlanejamento.has(p)).sort((a,b) => a.localeCompare(b,'pt'));
+  const foraDePlano  = todosPratos.filter(p => !pratosNoPlanejamento.has(p)).sort((a,b) => a.localeCompare(b,'pt'));
 
+  const buildCardPrato = (prato, noCardapio) => {
     const {num, nome} = nomeNum(prato);
     const ings = DADOS.ficha[prato];
 
-    // Monta cabeçalhos das colunas por nível
     const colsHeader = nivelAtivo.map(n => {
       const meta = NIVEIS_DISPONIVEIS.find(x => x.id === n.id);
       return `<th class="num" colspan="2" style="background:#e8f0fb;color:var(--azul)">${meta.nome}<br><small style="font-weight:500;opacity:.7">${n.alunos} alunos</small></th>`;
@@ -6050,10 +6096,9 @@ function renderPreparo(){
     ).join('');
 
     const rows = ings.map(ing => {
-      const {i, g} = ing;
+      const {i} = ing;
       if(!i) return '';
       const unid = DADOS.ingredientes[i]?.unidade || 'kg';
-
       let totalGeral = 0;
       const cellsCols = nivelAtivo.map(n => {
         const pc = getPC(prato, i, n.id, ing);
@@ -6065,7 +6110,6 @@ function renderPreparo(){
         return `<td class="num" style="${custom?'color:var(--laranja);font-weight:700':''}">${pcFmt}</td>
                 <td class="num" style="font-weight:600">${totalFmt}</td>`;
       }).join('');
-
       const totalFmt = totalGeral > 0 ? fmt(totalGeral) : '—';
       return `<tr>
         <td><b>${i}</b></td>
@@ -6075,9 +6119,15 @@ function renderPreparo(){
       </tr>`;
     }).filter(r => r).join('');
 
-    html += `<div class="card" style="margin-bottom:20px">
-      <div class="card-header">
-        ${diaNome} — ${dataFmt} &nbsp;|&nbsp; <span style="font-weight:400">#${num} ${nome}</span>
+    const headerBg  = noCardapio ? 'var(--azul)' : '#64748b';
+    const cardBorder = noCardapio ? 'border-left:4px solid var(--azul)' : '';
+    const badge = noCardapio
+      ? '<span style="background:rgba(255,255,255,.18);border-radius:999px;padding:1px 9px;font-size:11px;font-weight:600;margin-left:10px;vertical-align:middle">📅 No cardápio</span>'
+      : '';
+
+    return `<div class="card" style="margin-bottom:20px;${cardBorder}">
+      <div class="card-header" style="background:${headerBg}">
+        #${num} ${nome}${badge}
       </div>
       <div style="overflow-x:auto">
       <table>
@@ -6094,9 +6144,21 @@ function renderPreparo(){
       </table>
       </div>
     </div>`;
-  });
+  };
 
-  if(!html) html = '<div style="text-align:center;padding:40px;color:#aaa">Nenhum prato nesta semana. Configure o cardápio na aba Planejamento.</div>';
+  const secLabel = (txt, cor) =>
+    `<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:${cor};margin:24px 0 8px;padding-bottom:4px;border-bottom:2px solid ${cor}">${txt}</div>`;
+
+  let html = '';
+  if(noPlano.length){
+    html += secLabel('Pratos no cardápio', 'var(--azul)');
+    html += noPlano.map(p => buildCardPrato(p, true)).join('');
+  }
+  if(foraDePlano.length){
+    html += secLabel('Outros pratos cadastrados', '#64748b');
+    html += foraDePlano.map(p => buildCardPrato(p, false)).join('');
+  }
+
   document.getElementById('prep-conteudo').innerHTML = html;
 }
 
