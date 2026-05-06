@@ -5400,7 +5400,7 @@ function renderFichas(filtro=''){
         <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px" class="no-print">
           ${modificado && DADOS_FICHA_ORIGINAL[p] ? `<button class="btn-swap" onclick="event.stopPropagation();restaurarFichaOriginal('${pratoEnc}')" title="Restaurar ao padrão PNAE" style="color:#92400e;border-color:#f59e0b;background:#fffbeb">↩ Restaurar</button>` : ''}
           <button class="btn-swap" onclick="event.stopPropagation();editarPrato('${pratoEnc}')" title="Editar Prato" style="color:var(--azul2);border-color:var(--azul2)">✏️ Editar</button>
-          <button class="btn-swap" onclick="event.stopPropagation();removerPrato('${pratoEnc}')" title="Excluir Prato" style="color:var(--vermelho);border-color:var(--vermelho)">🗑️ Excluir</button>
+          ${!DADOS_FICHA_ORIGINAL[p] ? `<button class="btn-swap" onclick="event.stopPropagation();removerPrato('${pratoEnc}')" title="Excluir Prato" style="color:var(--vermelho);border-color:var(--vermelho)">🗑️ Excluir</button>` : ''}
         </div>
       </div>
     </div>`;
@@ -5805,8 +5805,12 @@ function editarPrato(key){
 }
 
 function removerPrato(key){
+  if(DADOS_FICHA_ORIGINAL[key]){
+    alert('Esta ficha técnica faz parte do padrão PNAE e não pode ser excluída. Use "↩ Restaurar" para desfazer modificações.');
+    return;
+  }
   if(!confirm(`Tem certeza que deseja excluir permanentemente o prato "${key}"?`)) return;
-  
+
   // Remover da memória
   delete DADOS.ficha[key];
   
