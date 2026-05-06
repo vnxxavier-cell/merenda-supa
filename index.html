@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Merenda Escolar — E.E. Eliazar José Rodrigues</title>
+<title>Sistema de Gestão de Merenda Escolar</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 :root {
@@ -582,7 +582,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="fecharNavMobile()"></div>
 
 <nav id="nav-principal">
-  <div class="nav-brand">🍽 Merenda <span>E.E. Eliazar José Rodrigues</span></div>
+  <div class="nav-brand">🍽 <span>Sistema de Merenda</span></div>
   <div class="nav-tabs">
     <button class="nav-tab ativo" onclick="ir('mercado');fecharNavMobile()">🛒 Mercado</button>
     <button class="nav-tab" onclick="ir('cardapio');fecharNavMobile()">📅 Planejamento & Calendário</button>
@@ -916,7 +916,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <div class="config-field">
           <label>Nome da Escola (cabeçalho)</label>
-          <input type="text" id="inp-nome-escola" placeholder="E.E. Eliazar José Rodrigues" oninput="salvarConfig()">
+          <input type="text" id="inp-nome-escola" placeholder="Ex: E.E. Nome da Escola" oninput="salvarConfig()">
         </div>
         <div class="config-field">
           <label>Subtítulo do cabeçalho</label>
@@ -934,7 +934,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <div class="mock-header" id="preview-header">
               <img id="preview-header-img" src="" alt="" style="display:none">
               <div class="mock-header-text">
-                <h1 id="preview-escola">E.E. Eliazar José Rodrigues</h1>
+                <h1 id="preview-escola"></h1>
                 <p id="preview-subtitulo">Programa Nacional de Alimentação Escolar — PNAE</p>
               </div>
             </div>
@@ -1747,6 +1747,21 @@ function recarregarDados(){
   ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque') || '{}');
   MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
   PERIODICIDADES          = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || PERIODICIDADES;
+  // Migração: garante que as periodicidades padrão novas existam para quem já tinha dados salvos
+  const _perPadrao = [
+    { id:'per_3', nome:'Tricosseminal', semanas:3 },
+    { id:'per_4', nome:'Mensal',        semanas:4 },
+  ];
+  let _perMigrou = false;
+  _perPadrao.forEach(pp => {
+    if(!PERIODICIDADES.some(p => p.id === pp.id || p.semanas === pp.semanas)){
+      // insere na posição correta pela qtd de semanas
+      const idx = PERIODICIDADES.findIndex(p => p.semanas > pp.semanas);
+      if(idx >= 0) PERIODICIDADES.splice(idx, 0, pp); else PERIODICIDADES.push(pp);
+      _perMigrou = true;
+    }
+  });
+  if(_perMigrou) localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES));
   ING_PERIODICIDADE       = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
   FORNECEDORES_CADASTRO   = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
   ING_FORNECEDORES        = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
@@ -2600,10 +2615,10 @@ const NIVEIS_DISPONIVEIS = [
 ];
 
 let NIVEIS_CONFIG = JSON.parse(localStorage.getItem('merenda_niveis') || 'null') || [
-  { id: 'f1',    alunos: 0,   ativo: false },
-  { id: 'f2',    alunos: 200, ativo: true  },
-  { id: 'medio', alunos: 0,   ativo: false },
-  { id: 'eja',   alunos: 0,   ativo: false },
+  { id: 'f1',    alunos: 0, ativo: false },
+  { id: 'f2',    alunos: 0, ativo: false },
+  { id: 'medio', alunos: 0, ativo: false },
+  { id: 'eja',   alunos: 0, ativo: false },
 ];
 
 // Per capita customizado pelo usuário (sobrepõe valores PNAE por nível)
@@ -4043,25 +4058,29 @@ function populateMesesMerc(){
   });
   const meses = MESES_NOMES.filter(m => mesesSet.has(m));
   const cur = sel.value;
-  sel.innerHTML = meses.map(m => `<option value="${m}">${m}</option>`).join('');
+  sel.innerHTML = '<option value="">— Selecionar mês —</option>' +
+    meses.map(m => `<option value="${m}">${m}</option>`).join('');
   if(cur && meses.includes(cur)) sel.value = cur;
-  else if(meses.length) sel.value = meses[0];
+  // sem mês pre-selecionado ao inicializar
 }
 
 function populateSemanasMerc(mesNome) {
   const sel = document.getElementById('sel-sem-merc');
   if(!sel) return;
+  if(!mesNome){ sel.innerHTML = '<option value="">— Selecionar semana —</option>'; return; }
   const weeks = SEMANAS_CAL.filter(w => {
     const mesIdx = new Date(w.monday + 'T00:00:00').getMonth() - 1;
     return mesIdx >= 0 && mesIdx < MESES_NOMES.length && MESES_NOMES[mesIdx] === mesNome;
   });
   const cur = sel.value;
-  sel.innerHTML = weeks.map((w, i) => {
-    const first = w.days[0];
-    const last  = w.days[w.days.length - 1];
-    return `<option value="${w.monday}">Semana ${i+1}  (${fmtDataCurta(first)} – ${fmtDataCurta(last)})</option>`;
-  }).join('');
+  sel.innerHTML = '<option value="">— Selecionar semana —</option>' +
+    weeks.map((w, i) => {
+      const first = w.days[0];
+      const last  = w.days[w.days.length - 1];
+      return `<option value="${w.monday}">Semana ${i+1}  (${fmtDataCurta(first)} – ${fmtDataCurta(last)})</option>`;
+    }).join('');
   if(cur && weeks.find(w => w.monday === cur)) sel.value = cur;
+  // sem semana pre-selecionada ao trocar de mês
 }
 
 function mudarCicloMerc(mesStr) {
@@ -4205,15 +4224,7 @@ function calcularTotaisNiveis(dias) {
   let totalAlunos = 0;
   const ativos = NIVEIS_CONFIG.filter(n => n.ativo && n.alunos > 0);
   if (ativos.length === 0) {
-    totalAlunos = 200;
-    dias.forEach(p => {
-      if (!p || !DADOS.ficha[p]) return;
-      DADOS.ficha[p].forEach(({i, g, d}) => {
-        const chave = d ? `${i} ___ ${d}` : i;
-        totais[chave] = (totais[chave] || 0) + g * 200 / 1000;
-      });
-    });
-    return { totais, totalAlunos };
+    return { totais, totalAlunos: 0 };
   }
   ativos.forEach(nivel => {
     totalAlunos += nivel.alunos;
@@ -4637,7 +4648,7 @@ function exportarExcelMercado(){
   const ciclo     = document.getElementById('sel-mes-merc').value;
   const mondayIso = document.getElementById('sel-sem-merc').value;
   const semLabel  = document.getElementById('sel-sem-merc').selectedOptions[0]?.text?.trim() || mondayIso;
-  const escola    = localStorage.getItem('merenda_escola') || 'E.E. Eliazar José Rodrigues';
+  const escola    = localStorage.getItem('merenda_escola') || '';
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
 
   const xml = _gerarXmlFornecedores(escola, ciclo + ' - ' + semLabel, af_items, mc_items, mondayIso);
@@ -4662,7 +4673,7 @@ function exportarExcelSemanaCal(mondayIso){
   const primeiro = w ? w.days[0] : mondayIso;
   const ultimo   = w ? w.days[w.days.length - 1] : mondayIso;
   const semLabel = `${fmtDataCurta(primeiro)} – ${fmtDataCurta(ultimo)}`;
-  const escola   = localStorage.getItem('merenda_escola') || 'E.E. Eliazar José Rodrigues';
+  const escola   = localStorage.getItem('merenda_escola') || '';
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
 
   const xml  = _gerarXmlFornecedores(escola, ciclo + ' - ' + semLabel, af_items, mc_items, mondayIso);
@@ -5009,7 +5020,7 @@ function renderMercado(){
   renderServidoresCard();
 
   // Preenche cabeçalho e assinatura de impressão com dados das Configurações
-  const _escola    = localStorage.getItem('merenda_escola')    || 'E.E. Eliazar José Rodrigues';
+  const _escola    = localStorage.getItem('merenda_escola')    || '';
   const _subtitulo = localStorage.getItem('merenda_subtitulo') || 'Programa Nacional de Alimentação Escolar — PNAE';
   const _diretor   = localStorage.getItem('merenda_diretor')   || '';
   const _cargo     = localStorage.getItem('merenda_cargo')     || 'Diretor(a) Escolar';
@@ -5035,9 +5046,13 @@ function renderMercado(){
   const ciclo     = document.getElementById('sel-mes-merc').value;
   const mondayIso = document.getElementById('sel-sem-merc').value;
 
-  if(!mondayIso){ // selector still empty (before populateSemanasMerc runs)
+  if(!ciclo || !mondayIso){
     const statsEl = document.getElementById('stats-merc');
+    const listaEl = document.getElementById('lista-pratos-merc');
+    const gridEl  = document.getElementById('forn-grid-dinamico');
     if(statsEl) statsEl.innerHTML = '';
+    if(listaEl) listaEl.innerHTML = '<span style="color:#aaa;font-size:13px;padding:8px">Selecione um mês e uma semana para ver a ordem de mercado.</span>';
+    if(gridEl)  gridEl.innerHTML  = '';
     return;
   }
 
@@ -6067,8 +6082,12 @@ function renderGastos(){
 
 
 function renderPreparo(){
-  const ativos = NIVEIS_CONFIG.filter(n => n.ativo && n.alunos > 0);
-  const nivelAtivo = ativos.length > 0 ? ativos : [{id:'f2', alunos:200, ativo:true}];
+  const nivelAtivo = NIVEIS_CONFIG.filter(n => n.ativo && n.alunos > 0);
+  if(!nivelAtivo.length){
+    document.getElementById('prep-conteudo').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#aaa">Nenhum nível de ensino configurado. Ative os níveis e informe a quantidade de alunos na aba <b>Configuração</b>.</div>';
+    return;
+  }
 
   // Coleta pratos presentes em qualquer semana do planejamento
   const pratosNoPlanejamento = new Set();
@@ -6339,7 +6358,7 @@ function atualizarPreviews(){
   const imgData = localStorage.getItem('merenda_header_img');
   const diretor = localStorage.getItem('merenda_diretor') || '';
   const cargo = localStorage.getItem('merenda_cargo') || 'Diretor(a) Escolar';
-  const escola = localStorage.getItem('merenda_escola') || 'E.E. Eliazar José Rodrigues';
+  const escola = localStorage.getItem('merenda_escola') || '';
   const subtitulo = localStorage.getItem('merenda_subtitulo') || 'Programa Nacional de Alimentação Escolar — PNAE';
 
   // Upload area state
@@ -6407,7 +6426,7 @@ function carregarConfig(){
   atualizarBannerDemo();
   const diretor = localStorage.getItem('merenda_diretor') || '';
   const cargo = localStorage.getItem('merenda_cargo') || 'Diretor(a) Escolar';
-  const escola = localStorage.getItem('merenda_escola') || 'E.E. Eliazar José Rodrigues';
+  const escola = localStorage.getItem('merenda_escola') || '';
   const subtitulo = localStorage.getItem('merenda_subtitulo') || 'Programa Nacional de Alimentação Escolar — PNAE';
   document.getElementById('inp-diretor').value = diretor;
   document.getElementById('inp-cargo').value = cargo;
