@@ -1852,7 +1852,8 @@ function migrarDadosLocais(userId){
     'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
     'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
     'merenda_subtitulo','merenda_embalagens','merenda_ing_periodicidade',
-    'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo'
+    'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
+    'merenda_fornecedores','merenda_ing_fornecedores'
   ];
   let n = 0;
   chaves.forEach(k => {
@@ -1920,6 +1921,12 @@ async function fazerLogin(){
       // Primeiro login de conta nova: apaga tudo local + Supabase para garantir estado limpo
       if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
       if(_supabase){ try { await _supabase.from('escola_dados').delete().eq('user_id', res.user.id); } catch(e){} }
+      // Grava defaults explícitos com proxy ativo — evita herdar dados residuais do localStorage
+      // ou defaults de coluna do Supabase em sessões posteriores
+      const _defNiveis = [{id:'f1',alunos:0,ativo:false},{id:'f2',alunos:0,ativo:false},{id:'medio',alunos:0,ativo:false},{id:'eja',alunos:0,ativo:false}];
+      localStorage.setItem('merenda_niveis', JSON.stringify(_defNiveis));
+      localStorage.setItem('merenda_fornecedores', '[]');
+      localStorage.setItem('merenda_ing_fornecedores', '{}');
       // Marca conta como inicializada
       res.user.nova_conta = false;
       const _ls = window._origLS || localStorage;
