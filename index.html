@@ -2328,6 +2328,8 @@ function configuracaoCompleta(){
 }
 
 function verificarOnboarding(){
+  const uid = window._SESSAO && window._SESSAO.user_id;
+  if(uid === 'usr_admin' || uid === 'usr_admin_rede') return;
   const demoAtivo = !!localStorage.getItem('merenda_usando_demo');
   if(demoAtivo || configuracaoCompleta()) return;
   abrirGuiaInicio();
