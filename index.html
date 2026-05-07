@@ -1640,8 +1640,8 @@ function salvarUsuarios(){
 
 // Garante acesso imediato dos perfis fixos usando hashes pré-computados (sem await)
 (function(){
-  const HASH_ELIAZAR = '2f232dfb17aca930c5f53b26d0683b87733998fd83a49c7dcc5f1757c07d771c'; // cardapioeliazar
-  const HASH_ADMIN   = '7277dd278012ebd6ffd704ac76250633ef43c519a4e940be603c978aaa663583'; // rede321
+  const HASH_ELIAZAR = '2f232dfb17aca930c5f53b26d0683b87733998fd83a49c7dcc5f1757c07d771c';
+  const HASH_ADMIN   = '7277dd278012ebd6ffd704ac76250633ef43c519a4e940be603c978aaa663583';
   let usuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
 
   // Perfil Eliazar — mantém id:usr_admin para preservar todos os dados já salvos
