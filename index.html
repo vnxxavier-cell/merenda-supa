@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Gestão de Merenda Escolar</title>
+<title>Prato Certo</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 :root {
@@ -545,7 +545,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- Tela de Login -->
 <div id="login-screen">
   <div class="login-box">
-    <h2>🍽 Merenda Escolar</h2>
+    <h2>🍽 Prato Certo</h2>
     <p class="sub">Acesse com suas credenciais</p>
     <div class="login-campo">
       <label>Login</label>
@@ -575,14 +575,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- Topbar mobile -->
 <div class="mobile-topbar" id="mobile-topbar">
   <button class="mobile-hamburger" onclick="toggleNavMobile()" aria-label="Menu">☰</button>
-  <span class="mobile-titulo">🍽 Merenda</span>
+  <span class="mobile-titulo">🍽 Prato Certo</span>
   <span id="mobile-user-nome" style="font-size:11px;opacity:.7;margin-left:auto;padding-right:4px"></span>
 </div>
 <!-- Overlay escuro quando nav está aberta no mobile -->
 <div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="fecharNavMobile()"></div>
 
 <nav id="nav-principal">
-  <div class="nav-brand">🍽 <span>Sistema de Merenda</span></div>
+  <div class="nav-brand">🍽 Prato Certo<span>Gestão de Merenda Escolar</span></div>
   <div class="nav-tabs">
     <button class="nav-tab ativo" onclick="ir('mercado');fecharNavMobile()">🛒 Mercado</button>
     <button class="nav-tab" onclick="ir('cardapio');fecharNavMobile()">📅 Planejamento & Calendário</button>
@@ -1071,7 +1071,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="overlay" id="overlay-boas-vindas" style="align-items:center">
   <div class="modal" style="max-width:540px">
     <div class="modal-header" style="background:var(--verde)">
-      <h3>👋 Bem-vindo ao Sistema de Merenda!</h3>
+      <h3>👋 Bem-vindo ao Prato Certo!</h3>
     </div>
     <div class="modal-body">
       <p style="font-size:13px;color:var(--txt2);margin-bottom:18px">
@@ -1924,9 +1924,13 @@ async function fazerLogin(){
       // Grava defaults explícitos com proxy ativo — evita herdar dados residuais do localStorage
       // ou defaults de coluna do Supabase em sessões posteriores
       const _defNiveis = [{id:'f1',alunos:0,ativo:false},{id:'f2',alunos:0,ativo:false},{id:'medio',alunos:0,ativo:false},{id:'eja',alunos:0,ativo:false}];
+      const _defServ  = {ativo:false,cafe_kg:0,acucar_kg:0,qtd_servidores:0,cafe_g_por_serv:16.5,acucar_g_por_serv:45};
       localStorage.setItem('merenda_niveis', JSON.stringify(_defNiveis));
       localStorage.setItem('merenda_fornecedores', '[]');
       localStorage.setItem('merenda_ing_fornecedores', '{}');
+      localStorage.setItem('merenda_servidores_config', JSON.stringify(_defServ));
+      // Grava defaults limpos imediatamente no Supabase — evita defaults de coluna aparecerem em refreshes
+      if(_supabase){ try { await _supabase.from('escola_dados').upsert({ user_id: res.user.id, niveis: _defNiveis, servidores_config: _defServ }, { onConflict: 'user_id' }); } catch(e){} }
       // Marca conta como inicializada
       res.user.nova_conta = false;
       const _ls = window._origLS || localStorage;
@@ -6225,7 +6229,7 @@ function atualizarResumoNivelMerc(){
   if(!el) return;
   const ativos = NIVEIS_CONFIG.filter(n => n.ativo && n.alunos > 0);
   if(ativos.length === 0){
-    el.innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,.6);font-style:italic">200 alunos (padrão)</span>';
+    el.innerHTML = '';
     return;
   }
   el.innerHTML = ativos.map(nivel => {
