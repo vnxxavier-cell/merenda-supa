@@ -584,16 +584,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <nav id="nav-principal">
   <div class="nav-brand">🍽 Prato Certo<span>Gestão de Merenda Escolar</span></div>
   <div class="nav-tabs">
-    <button class="nav-tab ativo" onclick="ir('mercado');fecharNavMobile()">🛒 Mercado</button>
-    <button class="nav-tab" onclick="ir('cardapio');fecharNavMobile()">📅 Planejamento & Calendário</button>
-    <button class="nav-tab" onclick="ir('ficha');fecharNavMobile()">📋 Fichas Técnicas</button>
-    <button class="nav-tab" onclick="ir('ingredientes');fecharNavMobile()">🥕 Ingredientes</button>
-    <button class="nav-tab" onclick="ir('gastos');fecharNavMobile()">💰 Gastos</button>
-    <button class="nav-tab" onclick="ir('estoque');fecharNavMobile()">📦 Estoque</button>
-    <button class="nav-tab" onclick="ir('licitacoes');fecharNavMobile()">📄 Licitações</button>
-    <button class="nav-tab" onclick="ir('preparo');fecharNavMobile()">🍳 Guia de Preparo</button>
-    <button class="nav-tab" onclick="ir('config');fecharNavMobile()">⚙ Configurações</button>
-    <button class="nav-tab" id="nav-btn-admin" style="display:none" onclick="ir('admin');fecharNavMobile()">👤 Admin <span class="badge-admin" id="badge-admin" style="display:none">0</span></button>
+    <button class="nav-tab ativo" onclick="ir('mercado',this);fecharNavMobile()">🛒 Mercado</button>
+    <button class="nav-tab" onclick="ir('cardapio',this);fecharNavMobile()">📅 Planejamento & Calendário</button>
+    <button class="nav-tab" onclick="ir('ficha',this);fecharNavMobile()">📋 Fichas Técnicas</button>
+    <button class="nav-tab" onclick="ir('ingredientes',this);fecharNavMobile()">🥕 Ingredientes</button>
+    <button class="nav-tab" onclick="ir('gastos',this);fecharNavMobile()">💰 Gastos</button>
+    <button class="nav-tab" onclick="ir('estoque',this);fecharNavMobile()">📦 Estoque</button>
+    <button class="nav-tab" onclick="ir('licitacoes',this);fecharNavMobile()">📄 Licitações</button>
+    <button class="nav-tab" onclick="ir('preparo',this);fecharNavMobile()">🍳 Guia de Preparo</button>
+    <button class="nav-tab" onclick="ir('config',this);fecharNavMobile()">⚙ Configurações</button>
+    <button class="nav-tab" id="nav-btn-admin" style="display:none" onclick="ir('admin',this);fecharNavMobile()">👤 Admin <span class="badge-admin" id="badge-admin" style="display:none">0</span></button>
   </div>
   <div class="nav-bottom">
     <div class="nav-user" id="nav-user-nome"></div>
@@ -1709,6 +1709,9 @@ async function hashSenha(senha){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(senha));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
+function esc(str){ const d=document.createElement('div'); d.textContent=String(str??''); return d.innerHTML; }
+
+window.addEventListener('beforeunload', () => { try{ _supaSync._flushSync(); }catch(e){} });
 
 async function autenticar(login, senha){
   // Garante que USUARIOS está atualizado (usa localStorage original)
@@ -2160,8 +2163,8 @@ function renderAdmin(){
     if(u.renovacao_solicitada) statusHtml += ' <span title="Renovação solicitada">🔔</span>';
     const isFixo = u.id === 'usr_admin' || u.id === 'usr_admin_rede';
     return `<tr>
-      <td><b>${u.nome}</b>${isFixo ? ' <span style="font-size:10px;background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 5px;font-weight:700">fixo</span>' : ''}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${u.login}</td>
+      <td><b>${esc(u.nome)}</b>${isFixo ? ' <span style="font-size:10px;background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 5px;font-weight:700">fixo</span>' : ''}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${esc(u.login)}</td>
       <td style="font-size:12px;color:var(--txt2)">${u.data_criacao ? fmtDataBR(u.data_criacao) : '—'}</td>
       <td style="font-size:12px">${u.data_expiracao ? fmtDataBR(u.data_expiracao) : '—'}</td>
       <td>${statusHtml}</td>
@@ -5226,7 +5229,7 @@ function adicionarItemMercForn(nomeBase, btn){
   const options = [
     `<option value="">— sem fornecedor —</option>`,
     ...FORNECEDORES_CADASTRO.map(f =>
-      `<option value="${f.id}" ${currentFornId === f.id ? 'selected' : ''}>${f.nome}</option>`)
+      `<option value="${f.id}" ${currentFornId === f.id ? 'selected' : ''}>${esc(f.nome)}</option>`)
   ].join('');
 
   tr.innerHTML = `<td colspan="7" style="padding:6px 8px">
@@ -5271,7 +5274,7 @@ function validarEImprimir(){
       <select data-modal-ing="${enc}"
         style="font-family:'Sora',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:150px">
         <option value="">— Selecione —</option>
-        ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('')}
+        ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}
       </select>
     </div>`;
   }).join('');
@@ -5906,14 +5909,14 @@ function renderIngredientes(filtro=''){
         <select onchange="aplicarPeriodicidadeIngrediente('${nome.replace(/'/g,"\\'")}',this.value)"
           style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid var(--borda);border-radius:6px;background:#f8fafc;width:90px">
           <option value="">—</option>
-          ${PERIODICIDADES.map(p=>`<option value="${p.id}" ${(ING_PERIODICIDADE[nome]||'')=== p.id?'selected':''}>${p.nome}</option>`).join('')}
+          ${PERIODICIDADES.map(p=>`<option value="${p.id}" ${(ING_PERIODICIDADE[nome]||'')=== p.id?'selected':''}>${esc(p.nome)}</option>`).join('')}
         </select>
       </td>
       <td>
         <select onchange="setIngFornecedor('${nome.replace(/'/g,"\\'")}',this.value)"
           style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_FORNECEDORES[nome]?'#7dd3fc':'var(--borda)'};border-radius:6px;background:${ING_FORNECEDORES[nome]?'#e0f2fe':'#f8fafc'};width:110px;color:${ING_FORNECEDORES[nome]?'#0369a1':'#94a3b8'}">
           <option value="">— Fornecedor —</option>
-          ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}" ${ING_FORNECEDORES[nome]===f.id?'selected':''}>${f.nome}</option>`).join('')}
+          ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}" ${ING_FORNECEDORES[nome]===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}
         </select>
       </td>
       <td data-emb-nome="${nome}">${renderEmbBotoes(nome, d.unidade)}</td>
@@ -6007,11 +6010,11 @@ function filtrarIngredientes(v){renderIngredientes(v)}
 function filtrarIngredientesForn(v){filtroIngForn=v;renderIngredientes()}
 
 // ── Navegação ──
-function ir(id){
+function ir(id, btn){
   document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
   document.getElementById('pg-'+id).classList.add('ativa');
-  event.currentTarget.classList.add('ativo');
+  if(btn) btn.classList.add('ativo');
   if(id==='cardapio') renderCardapio();
   if(id==='mercado') renderMercado();
   if(id==='gastos') renderGastos();
@@ -6458,11 +6461,11 @@ function carregarConfig(){
     st.textContent = `✅ ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados`;
 }
 
-function ir(id){
+function ir(id, btn){
   document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
   document.getElementById('pg-'+id).classList.add('ativa');
-  event.currentTarget.classList.add('ativo');
+  if(btn) btn.classList.add('ativo');
   if(id==='cardapio') renderCardapio();
   if(id==='mercado') renderMercado();
   if(id==='gastos') renderGastos();
