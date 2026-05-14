@@ -28,12 +28,15 @@ body{font-family:'Sora',sans-serif;background:#EEF2F8;color:var(--txt);min-heigh
 
 /* ── NAV ── */
 nav{background:var(--nav-bg);width:260px;min-width:260px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0}
-.nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 24px 32px;letter-spacing:.02em;line-height:1.4}
-.nav-brand span{display:block;color:var(--amarelo);font-size:12px;margin-top:4px}
+.nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 24px 32px;letter-spacing:.02em;line-height:1.4;display:flex;align-items:center;gap:10px}
+.nav-brand span{display:block;color:var(--amarelo);font-size:12px;margin-top:3px}
+.nav-brand svg{flex-shrink:0;opacity:.9}
 .nav-tabs{display:flex;flex-direction:column;gap:4px;width:100%}
-.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:14px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:100%}
+.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:100%;display:flex;align-items:center;gap:10px}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,.05)}
 .nav-tab.ativo{color:#fff;border-left-color:var(--amarelo);background:rgba(255,255,255,.1)}
+.nav-tab svg{flex-shrink:0;opacity:.7;transition:.2s}
+.nav-tab:hover svg,.nav-tab.ativo svg{opacity:1}
 
 /* ── PÁGINAS ── */
 .main-content{flex:1;min-width:0;overflow-y:auto}
@@ -348,15 +351,6 @@ tr:hover .hover-info{display:block}
 .tag-af{background:#d4edda;color:#1E6B3C;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}
 .tag-mc{background:#cce5ff;color:#1A3A6B;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}
 
-/* ── Estoque ── */
-.est-progress{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-top:4px}
-.est-progress-bar{height:100%;border-radius:3px;transition:.3s}
-.est-progress-bar.ok{background:var(--verde2)}
-.est-progress-bar.atencao{background:var(--amarelo)}
-.est-progress-bar.critico{background:var(--vermelho)}
-.est-alert-card{border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
-.est-alert-card.critico{background:#fee2e2;border:1.5px solid var(--vermelho)}
-.est-alert-card.atencao{background:#fef3c7;border:1.5px solid var(--amarelo)}
 
 /* ── Licitações ── */
 .lic-progress{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin-top:6px}
@@ -484,7 +478,7 @@ h2.titulo::after{content:'';flex:1;height:2px;background:linear-gradient(to righ
 .login-senha-wrap input{width:100%;padding-right:40px;box-sizing:border-box}
 .btn-ver-senha{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--txt2);padding:2px;line-height:1}
 .login-capslock{font-size:11px;color:#92400e;font-weight:600;margin-top:4px;display:none}
-.login-capslock.visivel{display:block}
+.login-capslock.visivel{display:flex}
 .login-erro{color:var(--vermelho);font-size:13px;font-weight:600;min-height:20px;margin-bottom:8px}
 .login-btn{width:100%;padding:12px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
 .login-btn:hover{background:var(--azul2)}
@@ -545,7 +539,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- Tela de Login -->
 <div id="login-screen">
   <div class="login-box">
-    <h2>🍽 Prato Certo</h2>
+    <h2 style="display:flex;align-items:center;justify-content:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>Prato Certo</h2>
     <p class="sub">Acesse com suas credenciais</p>
     <div class="login-campo">
       <label>Login</label>
@@ -555,9 +549,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <label>Senha</label>
       <div class="login-senha-wrap">
         <input type="password" id="senha-input" placeholder="••••••••" autocomplete="current-password">
-        <button type="button" class="btn-ver-senha" id="btn-ver-senha" onclick="toggleVerSenha()" title="Mostrar/ocultar senha">👁</button>
+        <button type="button" class="btn-ver-senha" id="btn-ver-senha" onclick="toggleVerSenha()" title="Mostrar/ocultar senha"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
       </div>
-      <div class="login-capslock" id="login-capslock">⚠ Caps Lock ativado</div>
+      <div class="login-capslock" id="login-capslock" style="align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Caps Lock ativado</div>
     </div>
     <div class="login-erro" id="login-erro"></div>
     <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
@@ -575,30 +569,29 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- Topbar mobile -->
 <div class="mobile-topbar" id="mobile-topbar">
   <button class="mobile-hamburger" onclick="toggleNavMobile()" aria-label="Menu">☰</button>
-  <span class="mobile-titulo">🍽 Prato Certo</span>
+  <span class="mobile-titulo" style="display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v7"/></svg>Prato Certo</span>
   <span id="mobile-user-nome" style="font-size:11px;opacity:.7;margin-left:auto;padding-right:4px"></span>
 </div>
 <!-- Overlay escuro quando nav está aberta no mobile -->
 <div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="fecharNavMobile()"></div>
 
 <nav id="nav-principal">
-  <div class="nav-brand">🍽 Prato Certo<span>Gestão de Merenda Escolar</span></div>
+  <div class="nav-brand"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v7"/></svg><div>Prato Certo<span>Gestão de Merenda Escolar</span></div></div>
   <div class="nav-tabs">
-    <button class="nav-tab ativo" onclick="ir('mercado',this);fecharNavMobile()">🛒 Mercado</button>
-    <button class="nav-tab" onclick="ir('cardapio',this);fecharNavMobile()">📅 Planejamento & Calendário</button>
-    <button class="nav-tab" onclick="ir('ficha',this);fecharNavMobile()">📋 Fichas Técnicas</button>
-    <button class="nav-tab" onclick="ir('ingredientes',this);fecharNavMobile()">🥕 Ingredientes</button>
-    <button class="nav-tab" onclick="ir('gastos',this);fecharNavMobile()">💰 Gastos</button>
-    <button class="nav-tab" onclick="ir('estoque',this);fecharNavMobile()">📦 Estoque</button>
-    <button class="nav-tab" onclick="ir('licitacoes',this);fecharNavMobile()">📄 Licitações</button>
-    <button class="nav-tab" onclick="ir('preparo',this);fecharNavMobile()">🍳 Guia de Preparo</button>
-    <button class="nav-tab" onclick="ir('config',this);fecharNavMobile()">⚙ Configurações</button>
-    <button class="nav-tab" id="nav-btn-admin" style="display:none" onclick="ir('admin',this);fecharNavMobile()">👤 Admin <span class="badge-admin" id="badge-admin" style="display:none">0</span></button>
+    <button class="nav-tab ativo" onclick="ir('mercado',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Lista de Compras</button>
+    <button class="nav-tab" onclick="ir('cardapio',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Cardápio Anual</button>
+    <button class="nav-tab" onclick="ir('ficha',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>Fichas Técnicas</button>
+    <button class="nav-tab" onclick="ir('ingredientes',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>Ingredientes</button>
+    <button class="nav-tab" onclick="ir('gastos',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Orçamento</button>
+    <button class="nav-tab" onclick="ir('licitacoes',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Contratos</button>
+    <button class="nav-tab" onclick="ir('preparo',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v7"/></svg>Guia de Preparo</button>
+    <button class="nav-tab" onclick="ir('config',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações</button>
+    <button class="nav-tab" id="nav-btn-admin" style="display:none" onclick="ir('admin',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Admin <span class="badge-admin" id="badge-admin" style="display:none">0</span></button>
   </div>
   <div class="nav-bottom">
     <div class="nav-user" id="nav-user-nome"></div>
-    <button class="btn-logout" style="background:none;border:1px solid var(--borda);color:var(--txt2);margin-bottom:6px;font-size:11px" onclick="abrirGuiaInicio()">❓ Guia de início</button>
-    <button class="btn-logout" onclick="logout()">↩ Sair</button>
+    <button class="btn-logout" style="background:none;border:1px solid var(--borda);color:var(--txt2);margin-bottom:6px;font-size:11px;display:flex;align-items:center;gap:6px" onclick="abrirGuiaInicio(true)"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Guia de início</button>
+    <button class="btn-logout" style="display:flex;align-items:center;gap:6px" onclick="logout()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</button>
   </div>
 </nav>
 
@@ -607,11 +600,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- Banner demo — aparece em todas as abas quando modo demo está ativo -->
 <div id="banner-demo" style="display:none;background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;padding:14px 18px;margin:24px 40px 0 40px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
   <div>
-    <div style="font-weight:700;color:#92400e;font-size:14px;margin-bottom:4px">⚠️ Você está usando a configuração de demonstração</div>
+    <div style="font-weight:700;color:#92400e;font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Você está usando a configuração de demonstração</div>
     <div style="font-size:12px;color:#78350f">Os dados exibidos são exemplos. Substitua pelas informações reais da sua escola antes de usar o sistema de verdade.</div>
   </div>
   <div style="display:flex;gap:8px;flex-shrink:0">
-    <button onclick="iniciarConfiguracaoManual()" style="font-size:12px;padding:7px 14px;background:#f59e0b;color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:700">⚙ Configurar meu sistema</button>
+    <button onclick="iniciarConfiguracaoManual()" style="font-size:12px;padding:7px 14px;background:#f59e0b;color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurar meu sistema</button>
   </div>
 </div>
 
@@ -628,16 +621,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: CARDÁPIO
 ══════════════════════════════════════════════════════ -->
 <div id="pg-cardapio" class="pagina">
-  <h2 class="titulo">📅 Planejamento Anual & Calendário 2026</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Cardápio Anual 2026</h2>
 
   <!-- Período letivo -->
   <div id="banner-periodo" class="card" style="margin-bottom:18px">
     <!-- Cabeçalho clicável — padrão igual ao Planejar Cardápio do Ciclo -->
-    <div class="card-header" style="background:var(--laranja);cursor:pointer;user-select:none" onclick="togglePeriodo()">
-      📅 Período Letivo
-      <span id="icon-periodo" style="float:right;font-size:16px">▼</span>
+    <div class="card-header" style="background:var(--azul);cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center" onclick="togglePeriodo()">
+      <span style="display:flex;align-items:center"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Período Letivo</span>
+      <span style="display:flex;align-items:center;gap:8px">
+        <button id="pin-periodo-btn" onclick="event.stopPropagation();togglePinPeriodo()" title="Fixar como retraído sempre que abrir a aba" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);font-size:11px;padding:2px 8px;border-radius:12px;cursor:pointer;line-height:1.4;font-family:inherit">fixar retraído</button>
+        <span id="icon-periodo" style="font-size:16px">▲</span>
+      </span>
     </div>
-    <div id="body-periodo" style="display:none;padding:16px 20px 16px">
+    <div id="body-periodo" style="padding:16px 20px 16px">
       <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
         <div class="campo" style="margin:0">
           <label>Início do Ano Letivo</label>
@@ -650,19 +646,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <span id="periodo-status" style="font-size:12px;color:var(--txt2);align-self:center"></span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;border-top:1px solid var(--borda);padding-top:14px">
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--laranja);margin-bottom:6px">🚫 Feriado / Recesso</div>
-          <div style="display:flex;gap:6px;margin-bottom:6px">
-            <input type="date" id="add-feriado-input" style="flex:1;min-width:0">
-            <button onclick="adicionarDataEspecial('feriado')" style="padding:4px 10px;background:var(--laranja);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
+        <div class="campo">
+          <label>Feriado / Recesso</label>
+          <div style="display:flex;gap:6px">
+            <input type="date" id="add-feriado-input" style="flex:1;min-width:0;margin:0">
+            <button class="btn btn-primary btn-sm" onclick="adicionarDataEspecial('feriado')">+ Add</button>
           </div>
           <div id="lista-feriados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
         </div>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--verde);margin-bottom:6px">✅ Sábados Letivos</div>
-          <div style="display:flex;gap:6px;margin-bottom:6px">
-            <input type="date" id="add-sabado-input" style="flex:1;min-width:0">
-            <button onclick="adicionarDataEspecial('sabado')" style="padding:4px 10px;background:var(--verde);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">+ Add</button>
+        <div class="campo">
+          <label>Sábados Letivos</label>
+          <div style="display:flex;gap:6px">
+            <input type="date" id="add-sabado-input" style="flex:1;min-width:0;margin:0">
+            <button class="btn btn-primary btn-sm" onclick="adicionarDataEspecial('sabado')">+ Add</button>
           </div>
           <div id="lista-sabados" style="display:flex;flex-wrap:wrap;gap:4px"></div>
         </div>
@@ -671,22 +667,25 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   </div>
 
   <div class="card" style="margin-bottom:30px">
-    <div class="card-header" style="background:var(--azul2); display:flex; justify-content:space-between; align-items:center">
-      <span>🗂 Atalhos dos Meses</span>
-      <button class="btn btn-primary admin-only" onclick="window.print()" style="background:#fff; color:var(--azul2); font-size:12px; padding:6px 12px">🖨 Imprimir Calendário Anual</button>
-      <button class="btn btn-primary admin-only" onclick="imprimirPoster()" style="background:#fff; color:var(--verde); border:1.5px solid var(--verde); font-size:12px; padding:6px 12px">🖼 Imprimir Pôster</button>
-      <button class="btn btn-primary admin-only" onclick="exportarExcel()" style="background:#fff; color:#217346; border:1.5px solid #217346; font-size:12px; padding:6px 12px">📊 Exportar Excel</button>
+    <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
+      <span style="display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Atalhos dos Meses</span>
+      <button class="btn btn-primary admin-only" onclick="window.print()" style="background:#fff; color:var(--azul2); font-size:12px; padding:6px 12px; display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Calendário Anual</button>
+      <button class="btn btn-primary admin-only" onclick="imprimirPoster()" style="background:#fff; color:var(--verde); border:1.5px solid var(--verde); font-size:12px; padding:6px 12px; display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Imprimir Pôster</button>
+      <button class="btn btn-primary admin-only" onclick="exportarExcel()" style="background:#fff; color:#217346; border:1.5px solid #217346; font-size:12px; padding:6px 12px; display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
     </div>
     <div style="padding:14px 20px; display:flex; gap:8px; flex-wrap:wrap" id="legenda-ciclos"></div>
   </div>
 
   <!-- ── PAINEL DE PLANEJAMENTO DE CICLO ── -->
   <div class="card" style="margin-bottom:24px">
-    <div class="card-header" style="background:var(--verde);cursor:pointer;user-select:none" onclick="togglePlanejador()">
-      🗓 Planejar Cardápio do Ciclo
-      <span id="icon-planejador" style="float:right;font-size:16px">▼</span>
+    <div class="card-header" style="background:var(--azul);cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center" onclick="togglePlanejador()">
+      <span style="display:flex;align-items:center"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>Planejar Cardápio do Ciclo</span>
+      <span style="display:flex;align-items:center;gap:8px">
+        <button id="pin-planejador-btn" onclick="event.stopPropagation();togglePinPlanejador()" title="Fixar como retraído sempre que abrir a aba" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);font-size:11px;padding:2px 8px;border-radius:12px;cursor:pointer;line-height:1.4;font-family:inherit">fixar retraído</button>
+        <span id="icon-planejador" style="font-size:16px">▲</span>
+      </span>
     </div>
-    <div id="body-planejador" style="display:none;padding:20px">
+    <div id="body-planejador" style="padding:20px">
 
       <!-- Modo Ciclo -->
       <div id="plan-modo-ciclo">
@@ -699,13 +698,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <label>Qtd. de Pratos</label>
             <input type="number" id="plan-qtd" min="1" max="25" value="25" style="width:90px" oninput="gerarSeletoresPratos()">
           </div>
-          <button class="btn btn-verde" onclick="distribuirCiclo()">✅ Distribuir neste Ciclo</button>
-          <button class="btn btn-primary" onclick="distribuirTodoOAno()" style="background:var(--azul2)">🗓 Distribuir em Todo o Ano</button>
-          <button class="btn btn-outline btn-sm" style="align-self:flex-end" onclick="limparCiclo()">🗑 Limpar Ciclo</button>
-          <button class="btn btn-outline btn-sm" style="align-self:flex-end;border-color:#e74c3c;color:#e74c3c" onclick="limparTodosCiclos()">🗑 Limpar Todos os Ciclos</button>
+          <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="distribuirCiclo()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Distribuir neste Ciclo</button>
+          <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="distribuirTodoOAno()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>Distribuir em Todo o Ano</button>
+          <button class="btn btn-outline btn-sm" style="display:flex;align-items:center;gap:5px" onclick="limparCiclo()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Limpar Ciclo</button>
+          <button class="btn btn-outline btn-sm" style="display:flex;align-items:center;gap:5px" onclick="limparTodosCiclos()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Limpar Todos os Ciclos</button>
         </div>
         <p style="font-size:12px;color:var(--txt2);margin-bottom:16px">
-          💡 Os pratos são distribuídos em rotação pelos dias letivos do ciclo selecionado.
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;flex-shrink:0"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Os pratos são distribuídos em rotação pelos dias letivos do ciclo selecionado.
         </p>
       </div>
 
@@ -720,11 +719,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: MERCADO
 ══════════════════════════════════════════════════════ -->
 <div id="pg-mercado" class="pagina ativa">
-  <h2 class="titulo">🛒 Ordens de Fornecimento</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Ordens de Fornecimento</h2>
   <div id="merc-preview-bar" class="no-print" style="display:none;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--azul2,#3b82f6);box-shadow:0 2px 8px rgba(0,0,0,.10)">
     <button class="btn" style="background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc;font-weight:700;font-size:14px" onclick="voltarDaPreview()">← Voltar ao Calendário</button>
-    <button class="btn btn-primary" onclick="validarEImprimir()">🖨️ Imprimir</button>
-    <button class="btn" onclick="exportarExcelMercado()" style="background:#fff;color:#217346;border:1.5px solid #217346;font-weight:700">📊 Exportar Excel</button>
+    <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="validarEImprimir()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+    <button class="btn" style="background:#fff;color:#217346;border:1.5px solid #217346;font-weight:700;display:flex;align-items:center;gap:5px" onclick="exportarExcelMercado()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
   </div>
   <div class="seletor-bar" id="merc-seletor-bar">
     <div style="display:flex;gap:16px;flex-wrap:wrap">
@@ -737,21 +736,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <select id="sel-sem-merc" onchange="renderMercado()" style="min-width:220px"></select>
       </div>
     </div>
-    <button class="btn btn-primary no-print" onclick="validarEImprimir()">🖨 Imprimir</button>
-    <button class="btn btn-primary no-print" onclick="exportarExcelMercado()">📊 Exportar Excel</button>
-    <button class="btn btn-primary no-print" onclick="registrarOrdemExpedida()">📋 Registrar Ordem</button>
+    <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="validarEImprimir()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+    <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="exportarExcelMercado()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
+    <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="registrarOrdemExpedida()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Registrar Ordem</button>
     <button class="btn btn-primary no-print" onclick="irParaPlanejamento()">← Planejamento</button>
   </div>
 
   <div class="stats-grid" id="stats-merc"></div>
 
   <div class="card no-print" style="margin-bottom:20px">
-    <div class="card-header">🍽 Pratos da Semana</div>
+    <div class="card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>Pratos da Semana</div>
     <div style="padding:14px 16px;display:flex;gap:10px;flex-wrap:wrap" id="lista-pratos-merc"></div>
   </div>
 
   <div class="card no-print" style="margin-bottom:20px">
-    <div class="card-header">☕ Café e Açúcar para Servidores</div>
+    <div class="card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Café e Açúcar para Servidores</div>
     <div style="padding:14px 16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
         <input type="checkbox" id="serv-ativo" style="width:16px;height:16px" onchange="toggleServidores()">
@@ -793,14 +792,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: FICHAS TÉCNICAS
 ══════════════════════════════════════════════════════ -->
 <div id="pg-ficha" class="pagina">
-  <h2 class="titulo">📋 Fichas Técnicas dos Pratos</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>Fichas Técnicas dos Pratos</h2>
   <div class="seletor-bar">
     <div class="campo">
       <label>Buscar prato</label>
       <input class="filtro-input" placeholder="Digite o nome..." oninput="filtrarFichas(this.value)" style="width:280px">
     </div>
-    <button class="btn btn-outline" onclick="restaurarTodasFichas()" style="align-self:flex-end;color:#991b1b;border-color:#fca5a5">↩ Restaurar tudo ao padrão PNAE</button>
-    <button class="btn btn-primary" onclick="abrirModalNovoPrato()" style="margin-left:auto;align-self:flex-end">➕ Novo Prato</button>
+    <button class="btn btn-outline" style="align-self:flex-end;color:#991b1b;border-color:#fca5a5;display:flex;align-items:center;gap:5px" onclick="restaurarTodasFichas()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Restaurar tudo ao padrão PNAE</button>
+    <button class="btn btn-primary" style="margin-left:auto;align-self:flex-end;display:flex;align-items:center;gap:5px" onclick="abrirModalNovoPrato()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Prato</button>
   </div>
   <div id="grid-fichas" style="display:grid;grid-template-columns:repeat(3,minmax(250px,1fr));gap:16px"></div>
 </div>
@@ -809,7 +808,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: INGREDIENTES
 ══════════════════════════════════════════════════════ -->
 <div id="pg-ingredientes" class="pagina">
-  <h2 class="titulo">🥕 Cadastro de Ingredientes</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>Cadastro de Ingredientes</h2>
   <div class="seletor-bar">
     <div class="campo">
       <label>Filtrar</label>
@@ -819,32 +818,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <label>Fornecedor</label>
       <select onchange="filtrarIngredientesForn(this.value)">
         <option value="">Todos</option>
-        <option value="AF">🌱 Agricultura Familiar</option>
-        <option value="MC">🏪 Mercado Convencional</option>
+        <option value="AF">Agricultura Familiar (AF)</option>
+        <option value="MC">Mercado Convencional (MC)</option>
       </select>
-    </div>
-  </div>
-  <!-- Periodicidades de entrega -->
-  <div class="card" style="margin-bottom:24px">
-    <div class="card-header" style="background:var(--azul)">⏱ Periodicidades de Entrega</div>
-    <div style="padding:16px">
-      <p style="font-size:12px;color:var(--txt2);margin-bottom:14px">Defina as frequências de entrega disponíveis. O lote por entrega de cada ingrediente será calculado automaticamente com base no consumo semanal × semanas da periodicidade.</p>
-      <table style="margin-bottom:12px">
-        <thead><tr><th>Nome</th><th class="num">A cada (semanas)</th><th></th></tr></thead>
-        <tbody id="tbody-periodicidades"></tbody>
-      </table>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-outline btn-sm" onclick="adicionarPeriodicidade()">+ Adicionar</button>
-        <button class="btn btn-primary btn-sm" onclick="salvarPeriodicidadesForm()">💾 Salvar</button>
-      </div>
     </div>
   </div>
 
   <!-- Fornecedores -->
   <div class="card" style="margin-bottom:24px">
-    <div class="card-header" style="background:var(--azul)">🏢 Fornecedores Cadastrados</div>
+    <div class="card-header" style="background:var(--azul);display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Fornecedores Cadastrados</div>
     <div style="padding:16px">
-      <p style="font-size:12px;color:var(--txt2);margin-bottom:14px">Cadastre os fornecedores. Para associar um fornecedor a um ingrediente, clique em 🏢 na linha do ingrediente abaixo.</p>
+      <p style="font-size:12px;color:var(--txt2);margin-bottom:14px">Cadastre os fornecedores. Para associar um fornecedor a um ingrediente, clique no ícone de fornecedor na linha do ingrediente abaixo.</p>
       <table style="margin-bottom:12px">
         <thead><tr><th>Nome</th><th></th></tr></thead>
         <tbody id="tbody-forn-cadastro"></tbody>
@@ -856,10 +840,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="overflow:visible">
     <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;border-radius:var(--r) var(--r) 0 0">
       <span>Lista de Ingredientes <span style="font-weight:400;font-size:12px;opacity:.8" id="cnt-ings"></span></span>
-      <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis">💾 Salvar embalagens como padrão</button>
+      <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar embalagens como padrão</button>
     </div>
     <table>
-      <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Tipo</th><th>Periodicidade</th><th title="Fornecedores associados">🏢</th><th class="num" title="Tamanho do pacote comercial (ex: 1, 5). Deixe 0 para não arredondar.">Embalagem</th><th class="num">Preço</th></tr></thead>
+      <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Tipo</th><th>Periodicidade</th><th title="Fornecedor cadastrado para este ingrediente">Fornecedor</th><th style="text-align:center" title="Tamanho do pacote comercial (ex: 1 kg, 5 kg). O total de compra será arredondado para o múltiplo mais próximo.">Pacote</th><th style="text-align:center">Preço</th></tr></thead>
       <tbody id="tbody-ings"></tbody>
     </table>
   </div>
@@ -869,12 +853,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: CONFIGURAÇÕES
 ══════════════════════════════════════════════════════ -->
 <div id="pg-config" class="pagina">
-  <h2 class="titulo">⚙ Configurações de Impressão</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações de Impressão</h2>
 
   <div class="config-container">
 
     <div class="config-card">
-      <div class="config-card-header">🎓 Níveis de Ensino e Número de Alunos</div>
+      <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Níveis de Ensino e Número de Alunos</div>
       <div class="config-card-body">
         <p style="font-size:13px;color:var(--txt2);margin-bottom:18px">
           Ative os níveis de ensino presentes na escola e informe a quantidade de alunos em cada um. As quantidades por ingrediente são extraídas diretamente das fichas PNAE — cada nível tem valores próprios de per capita.
@@ -886,12 +870,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 
     <div class="config-card">
-      <div class="config-card-header">🖼 Imagem do Cabeçalho</div>
+      <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Imagem do Cabeçalho</div>
       <div class="config-card-body">
         <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Escolha uma imagem (brasão, logotipo ou selo) que aparecerá no cabeçalho de todas as impressões.</p>
         <div class="upload-area" id="upload-area">
           <input type="file" accept="image/*" id="input-img-cabecalho" onchange="handleImageUpload(event)">
-          <div class="upload-icon">📷</div>
+          <div class="upload-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
           <div class="upload-text">Clique ou arraste uma imagem aqui</div>
           <div class="upload-hint">PNG, JPG ou SVG — tamanho recomendado: 200×100px</div>
         </div>
@@ -904,7 +888,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 
     <div class="config-card">
-      <div class="config-card-header">✍ Assinatura do Diretor</div>
+      <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Assinatura do Diretor</div>
       <div class="config-card-body">
         <div class="config-field">
           <label>Nome completo do(a) Diretor(a)</label>
@@ -926,7 +910,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 
     <div class="config-card">
-      <div class="config-card-header">👁 Pré-visualização da Impressão</div>
+      <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Pré-visualização da Impressão</div>
       <div class="config-card-body">
         <div class="print-preview-box">
           <h4>Aparência ao imprimir</h4>
@@ -947,7 +931,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
 
     <div style="text-align:center;margin-top:10px">
-      <span class="config-saved" id="config-saved">✅ Configurações salvas automaticamente</span>
+      <span class="config-saved" id="config-saved" style="display:inline-flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Configurações salvas automaticamente</span>
     </div>
   </div>
 </div>
@@ -956,13 +940,23 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: PREVISÃO DE GASTOS
 ══════════════════════════════════════════════════════ -->
 <div id="pg-gastos" class="pagina">
-  <h2 class="titulo">💰 Previsão de Gastos</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Orçamento</h2>
   <div class="seletor-bar">
     <div class="campo">
-      <label>Ciclo de Referência</label>
-      <select id="sel-mes-gastos" onchange="renderGastos()"></select>
+      <label>Mês</label>
+      <select id="sel-mes-gastos" onchange="popularSemanasGastos();renderGastos()"></select>
     </div>
-    <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir Relatório de Gastos</button>
+    <div class="campo">
+      <label>Semana</label>
+      <select id="sel-sem-gastos" onchange="renderGastos()">
+        <option value="0">Todas as semanas</option>
+        <option value="1">Semana 1</option>
+        <option value="2">Semana 2</option>
+        <option value="3">Semana 3</option>
+        <option value="4">Semana 4</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="window.print()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Relatório de Gastos</button>
   </div>
 
   <div class="stats-grid">
@@ -972,7 +966,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
     <div class="stat verde">
       <div class="stat-val" id="gasto-mes">R$ 0,00</div>
-      <div class="stat-lbl" id="gasto-mes-lbl">Gasto Estimado no Ciclo</div>
+      <div class="stat-lbl" id="gasto-mes-lbl">Gasto Estimado no Mês</div>
     </div>
     <div class="stat laranja">
       <div class="stat-val" id="gasto-ano">R$ 0,00</div>
@@ -981,7 +975,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   </div>
 
   <div class="card">
-    <div class="card-header">📊 Detalhamento de Custos - <span id="detalhe-periodo">Março</span></div>
+    <div class="card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Detalhamento de Custos - <span id="detalhe-periodo">Março</span></div>
     <table>
       <thead>
         <tr>
@@ -1007,12 +1001,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: ADMIN
 ══════════════════════════════════════════════════════ -->
 <div id="pg-admin" class="pagina">
-  <h2 class="titulo">👤 Painel Administrativo</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Painel Administrativo</h2>
   <div id="admin-alertas" style="margin-bottom:20px"></div>
   <div class="seletor-bar">
-    <button class="btn btn-primary" onclick="abrirNovoUsuario()">➕ Novo Usuário</button>
-    <button class="btn btn-outline" onclick="abrirAdmin()" title="Recarregar lista do servidor">🔄 Atualizar</button>
-    <button class="btn btn-outline" onclick="abrirAlterarSenhaAdmin()" style="margin-left:auto">🔑 Alterar minha senha</button>
+    <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="abrirNovoUsuario()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Usuário</button>
+    <button class="btn btn-outline" style="display:flex;align-items:center;gap:5px" onclick="abrirAdmin()" title="Recarregar lista do servidor"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Atualizar</button>
+    <button class="btn btn-outline" style="margin-left:auto;display:flex;align-items:center;gap:5px" onclick="abrirAlterarSenhaAdmin()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Alterar minha senha</button>
   </div>
   <div class="card">
     <table>
@@ -1030,7 +1024,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </table>
   </div>
   <div class="card" style="margin-top:20px">
-    <div class="card-header" style="background:var(--azul)"><span>ℹ️ Dados Compartilhados</span></div>
+    <div class="card-header" style="background:var(--azul);display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Dados Compartilhados</div>
     <div style="padding:16px;font-size:13px;color:var(--txt2)">
       As fichas técnicas customizadas (<b>Fichas Técnicas</b>) são compartilhadas com todas as escolas. Somente o administrador pode editá-las.<br>
       Cada escola tem seus próprios dados de cardápio, estoque, licitações e configurações.
@@ -1042,7 +1036,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="overlay" id="overlay-senha-admin" onclick="if(event.target===this)this.classList.remove('aberto')">
   <div class="modal" style="max-width:380px">
     <div class="modal-header" style="background:var(--azul2)">
-      <h3>🔑 Alterar Senha do Admin</h3>
+      <h3 style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Alterar Senha do Admin</h3>
       <button class="modal-close" onclick="document.getElementById('overlay-senha-admin').classList.remove('aberto')">×</button>
     </div>
     <div class="modal-body">
@@ -1061,7 +1055,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <div id="admin-senha-erro" style="color:var(--vermelho);font-size:12px;margin-bottom:10px;display:none"></div>
       <div style="display:flex;justify-content:flex-end;gap:10px">
         <button class="btn btn-outline" onclick="document.getElementById('overlay-senha-admin').classList.remove('aberto')">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarSenhaAdmin()">💾 Salvar</button>
+        <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="salvarSenhaAdmin()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       </div>
     </div>
   </div>
@@ -1069,41 +1063,105 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
 <!-- Modal Boas-vindas / Onboarding -->
 <div class="overlay" id="overlay-boas-vindas" style="align-items:center">
-  <div class="modal" style="max-width:540px">
+  <div class="modal" style="max-width:580px;overflow:hidden">
     <div class="modal-header" style="background:var(--verde)">
-      <h3>👋 Bem-vindo ao Prato Certo!</h3>
+      <h3 style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg><span id="onb-titulo-txt">Bem-vindo ao Prato Certo!</span></h3>
+      <button class="modal-close" onclick="fecharBoasVindas()">×</button>
     </div>
-    <div class="modal-body">
-      <p style="font-size:13px;color:var(--txt2);margin-bottom:18px">
-        Para usar o sistema, escolha uma das opções abaixo:
-      </p>
+    <div class="modal-body" style="padding:0">
 
-      <!-- Opção A: Demonstração -->
-      <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:16px;margin-bottom:16px">
-        <div style="font-weight:700;color:#166534;margin-bottom:4px;font-size:14px">🚀 Opção A — Configuração de demonstração</div>
-        <div style="font-size:12px;color:#166534;margin-bottom:12px">
-          Carrega automaticamente alunos, preços, ciclos e cardápio de exemplo. Ideal para conhecer o sistema antes de inserir seus dados reais.
+      <!-- Indicadores de etapa -->
+      <div style="display:flex;justify-content:center;gap:8px;padding:14px 0 0">
+        <span id="onb-dot-1" onclick="onbGoto(1)" style="display:block;width:10px;height:10px;border-radius:50%;background:var(--verde);cursor:pointer;transition:background .2s"></span>
+        <span id="onb-dot-2" onclick="onbGoto(2)" style="display:block;width:10px;height:10px;border-radius:50%;background:#cbd5e1;cursor:pointer;transition:background .2s"></span>
+        <span id="onb-dot-3" onclick="onbGoto(3)" style="display:block;width:10px;height:10px;border-radius:50%;background:#cbd5e1;cursor:pointer;transition:background .2s"></span>
+      </div>
+
+      <!-- Página 1: O que é o Prato Certo -->
+      <div id="onb-pg-1" style="padding:0">
+        <!-- Hero banner -->
+        <div style="background:linear-gradient(135deg,#166534 0%,#15803d 100%);padding:26px 28px 22px;color:#fff">
+          <div style="font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:7px">Prato Certo</div>
+          <div style="font-size:13px;opacity:.88;line-height:1.65;max-width:380px">
+            O sistema de gestão de merenda escolar que organiza seu planejamento do início ao fim — do cardápio à lista de compras.
+          </div>
         </div>
-        <button class="btn" style="background:#16a34a;color:#fff;width:100%;font-size:13px;font-weight:700" onclick="carregarDemostracao()">
-          ✨ Usar configuração de demonstração
-        </button>
-      </div>
-
-      <!-- Opção B: Manual -->
-      <div style="background:#f8faff;border:2px solid var(--borda);border-radius:10px;padding:16px">
-        <div style="font-weight:700;color:var(--txt);margin-bottom:4px;font-size:14px">⚙ Opção B — Configurar manualmente</div>
-        <div style="font-size:12px;color:var(--txt2);margin-bottom:12px">
-          Preencha as informações reais da sua escola. Clique em cada item abaixo para ser guiado à tela de configuração correspondente.
+        <!-- Benefícios em linhas horizontais -->
+        <div>
+          <div style="display:flex;align-items:center;gap:16px;padding:16px 26px;border-bottom:1px solid var(--borda)">
+            <div style="background:#f0fdf4;border-radius:10px;width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;color:var(--txt);margin-bottom:3px">Planejamento</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.4">Cardápios por ciclos com calendário letivo integrado</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;padding:16px 26px;border-bottom:1px solid var(--borda)">
+            <div style="background:#eff6ff;border-radius:10px;width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;color:var(--txt);margin-bottom:3px">Conformidade PNAE</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.4">Fichas técnicas com per capita por nível de ensino</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;padding:16px 26px">
+            <div style="background:#fffbeb;border-radius:10px;width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;color:var(--txt);margin-bottom:3px">Controle Total</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.4">Estoque, licitações e lista de compras automática</div>
+            </div>
+          </div>
         </div>
-        <div id="onboarding-checklist" style="display:flex;flex-direction:column;gap:8px"></div>
-        <div id="onboarding-iniciar" style="margin-top:12px"></div>
       </div>
 
-      <div style="margin-top:16px;text-align:center">
-        <button class="btn btn-outline" style="font-size:13px;color:var(--txt2);border-color:var(--borda)" onclick="fecharBoasVindas()">
-          Fechar e ir para o sistema
-        </button>
+      <!-- Página 2: Ferramentas -->
+      <div id="onb-pg-2" style="display:none;padding:0">
+        <div style="background:#f8fafc;border-bottom:1px solid var(--borda);padding:18px 26px 16px">
+          <div style="font-size:17px;font-weight:900;color:var(--txt);letter-spacing:-.3px;margin-bottom:4px">Tudo em um só sistema</div>
+          <div style="font-size:12px;color:var(--txt2)">Cada módulo resolve uma parte do seu trabalho diário</div>
+        </div>
+        <div style="padding:16px 26px 10px">
+          <div id="onb-features-grid"></div>
+        </div>
       </div>
+
+      <!-- Página 3: Configurar (conteúdo original) -->
+      <div id="onb-pg-3" style="display:none;padding:20px 26px 10px">
+        <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Para usar o sistema, escolha uma das opções abaixo:</p>
+        <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:16px;margin-bottom:14px">
+          <div style="font-weight:700;color:#166534;margin-bottom:4px;font-size:14px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Opção A — Configuração de demonstração</div>
+          <div style="font-size:12px;color:#166534;margin-bottom:12px">Carrega automaticamente alunos, preços, ciclos e cardápio de exemplo. Ideal para conhecer o sistema antes de inserir seus dados reais.</div>
+          <button class="btn" style="background:#16a34a;color:#fff;width:100%;font-size:13px;font-weight:700" onclick="carregarDemostracao()">Usar configuração de demonstração</button>
+        </div>
+        <div style="background:#f8faff;border:2px solid var(--borda);border-radius:10px;padding:16px">
+          <div style="font-weight:700;color:var(--txt);margin-bottom:4px;font-size:14px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Opção B — Configurar manualmente</div>
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:12px">Preencha as informações reais da sua escola. Clique em cada item abaixo para ser guiado à tela de configuração correspondente.</div>
+          <div id="onboarding-checklist" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div id="onboarding-iniciar" style="margin-top:12px"></div>
+        </div>
+        <div style="margin-top:14px;text-align:center">
+          <button class="btn btn-outline" style="font-size:13px;color:var(--txt2);border-color:var(--borda)" onclick="fecharBoasVindas()">Fechar e ir para o sistema</button>
+        </div>
+      </div>
+
+      <!-- Navegação -->
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 26px;border-top:1px solid var(--borda);margin-top:10px">
+        <button id="onb-btn-prev" onclick="onbGoto(_onbPag-1)" class="btn btn-outline btn-sm" style="visibility:hidden;font-size:12px">← Anterior</button>
+        <button id="onb-btn-skip" onclick="onbGoto(3)" style="background:none;border:none;font-size:12px;color:var(--txt2);cursor:pointer;text-decoration:underline">Pular apresentação</button>
+        <button id="onb-btn-next" onclick="onbGoto(_onbPag+1)" class="btn btn-primary btn-sm" style="font-size:12px">Próximo →</button>
+      </div>
+      <!-- Opção de não mostrar mais -->
+      <div style="text-align:center;padding:0 26px 14px">
+        <label style="font-size:11px;color:var(--txt2);display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none">
+          <input type="checkbox" id="chk-nao-mostrar" style="cursor:pointer;accent-color:var(--azul)">
+          Não mostrar automaticamente ao entrar
+        </label>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1160,7 +1218,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn btn-outline" onclick="fecharOverlayUsuario()">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarUsuarioForm()">💾 Salvar</button>
+        <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="salvarUsuarioForm()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       </div>
     </div>
   </div>
@@ -1169,64 +1227,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- ══════════════════════════════════════════════════════
      PÁGINA: ESTOQUE
 ══════════════════════════════════════════════════════ -->
-<div id="pg-estoque" class="pagina">
-  <h2 class="titulo">📦 Gestão de Estoque</h2>
-
-  <!-- Bloco 1: Alertas -->
-  <div id="est-alertas" style="margin-bottom:24px"></div>
-
-  <!-- Bloco 2: Tabela de previsão -->
-  <div class="card" style="margin-bottom:24px">
-    <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
-      <span>Previsão de Reposição</span>
-      <div style="display:flex;gap:8px" onclick="event.stopPropagation()">
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="filtrarEstoque('todos')">Todos</button>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="filtrarEstoque('atencao')">⚠️ Atenção</button>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="filtrarEstoque('ok')">✅ OK</button>
-      </div>
-    </div>
-    <div style="padding:0">
-      <table id="tabela-previsao">
-        <thead>
-          <tr>
-            <th>Ingrediente</th>
-            <th class="num">Estoque Atual</th>
-            <th class="num">Semanas Cobertas</th>
-            <th class="num">Próximo Pedido</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-previsao"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Bloco 3: Configuração de lotes -->
-  <div class="card">
-    <div class="card-header" style="background:var(--verde)">
-      <span>⚙️ Configurar Lote por Entrega</span>
-    </div>
-    <div style="padding:16px">
-      <p style="font-size:12px;color:var(--txt2);margin-bottom:12px">Defina a quantidade preferida a receber por entrega de cada ingrediente. O sistema usa esse valor para calcular quando fazer o próximo pedido.</p>
-      <table>
-        <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Periodicidade</th><th class="num">Lote Sugerido</th><th class="num">Lote por Entrega</th></tr></thead>
-        <tbody id="tbody-lotes"></tbody>
-      </table>
-      <div style="text-align:right;margin-top:12px">
-        <button class="btn btn-primary" onclick="salvarLotesForm()">💾 Salvar lotes</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ══════════════════════════════════════════════════════
      PÁGINA: LICITAÇÕES
 ══════════════════════════════════════════════════════ -->
 <div id="pg-licitacoes" class="pagina">
-  <h2 class="titulo">📄 Controle de Licitações</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Contratos</h2>
   <div class="seletor-bar">
-    <button class="btn btn-primary" onclick="abrirNovaLicitacao()">➕ Nova Licitação</button>
-    <button class="btn btn-outline" onclick="abrirCalculadora()">💰 Calculadora por Orçamento</button>
+    <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="abrirNovaLicitacao()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Licitação</button>
+    <button class="btn btn-outline" style="display:flex;align-items:center;gap:5px" onclick="abrirCalculadora()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Calculadora por Orçamento</button>
   </div>
   <div id="lista-licitacoes"></div>
 </div>
@@ -1235,9 +1244,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: GUIA DE PREPARO
 ══════════════════════════════════════════════════════ -->
 <div id="pg-preparo" class="pagina">
-  <h2 class="titulo">🍳 Guia de Preparo por Fase de Ensino</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2l1.5 1.5"/><path d="M9 2l-1.5 1.5"/><path d="M6 2v3"/><path d="M3 17h18"/><path d="M19.5 17v3.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V17"/><path d="M12 17V7"/><path d="M8 17V9"/><path d="M16 17v-5"/></svg>Guia de Preparo por Fase de Ensino</h2>
   <div class="seletor-bar">
-    <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir Guia</button>
+    <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="window.print()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Guia</button>
   </div>
   <div id="prep-conteudo"></div>
 </div>
@@ -1251,7 +1260,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="overlay" id="overlay-calculadora" onclick="fecharCalculadora(event)">
   <div class="modal" style="max-width:760px">
     <div class="modal-header" style="background:var(--azul)">
-      <h3>💰 Calculadora por Orçamento</h3>
+      <h3 style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Calculadora por Orçamento</h3>
       <button class="modal-close" onclick="fecharCalculadora()">×</button>
     </div>
     <div class="modal-body">
@@ -1290,7 +1299,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="fecharCalculadora()">Fechar</button>
-          <button class="btn btn-primary" id="btn-aplicar-calc" onclick="aplicarQuantidadesCalculadora()">📋 Usar no edital → Nova Licitação</button>
+          <button class="btn btn-primary" id="btn-aplicar-calc" style="display:flex;align-items:center;gap:5px" onclick="aplicarQuantidadesCalculadora()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Usar no edital → Nova Licitação</button>
         </div>
       </div>
       <div id="calc-vazio" style="text-align:center;color:#aaa;padding:24px;font-size:13px">
@@ -1323,7 +1332,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <span style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--txt2);letter-spacing:.06em">Itens Contratados</span>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm btn-outline" onclick="sugerirItensLicitacao()">📊 Sugerir quantidades</button>
+          <button class="btn btn-sm btn-outline" style="display:flex;align-items:center;gap:4px" onclick="sugerirItensLicitacao()"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Sugerir quantidades</button>
           <button class="btn btn-sm btn-verde" onclick="adicionarItemLic()">+ Item</button>
         </div>
       </div>
@@ -1336,7 +1345,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn btn-outline" onclick="fecharOverlayLic()">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarLicitacaoForm()">💾 Salvar Licitação</button>
+        <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="salvarLicitacaoForm()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar Licitação</button>
       </div>
     </div>
   </div>
@@ -1346,7 +1355,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="overlay" id="overlay-recebimento" onclick="fecharOverlayRec(event)">
   <div class="modal" style="max-width:600px">
     <div class="modal-header" style="background:var(--laranja)">
-      <h3>📦 Confirmar Recebimento</h3>
+      <h3 style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Confirmar Recebimento</h3>
       <button class="modal-close" onclick="fecharOverlayRec()">×</button>
     </div>
     <div class="modal-body" id="modal-body-recebimento"></div>
@@ -1368,7 +1377,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="overlay" id="overlay-novo-prato" onclick="fecharModalNovoPrato(event)">
   <div class="modal" style="max-width:600px">
     <div class="modal-header" style="background:var(--azul2)">
-      <h3>➕ Cadastrar Novo Prato</h3>
+      <h3 style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Cadastrar Novo Prato</h3>
       <button class="modal-close" onclick="fecharModalNovoPrato()">×</button>
     </div>
     <div class="modal-body">
@@ -1403,7 +1412,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       
       <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:12px">
         <button class="btn btn-outline" onclick="fecharModalNovoPrato()">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarNovoPrato()">💾 Salvar Prato</button>
+        <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="salvarNovoPrato()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar Prato</button>
       </div>
     </div>
   </div>
@@ -1440,13 +1449,9 @@ const _supaSync = {
     'merenda_licitacoes': 'licitacoes',
     'merenda_ordens_expedidas': 'ordens_expedidas',
     'merenda_recebimentos': 'recebimentos',
-    'merenda_lotes': 'lotes',
     'merenda_estoque': 'estoque',
     'merenda_merc_ajustes': 'merc_ajustes',
-    'merenda_semanas_consumidas': 'semanas_consumidas',
     'merenda_servidores_config': 'servidores_config',
-    'merenda_periodicidades': 'periodicidades',
-    'merenda_ing_periodicidade': 'ing_periodicidade',
     'merenda_af_custom': 'af_custom',
     'merenda_ciclos_planos': 'ciclos_planos',
     'merenda_unidades': 'unidades',
@@ -1458,6 +1463,8 @@ const _supaSync = {
     'merenda_cargo': 'config',
     'merenda_escola': 'config',
     'merenda_subtitulo': 'config',
+    'merenda_fornecedores': 'config',
+    'merenda_ing_fornecedores': 'config',
   },
 
   // Configura o userId para sync
@@ -1478,7 +1485,7 @@ const _supaSync = {
   async _flushSync() {
     if(!this._userId || !_supabase || this._pendingFields.size === 0) return;
     const updates = {};
-    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo'];
+    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
 
     // Coletar 'config' como um bundle
     const hasConfig = [...this._pendingFields].some(k => configFields.includes(k));
@@ -1536,7 +1543,7 @@ const _supaSync = {
         columnToKey[col].push(k);
       });
 
-      const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo'];
+      const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
 
       Object.entries(data).forEach(([col, val]) => {
         if(col === 'user_id' || col === 'updated_at' || val === null) return;
@@ -1710,6 +1717,8 @@ async function hashSenha(senha){
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 function esc(str){ const d=document.createElement('div'); d.textContent=String(str??''); return d.innerHTML; }
+function ico(name,sz=14){const p={printer:`<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>`,img:`<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`,chart:`<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>`,check:`<polyline points="20 6 9 17 4 12"/>`,checkCircle:`<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>`,trash:`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>`,bulb:`<line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>`,coffee:`<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>`,plus:`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`,save:`<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>`,eye:`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`,eyeOff:`<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`,refresh:`<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>`,key:`<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>`,info:`<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`,alert:`<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,bell:`<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`,edit:`<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>`,x:`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`,xCircle:`<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>`,logout:`<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>`,help:`<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,folder:`<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>`,play:`<polygon points="5 3 19 12 5 21 5 3"/>`,stop:`<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>`,zap:`<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`,smile:`<circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>`,calCheck:`<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/>`,cal:`<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>`,users:`<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`}[name]||'';return`<svg xmlns="http://www.w3.org/2000/svg" width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0">${p}</svg>`;}
+function dot(c){return`<svg width="9" height="9" viewBox="0 0 9 9" style="vertical-align:middle;margin-right:3px"><circle cx="4.5" cy="4.5" r="4" fill="${c}"/></svg>`;}
 
 window.addEventListener('beforeunload', () => { try{ _supaSync._flushSync(); }catch(e){} });
 
@@ -1746,30 +1755,11 @@ function recarregarDados(){
   LICITACOES      = JSON.parse(localStorage.getItem('merenda_licitacoes') || '[]');
   ORDENS_EXPEDIDAS= JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
   RECEBIMENTOS    = JSON.parse(localStorage.getItem('merenda_recebimentos') || '[]');
-  LOTES              = JSON.parse(localStorage.getItem('merenda_lotes') || '{}');
   ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque') || '{}');
   MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
-  PERIODICIDADES          = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || PERIODICIDADES;
-  // Migração: garante que as periodicidades padrão novas existam para quem já tinha dados salvos
-  const _perPadrao = [
-    { id:'per_3', nome:'Tricosseminal', semanas:3 },
-    { id:'per_4', nome:'Mensal',        semanas:4 },
-  ];
-  let _perMigrou = false;
-  _perPadrao.forEach(pp => {
-    if(!PERIODICIDADES.some(p => p.id === pp.id || p.semanas === pp.semanas)){
-      // insere na posição correta pela qtd de semanas
-      const idx = PERIODICIDADES.findIndex(p => p.semanas > pp.semanas);
-      if(idx >= 0) PERIODICIDADES.splice(idx, 0, pp); else PERIODICIDADES.push(pp);
-      _perMigrou = true;
-    }
-  });
-  if(_perMigrou) localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES));
-  ING_PERIODICIDADE       = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
   FORNECEDORES_CADASTRO   = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
   ING_FORNECEDORES        = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
   Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
-  SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas') || '[]');
   // Aplicar unidades customizadas
   const u = JSON.parse(localStorage.getItem('merenda_unidades') || '{}');
   Object.entries(u).forEach(([nome, unidade]) => {
@@ -1817,7 +1807,7 @@ function mostrarTelaLogin(opts){
           O acesso de <b>${user.nome}</b> expirou em ${fmtDataBR(user.data_expiracao)}.
         </p>
         ${user.renovacao_solicitada
-          ? '<p style="color:var(--azul2);font-weight:600;font-size:13px">✅ Renovação solicitada — aguardando aprovação do administrador.</p>'
+          ? `<p style="color:var(--azul2);font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px">${ico('checkCircle',14)}Renovação solicitada — aguardando aprovação do administrador.</p>`
           : `<button class="login-btn" style="background:var(--amarelo);margin-bottom:8px" onclick="solicitarRenovacaoExpirado('${user.id}')">Solicitar renovação</button>`
         }
         <button class="login-btn" style="background:transparent;color:var(--txt2);margin-top:8px" onclick="location.reload()">← Voltar ao login</button>
@@ -1854,7 +1844,7 @@ function migrarDadosLocais(userId){
   const chaves = [
     'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
     'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
-    'merenda_subtitulo','merenda_embalagens','merenda_ing_periodicidade',
+    'merenda_subtitulo','merenda_embalagens',
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
     'merenda_fornecedores','merenda_ing_fornecedores'
   ];
@@ -1905,10 +1895,10 @@ async function fazerLogin(){
     const _chavesPrefixadas = [
       'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
       'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
-      'merenda_subtitulo','merenda_embalagens','merenda_ing_periodicidade',
+      'merenda_subtitulo','merenda_embalagens',
       'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
-      'merenda_fornecedores','merenda_ing_fornecedores','merenda_periodicidades',
-      'merenda_licitacoes','merenda_estoque','merenda_lotes','merenda_merc_ajustes',
+      'merenda_fornecedores','merenda_ing_fornecedores',
+      'merenda_licitacoes','merenda_estoque','merenda_merc_ajustes',
       'merenda_onboarding_visto','merenda_servidores_config'
     ];
     const _isPerfilFixo = res.user.id === 'usr_admin' || res.user.id === 'usr_admin_rede';
@@ -1932,6 +1922,8 @@ async function fazerLogin(){
       localStorage.setItem('merenda_fornecedores', '[]');
       localStorage.setItem('merenda_ing_fornecedores', '{}');
       localStorage.setItem('merenda_servidores_config', JSON.stringify(_defServ));
+      localStorage.setItem('merenda_cal_config', JSON.stringify({inicio:'',fim:'',feriados:[],recesso:[],sabados:[]}));
+      localStorage.setItem('merenda_cardapio', JSON.stringify({}));
       // Grava defaults limpos imediatamente no Supabase — evita defaults de coluna aparecerem em refreshes
       if(_supabase){ try { await _supabase.from('escola_dados').upsert({ user_id: res.user.id, niveis: _defNiveis, servidores_config: _defServ }, { onConflict: 'user_id' }); } catch(e){} }
       // Marca conta como inicializada
@@ -2040,11 +2032,11 @@ function renderAlertaExpiracao(){
   if(dias > 14){ banner.className = ''; return; }
   if(user.renovacao_solicitada){
     banner.className = 'azul';
-    msg.textContent = '🔔 Renovação solicitada — aguardando aprovação do administrador.';
+    msg.innerHTML = `${ico('bell',13)} Renovação solicitada — aguardando aprovação do administrador.`;
     if(btnRen) btnRen.style.display = 'none';
   } else {
     banner.className = 'amarelo';
-    msg.textContent = `⚠️ Sua assinatura expira em ${dias} dia(s) (${fmtDataBR(user.data_expiracao)}).`;
+    msg.innerHTML = `${ico('alert',13)} Sua assinatura expira em ${dias} dia(s) (${fmtDataBR(user.data_expiracao)}).`;
     if(btnRen) btnRen.style.display = '';
   }
 }
@@ -2075,7 +2067,12 @@ document.addEventListener('DOMContentLoaded', function(){
   if(_screen) _screen.classList.add('oculto');
   atualizarNavAuth();
   renderAlertaExpiracao();
-  // Sincroniza dados do Supabase na retomada de sessão (refresh/reabrir aba)
+  // Inicializar UI com dados locais imediatamente (não depende do Supabase)
+  recarregarDados();
+  init();
+  gerarSeletoresPratos();
+  carregarConfig();
+  // Depois sincronizar com Supabase e atualizar se houver dados mais recentes
   (async () => {
     const sess = window._SESSAO;
     if(sess && _supabase) {
@@ -2087,9 +2084,9 @@ document.addEventListener('DOMContentLoaded', function(){
           gerarSeletoresPratos();
           carregarConfig();
         }
-        setTimeout(verificarOnboarding, 200);
       } catch(e) { console.warn('Sync on resume failed:', e); }
     }
+    setTimeout(verificarOnboarding, 200);
   })();
 });
 
@@ -2099,7 +2096,7 @@ function toggleVerSenha(){
   if(!inp) return;
   const oculto = inp.type === 'password';
   inp.type = oculto ? 'text' : 'password';
-  if(btn) btn.textContent = oculto ? '🙈' : '👁';
+  if(btn) btn.innerHTML = oculto ? ico('eyeOff') : ico('eye');
 }
 
 // ── ADMIN ─────────────────────────────────────────────
@@ -2137,11 +2134,11 @@ function renderAdmin(){
       u.data_expiracao >= hoje && diasEntre(hoje, u.data_expiracao) <= 7);
     let html = '';
     if(renovacoes.length)
-      html += `<div style="background:#fef3c7;border:1.5px solid var(--amarelo);border-radius:8px;padding:10px 16px;margin-bottom:8px;font-size:13px">
-        🔔 <b>${renovacoes.length} escola(s)</b> solicitaram renovação de acesso.</div>`;
+      html += `<div style="background:#fef3c7;border:1.5px solid var(--amarelo);border-radius:8px;padding:10px 16px;margin-bottom:8px;font-size:13px;display:flex;align-items:center;gap:7px">
+        ${ico('bell',13)} <b>${renovacoes.length} escola(s)</b> solicitaram renovação de acesso.</div>`;
     if(expirando.length)
       html += `<div style="background:#fee2e2;border:1.5px solid var(--vermelho);border-radius:8px;padding:10px 16px;margin-bottom:8px;font-size:13px">
-        ⚠️ <b>${expirando.length} escola(s)</b> expiram em menos de 7 dias.</div>`;
+        ${ico('alert',13)} <b>${expirando.length} escola(s)</b> expiram em menos de 7 dias.</div>`;
     alertasEl.innerHTML = html;
   }
 
@@ -2156,11 +2153,11 @@ function renderAdmin(){
   tbody.innerHTML = escolasOnly.map(u => {
     const dias = u.data_expiracao ? diasEntre(hoje, u.data_expiracao) : null;
     let statusHtml;
-    if(!u.ativo) statusHtml = '<span class="status-inativo">⚪ Inativo</span>';
-    else if(u.data_expiracao && u.data_expiracao < hoje) statusHtml = '<span class="status-expirado">🔴 Expirado</span>';
-    else if(dias !== null && dias <= 14) statusHtml = `<span class="status-expira">🟡 Expira em ${dias}d</span>`;
-    else statusHtml = '<span class="status-ativo">🟢 Ativo</span>';
-    if(u.renovacao_solicitada) statusHtml += ' <span title="Renovação solicitada">🔔</span>';
+    if(!u.ativo) statusHtml = `<span class="status-inativo" style="display:inline-flex;align-items:center;gap:4px">${dot('#9ca3af')}Inativo</span>`;
+    else if(u.data_expiracao && u.data_expiracao < hoje) statusHtml = `<span class="status-expirado" style="display:inline-flex;align-items:center;gap:4px">${dot('#ef4444')}Expirado</span>`;
+    else if(dias !== null && dias <= 14) statusHtml = `<span class="status-expira" style="display:inline-flex;align-items:center;gap:4px">${dot('#f59e0b')}Expira em ${dias}d</span>`;
+    else statusHtml = `<span class="status-ativo" style="display:inline-flex;align-items:center;gap:4px">${dot('#22c55e')}Ativo</span>`;
+    if(u.renovacao_solicitada) statusHtml += ` <span title="Renovação solicitada" style="display:inline-flex;align-items:center">${ico('bell',12)}</span>`;
     const isFixo = u.id === 'usr_admin' || u.id === 'usr_admin_rede';
     return `<tr>
       <td><b>${esc(u.nome)}</b>${isFixo ? ' <span style="font-size:10px;background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 5px;font-weight:700">fixo</span>' : ''}</td>
@@ -2169,9 +2166,9 @@ function renderAdmin(){
       <td style="font-size:12px">${u.data_expiracao ? fmtDataBR(u.data_expiracao) : '—'}</td>
       <td>${statusHtml}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-sm btn-outline" onclick="editarUsuario('${u.id}')" title="Editar">✏️</button>
-        ${u.renovacao_solicitada ? `<button class="btn btn-sm" style="background:var(--verde);color:#fff" onclick="aprovarRenovacao('${u.id}')">✅ Renovar</button>` : ''}
-        ${!isFixo ? `<button class="btn btn-sm" style="background:var(--vermelho);color:#fff" onclick="excluirUsuario('${u.id}')" title="Excluir usuário">🗑️ Excluir</button>` : ''}
+        <button class="btn btn-sm btn-outline" style="display:inline-flex;align-items:center;justify-content:center;padding:4px 8px" onclick="editarUsuario('${u.id}')" title="Editar">${ico('edit',13)}</button>
+        ${u.renovacao_solicitada ? `<button class="btn btn-sm" style="background:var(--verde);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="aprovarRenovacao('${u.id}')">${ico('checkCircle',12)}Renovar</button>` : ''}
+        ${!isFixo ? `<button class="btn btn-sm" style="background:var(--vermelho);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="excluirUsuario('${u.id}')" title="Excluir usuário">${ico('trash',12)}Excluir</button>` : ''}
       </td>
     </tr>`;
   }).join('');
@@ -2344,14 +2341,70 @@ function configuracaoCompleta(){
 function verificarOnboarding(){
   const uid = window._SESSAO && window._SESSAO.user_id;
   if(uid === 'usr_admin' || uid === 'usr_admin_rede') return;
+  if(localStorage.getItem('merenda_ocultar_boasvindas') === '1') return;
   const demoAtivo = !!localStorage.getItem('merenda_usando_demo');
   if(demoAtivo || configuracaoCompleta()) return;
   abrirGuiaInicio();
 }
 
-function abrirGuiaInicio(){
-  renderChecklistOnboarding();
+var _onbPag = 1;
+
+function abrirGuiaInicio(irParaSetup){
+  _onbPag = 1;
   document.getElementById('overlay-boas-vindas').classList.add('aberto');
+  onbGoto(irParaSetup ? 3 : 1);
+  const chk = document.getElementById('chk-nao-mostrar');
+  if(chk) chk.checked = localStorage.getItem('merenda_ocultar_boasvindas') === '1';
+}
+
+function onbGoto(n){
+  if(n < 1 || n > 3) return;
+  _onbPag = n;
+  for(var i = 1; i <= 3; i++){
+    var pg = document.getElementById('onb-pg-'+i);
+    if(pg) pg.style.display = (i === n) ? '' : 'none';
+    var dot = document.getElementById('onb-dot-'+i);
+    if(dot) dot.style.background = (i <= n) ? 'var(--verde)' : '#cbd5e1';
+  }
+  if(n === 2){
+    var grid = document.getElementById('onb-features-grid');
+    if(grid && !grid.children.length) renderOnbFeatures();
+  }
+  if(n === 3) renderChecklistOnboarding();
+  var titles = ['Bem-vindo ao Prato Certo!','O que você pode fazer','Como você prefere começar?'];
+  var t = document.getElementById('onb-titulo-txt');
+  if(t) t.textContent = titles[n-1];
+  var prev = document.getElementById('onb-btn-prev');
+  var next = document.getElementById('onb-btn-next');
+  var skip = document.getElementById('onb-btn-skip');
+  if(prev) prev.style.visibility = n > 1 ? 'visible' : 'hidden';
+  if(next){
+    next.style.display = n < 3 ? '' : 'none';
+    next.textContent = n === 2 ? 'Configurar →' : 'Próximo →';
+  }
+  if(skip) skip.style.display = n < 3 ? '' : 'none';
+}
+
+function renderOnbFeatures(){
+  var features = [
+    {key:'cal',    title:'Cardápio Anual',    desc:'Planejamento por ciclos com calendário letivo', bg:'#eff6ff',bc:'#93c5fd',tc:'#1e40af'},
+    {key:'folder', title:'Fichas Técnicas',   desc:'Receitas PNAE com per capita por nível',        bg:'#f0fdf4',bc:'#86efac',tc:'#166534'},
+    {key:'chart',  title:'Lista de Compras',   desc:'Compras semanais calculadas automaticamente',   bg:'#faf5ff',bc:'#d8b4fe',tc:'#7e22ce'},
+    {key:'alert',  title:'Estoque',           desc:'Monitoramento com alertas de nível crítico',    bg:'#fffbeb',bc:'#fcd34d',tc:'#b45309'},
+    {key:'edit',   title:'Contratos',          desc:'Controle de contratos, pedidos e recebimentos', bg:'#fff1f2',bc:'#fda4af',tc:'#be123c'},
+    {key:'coffee', title:'Guia de Preparo',   desc:'Quantidades para cozinhar no dia por turno',   bg:'#fdf4ff',bc:'#e9d5ff',tc:'#86198f'},
+    {key:'users',  title:'Ingredientes',      desc:'Preços, unidades, pacotes e fornecedores',      bg:'#f0fdfa',bc:'#99f6e4',tc:'#0f766e'},
+    {key:'key',    title:'Configurações',     desc:'Escola, calendário, níveis e cabeçalho',        bg:'#f8fafc',bc:'#cbd5e1',tc:'#475569'},
+  ];
+  document.getElementById('onb-features-grid').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+    features.map(function(f){
+      return '<div style="display:flex;align-items:flex-start;gap:10px;background:'+f.bg+';border:1.5px solid '+f.bc+';border-radius:8px;padding:10px 12px">' +
+        '<span style="color:'+f.tc+';flex-shrink:0;margin-top:1px">'+ico(f.key,16)+'</span>' +
+        '<div><div style="font-size:12px;font-weight:700;color:'+f.tc+'">'+f.title+'</div>' +
+        '<div style="font-size:11px;color:var(--txt2);margin-top:2px">'+f.desc+'</div></div></div>';
+    }).join('') +
+    '</div>';
 }
 
 function renderChecklistOnboarding(){
@@ -2392,7 +2445,7 @@ function renderChecklistOnboarding(){
   if(!el) return;
   el.innerHTML = steps.map((s,i) => `
     <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:${s.ok?'#f0fdf4':'#f9fafb'};border:1.5px solid ${s.ok?'#86efac':'var(--borda)'};border-radius:8px;cursor:${s.ok?'default':'pointer'}" onclick="${s.ok?'':('_onbStep('+i+')')}">
-      <span style="font-size:18px;flex-shrink:0;margin-top:1px">${s.ok?'✅':'⚪'}</span>
+      <span style="font-size:18px;flex-shrink:0;margin-top:1px">${s.ok?ico('checkCircle',18):dot('#9ca3af')}</span>
       <div>
         <div style="font-size:13px;font-weight:700;color:${s.ok?'#166534':'var(--txt)'}">${s.label}</div>
         <div style="font-size:11px;color:var(--txt2)">${s.desc}</div>
@@ -2408,7 +2461,7 @@ function renderChecklistOnboarding(){
   if(iniciarEl){
     const tudo = steps.every(s => s.ok);
     iniciarEl.innerHTML = tudo
-      ? `<button class="btn btn-primary" style="width:100%;font-size:14px;font-weight:700" onclick="concluirOnboarding()">✅ Tudo configurado — Iniciar o sistema →</button>`
+      ? `<button class="btn btn-primary" style="width:100%;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px" onclick="concluirOnboarding()">${ico('checkCircle',15)}Tudo configurado — Iniciar o sistema →</button>`
       : `<div style="text-align:center;font-size:12px;color:var(--txt2);padding:8px;background:#f1f5f9;border-radius:7px;border:1.5px dashed #cbd5e1">Complete os itens acima para iniciar o sistema</div>`;
   }
 }
@@ -2418,7 +2471,12 @@ function _onbStep(i){
 }
 
 function fecharBoasVindas(){
-  // Fecha temporariamente para o usuário navegar e configurar
+  const chk = document.getElementById('chk-nao-mostrar');
+  if(chk?.checked){
+    localStorage.setItem('merenda_ocultar_boasvindas', '1');
+  } else {
+    localStorage.removeItem('merenda_ocultar_boasvindas');
+  }
   document.getElementById('overlay-boas-vindas').classList.remove('aberto');
 }
 
@@ -2439,8 +2497,6 @@ function iniciarConfiguracaoManual(){
     'merenda_onboarding_visto',
     'merenda_percapta',
     'merenda_embalagens',
-    'merenda_periodicidades',
-    'merenda_ing_periodicidade',
   ];
   chaves.forEach(k => localStorage.removeItem(k));
 
@@ -2562,6 +2618,22 @@ function carregarDemostracao(){
     localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   }
 
+  // 5. Fornecedores fictícios de exemplo
+  FORNECEDORES_CADASTRO = [
+    { id: 'forn_demo1', nome: 'Distribuidora Central Alimentos', cor: '#c7d2fe' },
+    { id: 'forn_demo2', nome: 'Cooperativa Vale Verde',          cor: '#a7f3d0' },
+    { id: 'forn_demo3', nome: 'Mercado Bom Preço',               cor: '#fed7aa' },
+  ];
+  localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO));
+
+  // 6. Associa ingredientes aos fornecedores em rodízio proporcional (1/3 cada)
+  const _fornIds = ['forn_demo1','forn_demo2','forn_demo3'];
+  ING_FORNECEDORES = {};
+  Object.keys(DADOS.ingredientes).sort().forEach((nome, i) => {
+    ING_FORNECEDORES[nome] = _fornIds[i % 3];
+  });
+  localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES));
+
   localStorage.setItem('merenda_usando_demo', '1');
 
   concluirOnboarding();
@@ -2659,8 +2731,6 @@ function isCustom(prato, ingName, nivel_id){
   return PERCAPTA_CUSTOM[prato]?.[ingName]?.[nivel_id] !== undefined;
 }
 
-const estoque = {};
-Object.keys(DADOS.ingredientes).forEach(k=>{estoque[k]=DADOS.ingredientes[k].estoque||0});
 
 // Tamanhos de embalagem por ingrediente (ex: 1 kg, 5 kg, 12 un…)
 let EMBALAGENS = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
@@ -2677,7 +2747,14 @@ let EMBALAGENS = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
 let MERC_AJUSTES = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
 function salvarMercAjustes(){ localStorage.setItem('merenda_merc_ajustes', JSON.stringify(MERC_AJUSTES)); }
 function getMercKey(){ return document.getElementById('sel-mes-merc').value + '_' + document.getElementById('sel-sem-merc').value; }
-function getMercAjuste(){ const k=getMercKey(); if(!MERC_AJUSTES[k]) MERC_AJUSTES[k]={overrides:{},extras:[]}; return MERC_AJUSTES[k]; }
+function getMercAjuste(){ const k=getMercKey(); if(!MERC_AJUSTES[k]) MERC_AJUSTES[k]={overrides:{},extras:[],obs:{}}; if(!MERC_AJUSTES[k].obs) MERC_AJUSTES[k].obs={}; return MERC_AJUSTES[k]; }
+function salvarObsItemMerc(nome, texto){
+  const aj = getMercAjuste();
+  if(texto.trim()) aj.obs[nome] = texto.trim();
+  else delete aj.obs[nome];
+  salvarMercAjustes();
+  renderMercado();
+}
 
 // Licitações
 let LICITACOES       = JSON.parse(localStorage.getItem('merenda_licitacoes')      || '[]');
@@ -2690,26 +2767,12 @@ function salvarRecebimentos(){ localStorage.setItem('merenda_recebimentos',  JSO
 function gerarId(prefix){ return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 
 // Estoque
-let LOTES              = JSON.parse(localStorage.getItem('merenda_lotes')              || '{}');
 let ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque')             || '{}');
-let SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas')  || '[]');
 let SERVIDORES_CONFIG  = JSON.parse(localStorage.getItem('merenda_servidores_config')   || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45 };
 // Garante campos novos em configs salvas antigas
 if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
 if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
 if(SERVIDORES_CONFIG.acucar_g_por_serv === undefined) SERVIDORES_CONFIG.acucar_g_por_serv = 45;
-
-// Periodicidades de entrega
-let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || [
-  { id: 'per_1', nome: 'Semanal',         semanas: 1 },
-  { id: 'per_2', nome: 'Quinzenal',       semanas: 2 },
-  { id: 'per_3', nome: 'Tricosseminal',   semanas: 3 },
-  { id: 'per_4', nome: 'Mensal',          semanas: 4 },
-  { id: 'per_5', nome: 'Por ciclo',       semanas: 5 },
-];
-let ING_PERIODICIDADE  = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
-function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
-function salvarIngPeriodicidade(){ localStorage.setItem('merenda_ing_periodicidade', JSON.stringify(ING_PERIODICIDADE)); }
 
 // ── Fornecedores cadastrados ───────────────────────────
 let FORNECEDORES_CADASTRO = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
@@ -2845,7 +2908,7 @@ function toggleIngFornecedor(nome, fornId, checked){
   const b = document.querySelector(`[data-forn-ing="${nome.replace(/"/g,'&quot;')}"]`);
   if(b){
     const count = (ING_FORNECEDORES[nome]||[]).filter(id => FORNECEDORES_CADASTRO.find(f => f.id===id)).length;
-    b.textContent = count > 0 ? `🏢 ${count}` : '🏢';
+    b.innerHTML = count > 0 ? `${ico('users',12)} ${count}` : ico('users',12);
     b.style.background = count > 0 ? '#e0f2fe' : '#f8fafc';
     b.style.color       = count > 0 ? '#0369a1' : '#94a3b8';
     b.style.borderColor = count > 0 ? '#7dd3fc' : 'var(--borda)';
@@ -2856,295 +2919,9 @@ function salvarServidoresConfig(){ localStorage.setItem('merenda_servidores_conf
 // Inicializar estoque zero para ingredientes ainda sem valor salvo
 Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
 
-function salvarLotes(){            localStorage.setItem('merenda_lotes',              JSON.stringify(LOTES)); }
-function salvarEstoque(){          localStorage.setItem('merenda_estoque',             JSON.stringify(ESTOQUE)); }
-function salvarSemanasConsumidas(){ localStorage.setItem('merenda_semanas_consumidas', JSON.stringify(SEMANAS_CONSUMIDAS)); }
+function salvarEstoque(){ localStorage.setItem('merenda_estoque', JSON.stringify(ESTOQUE)); }
 
-// Desconta do estoque o consumo de todas as semanas já encerradas (roda no init)
-function aplicarConsumoSemanas(){
-  const hoje = new Date().toISOString().split('T')[0];
-  const totalSemanas = Math.ceil(DIAS_LETIVOS_ARRAY.length / 5);
-  let modificou = false;
-  for(let wi = 0; wi < totalSemanas; wi++){
-    if(SEMANAS_CONSUMIDAS.includes(wi)) continue;
-    const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
-    const lastDay = DIAS_LETIVOS_ARRAY[lastDayIdx];
-    if(!lastDay || lastDay >= hoje) break; // a partir daqui semanas ainda não encerraram
-    const weekData = getWeekData(wi);
-    if(!weekData) continue;
-    const { totais } = calcularTotaisNiveis(weekData.dias);
-    Object.entries(totais).forEach(([chave, qtd]) => {
-      const nome = chave.includes(' ___ ') ? chave.split(' ___ ')[0] : chave;
-      ESTOQUE[nome] = Math.max(0, (ESTOQUE[nome] || 0) - qtd);
-    });
-    SEMANAS_CONSUMIDAS.push(wi);
-    modificou = true;
-  }
-  if(modificou){
-    salvarEstoque();
-    salvarSemanasConsumidas();
-  }
-}
-
-// Retorna previsão de esgotamento para um ingrediente
-// { semanasCoberta, dataEsgotamento, dataPedido, status, consumoSemanalMedio }
-function calcularPrevisaoIngrediente(nome){
-  const estoqueAtual = ESTOQUE[nome] || 0;
-  const lote = LOTES[nome] || 0;
-  const hoje = new Date().toISOString().split('T')[0];
-  const totalSemanas = Math.ceil(DIAS_LETIVOS_ARRAY.length / 5);
-
-  // Encontra a semana atual (primeira semana cujo último dia >= hoje)
-  let semanaAtual = 0;
-  for(let wi = 0; wi < totalSemanas; wi++){
-    const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
-    if(DIAS_LETIVOS_ARRAY[lastDayIdx] >= hoje){ semanaAtual = wi; break; }
-    semanaAtual = wi + 1;
-  }
-
-  // Calcula consumo médio das próximas 4 semanas
-  let somaConsumo = 0;
-  let contagemSemanas = 0;
-  for(let wi = semanaAtual; wi < Math.min(semanaAtual + 4, totalSemanas); wi++){
-    const wd = getWeekData(wi);
-    if(!wd) continue;
-    const { totais } = calcularTotaisNiveis(wd.dias);
-    let consumoSemana = 0;
-    Object.entries(totais).forEach(([chave, qtd]) => {
-      const n = chave.includes(' ___ ') ? chave.split(' ___ ')[0] : chave;
-      if(n === nome) consumoSemana += qtd;
-    });
-    somaConsumo += consumoSemana;
-    contagemSemanas++;
-  }
-  const consumoSemanalMedio = contagemSemanas > 0 ? somaConsumo / contagemSemanas : 0;
-
-  if(!lote) return { semanasCoberta: null, dataEsgotamento: null, dataPedido: null, status: 'sem_lote', consumoSemanalMedio };
-
-  // Projeta semana a semana até esgotamento
-  let saldoProjetado = estoqueAtual;
-  const limiarSeguranca = lote * 0.2;
-  let semanasCoberta = 0;
-  let dataEsgotamento = null;
-
-  for(let wi = semanaAtual; wi < totalSemanas; wi++){
-    const wd = getWeekData(wi);
-    if(!wd) break;
-    const { totais } = calcularTotaisNiveis(wd.dias);
-    let consumoSemana = 0;
-    Object.entries(totais).forEach(([chave, qtd]) => {
-      const n = chave.includes(' ___ ') ? chave.split(' ___ ')[0] : chave;
-      if(n === nome) consumoSemana += qtd;
-    });
-    saldoProjetado -= consumoSemana;
-    if(saldoProjetado <= limiarSeguranca){
-      const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
-      dataEsgotamento = DIAS_LETIVOS_ARRAY[lastDayIdx] || null;
-      break;
-    }
-    semanasCoberta++;
-  }
-
-  let dataPedido = null;
-  if(dataEsgotamento){
-    const d = new Date(dataEsgotamento + 'T00:00:00');
-    d.setDate(d.getDate() - 7);
-    dataPedido = d.toISOString().split('T')[0];
-  }
-
-  let status;
-  if(!dataEsgotamento) status = 'ok';
-  else if(semanasCoberta < 1) status = 'critico';
-  else if(semanasCoberta <= 3) status = 'atencao';
-  else status = 'ok';
-
-  return { semanasCoberta, dataEsgotamento, dataPedido, status, consumoSemanalMedio };
-}
-
-// ══════════════════════════════════════════════════════
-// ESTOQUE — UI
-// ══════════════════════════════════════════════════════
-let _estFiltro = 'todos';
-
-function renderEstoque(){
-  const ings = Object.keys(DADOS.ingredientes).sort();
-
-  // Bloco 1: alertas
-  const alertEl = document.getElementById('est-alertas');
-  if(alertEl){
-    const criticos = [], atencaos = [];
-    ings.forEach(nome => {
-      const p = calcularPrevisaoIngrediente(nome);
-      if(p.status === 'critico') criticos.push({ nome, p });
-      if(p.status === 'atencao') atencaos.push({ nome, p });
-    });
-    if(!criticos.length && !atencaos.length){
-      alertEl.innerHTML = '<div style="background:#d1fae5;border:1.5px solid var(--verde2);border-radius:10px;padding:14px 18px;color:#065f46;font-weight:600;font-size:13px">✅ Estoque em dia — nenhum ingrediente precisa de pedido no momento.</div>';
-    } else {
-      alertEl.innerHTML =
-        criticos.map(({nome, p}) => `
-          <div class="est-alert-card critico">
-            <span>🔴 <b>${nome}</b>${p.dataPedido ? ` — pedir até ${fmtDataBR(p.dataPedido)}` : ' — pedir agora'}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:12px">${fmt(ESTOQUE[nome]||0)} ${DADOS.ingredientes[nome]?.unidade||'kg'}</span>
-          </div>`).join('') +
-        atencaos.map(({nome, p}) => `
-          <div class="est-alert-card atencao">
-            <span>🟡 <b>${nome}</b>${p.dataPedido ? ` — pedir até ${fmtDataBR(p.dataPedido)}` : ''}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:12px">${fmt(ESTOQUE[nome]||0)} ${DADOS.ingredientes[nome]?.unidade||'kg'}</span>
-          </div>`).join('');
-    }
-  }
-
-  // Bloco 2: tabela de previsão
-  const tbody = document.getElementById('tbody-previsao');
-  if(tbody){
-    const rows = ings
-      .map(nome => {
-        const p = calcularPrevisaoIngrediente(nome);
-        const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
-        const cobertaPct = (LOTES[nome] && p.semanasCoberta != null)
-          ? Math.min(100, (p.semanasCoberta / 8) * 100) : 0;
-        const corBar = p.status === 'critico' ? 'critico' : p.status === 'atencao' ? 'atencao' : 'ok';
-        const statusBadge =
-          p.status === 'critico'  ? '<span style="color:var(--vermelho);font-weight:700">🔴 Crítico</span>' :
-          p.status === 'atencao'  ? '<span style="color:#92400e;font-weight:700">🟡 Atenção</span>' :
-          p.status === 'sem_lote' ? '<span style="color:#aaa">— sem lote</span>' :
-                                    '<span style="color:var(--verde);font-weight:700">✅ OK</span>';
-        return { nome, p, unid, cobertaPct, corBar, statusBadge, status: p.status };
-      })
-      .filter(r =>
-        _estFiltro === 'todos' ||
-        (_estFiltro === 'atencao' && (r.status === 'critico' || r.status === 'atencao')) ||
-        (_estFiltro === 'ok'     && r.status === 'ok')
-      );
-
-    tbody.innerHTML = rows.map(({nome, p, unid, cobertaPct, corBar, statusBadge}) => `
-      <tr>
-        <td><b>${nome}</b></td>
-        <td class="num" style="font-family:'DM Mono',monospace">${fmt(ESTOQUE[nome]||0)} ${unid}</td>
-        <td class="num">
-          ${p.semanasCoberta != null ? `
-            <div style="font-weight:700">${p.semanasCoberta} sem.</div>
-            <div class="est-progress"><div class="est-progress-bar ${corBar}" style="width:${cobertaPct}%"></div></div>` : '—'}
-        </td>
-        <td class="num" style="font-size:12px">${p.dataPedido ? fmtDataBR(p.dataPedido) : p.dataEsgotamento ? '<span style="color:var(--vermelho);font-weight:700">Agora</span>' : '—'}</td>
-        <td>${statusBadge}</td>
-      </tr>`).join('') ||
-      '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">Nenhum ingrediente para este filtro.</td></tr>';
-  }
-
-  // Bloco 3: configuração de lotes
-  const tbodyLotes = document.getElementById('tbody-lotes');
-  if(tbodyLotes){
-    const optsPeriodicidade = `<option value="">— Nenhuma —</option>` +
-      PERIODICIDADES.map(p => `<option value="${p.id}">${p.nome} (${p.semanas}sem.)</option>`).join('');
-    tbodyLotes.innerHTML = Object.keys(DADOS.ingredientes).sort().map(nome => {
-      const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
-      const perId = ING_PERIODICIDADE[nome] || '';
-      const per = PERIODICIDADES.find(p => p.id === perId);
-      const consumoSemanal = calcularPrevisaoIngrediente(nome)?.consumoSemanalMedio || 0;
-      const sugerido = per && consumoSemanal > 0
-        ? (consumoSemanal * per.semanas).toFixed(2).replace('.',',') + ' ' + unid
-        : '<span style="color:#aaa">—</span>';
-      return `<tr>
-        <td>${nome}</td>
-        <td>${unid}</td>
-        <td>
-          <select data-per-ing="${nome}" onchange="aplicarPeriodicidadeIngrediente('${nome.replace(/'/g,"\\'")}',this.value)"
-            style="font-family:'Sora',sans-serif;font-size:12px;padding:3px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#f8fafc">
-            ${optsPeriodicidade.replace(`value="${perId}"`,`value="${perId}" selected`)}
-          </select>
-        </td>
-        <td class="num" id="lote-sugerido-${nome.replace(/[^a-zA-Z0-9]/g,'_')}" style="color:var(--txt2);font-size:12px">${sugerido}</td>
-        <td class="num">
-          <input type="number" step="0.01" min="0" value="${LOTES[nome]||''}"
-            data-ing="${nome}" placeholder="0" id="lote-input-${nome.replace(/[^a-zA-Z0-9]/g,'_')}"
-            style="width:80px;text-align:right;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px">
-        </td>
-      </tr>`;
-    }).join('');
-  }
-}
-
-function filtrarEstoque(filtro){
-  _estFiltro = filtro;
-  renderEstoque();
-}
-
-// ── Periodicidades ────────────────────────────────────
-function renderPeriodicidades(){
-  const tbody = document.getElementById('tbody-periodicidades');
-  if(!tbody) return;
-  tbody.innerHTML = PERIODICIDADES.map((p, i) => `<tr>
-    <td><input type="text" value="${p.nome}" data-per-idx="${i}" data-per-campo="nome"
-      style="font-family:'Sora',sans-serif;font-size:13px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;width:160px"
-      oninput="atualizarPeriodicidade(${i},'nome',this.value)"></td>
-    <td class="num"><input type="number" min="1" step="1" value="${p.semanas}" data-per-idx="${i}" data-per-campo="semanas"
-      style="width:70px;text-align:right;font-family:'DM Mono',monospace;font-size:13px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px"
-      oninput="atualizarPeriodicidade(${i},'semanas',this.value)"></td>
-    <td><button class="emb-btn" style="color:#e74c3c;border-color:#e74c3c" onclick="removerPeriodicidade(${i})">✕</button></td>
-  </tr>`).join('');
-}
-
-function atualizarPeriodicidade(idx, campo, valor){
-  PERIODICIDADES[idx][campo] = campo === 'semanas' ? (parseInt(valor) || 1) : valor;
-}
-
-function adicionarPeriodicidade(){
-  PERIODICIDADES.push({ id: 'per_' + Date.now(), nome: 'Nova', semanas: 1 });
-  renderPeriodicidades();
-}
-
-function removerPeriodicidade(idx){
-  const id = PERIODICIDADES[idx].id;
-  PERIODICIDADES.splice(idx, 1);
-  Object.keys(ING_PERIODICIDADE).forEach(ing => {
-    if(ING_PERIODICIDADE[ing] === id) delete ING_PERIODICIDADE[ing];
-  });
-  salvarPeriodicidades();
-  salvarIngPeriodicidade();
-  renderPeriodicidades();
-}
-
-function salvarPeriodicidadesForm(){
-  salvarPeriodicidades();
-  salvarIngPeriodicidade();
-  alert('✅ Periodicidades salvas!');
-}
-
-function aplicarPeriodicidadeIngrediente(nome, perId){
-  if(perId) ING_PERIODICIDADE[nome] = perId;
-  else delete ING_PERIODICIDADE[nome];
-  salvarIngPeriodicidade();
-
-  const per = PERIODICIDADES.find(p => p.id === perId);
-  const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
-  const consumoSemanal = calcularPrevisaoIngrediente(nome)?.consumoSemanalMedio || 0;
-  const idSafe = nome.replace(/[^a-zA-Z0-9]/g,'_');
-
-  const sugeridoEl = document.getElementById('lote-sugerido-' + idSafe);
-  const inputEl    = document.getElementById('lote-input-' + idSafe);
-
-  if(per && consumoSemanal > 0){
-    const sugerido = consumoSemanal * per.semanas;
-    if(sugeridoEl) sugeridoEl.innerHTML = sugerido.toFixed(2).replace('.',',') + ' ' + unid;
-    if(inputEl && !inputEl.value) inputEl.value = sugerido.toFixed(2);
-  } else {
-    if(sugeridoEl) sugeridoEl.innerHTML = '<span style="color:#aaa">—</span>';
-  }
-}
-
-function salvarLotesForm(){
-  document.querySelectorAll('#tbody-lotes input[data-ing]').forEach(inp => {
-    const nome = inp.getAttribute('data-ing');
-    const val  = parseFloat(inp.value) || 0;
-    if(val > 0) LOTES[nome] = val;
-    else delete LOTES[nome];
-  });
-  salvarLotes();
-  renderEstoque();
-  alert('✅ Lotes salvos!');
-}
+function aplicarConsumoSemanas(){}
 
 // ══════════════════════════════════════════════════════
 // LICITAÇÕES — CÁLCULO
@@ -3225,8 +3002,8 @@ function renderLicitacoes(){
           <span class="badge-${lic.status==='ativa'?'ativa':'encerrada'}">${lic.status==='ativa'?'Ativa':'Encerrada'}</span>
         </span>
         <div style="display:flex;gap:8px" onclick="event.stopPropagation()">
-          <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="editarLicitacao('${lic.id}')">✏️ Editar</button>
-          <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="toggleStatusLic('${lic.id}')">${lic.status==='ativa'?'⏹ Encerrar':'▶ Reativar'}</button>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="editarLicitacao('${lic.id}')">${ico('edit',11)}Editar</button>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="toggleStatusLic('${lic.id}')">${lic.status==='ativa'?ico('stop',11)+'Encerrar':ico('play',11)+'Reativar'}</button>
         </div>
       </div>
       <div id="body-lic-${lic.id}" style="display:none;padding:20px">
@@ -3263,7 +3040,7 @@ function renderLicitacoes(){
               <div style="background:#f8fafc;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleOrdem('${o.id}')">
                 <span style="font-weight:700;font-size:13px">${o.ciclo} — Semana ${o.semana}</span>
                 <span style="font-size:12px;color:var(--txt2)">${fmtDataBR(o.data_expedicao)} · ${confirmados}/${totalItens} confirmados</span>
-                ${pendentes > 0 ? `<button class="btn btn-sm" style="background:var(--laranja);color:#fff" onclick="event.stopPropagation();abrirConfirmarRecebimento('${o.id}')">📦 Confirmar recebimento</button>` : '<span style="color:var(--verde);font-weight:700;font-size:12px">✅ Completo</span>'}
+                ${pendentes > 0 ? `<button class="btn btn-sm" style="background:var(--laranja);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="event.stopPropagation();abrirConfirmarRecebimento('${o.id}')">${ico('check',11)}Confirmar recebimento</button>` : `<span style="color:var(--verde);font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:4px">${ico('checkCircle',12)}Completo</span>`}
               </div>
               <div id="body-ordem-${o.id}" style="display:none;padding:12px 14px">
                 <table><thead><tr><th>Ingrediente</th><th class="num">Solicitado</th><th class="num">Recebido</th><th>Status</th></tr></thead>
@@ -3271,9 +3048,9 @@ function renderLicitacoes(){
                   ${o.itens.map(it => {
                     const rec = recebidos.find(r => r.ingrediente === it.ingrediente);
                     const statusLabel = !rec ? '<span style="color:#aaa">Pendente</span>' :
-                      rec.status === 'recebido' ? '<span style="color:var(--verde);font-weight:700">✅ Total</span>' :
-                      rec.status === 'parcial'  ? `<span style="color:var(--amarelo);font-weight:700">⚠️ Parcial</span>` :
-                      '<span style="color:var(--vermelho);font-weight:700">❌ Não recebido</span>';
+                      rec.status === 'recebido' ? `<span style="color:var(--verde);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('checkCircle',12)}Total</span>` :
+                      rec.status === 'parcial'  ? `<span style="color:var(--amarelo);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('alert',12)}Parcial</span>` :
+                      `<span style="color:var(--vermelho);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('xCircle',12)}Não recebido</span>`;
                     const unid = DADOS.ingredientes[it.ingrediente]?.unidade || 'kg';
                     return `<tr>
                       <td>${it.ingrediente}</td>
@@ -3421,9 +3198,9 @@ function executarCalculadora(){
   const avisos = document.getElementById('calc-avisos');
   let htmlAvisos = '';
   if(r.semSemPreco.length)
-    htmlAvisos += `<div class="calc-sem-preco">⚠️ ${r.semSemPreco.length} ingrediente(s) sem preço cadastrado e não foram incluídos no cálculo de custo: <b>${r.semSemPreco.join(', ')}</b>. Cadastre os preços na aba Ingredientes.</div>`;
+    htmlAvisos += `<div class="calc-sem-preco" style="display:flex;align-items:flex-start;gap:6px">${ico('alert',13)} <span>${r.semSemPreco.length} ingrediente(s) sem preço cadastrado e não foram incluídos no cálculo de custo: <b>${r.semSemPreco.join(', ')}</b>. Cadastre os preços na aba Ingredientes.</span></div>`;
   if(r.ratio >= 1)
-    htmlAvisos += `<div class="calc-aviso" style="background:#d1fae5;border-color:var(--verde);color:#065f46">✅ Orçamento cobre o ano letivo completo (${r.totalSemanas} semanas). Sobram R$ ${r.sobra.toLocaleString('pt-BR',{minimumFractionDigits:2})}.</div>`;
+    htmlAvisos += `<div class="calc-aviso" style="background:#d1fae5;border-color:var(--verde);color:#065f46;display:flex;align-items:center;gap:6px">${ico('checkCircle',13)}Orçamento cobre o ano letivo completo (${r.totalSemanas} semanas). Sobram R$ ${r.sobra.toLocaleString('pt-BR',{minimumFractionDigits:2})}.</div>`;
   avisos.innerHTML = htmlAvisos;
 
   // Stats
@@ -3730,12 +3507,12 @@ function renderModalRecebimento(ordem){
     return `<tr>
       <td><b>${it.ingrediente}</b><br><small style="color:#888">${fmt(it.qtd_solicitada)} ${unid}</small></td>
       <td style="text-align:right;white-space:nowrap">
-        <button class="rec-btn total ${cur.status==='recebido'?'ativo':''}"
-          onclick="setRecStatus('${it.ingrediente}','recebido',${it.qtd_solicitada})">✅ Total</button>
-        <button class="rec-btn parcial ${cur.status==='parcial'?'ativo':''}"
-          onclick="setRecStatus('${it.ingrediente}','parcial',null)">⚠️ Parcial</button>
-        <button class="rec-btn nao ${cur.status==='nao_recebido'?'ativo':''}"
-          onclick="setRecStatus('${it.ingrediente}','nao_recebido',0)">❌ Não recebi</button>
+        <button class="rec-btn total ${cur.status==='recebido'?'ativo':''}" style="display:inline-flex;align-items:center;gap:3px"
+          onclick="setRecStatus('${it.ingrediente}','recebido',${it.qtd_solicitada})">${ico('check',11)}Total</button>
+        <button class="rec-btn parcial ${cur.status==='parcial'?'ativo':''}" style="display:inline-flex;align-items:center;gap:3px"
+          onclick="setRecStatus('${it.ingrediente}','parcial',null)">${ico('alert',11)}Parcial</button>
+        <button class="rec-btn nao ${cur.status==='nao_recebido'?'ativo':''}" style="display:inline-flex;align-items:center;gap:3px"
+          onclick="setRecStatus('${it.ingrediente}','nao_recebido',0)">${ico('x',11)}Não recebi</button>
         ${cur.status==='parcial' ? `<input type="number" step="0.01" min="0" max="${it.qtd_solicitada}"
           value="${cur.qtd||''}" placeholder="qtd"
           onchange="setRecQtd('${it.ingrediente}',this.value)"
@@ -3747,8 +3524,8 @@ function renderModalRecebimento(ordem){
     <tbody>${rows}</tbody></table>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn btn-outline" onclick="fecharOverlayRec()">Cancelar</button>
-      <button class="btn btn-verde" onclick="confirmarTodosRecebidos()">✅ Confirmar todos</button>
-      <button class="btn btn-primary" onclick="confirmarRecebimentoForm()">💾 Salvar</button>
+      <button class="btn btn-verde" style="display:inline-flex;align-items:center;gap:5px" onclick="confirmarTodosRecebidos()">${ico('checkCircle',13)}Confirmar todos</button>
+      <button class="btn btn-primary" style="display:inline-flex;align-items:center;gap:5px" onclick="confirmarRecebimentoForm()">${ico('save',13)}Salvar</button>
     </div>`;
 }
 
@@ -3878,8 +3655,8 @@ const FERIADOS_DEFAULT = [
 const SABADOS_DEFAULT = ["2026-04-11","2026-05-23","2026-08-22"];
 
 let CAL_CONFIG = JSON.parse(localStorage.getItem('merenda_cal_config') || 'null') || {
-  inicio: '2026-02-04',
-  fim: '2026-12-20',
+  inicio: '',
+  fim: '',
   feriados: [],
   recesso: [],
   sabados: []
@@ -3915,7 +3692,7 @@ function atualizarCiclos(){
   DADOS.ciclos = Array.from({length: n}, (_, i) => `Ciclo ${i+1}`);
   CORES_CICLOS = Array.from({length: n}, (_, i) => CORES_CICLOS_BASE[i % CORES_CICLOS_BASE.length]);
   // Re-popula selects de ciclo
-  ['sel-mes-card','plan-ciclo','sel-mes-gastos'].forEach(id => {
+  ['sel-mes-card','plan-ciclo'].forEach(id => {
     const s = document.getElementById(id);
     if(!s) return;
     const cur = s.value;
@@ -4208,17 +3985,7 @@ function init(){
 
   atualizarCiclos();
 
-  if(document.getElementById('sel-mes-gastos')){
-    const s = document.getElementById('sel-mes-gastos');
-    const cur = s.value;
-    s.innerHTML = '';
-    DADOS.ciclos.forEach(c => {
-      const o = document.createElement('option');
-      o.value = c; o.textContent = c;
-      s.appendChild(o);
-    });
-    if(cur && DADOS.ciclos.includes(cur)) s.value = cur;
-  }
+  popularMesesGastos();
 
   SEMANAS_CAL = buildCalendarWeeks();
   populateMesesMerc();
@@ -4379,7 +4146,7 @@ function imprimirPoster(){
   const cleanup = () => {
     document.body.removeChild(root);
     document.head.removeChild(style);
-    if(btnPoster){ btnPoster.textContent = '🖼 Imprimir Pôster'; btnPoster.disabled = false; }
+    if(btnPoster){ btnPoster.innerHTML = `${ico('img',13)} Imprimir Pôster`; btnPoster.disabled = false; }
   };
 
   (async () => {
@@ -4774,12 +4541,14 @@ function irParaPlanejamento(){
   renderCardapio();
 }
 
+var mesesAbertos = new Set();
+
 function renderCardapio(){
   const grid = document.getElementById('grid-calendario');
   const legenda = document.getElementById('legenda-ciclos');
   if(!grid) return;
   // Preservar quais meses estão expandidos antes de re-renderizar
-  const mesesAbertos = new Set(
+  mesesAbertos = new Set(
     [...grid.querySelectorAll('[id^="cal-mes-"]')]
       .filter(el => el.style.display !== 'none')
       .map(el => el.id)
@@ -4866,8 +4635,8 @@ function renderCardapio(){
         const botoesWeek = semana ? `
           <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
             <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
-            <button class="cal-sem-btn cal-sem-btn-print" onclick="irParaImprimirSemana('${mondayIso}','${mesId}');event.stopPropagation()" title="Imprimir lista de mercado">🖨️ Imprimir</button>
-            <button class="cal-sem-btn cal-sem-btn-xls" onclick="exportarExcelSemanaCal('${mondayIso}');event.stopPropagation()" title="Exportar Excel">📊 Excel</button>
+            <button class="cal-sem-btn cal-sem-btn-print" style="display:inline-flex;align-items:center;gap:4px" onclick="irParaImprimirSemana('${mondayIso}','${mesId}');event.stopPropagation()" title="Imprimir lista de mercado">${ico('printer',11)}Imprimir</button>
+            <button class="cal-sem-btn cal-sem-btn-xls" style="display:inline-flex;align-items:center;gap:4px" onclick="exportarExcelSemanaCal('${mondayIso}');event.stopPropagation()" title="Exportar Excel">${ico('chart',11)}Excel</button>
           </div>` : '';
         days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
       } else {
@@ -4879,7 +4648,10 @@ function renderCardapio(){
       <div class="cal-top" style="cursor:pointer;user-select:none" onclick="toggleMes('${mesId}')">
         <span class="cal-mes-nome">${mesNome}</span>
         <span class="cal-ano">2026</span>
-        <span id="${mesId}-icon" style="margin-left:auto;font-size:16px;padding-left:10px">▼</span>
+        <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
+          <button id="${mesId}-pin" onclick="event.stopPropagation();togglePinMes('${mesId}')" title="Fixar este mês como aberto ao entrar na aba" style="background:rgba(26,58,107,.08);border:1px solid rgba(26,58,107,.15);color:rgba(26,58,107,.55);font-size:11px;padding:2px 8px;border-radius:12px;cursor:pointer;line-height:1.4;font-family:inherit">fixar aberto</button>
+          <span id="${mesId}-icon" style="font-size:16px">▼</span>
+        </span>
       </div>
       <div id="${mesId}" style="display:none">
         <div class="cal-body">
@@ -4898,11 +4670,23 @@ function renderCardapio(){
 
   html += '</div>';
   grid.innerHTML = html;
-  // Restaurar meses que estavam abertos antes do re-render
+  // Restaurar meses abertos na sessão
   mesesAbertos.forEach(id => {
     const panel = document.getElementById(id);
     const icon  = document.getElementById(id + '-icon');
     if(panel){ panel.style.display = 'block'; if(icon) icon.textContent = '▲'; }
+  });
+  // Abrir meses fixados como abertos (persistidos no localStorage)
+  const fixados = JSON.parse(localStorage.getItem('merenda_meses_fixados') || '[]');
+  fixados.forEach(id => {
+    const panel = document.getElementById(id);
+    const icon  = document.getElementById(id + '-icon');
+    const btn   = document.getElementById(id + '-pin');
+    if(panel && panel.style.display === 'none'){
+      panel.style.display = 'block';
+      if(icon) icon.textContent = '▲';
+    }
+    if(btn) _estilizarPinMes(btn, true);
   });
 }
 
@@ -5116,8 +4900,9 @@ function renderMercado(){
 
   const inputStyle = `width:72px;text-align:right;padding:3px 5px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--azul2)`;
 
+  const _obsMap = getMercAjuste().obs || {};
   const buildRows = (items, fornId) => items.length === 0
-    ? `<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">Nenhum item</td></tr>`
+    ? `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:16px">Nenhum item</td></tr>`
     : items.map((it,i) => {
         const {arred, nPacotes} = arredondarEmb(it.nomeBase, it.comprar);
         const embTamanho = EMBALAGENS[it.nomeBase];
@@ -5125,12 +4910,19 @@ function renderMercado(){
         const pacInfo = nPacotes ? `<div class="hover-info no-print" style="font-size:10px;color:#666;margin-top:2px">${nPacotes} pct × ${embTamanho} ${it.unid}</div>` : '';
         const exInfo  = foiArred ? `<div class="hover-info no-print" style="font-size:10px;color:#aaa">exato: ${fmtEsp(it.nomeBase,it.comprar)}</div>` : '';
         const enc     = it.nomeBase.replace(/'/g,"\\'");
+        const obsAtual = (_obsMap[it.nomeBase] || '').replace(/"/g,'&quot;');
         const tipoTag = isAF(it.nomeBase)
-          ? `<span class="tag-af" style="font-size:10px;padding:2px 5px">🌱 AF</span>`
-          : `<span class="tag-mc" style="font-size:10px;padding:2px 5px">🏪 MC</span>`;
+          ? `<span class="tag-af" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/><path d="M6.168 9a10 10 0 0 0 11.664 0"/></svg>AF</span>`
+          : `<span class="tag-mc" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>MC</span>`;
         return `<tr>
           <td style="text-align:center;font-weight:700;color:#666">${i+1}</td>
           <td><b>${it.displayNome}</b></td>
+          <td>
+            <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
+              style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Sora',sans-serif;background:#fafafa"
+              onchange="salvarObsItemMerc('${enc}',this.value)">
+            <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
+          </td>
           <td>${tipoTag}</td>
           <td class="num no-print" style="color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)}</td>
           <td class="num no-print" style="color:var(--verde2)">${fmtEsp(it.nomeBase,it.est)}</td>
@@ -5142,7 +4934,7 @@ function renderMercado(){
               <button class="emb-btn no-print" style="color:#e74c3c;border-color:#e74c3c;padding:2px 6px"
                 onclick="removerItemMerc('${enc}',${it.extra?'true':'false'})">✕</button>
               <button class="emb-btn no-print" style="color:#0369a1;border-color:#7dd3fc;padding:2px 6px"
-                onclick="adicionarItemMercForn('${enc}',this)" title="Trocar fornecedor">🏢</button>
+                onclick="adicionarItemMercForn('${enc}',this)" title="Trocar fornecedor" style="display:inline-flex;align-items:center;justify-content:center">${ico('users',11)}</button>
             </div>${pacInfo}${exInfo}
           </td>
           <td class="print-only" style="text-align:right;white-space:nowrap">
@@ -5165,9 +4957,11 @@ function renderMercado(){
       const qtd = typeof arred === 'number'
         ? arred.toLocaleString('pt-BR', {maximumFractionDigits:3})
         : arred;
+      const obsImp = (_obsMap[it.nomeBase] || '').trim();
       return `<tr>
         <td>${i+1}</td>
         <td>${it.displayNome}</td>
+        <td style="font-style:italic;color:#555;font-size:10.5px">${esc(obsImp)}</td>
         <td>${qtd}</td>
         <td>${it.unid}</td>
       </tr>`;
@@ -5183,7 +4977,7 @@ function renderMercado(){
           <span><strong>Data:</strong> ${hoje}</span>
         </div>
         <table class="forn-tabela">
-          <thead><tr><th>ITEM</th><th>DESCRIÇÃO</th><th>QTD</th><th>UN</th></tr></thead>
+          <thead><tr><th>ITEM</th><th>DESCRIÇÃO</th><th>OBSERVAÇÃO</th><th>QTD</th><th>UN</th></tr></thead>
           <tbody>${printRows}</tbody>
         </table>
         <div class="forn-assinatura">
@@ -5196,8 +4990,9 @@ function renderMercado(){
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
-        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Tipo</th><th class="num">Necessidade</th><th class="num">Estoque</th><th class="num">A Comprar</th></tr></thead>
+        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Observação</th><th>Tipo</th><th class="num">Necessidade</th><th class="num">Estoque</th><th class="num">A Comprar</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
+
       </div>
     </div>`;
   };
@@ -5268,7 +5063,7 @@ function validarEImprimir(){
   const lista = document.getElementById('modal-sem-forn-lista');
   lista.innerHTML = semForn.map(it => {
     const enc = it.nomeBase.replace(/"/g,'&quot;');
-    const tipoTag = isAF(it.nomeBase) ? '🌱 AF' : '🏪 MC';
+    const tipoTag = isAF(it.nomeBase) ? 'AF' : 'MC';
     return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9">
       <span style="flex:1;font-size:13px;font-weight:600">${it.displayNome} <span style="font-size:11px;color:#94a3b8">${tipoTag}</span></span>
       <select data-modal-ing="${enc}"
@@ -5377,8 +5172,9 @@ function cancelarAdicionarItemMerc(af){
 // ══════════════════════════════════════════════════════
 let fichasVisiveis = Object.keys(DADOS.ficha);
 function pratoModificado(p){
-  const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
-  return !!(custom[p] || PERCAPTA_CUSTOM[p]);
+  if(!DADOS_FICHA_ORIGINAL[p]) return false;
+  const diff = diffFicha(p);
+  return !!(diff && (diff.adicionados.length || diff.removidos.length || diff.modificadosQtd.length));
 }
 
 function diffFicha(prato){
@@ -5419,7 +5215,7 @@ function renderFichas(filtro=''){
     <div class="card" style="cursor:pointer;${cardBorder}" onclick="abrirFicha('${pratoEnc}')">
       <div class="card-header" style="padding:12px 16px;${headerExtra}">
         <span style="font-size:20px;font-weight:800;opacity:.4;margin-right:8px">${num}</span>${nome}
-        ${modificado ? `<span style="margin-left:8px;font-size:10px;font-weight:700;background:#f59e0b;color:#fff;border-radius:10px;padding:2px 8px;vertical-align:middle">✏ Modificado</span>` : ''}
+        ${modificado ? `<span style="margin-left:8px;font-size:10px;font-weight:700;background:#f59e0b;color:#fff;border-radius:10px;padding:2px 8px;vertical-align:middle;display:inline-flex;align-items:center;gap:3px">${ico('edit',10)}Modificado</span>` : ''}
       </div>
       <div style="padding:12px 16px">
         <div style="font-size:12px;color:var(--txt2);margin-bottom:4px">${ings.length} ingredientes · ${totalPer.toFixed(0)}g per capita</div>
@@ -5430,8 +5226,8 @@ function renderFichas(filtro=''){
         </div>
         <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px" class="no-print">
           ${modificado && DADOS_FICHA_ORIGINAL[p] ? `<button class="btn-swap" onclick="event.stopPropagation();restaurarFichaOriginal('${pratoEnc}')" title="Restaurar ao padrão PNAE" style="color:#92400e;border-color:#f59e0b;background:#fffbeb">↩ Restaurar</button>` : ''}
-          <button class="btn-swap" onclick="event.stopPropagation();editarPrato('${pratoEnc}')" title="Editar Prato" style="color:var(--azul2);border-color:var(--azul2)">✏️ Editar</button>
-          ${!DADOS_FICHA_ORIGINAL[p] ? `<button class="btn-swap" onclick="event.stopPropagation();removerPrato('${pratoEnc}')" title="Excluir Prato" style="color:var(--vermelho);border-color:var(--vermelho)">🗑️ Excluir</button>` : ''}
+          <button class="btn-swap" style="display:inline-flex;align-items:center;gap:4px" onclick="event.stopPropagation();editarPrato('${pratoEnc}')" title="Editar Prato" style="color:var(--azul2);border-color:var(--azul2)">${ico('edit',12)}Editar</button>
+          ${!DADOS_FICHA_ORIGINAL[p] ? `<button class="btn-swap" style="display:inline-flex;align-items:center;gap:4px;color:var(--vermelho);border-color:var(--vermelho)" onclick="event.stopPropagation();removerPrato('${pratoEnc}')" title="Excluir Prato">${ico('trash',12)}Excluir</button>` : ''}
         </div>
       </div>
     </div>`;
@@ -5464,7 +5260,7 @@ function renderFichaTable(prato){
     diffBanner = `<div style="background:#fffbeb;border:1.5px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
         <div>
-          <div style="font-weight:700;color:#92400e;margin-bottom:4px">✏ Modificado em relação ao padrão PNAE</div>
+          <div style="font-weight:700;color:#92400e;margin-bottom:4px;display:flex;align-items:center;gap:5px">${ico('edit',12)}Modificado em relação ao padrão PNAE</div>
           <div style="display:flex;flex-direction:column;gap:2px">${partes.map(p=>`<div>${p}</div>`).join('')}</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0">
@@ -5567,12 +5363,11 @@ function abrirFicha(prato){
 }
 
 function removerIngDaFicha(prato, ingName){
-  if(!confirm(`Remover "${ingName}" da ficha de "${prato}"?`)) return;
   DADOS.ficha[prato] = (DADOS.ficha[prato]||[]).filter(i => i.i !== ingName);
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
   custom[prato] = DADOS.ficha[prato];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
-  if(_supabase) _supabase.from('fichas_custom').upsert({id:1,dados:custom},{onConflict:'id'}).catch(console.error);
+  _supaSync.saveFichasCustom(custom);
   document.getElementById('modal-body').innerHTML = renderFichaTable(prato);
   renderFichas();
 }
@@ -5586,8 +5381,8 @@ function restaurarIngDaFicha(prato, ingName){
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
   custom[prato] = DADOS.ficha[prato];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
-  if(_supabase) _supabase.from('fichas_custom').upsert({id:1,dados:custom},{onConflict:'id'}).catch(console.error);
-  document.getElementById('modal-body').innerHTML = renderFichaTable(prato);
+  _supaSync.saveFichasCustom(custom);
+  abrirFicha(prato);
   renderFichas();
 }
 
@@ -5624,8 +5419,8 @@ function adicionarIngAFicha(prato){
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
   custom[prato] = DADOS.ficha[prato];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
-  if(_supabase) _supabase.from('fichas_custom').upsert({id:1,dados:custom},{onConflict:'id'}).catch(console.error);
-  document.getElementById('modal-body').innerHTML = renderFichaTable(prato);
+  _supaSync.saveFichasCustom(custom);
+  abrirFicha(prato);
   renderFichas();
 }
 
@@ -5670,7 +5465,7 @@ function resetPercaptaPrato(prato){
   if(!confirm('Restaurar todas as quantidades per capita deste prato para os valores PNAE?')) return;
   delete PERCAPTA_CUSTOM[prato];
   salvarPercapta();
-  document.getElementById('modal-body').innerHTML = renderFichaTable(prato);
+  setTimeout(() => abrirFicha(prato), 50);
 }
 
 function restaurarFichaOriginal(prato){
@@ -5690,7 +5485,7 @@ function restaurarFichaOriginal(prato){
   salvarPercapta();
   // Salva Supabase se disponível
   if(_supabase){
-    _supabase.from('fichas_custom').upsert({ id: 1, dados: custom }, { onConflict: 'id' }).catch(console.error);
+    _supaSync.saveFichasCustom(custom);
   }
   document.getElementById('overlay').classList.remove('aberto');
   renderFichas();
@@ -5712,7 +5507,7 @@ function restaurarTodasFichas(){
   salvarPercapta();
   // Salva Supabase se disponível
   if(_supabase){
-    _supabase.from('fichas_custom').upsert({ id: 1, dados: custom }, { onConflict: 'id' }).catch(console.error);
+    _supaSync.saveFichasCustom(custom);
   }
   renderFichas();
   alert('✅ Todas as fichas técnicas foram restauradas para o padrão PNAE da secretaria.');
@@ -5734,7 +5529,7 @@ function abrirModalNovoPrato(){
   document.getElementById('novo-prato-num').value = '';
   document.getElementById('novo-prato-nome').value = '';
   document.getElementById('qtd-ing-novo').value = '';
-  document.querySelector('#overlay-novo-prato h3').textContent = '➕ Cadastrar Novo Prato';
+  document.querySelector('#overlay-novo-prato h3').innerHTML = `${ico('plus',16)} Cadastrar Novo Prato`;
   renderNovoPratoIngs();
 
   // Preencher select com ingredientes cadastrados
@@ -5902,15 +5697,8 @@ function renderIngredientes(filtro=''){
         </select>
       </td>
       <td style="white-space:nowrap;cursor:pointer" onclick="trocarFornecedor('${nome.replace(/'/g,"\\'")}')" title="Clique para mudar para ${isAF(nome)?'Mercado Convencional':'Agricultura Familiar'}">
-        ${isAF(nome)?'<span class="tag-af">🌱 AF</span>':'<span class="tag-mc">🏪 MC</span>'}
-        <button class="btn-swap no-print" style="margin-left:6px" title="Alterar fornecedor">🔁</button>
-      </td>
-      <td>
-        <select onchange="aplicarPeriodicidadeIngrediente('${nome.replace(/'/g,"\\'")}',this.value)"
-          style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid var(--borda);border-radius:6px;background:#f8fafc;width:90px">
-          <option value="">—</option>
-          ${PERIODICIDADES.map(p=>`<option value="${p.id}" ${(ING_PERIODICIDADE[nome]||'')=== p.id?'selected':''}>${esc(p.nome)}</option>`).join('')}
-        </select>
+        ${isAF(nome)?`<span class="tag-af" style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/><path d="M6.168 9a10 10 0 0 0 11.664 0"/></svg>AF</span>`:'<span class="tag-mc" style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>MC</span>'}
+        <button class="btn-swap no-print" style="margin-left:6px;display:inline-flex;align-items:center;justify-content:center" title="Alterar fornecedor">${ico('refresh',11)}</button>
       </td>
       <td>
         <select onchange="setIngFornecedor('${nome.replace(/'/g,"\\'")}',this.value)"
@@ -6001,7 +5789,7 @@ function salvarPreco(nome, valor){
   // Notificar sucesso (subutilizando o config-saved ou criando um novo se necessário)
   const el = document.getElementById('config-saved');
   if(el){
-    el.textContent = "✅ Preço de " + nome + " salvo";
+    el.innerHTML = `${ico('check',12)} Preço de ${nome} salvo`;
     el.classList.add('show');
     setTimeout(()=> el.classList.remove('show'), 2000);
   }
@@ -6019,55 +5807,78 @@ function ir(id, btn){
   if(id==='mercado') renderMercado();
   if(id==='gastos') renderGastos();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque') renderEstoque();
   if(id==='licitacoes') renderLicitacoes();
   if(id==='preparo') renderPreparo();
-  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
+  if(id==='ingredientes'){ renderIngredientes(); renderFornecedoresCadastro(); }
   // Esconder header/assinatura global quando mercado ativo (tem os próprios)
   atualizarPrintGlobal();
 }
 
+function popularMesesGastos(){
+  const s = document.getElementById('sel-mes-gastos');
+  if(!s || !MESES_NOMES?.length) return;
+  const cur = s.value;
+  s.innerHTML = '';
+  MESES_NOMES.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m;
+    s.appendChild(o);
+  });
+  if(cur && MESES_NOMES.includes(cur)) s.value = cur;
+  popularSemanasGastos();
+}
+
+function popularSemanasGastos(){
+  const mesNome = document.getElementById('sel-mes-gastos')?.value;
+  const sel = document.getElementById('sel-sem-gastos');
+  if(!sel) return;
+  const cur = sel.value;
+  const qtdSemanas = Math.max(1, (DADOS.cardapio[mesNome] || []).length || 4);
+  sel.innerHTML = '<option value="0">Todas as semanas</option>';
+  for(let i = 1; i <= qtdSemanas; i++){
+    const o = document.createElement('option');
+    o.value = i; o.textContent = 'Semana ' + i;
+    sel.appendChild(o);
+  }
+  if(cur && sel.querySelector(`option[value="${cur}"]`)) sel.value = cur;
+}
+
 function renderGastos(){
-  const ciclo = document.getElementById('sel-mes-gastos').value;
-  const semSel = parseInt(document.getElementById('sel-sem-rel')?.value || 1); // 1–5
-  document.getElementById('detalhe-periodo').textContent = ciclo;
+  const mesNome = document.getElementById('sel-mes-gastos')?.value;
+  const semSel  = parseInt(document.getElementById('sel-sem-gastos')?.value || 0);
+  if(!mesNome) return;
 
-  const precos = JSON.parse(localStorage.getItem('merenda_precos') || '{}');
-  const cIdx = parseInt(ciclo.split(' ')[1]) - 1;
+  const sufixo = semSel > 0 ? ` — Semana ${semSel}` : '';
+  document.getElementById('detalhe-periodo').textContent = mesNome + sufixo;
 
-  // Função auxiliar: busca dados de uma semana pelo índice global
-  const calcularSemanaGlobal = (weekIdx) => {
-    const mesIdx = Math.min(Math.floor(weekIdx / 4), MESES_NOMES.length - 1);
-    const sIdx = weekIdx % 4;
-    const mesNome = MESES_NOMES[mesIdx];
-    const semData = DADOS.cardapio[mesNome]?.[sIdx];
-    if(!semData) return {};
+  const precos  = JSON.parse(localStorage.getItem('merenda_precos') || '{}');
+  const semanas = DADOS.cardapio[mesNome] || [];
+
+  const totaisMes = {};
+  let custoSemana = 0;
+
+  semanas.forEach((semData, idx) => {
+    if(!semData) return;
     const { totais } = calcularTotaisNiveis(semData.dias);
     if(SERVIDORES_CONFIG.ativo){
       totais['CAFÉ']   = (totais['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg;
       totais['AÇÚCAR'] = (totais['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg;
     }
-    return totais;
-  };
-
-  const totaisCiclo = {};
-  let custoSemanaSelecionada = 0;
-
-  // Ciclo = 5 semanas (índices globais: cIdx*5 … cIdx*5+4)
-  for(let s = 0; s < 5; s++){
-    const weekIdx = cIdx * 5 + s;
-    const tSem = calcularSemanaGlobal(weekIdx);
-    for(const [ing, qtd] of Object.entries(tSem)){
-      totaisCiclo[ing] = (totaisCiclo[ing] || 0) + qtd;
-      if(s === semSel - 1) custoSemanaSelecionada += qtd * (precos[ing] || 0);
+    for(const [ing, qtd] of Object.entries(totais)){
+      totaisMes[ing] = (totaisMes[ing] || 0) + qtd;
     }
-  }
+    if(semSel === 0 || semSel === idx + 1){
+      for(const [ing, qtd] of Object.entries(totais)){
+        custoSemana += qtd * (precos[ing] || 0);
+      }
+    }
+  });
 
-  let custoCiclo = 0;
-  const rows = Object.entries(totaisCiclo).sort((a,b)=>a[0].localeCompare(b[0])).map(([nome, nec]) => {
-    const p = precos[nome] || 0;
+  let custoMes = 0;
+  const rows = Object.entries(totaisMes).sort((a,b)=>a[0].localeCompare(b[0])).map(([nome, nec]) => {
+    const p   = precos[nome] || 0;
     const sub = nec * p;
-    custoCiclo += sub;
+    custoMes += sub;
     if(nec === 0 && p === 0) return '';
     return `<tr>
       <td><b>${nome}</b></td>
@@ -6078,22 +5889,29 @@ function renderGastos(){
     </tr>`;
   }).join('');
 
-  // Cálculo Anual (todos os ciclos)
+  // Cálculo anual (todos os meses)
   let custoAno = 0;
-  DADOS.ciclos.forEach((_, ci) => {
-    for(let s = 0; s < 5; s++){
-      const t = calcularSemanaGlobal(ci * 5 + s);
-      for(const [ing, qtd] of Object.entries(t)){
+  (MESES_NOMES || []).forEach(mes => {
+    (DADOS.cardapio[mes] || []).forEach(semData => {
+      if(!semData) return;
+      const { totais } = calcularTotaisNiveis(semData.dias);
+      if(SERVIDORES_CONFIG.ativo){
+        totais['CAFÉ']   = (totais['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg;
+        totais['AÇÚCAR'] = (totais['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg;
+      }
+      for(const [ing, qtd] of Object.entries(totais)){
         custoAno += qtd * (precos[ing] || 0);
       }
-    }
+    });
   });
 
-  document.getElementById('tbody-gastos').innerHTML = rows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:#aaa">Nenhum dado para este ciclo</td></tr>';
-  document.getElementById('gasto-semana').textContent = 'R$ ' + custoSemanaSelecionada.toLocaleString('pt-BR', {minimumFractionDigits:2});
-  document.getElementById('gasto-mes').textContent   = 'R$ ' + custoCiclo.toLocaleString('pt-BR', {minimumFractionDigits:2});
-  document.getElementById('gasto-ano').textContent   = 'R$ ' + custoAno.toLocaleString('pt-BR', {minimumFractionDigits:2});
-  document.getElementById('total-gastos-mes').textContent = 'R$ ' + custoCiclo.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('tbody-gastos').innerHTML = rows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:#aaa">Nenhum dado para este mês</td></tr>';
+  const lblSem = semSel > 0 ? `Gasto na Semana ${semSel}` : 'Gasto Total do Mês';
+  document.getElementById('gasto-semana-lbl').textContent = lblSem;
+  document.getElementById('gasto-semana').textContent = 'R$ ' + custoSemana.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('gasto-mes').textContent    = 'R$ ' + custoMes.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('gasto-ano').textContent    = 'R$ ' + custoAno.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('total-gastos-mes').textContent = 'R$ ' + custoMes.toLocaleString('pt-BR', {minimumFractionDigits:2});
 }
 
 
@@ -6164,7 +5982,7 @@ function renderPreparo(){
     const headerBg  = noCardapio ? 'var(--azul)' : '#64748b';
     const cardBorder = noCardapio ? 'border-left:4px solid var(--azul)' : '';
     const badge = noCardapio
-      ? '<span style="background:rgba(255,255,255,.18);border-radius:999px;padding:1px 9px;font-size:11px;font-weight:600;margin-left:10px;vertical-align:middle">📅 No cardápio</span>'
+      ? `<span style="background:rgba(255,255,255,.18);border-radius:999px;padding:1px 9px;font-size:11px;font-weight:600;margin-left:10px;vertical-align:middle;display:inline-flex;align-items:center;gap:4px">${ico('cal',11)}No cardápio</span>`
       : '';
 
     return `<div class="card" style="margin-bottom:20px;${cardBorder}">
@@ -6458,7 +6276,7 @@ function carregarConfig(){
   if(fim) fim.value = CAL_CONFIG.fim    || '';
   const st = document.getElementById('periodo-status');
   if(st && DIAS_LETIVOS_ARRAY.length)
-    st.textContent = `✅ ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados`;
+    st.innerHTML = `${ico('check',12)} ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados`;
 }
 
 function ir(id, btn){
@@ -6466,17 +6284,18 @@ function ir(id, btn){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
-  if(id==='cardapio') renderCardapio();
+  if(id==='cardapio'){ renderCardapio(); aplicarEstadoPaineisCardapio(); }
   if(id==='mercado') renderMercado();
   if(id==='gastos') renderGastos();
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque') renderEstoque();
   if(id==='licitacoes') renderLicitacoes();
-  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
+  if(id==='ingredientes'){ renderIngredientes(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
   if(id==='preparo') renderPreparo();
   atualizarPrintGlobal();
+  _abaAtual = id;
+  fecharAjudaTab();
 }
 
 // ══════════════════════════════════════════════════════
@@ -6667,8 +6486,22 @@ function togglePeriodo(){
   const panel = document.getElementById('body-periodo');
   const icon  = document.getElementById('icon-periodo');
   const aberto = panel.style.display !== 'none';
-  panel.style.display = aberto ? 'none' : 'block';
+  panel.style.display = aberto ? 'none' : '';
   icon.textContent = aberto ? '▼' : '▲';
+}
+
+function togglePinPeriodo(){
+  const pinned = localStorage.getItem('merenda_fixar_periodo') === '1';
+  if(pinned){
+    localStorage.removeItem('merenda_fixar_periodo');
+    document.getElementById('body-periodo').style.display = '';
+    document.getElementById('icon-periodo').textContent = '▲';
+  } else {
+    localStorage.setItem('merenda_fixar_periodo', '1');
+    document.getElementById('body-periodo').style.display = 'none';
+    document.getElementById('icon-periodo').textContent = '▼';
+  }
+  atualizarBotoesPinCardapio();
 }
 
 function toggleMes(id){
@@ -6678,6 +6511,40 @@ function toggleMes(id){
   const aberto = panel.style.display !== 'none';
   panel.style.display = aberto ? 'none' : 'block';
   if(icon) icon.textContent = aberto ? '▼' : '▲';
+  if(aberto){ // fechando manualmente: remove do set de abertos da sessão
+    mesesAbertos.delete(id);
+  } else {
+    mesesAbertos.add(id);
+  }
+}
+
+function _estilizarPinMes(btn, fixado){
+  if(!btn) return;
+  btn.textContent    = fixado ? '📌 fixado' : 'fixar aberto';
+  btn.style.background  = fixado ? 'rgba(26,58,107,.18)' : 'rgba(26,58,107,.08)';
+  btn.style.color       = fixado ? 'var(--azul)' : 'rgba(26,58,107,.55)';
+  btn.style.borderColor = fixado ? 'rgba(26,58,107,.4)' : 'rgba(26,58,107,.15)';
+  btn.style.fontWeight  = fixado ? '700' : 'normal';
+}
+
+function togglePinMes(id){
+  const fixados = new Set(JSON.parse(localStorage.getItem('merenda_meses_fixados') || '[]'));
+  const btn     = document.getElementById(id + '-pin');
+  const panel   = document.getElementById(id);
+  const icon    = document.getElementById(id + '-icon');
+  if(fixados.has(id)){
+    fixados.delete(id);
+    _estilizarPinMes(btn, false);
+  } else {
+    fixados.add(id);
+    _estilizarPinMes(btn, true);
+    // Abre o mês imediatamente ao fixar
+    if(panel && panel.style.display === 'none'){
+      panel.style.display = 'block';
+      if(icon) icon.textContent = '▲';
+    }
+  }
+  localStorage.setItem('merenda_meses_fixados', JSON.stringify([...fixados]));
 }
 
 function toggleDatasEspeciais(){
@@ -6701,9 +6568,9 @@ function salvarPeriodoLetivo(){
   renderCardapio();
   const st = document.getElementById('periodo-status');
   if(st){
-    st.textContent = DIAS_LETIVOS_ARRAY.length
-      ? `✅ ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados`
-      : '⚠ Defina início e término válidos';
+    st.innerHTML = DIAS_LETIVOS_ARRAY.length
+      ? `${ico('check',12)} ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados`
+      : `${ico('alert',12)} Defina início e término válidos`;
   }
 }
 
@@ -6742,7 +6609,7 @@ function _recalcularDias(){
   atualizarCiclos();
   renderCardapio();
   const st = document.getElementById('periodo-status');
-  if(st) st.textContent = DIAS_LETIVOS_ARRAY.length ? `✅ ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados` : '⚠ Defina início e término válidos';
+  if(st) st.innerHTML = DIAS_LETIVOS_ARRAY.length ? `${ico('check',12)} ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados` : `${ico('alert',12)} Defina início e término válidos`;
 }
 
 function renderListasEspeciais(){
@@ -6781,8 +6648,59 @@ function togglePlanejador(){
   const body = document.getElementById('body-planejador');
   const icon = document.getElementById('icon-planejador');
   const aberto = body.style.display !== 'none';
-  body.style.display = aberto ? 'none' : 'block';
+  body.style.display = aberto ? 'none' : '';
   icon.textContent = aberto ? '▼' : '▲';
+}
+
+function togglePinPlanejador(){
+  const pinned = localStorage.getItem('merenda_fixar_planejador') === '1';
+  if(pinned){
+    localStorage.removeItem('merenda_fixar_planejador');
+    document.getElementById('body-planejador').style.display = '';
+    document.getElementById('icon-planejador').textContent = '▲';
+  } else {
+    localStorage.setItem('merenda_fixar_planejador', '1');
+    document.getElementById('body-planejador').style.display = 'none';
+    document.getElementById('icon-planejador').textContent = '▼';
+  }
+  atualizarBotoesPinCardapio();
+}
+
+function atualizarBotoesPinCardapio(){
+  const isPinPeriodo = localStorage.getItem('merenda_fixar_periodo') === '1';
+  const isPinPlan    = localStorage.getItem('merenda_fixar_planejador') === '1';
+  const btnP = document.getElementById('pin-periodo-btn');
+  const btnL = document.getElementById('pin-planejador-btn');
+  if(btnP){
+    btnP.textContent = isPinPeriodo ? '📌 fixado' : 'fixar retraído';
+    btnP.style.background     = isPinPeriodo ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.15)';
+    btnP.style.color          = isPinPeriodo ? '#fff' : 'rgba(255,255,255,.8)';
+    btnP.style.borderColor    = isPinPeriodo ? 'rgba(255,255,255,.6)' : 'rgba(255,255,255,.25)';
+  }
+  if(btnL){
+    btnL.textContent = isPinPlan ? '📌 fixado' : 'fixar retraído';
+    btnL.style.background     = isPinPlan ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.15)';
+    btnL.style.color          = isPinPlan ? '#fff' : 'rgba(255,255,255,.8)';
+    btnL.style.borderColor    = isPinPlan ? 'rgba(255,255,255,.6)' : 'rgba(255,255,255,.25)';
+  }
+}
+
+function aplicarEstadoPaineisCardapio(){
+  if(localStorage.getItem('merenda_fixar_periodo') === '1'){
+    document.getElementById('body-periodo').style.display = 'none';
+    document.getElementById('icon-periodo').textContent = '▼';
+  } else {
+    document.getElementById('body-periodo').style.display = '';
+    document.getElementById('icon-periodo').textContent = '▲';
+  }
+  if(localStorage.getItem('merenda_fixar_planejador') === '1'){
+    document.getElementById('body-planejador').style.display = 'none';
+    document.getElementById('icon-planejador').textContent = '▼';
+  } else {
+    document.getElementById('body-planejador').style.display = '';
+    document.getElementById('icon-planejador').textContent = '▲';
+  }
+  atualizarBotoesPinCardapio();
 }
 
 function gerarSeletoresPratos(){
@@ -6808,8 +6726,8 @@ function gerarSeletoresPratos(){
     const cur = plano[i] || '';
     const {num: curNum} = cur ? nomeNum(cur) : {num:''};
     const btnFicha = cur
-      ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${i})" style="flex-shrink:0;padding:7px 9px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;font-size:14px;line-height:1">📋</button>`
-      : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:7px 9px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;font-size:14px;line-height:1;opacity:.4">📋</button>`;
+      ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${i})" style="flex-shrink:0;padding:7px 9px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center">${ico('folder',14)}</button>`
+      : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:7px 9px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;opacity:.4;display:flex;align-items:center;justify-content:center">${ico('folder',14)}</button>`;
     items.push(`<div style="background:var(--cinza);border-radius:8px;padding:10px">
       <div style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Prato ${i+1}</div>
       <div style="display:flex;gap:6px;align-items:center">
@@ -6870,8 +6788,8 @@ function atualizarBtnFicha(idx){
   const wrap = document.getElementById(`btn-ficha-${idx}`);
   if(!sel || !wrap) return;
   wrap.innerHTML = sel.value
-    ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${idx})" style="flex-shrink:0;padding:7px 9px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;font-size:14px;line-height:1">📋</button>`
-    : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:7px 9px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;font-size:14px;line-height:1;opacity:.4">📋</button>`;
+    ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${idx})" style="flex-shrink:0;padding:7px 9px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center">${ico('folder',14)}</button>`
+    : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:7px 9px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;opacity:.4;display:flex;align-items:center;justify-content:center">${ico('folder',14)}</button>`;
 }
 
 function carregarPlanoCiclo(){
@@ -6981,6 +6899,134 @@ if(!window._AUTH_BLOCKED){
   gerarSeletoresPratos();
   carregarConfig();
 }
+
+// ── Ajuda por aba ──────────────────────────────────────────
+var _abaAtual = 'mercado';
+
+var AJUDA_ABAS = {
+  mercado: {
+    titulo: 'Lista de Compras',
+    desc: 'Gera automaticamente o que precisa ser comprado ou retirado do estoque para cada semana letiva, com base no cardápio planejado e nas fichas técnicas.',
+    itens: [
+      'Selecione a semana desejada para ver os ingredientes necessários agrupados por fornecedor.',
+      'Os totais já consideram o per capita de cada nível de ensino e o número de alunos configurado.',
+      'O tamanho de embalagem (pacote) de cada ingrediente é usado para arredondar as quantidades.',
+      'Use o botão de impressão para gerar o documento de requisição.'
+    ]
+  },
+  cardapio: {
+    titulo: 'Cardápio Anual',
+    desc: 'Monte o calendário letivo e distribua os pratos por todo o ano em poucos passos.',
+    itens: [
+      'Marque o início e o fim do ano letivo no campo de período.',
+      'Cadastre todos os feriados e dias de recesso do ano.',
+      'Se houver sábados letivos, marque-os individualmente no calendário.',
+      'Defina quantos pratos diferentes compõem um ciclo semanal e cadastre cada prato do ciclo.',
+      'Clique em "Distribuir em todo o ano" para o sistema preencher automaticamente o calendário inteiro, pulando os dias sem aula.'
+    ]
+  },
+  ficha: {
+    titulo: 'Fichas Técnicas',
+    desc: 'Receitas com ingredientes e quantidades (per capita) por nível de ensino, baseadas no padrão PNAE. Personalize conforme a realidade da sua escola.',
+    itens: [
+      'Cada prato tem uma ficha com per capita para Fundamental I, Fundamental II e Ensino Médio.',
+      'As fichas já vêm pré-configuradas com o padrão PNAE — modifique se necessário.',
+      'Fichas alteradas em relação ao padrão recebem a marcação "Modificado" no card.',
+      'Para desfazer alterações, use o botão "Restaurar padrão PNAE" dentro da ficha.'
+    ]
+  },
+  ingredientes: {
+    titulo: 'Ingredientes',
+    desc: 'Cadastro completo dos ingredientes: preços, unidades, periodicidade de compra, tamanho do pacote comercial e fornecedor responsável.',
+    itens: [
+      'Informe o preço de compra de cada ingrediente para que os orçamentos sejam calculados.',
+      'O campo "Pacote" define o múltiplo de arredondamento nas listas de compras (ex: 5 kg).',
+      'Associe cada ingrediente a um fornecedor cadastrado para organizar as ordens por fornecedor.',
+      'A periodicidade indica se o ingrediente é comprado semanal, quinzenal ou mensalmente.'
+    ]
+  },
+  gastos: {
+    titulo: 'Orçamento',
+    desc: 'Visão consolidada do custo da merenda por período — total gasto, custo por aluno/dia e comparativo por ingrediente ou fornecedor.',
+    itens: [
+      'Selecione o período para ver o total calculado com base nos cardápios e preços cadastrados.',
+      'Os valores refletem os preços informados na aba Ingredientes.',
+      'Compare o custo real com o teto de per capita do PNAE para identificar distorções.'
+    ]
+  },
+  licitacoes: {
+    titulo: 'Contratos',
+    desc: 'Controle dos contratos de licitação ativos: valor autorizado, saldo utilizado e geração de pedidos de compra vinculados ao contrato.',
+    itens: [
+      'Cadastre cada contrato com o valor total autorizado e vigência.',
+      'Cada pedido de compra gerado desconta do saldo contratual disponível.',
+      'Acompanhe o percentual utilizado e receba alerta ao se aproximar do limite.',
+      'Exporte o histórico de pedidos por contrato para prestação de contas.'
+    ]
+  },
+  preparo: {
+    titulo: 'Guia de Preparo',
+    desc: 'Quantidades prontas para a cozinha: ingredientes do dia de hoje, separados por turno e nível de ensino, com base no cardápio e no número real de alunos.',
+    itens: [
+      'Selecione o dia para ver o cardápio do dia e as quantidades de cada ingrediente.',
+      'As quantidades já aplicam o per capita e consideram os alunos ativos em cada nível.',
+      'Imprima ou exiba na tela da cozinha como guia de trabalho do cozinheiro.',
+      'Fichas técnicas detalhadas podem ser abertas diretamente deste guia.'
+    ]
+  },
+  config: {
+    titulo: 'Configurações',
+    desc: 'Dados gerais da escola, níveis de ensino ativos, número de alunos e calendário letivo com feriados, recessos e sábados letivos.',
+    itens: [
+      'Informe o nome da escola e subtítulo que aparecem no cabeçalho dos documentos impressos.',
+      'Ative os níveis de ensino (F I, F II, Médio, EJA) e informe o número de alunos de cada um.',
+      'Configure o período letivo (início e fim do ano) para que o calendário seja gerado corretamente.',
+      'Adicione feriados, recessos e sábados letivos — o sistema exclui esses dias automaticamente.'
+    ]
+  }
+};
+
+function abrirAjudaTab(){
+  var ativaPg = document.querySelector('.pagina.ativa');
+  var id = ativaPg ? ativaPg.id.replace('pg-','') : _abaAtual;
+  var dados = AJUDA_ABAS[id];
+  if(!dados) return;
+  document.getElementById('ajuda-titulo').textContent = dados.titulo;
+  document.getElementById('ajuda-corpo').innerHTML =
+    '<p style="margin:0 0 14px">'+dados.desc+'</p>'+
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:8px">Como usar</div>'+
+    '<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">'+
+    dados.itens.map(function(i){ return '<li>'+i+'</li>'; }).join('')+
+    '</ul>';
+  document.getElementById('panel-ajuda-tab').style.right = '0';
+  document.getElementById('ajuda-overlay').style.display = 'block';
+}
+
+function fecharAjudaTab(){
+  var p = document.getElementById('panel-ajuda-tab');
+  var o = document.getElementById('ajuda-overlay');
+  if(p) p.style.right = '-320px';
+  if(o) o.style.display = 'none';
+}
 </script>
+
+<!-- Botão de ajuda por aba -->
+<button id="btn-ajuda-tab" onclick="abrirAjudaTab()" title="Ajuda desta aba" style="position:fixed;bottom:24px;right:24px;width:36px;height:36px;border-radius:50%;background:#fff;border:1.5px solid var(--borda);color:var(--txt2);font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.10);display:flex;align-items:center;justify-content:center;z-index:999;transition:background .15s,color .15s;line-height:1" onmouseover="this.style.background='var(--verde)';this.style.color='#fff';this.style.borderColor='var(--verde)'" onmouseout="this.style.background='#fff';this.style.color='var(--txt2)';this.style.borderColor='var(--borda)'">?</button>
+
+<!-- Overlay escuro atrás do painel -->
+<div id="ajuda-overlay" onclick="fecharAjudaTab()" style="position:fixed;inset:0;background:rgba(0,0,0,.15);z-index:9997;display:none"></div>
+
+<!-- Painel de ajuda deslizante -->
+<div id="panel-ajuda-tab" style="position:fixed;top:0;right:-320px;width:300px;height:100vh;background:#fff;border-left:1px solid var(--borda);box-shadow:-4px 0 24px rgba(0,0,0,.10);z-index:9998;transition:right .25s ease;display:flex;flex-direction:column">
+  <div style="padding:16px 18px;border-bottom:1px solid var(--borda);display:flex;align-items:center;justify-content:space-between;background:#f8fafc">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--verde);color:#fff;font-size:12px;font-weight:700;flex-shrink:0">?</span>
+      <span id="ajuda-titulo" style="font-weight:700;font-size:13px;color:var(--txt)"></span>
+    </div>
+    <button onclick="fecharAjudaTab()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--txt2);line-height:1;padding:0 2px" title="Fechar">×</button>
+  </div>
+  <div id="ajuda-corpo" style="padding:18px;overflow-y:auto;flex:1;font-size:13px;line-height:1.65;color:var(--txt2)"></div>
+</div>
+
 </body>
 </html>
