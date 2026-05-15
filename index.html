@@ -40,7 +40,7 @@ nav{background:var(--nav-bg);width:260px;min-width:260px;display:flex;flex-direc
 
 /* ── PÁGINAS ── */
 .main-content{flex:1;min-width:0;overflow-y:auto}
-.pagina{display:none;padding:32px 40px;max-width:1200px;margin:0;animation:fadeIn .3s}
+.pagina{display:none;padding:32px 40px;margin:0;animation:fadeIn .3s}
 .pagina.ativa{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
@@ -61,7 +61,7 @@ nav{background:var(--nav-bg);width:260px;min-width:260px;display:flex;flex-direc
 
 /* ── TABELAS ── */
 .card{background:#fff;border-radius:var(--r);box-shadow:var(--sombra);overflow:hidden;margin-bottom:20px}
-.card-header{background:var(--azul);color:#fff;padding:14px 20px;font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.card-header{background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);color:#fff;padding:14px 20px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
 .card-header.verde{background:var(--verde)}
 .card-header.laranja{background:var(--laranja)}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -89,7 +89,7 @@ tbody tr:hover td{background:#f0f5fc}
 
 /* ── CARDÁPIO GRID ── */
 .grade-cardapio{display:grid;grid-template-columns:80px repeat(5,1fr);gap:0;border:1px solid var(--borda);border-radius:var(--r);overflow:hidden;font-size:12.5px}
-.gc-head{background:var(--azul);color:#fff;padding:10px 8px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.gc-head{background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);color:#fff;padding:10px 8px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;text-align:center}
 .gc-sem{background:var(--cinza);font-weight:800;color:var(--azul);padding:12px 8px;text-align:center;font-size:12px;border-right:1px solid var(--borda)}
 .gc-cell{padding:10px 8px;border:1px solid var(--borda);line-height:1.3;cursor:pointer;transition:.15s;background:#fff}
 .gc-cell:hover{background:#eef5ff}
@@ -102,7 +102,7 @@ tbody tr:hover td{background:#f0f5fc}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
 .overlay.aberto{display:flex}
 .modal{background:#fff;border-radius:14px;max-width:520px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.modal-header{background:var(--azul);color:#fff;padding:18px 22px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center}
+.modal-header{background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);color:#fff;padding:18px 22px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center}
 .modal-header h3{font-size:15px;font-weight:700}
 .modal-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
 .modal-body{padding:20px 22px}
@@ -202,7 +202,8 @@ tbody tr:hover td{background:#f0f5fc}
   h2.titulo{font-size:18px;margin-bottom:16px}
 
   /* Tabela de ingredientes */
-  #tbody-ings tr td:nth-child(3){display:none}
+  #tbody-ings tr td:nth-child(3),
+  #pg-ingredientes thead tr th:nth-child(3){display:none}
 
   /* Licitações e estoque */
   .no-print.btn-swap{padding:5px 8px;font-size:11px}
@@ -215,7 +216,7 @@ tbody tr:hover td{background:#f0f5fc}
 @media print{
   @page{margin:20mm 24mm;size:A4}
   /* ── ocultar UI ── */
-  nav,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay{display:none!important}
+  nav,#nav-principal,.mobile-topbar,#mobile-topbar,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay{display:none!important}
   h2.titulo{display:none!important}
   /* ── layout base ── */
   body{background:#fff;font-size:10.5pt;color:#000;padding:0;margin:0;display:block!important}
@@ -228,8 +229,9 @@ tbody tr:hover td{background:#f0f5fc}
   .print-only{display:block!important}
   .print-only.print-hide{display:none!important}
   /* ── cabeçalho global (relatório/gastos) ── */
-  .print-header{display:block!important;border-bottom:2.5px solid #1A3A6B;padding-bottom:10px;margin-bottom:14px}
-  .print-header img{max-height:160px;max-width:360px;object-fit:contain;margin:0 auto;display:block}
+  .print-header{display:block!important;margin-bottom:14px}
+  .print-header img{width:100%;height:auto;display:block}
+  .print-header.sem-timbre{border-bottom:2.5px solid #1A3A6B;padding-bottom:10px}
   .print-title{font-size:13pt;font-weight:800;text-align:center;margin:12px 0 10px;color:#000;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #c8d4e8;padding-bottom:8px}
   /* ── cards e tabelas gerais ── */
   .card{box-shadow:none;border:1px solid #c8d4e8!important;margin-bottom:14px;break-inside:avoid}
@@ -251,8 +253,8 @@ tbody tr:hover td{background:#f0f5fc}
   .forn-page .no-print{display:none!important}
 
   /* timbre */
-  .forn-timbre{text-align:center;margin-bottom:10px}
-  .forn-timbre img{max-height:80px;max-width:220px;object-fit:contain}
+  .forn-timbre{margin-bottom:14px}
+  .forn-timbre img{width:100%;height:auto;display:block}
 
   /* título */
   .forn-titulo{
@@ -267,7 +269,7 @@ tbody tr:hover td{background:#f0f5fc}
 
   /* tabela formal */
   .forn-tabela{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:0}
-  .forn-tabela thead tr{background:#1A3A6B;color:#fff}
+  .forn-tabela thead tr{background:linear-gradient(135deg,#1A3A6B 0%,#2E75B6 100%);color:#fff}
   .forn-tabela thead th{
     padding:7px 10px;border:1px solid #1A3A6B;
     font-weight:700;text-transform:uppercase;font-size:9pt;letter-spacing:.04em
@@ -369,8 +371,8 @@ tr:hover .hover-info{display:block}
 .rec-btn.nao.ativo{background:var(--vermelho);color:#fff}
 
 /* título de seção */
-h2.titulo{font-size:18px;font-weight:800;color:var(--azul);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-h2.titulo::after{content:'';flex:1;height:2px;background:linear-gradient(to right,var(--borda),transparent)}
+h2.titulo{font-size:17px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);margin-bottom:20px;display:flex;align-items:center;gap:10px;padding:14px 22px;border-radius:var(--r);box-shadow:var(--sombra)}
+h2.titulo::after{content:'';flex:1;height:1.5px;background:rgba(255,255,255,.22)}
 
 /* ── CONFIGURAÇÕES ── */
 .config-container{max-width:720px;margin:0 auto}
@@ -400,6 +402,8 @@ h2.titulo::after{content:'';flex:1;height:2px;background:linear-gradient(to righ
 .preview-mock .mock-header-text{text-align:center}
 .preview-mock .mock-header-text h1{font-size:12px;color:var(--azul);margin:0;line-height:1.3}
 .preview-mock .mock-header-text p{font-size:9px;color:#888;margin:2px 0 0}
+.preview-mock .mock-header.timbre-mode{display:block;border-bottom:none;padding-bottom:4px}
+.preview-mock .mock-header.timbre-mode img{max-height:none;max-width:100%;width:100%;height:auto;object-fit:contain}
 .preview-mock .mock-body{height:60px;background:repeating-linear-gradient(0deg,#f0f0f0,#f0f0f0 6px,transparent 6px,transparent 12px);border-radius:4px;margin-bottom:8px}
 .preview-mock .mock-sig{text-align:center;border-top:1px solid #999;width:200px;margin:0 auto;padding-top:4px;font-size:9px;color:var(--azul);font-weight:700}
 .config-saved{display:inline-flex;align-items:center;gap:6px;background:#d4edda;color:#155724;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;opacity:0;transition:opacity .3s}
@@ -408,6 +412,11 @@ h2.titulo::after{content:'';flex:1;height:2px;background:linear-gradient(to righ
 /* ── CALENDÁRIO REDESIGN ── */
 .cal-grid{display:grid;grid-template-columns:1fr;gap:28px}
 .cal-month{background:#fff;border-radius:16px;box-shadow:0 2px 18px rgba(26,58,107,.09);overflow:hidden}
+.cal-nav-wrapper{display:flex;align-items:center;justify-content:center;margin-bottom:16px;gap:8px}
+.cal-nav-btn{background:#fff;border:1.5px solid var(--borda);color:var(--azul);font-size:13px;font-weight:700;padding:7px 22px;border-radius:50px;cursor:pointer;transition:.12s;font-family:inherit}
+.cal-nav-btn:hover:not(:disabled){border-color:var(--azul2);background:var(--azul2);color:#fff}
+.cal-nav-btn:disabled{opacity:.35;cursor:default}
+.cal-nav-titulo{font-size:17px;font-weight:800;color:var(--azul);letter-spacing:.04em;text-align:center;flex:1}
 /* Cabeçalho do mês */
 .cal-top{display:flex;justify-content:space-between;align-items:baseline;padding:22px 28px 16px;border-bottom:2px solid var(--borda)}
 .cal-mes-nome{font-size:32px;font-weight:900;color:var(--azul);text-transform:uppercase;letter-spacing:-.5px;line-height:1}
@@ -584,7 +593,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <button class="nav-tab" onclick="ir('ingredientes',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>Ingredientes</button>
     <button class="nav-tab" onclick="ir('gastos',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Orçamento</button>
     <button class="nav-tab" onclick="ir('licitacoes',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Contratos</button>
-    <button class="nav-tab" onclick="ir('preparo',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v7"/></svg>Guia de Preparo</button>
+    <button class="nav-tab" onclick="ir('preparo',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Quantidades por Turno</button>
     <button class="nav-tab" onclick="ir('config',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações</button>
     <button class="nav-tab" id="nav-btn-admin" style="display:none" onclick="ir('admin',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Admin <span class="badge-admin" id="badge-admin" style="display:none">0</span></button>
   </div>
@@ -698,17 +707,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <label>Qtd. de Pratos</label>
             <input type="number" id="plan-qtd" min="1" max="25" value="25" style="width:90px" oninput="gerarSeletoresPratos()">
           </div>
-          <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="distribuirCiclo()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Distribuir neste Ciclo</button>
-          <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="distribuirTodoOAno()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>Distribuir em Todo o Ano</button>
+          <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="distribuirAPartirDoCiclo()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>Distribuir a partir deste Ciclo</button>
           <button class="btn btn-outline btn-sm" style="display:flex;align-items:center;gap:5px" onclick="limparCiclo()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Limpar Ciclo</button>
           <button class="btn btn-outline btn-sm" style="display:flex;align-items:center;gap:5px" onclick="limparTodosCiclos()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Limpar Todos os Ciclos</button>
         </div>
         <p style="font-size:12px;color:var(--txt2);margin-bottom:16px">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;flex-shrink:0"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Os pratos são distribuídos em rotação pelos dias letivos do ciclo selecionado.
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;flex-shrink:0"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Os pratos são distribuídos em rotação pelos dias letivos do ciclo selecionado. Após escolher os pratos, selecione o ciclo de início e clique em <strong>Distribuir a partir deste Ciclo</strong> para aplicar ao calendário.
         </p>
       </div>
 
-      <div id="grid-pratos-plan" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+      <div id="grid-pratos-plan" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px"></div>
     </div>
   </div>
 
@@ -843,7 +851,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar embalagens como padrão</button>
     </div>
     <table>
-      <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Tipo</th><th>Periodicidade</th><th title="Fornecedor cadastrado para este ingrediente">Fornecedor</th><th style="text-align:center" title="Tamanho do pacote comercial (ex: 1 kg, 5 kg). O total de compra será arredondado para o múltiplo mais próximo.">Pacote</th><th style="text-align:center">Preço</th></tr></thead>
+      <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Tipo</th><th>Periodicidade</th><th title="Fornecedor cadastrado para este ingrediente">Fornecedor</th><th style="text-align:center" title="Tamanho do pacote comercial (ex: 1 kg, 5 kg). O total de compra será arredondado para o múltiplo mais próximo.">Pacote</th><th style="text-align:right">Preço</th></tr></thead>
       <tbody id="tbody-ings"></tbody>
     </table>
   </div>
@@ -870,14 +878,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 
     <div class="config-card">
-      <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Imagem do Cabeçalho</div>
+      <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Timbre do Cabeçalho</div>
       <div class="config-card-body">
-        <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Escolha uma imagem (brasão, logotipo ou selo) que aparecerá no cabeçalho de todas as impressões.</p>
+        <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Faça upload do <strong>timbre da escola</strong> — ele substituirá todo o cabeçalho nas impressões, ocupando a largura total da página. Tamanho ideal: <strong>581×91 px</strong>.</p>
         <div class="upload-area" id="upload-area">
           <input type="file" accept="image/*" id="input-img-cabecalho" onchange="handleImageUpload(event)">
           <div class="upload-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
           <div class="upload-text">Clique ou arraste uma imagem aqui</div>
-          <div class="upload-hint">PNG, JPG ou SVG — tamanho recomendado: 200×100px</div>
+          <div class="upload-hint">PNG ou JPG — tamanho ideal: 581×91 px</div>
         </div>
         <div class="img-preview" id="img-preview" style="display:none">
           <img id="preview-img" src="" alt="Preview">
@@ -1244,7 +1252,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: GUIA DE PREPARO
 ══════════════════════════════════════════════════════ -->
 <div id="pg-preparo" class="pagina">
-  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2l1.5 1.5"/><path d="M9 2l-1.5 1.5"/><path d="M6 2v3"/><path d="M3 17h18"/><path d="M19.5 17v3.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V17"/><path d="M12 17V7"/><path d="M8 17V9"/><path d="M16 17v-5"/></svg>Guia de Preparo por Fase de Ensino</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Quantidades por Turno por Fase de Ensino</h2>
   <div class="seletor-bar">
     <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="window.print()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Guia</button>
   </div>
@@ -1550,6 +1558,7 @@ const _supaSync = {
         if(col === 'config' && typeof val === 'object') {
           // Restaurar campos de config individuais
           Object.entries(val).forEach(([k, v]) => {
+            if(v === null || v === undefined) return;
             localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
           });
           return;
@@ -1759,6 +1768,7 @@ function recarregarDados(){
   MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
   FORNECEDORES_CADASTRO   = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
   ING_FORNECEDORES        = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
+  ING_PERIODICIDADE       = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
   Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
   // Aplicar unidades customizadas
   const u = JSON.parse(localStorage.getItem('merenda_unidades') || '{}');
@@ -1918,16 +1928,36 @@ async function fazerLogin(){
       // ou defaults de coluna do Supabase em sessões posteriores
       const _defNiveis = [{id:'f1',alunos:0,ativo:false},{id:'f2',alunos:0,ativo:false},{id:'medio',alunos:0,ativo:false},{id:'eja',alunos:0,ativo:false}];
       const _defServ  = {ativo:false,cafe_kg:0,acucar_kg:0,qtd_servidores:0,cafe_g_por_serv:16.5,acucar_g_por_serv:45};
+      const _defCal   = {inicio:'',fim:'',feriados:[],recesso:[],sabados:[]};
+      const _defCfg   = {merenda_cardapio:{},merenda_diretor:'',merenda_cargo:'Diretor(a) Escolar',merenda_escola:'',merenda_subtitulo:'',merenda_fornecedores:[],merenda_ing_fornecedores:{}};
+      localStorage.removeItem('merenda_header_img');
       localStorage.setItem('merenda_niveis', JSON.stringify(_defNiveis));
       localStorage.setItem('merenda_fornecedores', '[]');
       localStorage.setItem('merenda_ing_fornecedores', '{}');
+      localStorage.setItem('merenda_ing_periodicidade', '{}');
       localStorage.setItem('merenda_servidores_config', JSON.stringify(_defServ));
-      localStorage.setItem('merenda_cal_config', JSON.stringify({inicio:'',fim:'',feriados:[],recesso:[],sabados:[]}));
+      localStorage.setItem('merenda_cal_config', JSON.stringify(_defCal));
       localStorage.setItem('merenda_cardapio', JSON.stringify({}));
-      // Grava defaults limpos imediatamente no Supabase — evita defaults de coluna aparecerem em refreshes
-      if(_supabase){ try { await _supabase.from('escola_dados').upsert({ user_id: res.user.id, niveis: _defNiveis, servidores_config: _defServ }, { onConflict: 'user_id' }); } catch(e){} }
+      localStorage.setItem('merenda_precos', '{}');
+      localStorage.setItem('merenda_embalagens', '{}');
+      localStorage.setItem('merenda_ciclos_planos', '{}');
+      localStorage.setItem('merenda_licitacoes', '[]');
+      localStorage.setItem('merenda_merc_ajustes', '{}');
+      // Grava TODAS as colunas limpas no Supabase imediatamente — evita que defaults de coluna
+      // do Supabase apareçam em sessões posteriores (ex: após F5 dentro dos 2s do debounce)
+      if(_supabase){ try { await _supabase.from('escola_dados').upsert({
+        user_id: res.user.id,
+        niveis: _defNiveis,
+        servidores_config: _defServ,
+        config: _defCfg,
+        cal_config: _defCal,
+        precos: {},
+        unidades: {},
+        embalagens: {}
+      }, { onConflict: 'user_id' }); } catch(e){} }
       // Marca conta como inicializada
       res.user.nova_conta = false;
+      window._primeiroLogin = true;
       const _ls = window._origLS || localStorage;
       _ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS.map(u => u.id === res.user.id ? {...u, nova_conta: false} : u)));
       if(_supabase){ try { await _supabase.from('usuarios').update({ nova_conta: false }).eq('id', res.user.id); } catch(e){} }
@@ -2341,6 +2371,7 @@ function configuracaoCompleta(){
 function verificarOnboarding(){
   const uid = window._SESSAO && window._SESSAO.user_id;
   if(uid === 'usr_admin' || uid === 'usr_admin_rede') return;
+  if(window._primeiroLogin){ window._primeiroLogin = false; abrirGuiaInicio(); return; }
   if(localStorage.getItem('merenda_ocultar_boasvindas') === '1') return;
   const demoAtivo = !!localStorage.getItem('merenda_usando_demo');
   if(demoAtivo || configuracaoCompleta()) return;
@@ -2392,7 +2423,7 @@ function renderOnbFeatures(){
     {key:'chart',  title:'Lista de Compras',   desc:'Compras semanais calculadas automaticamente',   bg:'#faf5ff',bc:'#d8b4fe',tc:'#7e22ce'},
     {key:'alert',  title:'Estoque',           desc:'Monitoramento com alertas de nível crítico',    bg:'#fffbeb',bc:'#fcd34d',tc:'#b45309'},
     {key:'edit',   title:'Contratos',          desc:'Controle de contratos, pedidos e recebimentos', bg:'#fff1f2',bc:'#fda4af',tc:'#be123c'},
-    {key:'coffee', title:'Guia de Preparo',   desc:'Quantidades para cozinhar no dia por turno',   bg:'#fdf4ff',bc:'#e9d5ff',tc:'#86198f'},
+    {key:'chart', title:'Quantidades por Turno',   desc:'Quantidades para cozinhar no dia por turno',   bg:'#fdf4ff',bc:'#e9d5ff',tc:'#86198f'},
     {key:'users',  title:'Ingredientes',      desc:'Preços, unidades, pacotes e fornecedores',      bg:'#f0fdfa',bc:'#99f6e4',tc:'#0f766e'},
     {key:'key',    title:'Configurações',     desc:'Escola, calendário, níveis e cabeçalho',        bg:'#f8fafc',bc:'#cbd5e1',tc:'#475569'},
   ];
@@ -2784,8 +2815,15 @@ let FORNECEDORES_CADASTRO = JSON.parse(localStorage.getItem('merenda_fornecedore
   localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(migrado));
 })();
 let ING_FORNECEDORES = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
+let ING_PERIODICIDADE = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
 function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
 function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
+function salvarIngPeriodicidade(){ localStorage.setItem('merenda_ing_periodicidade', JSON.stringify(ING_PERIODICIDADE)); }
+function setIngPeriodicidade(nome, valor){
+  if(valor) ING_PERIODICIDADE[nome] = valor;
+  else delete ING_PERIODICIDADE[nome];
+  salvarIngPeriodicidade();
+}
 function setIngFornecedor(nome, fornId){
   if(fornId) ING_FORNECEDORES[nome] = fornId;
   else delete ING_FORNECEDORES[nome];
@@ -4511,23 +4549,11 @@ function voltarDaPreview(){
   document.querySelectorAll('.nav-tab').forEach(t => {
     if((t.getAttribute('onclick') || '').includes("'cardapio'")) t.classList.add('ativo');
   });
-  renderCardapio();
-
-  // Reabre e rola até o mês que o usuário estava visualizando
+  // Volta para o mês que o usuário estava visualizando
   const mesAlvo = PREVIEW_RETURN_MES;
   PREVIEW_RETURN_MES = null;
-  if(mesAlvo){
-    // Aguarda renderCardapio terminar antes de expandir e rolar
-    setTimeout(() => {
-      const panel = document.getElementById(mesAlvo);
-      const icon  = document.getElementById(mesAlvo + '-icon');
-      if(panel && panel.style.display === 'none'){
-        panel.style.display = 'block';
-        if(icon) icon.textContent = '▲';
-      }
-      panel?.closest('.cal-month')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 80);
-  }
+  if(mesAlvo) irParaMes(mesAlvo);
+  else renderCardapio();
 }
 
 function irParaPlanejamento(){
@@ -4542,17 +4568,17 @@ function irParaPlanejamento(){
 }
 
 var mesesAbertos = new Set();
+var _calMesAtual = 0;
+function _getMesAtualDefault(){
+  const m = new Date().getMonth(); // 0=Jan ... 11=Dez
+  return Math.max(0, Math.min(10, m - 1)); // Fev(1)=0 ... Dez(11)=10; Jan→0
+}
 
 function renderCardapio(){
   const grid = document.getElementById('grid-calendario');
   const legenda = document.getElementById('legenda-ciclos');
   if(!grid) return;
-  // Preservar quais meses estão expandidos antes de re-renderizar
-  mesesAbertos = new Set(
-    [...grid.querySelectorAll('[id^="cal-mes-"]')]
-      .filter(el => el.style.display !== 'none')
-      .map(el => el.id)
-  );
+
   const elIni = document.getElementById('cal-inicio');
   const elFim = document.getElementById('cal-fim');
   if(elIni && CAL_CONFIG.inicio) elIni.value = CAL_CONFIG.inicio;
@@ -4560,134 +4586,114 @@ function renderCardapio(){
   renderListasEspeciais();
   gerarSeletoresPratos();
 
-  const pratosOptions = `<option value="">— Recesso / Sem merenda —</option>` +
-    PRATOS_LISTA.map(p => {
-      const {num, nome} = nomeNum(p);
-      return `<option value="${p.replace(/"/g,'&quot;')}">${num?num+' - ':''}${nome}</option>`;
-    }).join('');
-
   const MESES_DISPLAY = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
-  // Atalhos dos meses — botões que expandem e rolam até o mês
-  legenda.innerHTML = MESES_DISPLAY.map(mes => {
+  // Atalhos dos meses — destaca o mês ativo
+  legenda.innerHTML = MESES_DISPLAY.map((mes, idx) => {
+    const ativo = idx === _calMesAtual;
     const mesId = `cal-mes-${mes.replace(/\s/g,'')}`;
     return `<button onclick="irParaMes('${mesId}')"
-      style="padding:5px 14px;background:#f8fafc;border-radius:50px;border:1.5px solid var(--borda);font-size:11px;font-weight:700;color:#475569;cursor:pointer;transition:.12s"
-      onmouseover="this.style.borderColor='var(--azul2)';this.style.color='var(--azul2)'"
-      onmouseout="this.style.borderColor='var(--borda)';this.style.color='#475569'">${mes}</button>`;
+      style="padding:5px 14px;background:${ativo?'var(--azul2)':'#f8fafc'};border-radius:50px;border:1.5px solid ${ativo?'var(--azul2)':'var(--borda)'};font-size:11px;font-weight:700;color:${ativo?'#fff':'#475569'};cursor:pointer;transition:.12s">${mes}</button>`;
   }).join('');
+
   const WK = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
-  let html = '<div class="cal-grid">';
+  // Renderiza apenas o mês atual
+  const m = _calMesAtual + 1; // 1=Fev ... 11=Dez (Date usa mês 0-indexado, +1 desloca para Fev)
+  const mesNome = MESES_DISPLAY[_calMesAtual];
+  const mesId = `cal-mes-${mesNome.replace(/\s/g,'')}`;
+  const firstDow = new Date(2026, m, 1).getDay();
+  const daysInMonth = new Date(2026, m+1, 0).getDate();
 
-  for(let m = 1; m < 12; m++){
-    const mesNome = MESES_DISPLAY[m-1];
-    const mesId = `cal-mes-${mesNome.replace(/\s/g,'')}`;
-    const firstDow = new Date(2026, m, 1).getDay();
-    const daysInMonth = new Date(2026, m+1, 0).getDate();
+  let days = '';
+  for(let i=0; i<firstDow; i++) days += '<div class="cal-day day-off"></div>';
 
-    // Monta células do calendário
-    let days = '';
-    for(let i=0; i<firstDow; i++) days += '<div class="cal-day day-off"></div>';
+  for(let day=1; day<=daysInMonth; day++){
+    const date = new Date(2026, m, day);
+    const iso = date.toISOString().split('T')[0];
+    const dow = date.getDay();
+    const isHoliday = CAL_CONFIG.feriados.includes(iso);
+    const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
 
-    for(let day=1; day<=daysInMonth; day++){
-      const date = new Date(2026, m, day);
-      const iso = date.toISOString().split('T')[0];
-      const dow = date.getDay();
-      const isHoliday = CAL_CONFIG.feriados.includes(iso);
-      const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
+    const isInicio = iso === CAL_CONFIG.inicio;
+    const isFim    = iso === CAL_CONFIG.fim;
+    const isSabLetivoDay = CAL_CONFIG.sabados.includes(iso);
+    const badge = isInicio
+      ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--verde);border-radius:3px;padding:1px 4px;line-height:1.4">INÍCIO</span>`
+      : isFim
+        ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--laranja);border-radius:3px;padding:1px 4px;line-height:1.4">FIM</span>`
+        : '';
 
-      const isInicio = iso === CAL_CONFIG.inicio;
-      const isFim    = iso === CAL_CONFIG.fim;
-      const isSabLetivoDay = CAL_CONFIG.sabados.includes(iso);
-      const badge = isInicio
-        ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--verde);border-radius:3px;padding:1px 4px;line-height:1.4">INÍCIO</span>`
-        : isFim
-          ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--laranja);border-radius:3px;padding:1px 4px;line-height:1.4">FIM</span>`
-          : '';
-
-      if(letIdx !== -1){
-        const cor = getCorDia(iso, letIdx);
-        const curP = getMealByDate(iso) || getPratoFromCiclo(iso);
-        const {nome} = curP ? nomeNum(curP) : {nome:''};
-        const isSabLetivo = dow === 6;
-        const numBtnClass = isSabLetivo ? 'cal-day-num-btn btn-sabletivo' : 'cal-day-num-btn';
-        const numBtnTitle = isSabLetivo ? 'Remover Sábado Letivo' : 'Marcar como Feriado/Recesso';
-        days += `<div class="cal-day day-school" id="cal-day-${letIdx}" onclick="abrirPopupDia('${iso}',event)">
-          <span class="${numBtnClass}" onclick="clicarNumDia('${iso}',event)" title="${numBtnTitle}">${day}</span>${badge}
-          ${curP ? `<div class="cal-event" style="background:${cor}">${nome}</div>` : ''}
-        </div>`;
-      } else if(isHoliday){
-        days += `<div class="cal-day day-holiday" onclick="abrirPopupDia('${iso}',event)">
-          <span class="cal-day-num-btn btn-feriado" onclick="clicarNumDia('${iso}',event)" title="Remover Feriado/Recesso">${day}</span>${badge}
-          <span class="cal-feriado-tag">Feriado/Recesso</span>
-        </div>`;
-      } else if(dow===6){
-        const sabClass = isSabLetivoDay ? 'btn-sabletivo' : '';
-        const sabTitle = isSabLetivoDay ? 'Remover Sábado Letivo' : 'Marcar como Sábado Letivo';
-        const tag = isSabLetivoDay ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--azul2);border-radius:3px;padding:1px 4px;line-height:1.4">SAB.LET.</span>` : '';
-        days += `<div class="cal-day day-off"><span class="cal-day-num-btn ${sabClass}" onclick="clicarNumDia('${iso}',event)" title="${sabTitle}">${day}</span>${tag}${badge}</div>`;
-      } else if(dow===0){
-        const nextDate = new Date(2026, m, day + 1);
-        const mondayIso = nextDate.toISOString().split('T')[0];
-        const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
-        const semana = semanaIdx >= 0 ? SEMANAS_CAL[semanaIdx] : null;
-        const botoesWeek = semana ? `
-          <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
-            <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
-            <button class="cal-sem-btn cal-sem-btn-print" style="display:inline-flex;align-items:center;gap:4px" onclick="irParaImprimirSemana('${mondayIso}','${mesId}');event.stopPropagation()" title="Imprimir lista de mercado">${ico('printer',11)}Imprimir</button>
-            <button class="cal-sem-btn cal-sem-btn-xls" style="display:inline-flex;align-items:center;gap:4px" onclick="exportarExcelSemanaCal('${mondayIso}');event.stopPropagation()" title="Exportar Excel">${ico('chart',11)}Excel</button>
-          </div>` : '';
-        days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
-      } else {
-        days += `<div class="cal-day day-nletivo" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}</div>`;
-      }
+    if(letIdx !== -1){
+      const cor = getCorDia(iso, letIdx);
+      const curP = getMealByDate(iso) || getPratoFromCiclo(iso);
+      const {nome} = curP ? nomeNum(curP) : {nome:''};
+      const isSabLetivo = dow === 6;
+      const numBtnClass = isSabLetivo ? 'cal-day-num-btn btn-sabletivo' : 'cal-day-num-btn';
+      const numBtnTitle = isSabLetivo ? 'Remover Sábado Letivo' : 'Marcar como Feriado/Recesso';
+      days += `<div class="cal-day day-school" id="cal-day-${letIdx}" onclick="abrirPopupDia('${iso}',event)">
+        <span class="${numBtnClass}" onclick="clicarNumDia('${iso}',event)" title="${numBtnTitle}">${day}</span>${badge}
+        ${curP ? `<div class="cal-event" style="background:${cor}">${nome}</div>` : ''}
+      </div>`;
+    } else if(isHoliday){
+      days += `<div class="cal-day day-holiday" onclick="abrirPopupDia('${iso}',event)">
+        <span class="cal-day-num-btn btn-feriado" onclick="clicarNumDia('${iso}',event)" title="Remover Feriado/Recesso">${day}</span>${badge}
+        <span class="cal-feriado-tag">Feriado/Recesso</span>
+      </div>`;
+    } else if(dow===6){
+      const sabClass = isSabLetivoDay ? 'btn-sabletivo' : '';
+      const sabTitle = isSabLetivoDay ? 'Remover Sábado Letivo' : 'Marcar como Sábado Letivo';
+      const tag = isSabLetivoDay ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--azul2);border-radius:3px;padding:1px 4px;line-height:1.4">SAB.LET.</span>` : '';
+      days += `<div class="cal-day day-off"><span class="cal-day-num-btn ${sabClass}" onclick="clicarNumDia('${iso}',event)" title="${sabTitle}">${day}</span>${tag}${badge}</div>`;
+    } else if(dow===0){
+      const nextDate = new Date(2026, m, day + 1);
+      const mondayIso = nextDate.toISOString().split('T')[0];
+      const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
+      const semana = semanaIdx >= 0 ? SEMANAS_CAL[semanaIdx] : null;
+      const botoesWeek = semana ? `
+        <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+          <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
+          <button class="cal-sem-btn cal-sem-btn-print" style="display:inline-flex;align-items:center;gap:4px" onclick="irParaImprimirSemana('${mondayIso}','${mesId}');event.stopPropagation()" title="Imprimir lista de mercado">${ico('printer',11)}Imprimir</button>
+          <button class="cal-sem-btn cal-sem-btn-xls" style="display:inline-flex;align-items:center;gap:4px" onclick="exportarExcelSemanaCal('${mondayIso}');event.stopPropagation()" title="Exportar Excel">${ico('chart',11)}Excel</button>
+        </div>` : '';
+      days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
+    } else {
+      days += `<div class="cal-day day-nletivo" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}</div>`;
     }
+  }
 
-    html += `<div class="cal-month">
-      <div class="cal-top" style="cursor:pointer;user-select:none" onclick="toggleMes('${mesId}')">
-        <span class="cal-mes-nome">${mesNome}</span>
-        <span class="cal-ano">2026</span>
-        <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
-          <button id="${mesId}-pin" onclick="event.stopPropagation();togglePinMes('${mesId}')" title="Fixar este mês como aberto ao entrar na aba" style="background:rgba(26,58,107,.08);border:1px solid rgba(26,58,107,.15);color:rgba(26,58,107,.55);font-size:11px;padding:2px 8px;border-radius:12px;cursor:pointer;line-height:1.4;font-family:inherit">fixar aberto</button>
-          <span id="${mesId}-icon" style="font-size:16px">▼</span>
-        </span>
-      </div>
-      <div id="${mesId}" style="display:none">
-        <div class="cal-body">
-          <div class="cal-main">
-            <div class="cal-wk-hdr">${WK.map(d=>`<span>${d}</span>`).join('')}</div>
-            <div class="cal-days">${days}</div>
-          </div>
+  const navPrev = _calMesAtual > 0
+    ? `<button class="cal-nav-btn" onclick="navegarMes(-1)">‹ Anterior</button>`
+    : `<button class="cal-nav-btn" disabled>‹ Anterior</button>`;
+  const navNext = _calMesAtual < 10
+    ? `<button class="cal-nav-btn" onclick="navegarMes(1)">Próximo ›</button>`
+    : `<button class="cal-nav-btn" disabled>Próximo ›</button>`;
+
+  grid.innerHTML = `
+    <div class="cal-nav-wrapper">
+      ${navPrev}
+      ${navNext}
+    </div>
+    <div class="cal-grid">
+      <div class="cal-month">
+        <div class="cal-top">
+          <span class="cal-mes-nome">${mesNome}</span>
+          <span class="cal-ano">2026</span>
         </div>
-        <div class="cal-footer">
-          <span class="cal-footer-label">Importante</span>
-          <span class="cal-footer-text">—</span>
+        <div id="${mesId}">
+          <div class="cal-body">
+            <div class="cal-main">
+              <div class="cal-wk-hdr">${WK.map(d=>`<span>${d}</span>`).join('')}</div>
+              <div class="cal-days">${days}</div>
+            </div>
+          </div>
+          <div class="cal-footer">
+            <span class="cal-footer-label">Importante</span>
+            <span class="cal-footer-text">—</span>
+          </div>
         </div>
       </div>
     </div>`;
-  }
-
-  html += '</div>';
-  grid.innerHTML = html;
-  // Restaurar meses abertos na sessão
-  mesesAbertos.forEach(id => {
-    const panel = document.getElementById(id);
-    const icon  = document.getElementById(id + '-icon');
-    if(panel){ panel.style.display = 'block'; if(icon) icon.textContent = '▲'; }
-  });
-  // Abrir meses fixados como abertos (persistidos no localStorage)
-  const fixados = JSON.parse(localStorage.getItem('merenda_meses_fixados') || '[]');
-  fixados.forEach(id => {
-    const panel = document.getElementById(id);
-    const icon  = document.getElementById(id + '-icon');
-    const btn   = document.getElementById(id + '-pin');
-    if(panel && panel.style.display === 'none'){
-      panel.style.display = 'block';
-      if(icon) icon.textContent = '▲';
-    }
-    if(btn) _estilizarPinMes(btn, true);
-  });
 }
 
 function atualizarPratoCalendario(prato, letIdx){
@@ -4896,7 +4902,7 @@ function renderMercado(){
   });
 
   const _sub    = _subtitulo;
-  const imgHtml = _imgData ? `<img class="ph-img" src="${_imgData}" style="max-height:60px;max-width:140px;object-fit:contain;flex-shrink:0">` : '';
+  const imgHtml = _imgData ? `<img src="${_imgData}" style="width:100%;height:auto;display:block">` : '';
 
   const inputStyle = `width:72px;text-align:right;padding:3px 5px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--azul2)`;
 
@@ -4970,7 +4976,13 @@ function renderMercado(){
     return `<div class="forn-page">
       <!-- impressão formal -->
       <div class="print-only forn-print-doc">
-        ${imgHtml ? `<div class="forn-timbre">${imgHtml}</div>` : ''}
+        ${_imgData
+          ? `<div class="forn-timbre"><img src="${_imgData}" style="width:100%;height:auto;display:block"></div>`
+          : `<div style="border-bottom:2.5px solid #1A3A6B;padding-bottom:10px;margin-bottom:14px;text-align:center">
+              <div style="font-size:14pt;font-weight:800;color:#1A3A6B;letter-spacing:.02em">${esc(_escola)}</div>
+              <div style="font-size:9pt;color:#555;margin-top:3px">${esc(_subtitulo)}</div>
+            </div>`
+        }
         <div class="forn-titulo">ORDEM DE FORNECIMENTO Nº ${_numOrdem}</div>
         <div class="forn-info">
           <span><strong>Fornecedor:</strong> ${titulo}</span>
@@ -5701,6 +5713,15 @@ function renderIngredientes(filtro=''){
         <button class="btn-swap no-print" style="margin-left:6px;display:inline-flex;align-items:center;justify-content:center" title="Alterar fornecedor">${ico('refresh',11)}</button>
       </td>
       <td>
+        <select onchange="setIngPeriodicidade('${nome.replace(/'/g,"\\'")}',this.value)"
+          style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_PERIODICIDADE[nome]?'#a5b4fc':'var(--borda)'};border-radius:6px;background:${ING_PERIODICIDADE[nome]?'#eef2ff':'#f8fafc'};width:100px;color:${ING_PERIODICIDADE[nome]?'#4338ca':'#94a3b8'}">
+          <option value="">— Período —</option>
+          <option value="semanal"   ${ING_PERIODICIDADE[nome]==='semanal'  ?'selected':''}>Semanal</option>
+          <option value="quinzenal" ${ING_PERIODICIDADE[nome]==='quinzenal'?'selected':''}>Quinzenal</option>
+          <option value="mensal"    ${ING_PERIODICIDADE[nome]==='mensal'   ?'selected':''}>Mensal</option>
+        </select>
+      </td>
+      <td>
         <select onchange="setIngFornecedor('${nome.replace(/'/g,"\\'")}',this.value)"
           style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_FORNECEDORES[nome]?'#7dd3fc':'var(--borda)'};border-radius:6px;background:${ING_FORNECEDORES[nome]?'#e0f2fe':'#f8fafc'};width:110px;color:${ING_FORNECEDORES[nome]?'#0369a1':'#94a3b8'}">
           <option value="">— Fornecedor —</option>
@@ -5754,7 +5775,7 @@ function renderEmbBotoes(nome, unidade){
     return `<button class="emb-btn${isAt?' emb-ativo':''}" onclick="salvarEmbalagem('${nomeEnc}',${v})">${l}</button>`;
   }).join('');
   const valorCustom = (!livreAtivo && !presets.some(p => p.v === ativo)) ? ativo : '';
-  return `<div style="display:flex;gap:3px;flex-wrap:nowrap;justify-content:flex-end;align-items:center">
+  return `<div style="display:flex;gap:3px;flex-wrap:nowrap;justify-content:center;align-items:center">
     <button class="emb-btn emb-livre${livreAtivo?' emb-ativo':''}" onclick="salvarEmbalagem('${nomeEnc}',0)">Livre</button>
     ${btns}
     <input type="number" min="0.001" step="any" placeholder="outro…"
@@ -5803,7 +5824,7 @@ function ir(id, btn){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
-  if(id==='cardapio') renderCardapio();
+  if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); }
   if(id==='mercado') renderMercado();
   if(id==='gastos') renderGastos();
   if(id==='admin') abrirAdmin();
@@ -6209,11 +6230,17 @@ function atualizarPreviews(){
 
   // Config page preview
   const prevHeaderImg = document.getElementById('preview-header-img');
+  const mockHeader = document.getElementById('preview-header');
+  const mockHeaderText = mockHeader ? mockHeader.querySelector('.mock-header-text') : null;
   if(imgData){
     prevHeaderImg.src = imgData;
     prevHeaderImg.style.display = 'block';
+    if(mockHeader) mockHeader.classList.add('timbre-mode');
+    if(mockHeaderText) mockHeaderText.style.display = 'none';
   } else {
     prevHeaderImg.style.display = 'none';
+    if(mockHeader) mockHeader.classList.remove('timbre-mode');
+    if(mockHeaderText) mockHeaderText.style.display = '';
   }
   const prevEscola = document.getElementById('preview-escola');
   if(prevEscola) prevEscola.textContent = escola;
@@ -6225,6 +6252,8 @@ function atualizarPreviews(){
 
   const phImg = document.getElementById('print-header-img');
   if(phImg){ phImg.src = imgData || ''; phImg.style.display = imgData ? 'block' : 'none'; }
+  const phDiv = document.getElementById('print-header');
+  if(phDiv){ imgData ? phDiv.classList.remove('sem-timbre') : phDiv.classList.add('sem-timbre'); }
 
   // Print signature
   const pdn = document.getElementById('print-diretor-nome');
@@ -6284,7 +6313,7 @@ function ir(id, btn){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
-  if(id==='cardapio'){ renderCardapio(); aplicarEstadoPaineisCardapio(); }
+  if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
   if(id==='mercado') renderMercado();
   if(id==='gastos') renderGastos();
   if(id==='config') carregarConfig();
@@ -6474,12 +6503,15 @@ function aplicarConfigDia(acao){
 }
 
 function irParaMes(mesId){
-  const panel = document.getElementById(mesId);
-  const icon  = document.getElementById(mesId + '-icon');
-  if(!panel) return;
-  panel.style.display = 'block';
-  if(icon) icon.textContent = '▲';
-  panel.closest('.cal-month').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const MESES_DISPLAY = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  const nome = mesId.replace('cal-mes-','');
+  const idx = MESES_DISPLAY.findIndex(m => m.replace(/\s/g,'') === nome);
+  if(idx >= 0){ _calMesAtual = idx; renderCardapio(); }
+}
+
+function navegarMes(delta){
+  _calMesAtual = Math.max(0, Math.min(10, _calMesAtual + delta));
+  renderCardapio();
 }
 
 function togglePeriodo(){
@@ -6799,27 +6831,31 @@ function carregarPlanoCiclo(){
   gerarSeletoresPratos();
 }
 
-function distribuirCiclo(){
+function distribuirAPartirDoCiclo(){
   if(!verificarPeriodo()) return;
   const ciclo = document.getElementById('plan-ciclo').value;
   const pratos = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value).filter(p => p);
   if(pratos.length === 0){ alert('Defina ao menos um prato para distribuir.'); return; }
 
-  // Salva o plano
+  const cIdx = parseInt(ciclo.split(' ')[1]) - 1;
+  const msg = cIdx === 0
+    ? `Distribuir ${pratos.length} prato(s) em rotação por todo o ano letivo?\n\nIsso substituirá todos os pratos já definidos no calendário.`
+    : `Distribuir ${pratos.length} prato(s) em rotação do ${ciclo} até o fim do ano?\n\nOs ciclos anteriores não serão alterados.`;
+  if(!confirm(msg)) return;
+
   CICLOS_PLANOS[ciclo] = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value);
   localStorage.setItem('merenda_ciclos_planos', JSON.stringify(CICLOS_PLANOS));
 
-  const cIdx = parseInt(ciclo.split(' ')[1]) - 1;
-
-  // Itera pelas 5 semanas × 5 posições de calendário (Seg=0…Sex=4)
-  // Prato 1 → Seg semana 1, Prato 2 → Ter semana 1, … Prato 6 → Seg semana 2, etc.
+  if(!DIAS_LETIVOS_ARRAY.length) return;
+  const totalCalWeeks = getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1;
+  const startWeek = cIdx * 5;
   let pratoIdx = 0;
-  for(let wk = 0; wk < 5; wk++){
-    const globalWeekIdx = cIdx * 5 + wk;
-    const mesIdx = Math.min(Math.floor(globalWeekIdx / 4), MESES_NOMES.length - 1);
-    const sIdx   = globalWeekIdx % 4;
+  for(let wi = startWeek; wi < totalCalWeeks; wi++){
+    const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
+    const sIdx   = wi % 4;
     const mesNome = MESES_NOMES[mesIdx];
-    if(!DADOS.cardapio[mesNome]?.[sIdx]){ pratoIdx += 5; continue; }
+    if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
+    if(!DADOS.cardapio[mesNome][sIdx]) DADOS.cardapio[mesNome][sIdx] = { dias: ['','','','',''] };
     for(let dow = 0; dow < 5; dow++){
       DADOS.cardapio[mesNome][sIdx].dias[dow] = pratos[pratoIdx % pratos.length];
       pratoIdx++;
@@ -6829,33 +6865,8 @@ function distribuirCiclo(){
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   renderCardapio();
   sincronizarSeletores(ciclo, 1, true);
-  alert(`✅ 25 posições preenchidas no ${ciclo} com ${pratos.length} prato(s) em rotação!`);
-}
-
-function distribuirTodoOAno(){
-  if(!verificarPeriodo()) return;
-  const pratos = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value).filter(p => p);
-  if(pratos.length === 0){ alert('Defina ao menos um prato para distribuir.'); return; }
-  if(!confirm(`Distribuir ${pratos.length} prato(s) em rotação por TODOS os ciclos do ano letivo?\n\nIsso substituirá todos os pratos já definidos no calendário.`)) return;
-
-  if(!DIAS_LETIVOS_ARRAY.length) return;
-  const totalCalWeeks = getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1;
-  let pratoIdx = 0;
-  for(let wi = 0; wi < totalCalWeeks; wi++){
-    const mesIdx  = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
-    const sIdx    = wi % 4;
-    const mesNome = MESES_NOMES[mesIdx];
-    if(!DADOS.cardapio[mesNome]?.[sIdx]){ pratoIdx += 5; continue; }
-    for(let dow = 0; dow < 5; dow++){
-      DADOS.cardapio[mesNome][sIdx].dias[dow] = pratos[pratoIdx % pratos.length];
-      pratoIdx++;
-    }
-  }
-
-  localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
-  renderCardapio();
-  sincronizarSeletores(document.getElementById('plan-ciclo').value || 'Ciclo 1', 1, true);
-  alert(`✅ ${totalCalWeeks * 5} posições preenchidas com ${pratos.length} prato(s) em rotação!`);
+  const semanas = totalCalWeeks - startWeek;
+  alert(`✅ ${semanas * 5} posições preenchidas a partir do ${ciclo} com ${pratos.length} prato(s) em rotação!`);
 }
 
 function getCorDia(iso, letIdx){
@@ -6965,7 +6976,7 @@ var AJUDA_ABAS = {
     ]
   },
   preparo: {
-    titulo: 'Guia de Preparo',
+    titulo: 'Quantidades por Turno',
     desc: 'Quantidades prontas para a cozinha: ingredientes do dia de hoje, separados por turno e nível de ensino, com base no cardápio e no número real de alunos.',
     itens: [
       'Selecione o dia para ver o cardápio do dia e as quantidades de cada ingrediente.',
