@@ -4628,10 +4628,10 @@ function sincronizarSeletores(ciclo, sem, skipRender = false){
     const mondayIso = weekStart.toISOString().split('T')[0];
     const mesIdx = weekStart.getMonth() - 1;
     const mesNome = (mesIdx >= 0 && mesIdx < MESES_NOMES.length) ? MESES_NOMES[mesIdx] : (MESES_NOMES[0] || '');
-    const selMes = document.getElementById('sel-mes-merc');
-    if(selMes){ selMes.value = mesNome; populateSemanasMerc(mesNome); }
-    const selSem = document.getElementById('sel-sem-merc');
-    if(selSem) selSem.value = mondayIso;
+    const iniciEl = document.getElementById('merc-data-inicio');
+    const fimEl   = document.getElementById('merc-data-fim');
+    if(iniciEl) iniciEl.value = mondayIso;
+    if(fimEl && !fimEl.value){ const _d=new Date(mondayIso+'T00:00:00'); _d.setDate(_d.getDate()+4); fimEl.value=_d.toISOString().substring(0,10); }
   }
 
   if(!skipRender) renderCardapio();
@@ -5969,9 +5969,9 @@ function selecionarItemMerc(nomeBase){
 }
 
 function abrirPainelEstoque(){
-  const ciclo     = document.getElementById('sel-mes-merc').value;
-  const mondayIso = document.getElementById('sel-sem-merc').value;
-  if(!ciclo || !mondayIso){ alert('Selecione um mês e uma semana primeiro.'); return; }
+  const ciclo     = getMercCiclo() || '';
+  const mondayIso = getMercMondayIso();
+  if(!mondayIso){ alert('Selecione o período primeiro.'); return; }
 
   const { dias, datas } = getCalWeekDiasAndDatas(mondayIso);
   const dailyTotais = dias.map((d, i) => (!d || !datas[i]) ? {} : calcularTotaisNiveis([d]).totais);
@@ -6254,8 +6254,9 @@ function confirmarAddItemForn(nomeBase, btn){
 }
 
 function validarEImprimir(){
-  const ciclo     = document.getElementById('sel-mes-merc').value;
-  const mondayIso = document.getElementById('sel-sem-merc').value;
+  const ciclo     = getMercCiclo() || '';
+  const mondayIso = getMercMondayIso();
+  if(!mondayIso){ alert('Selecione o período antes de imprimir.'); return; }
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
   const semForn = [...af_items, ...mc_items].filter(it => {
     const fid = ING_FORNECEDORES[it.nomeBase];
