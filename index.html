@@ -27,7 +27,7 @@ html{overflow-x:hidden}
 body{font-family:'Sora',sans-serif;background:#EEF2F8;color:var(--txt);min-height:100vh;display:flex;align-items:stretch;overflow-x:hidden}
 
 /* ── NAV ── */
-nav{background:var(--nav-bg);width:260px;min-width:260px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0}
+nav{background:var(--nav-bg);width:260px;min-width:260px;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0}
 .nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 24px 32px;letter-spacing:.02em;line-height:1.4;display:flex;align-items:center;gap:10px}
 .nav-brand span{display:block;color:var(--amarelo);font-size:12px;margin-top:3px}
 .nav-brand svg{flex-shrink:0;opacity:.9}
@@ -39,7 +39,7 @@ nav{background:var(--nav-bg);width:260px;min-width:260px;display:flex;flex-direc
 .nav-tab:hover svg,.nav-tab.ativo svg{opacity:1}
 
 /* ── PÁGINAS ── */
-.main-content{flex:1;min-width:0;overflow-y:auto}
+.main-content{flex:1;min-width:0;overflow-y:auto;margin-left:260px;height:100vh}
 .pagina{display:none;padding:32px 40px;margin:0;animation:fadeIn .3s}
 .pagina.ativa{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -109,12 +109,77 @@ tbody tr:hover td{background:#f0f5fc}
 .modal-body table thead th{background:#eef2f8}
 
 /* ── FORNECEDORES ── */
-.forn-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.forn-grid table{width:100%;min-width:340px}
-.forn-grid table th:nth-child(1),.forn-grid table td:nth-child(1){width:42px}
-.forn-grid table th:nth-child(2),.forn-grid table td:nth-child(2){min-width:200px;white-space:nowrap}
-.forn-grid table th:last-child,.forn-grid table td:last-child{width:130px;white-space:nowrap}
-@media(max-width:700px){.forn-grid{grid-template-columns:1fr}}
+.forn-grid{display:flex;flex-direction:column;gap:20px}
+.forn-grid table{width:100%;table-layout:fixed}
+.forn-grid table th:nth-child(1),.forn-grid table td:nth-child(1){width:38px}
+.forn-grid table th:nth-child(2),.forn-grid table td:nth-child(2){width:160px}
+.forn-grid table th:nth-child(3),.forn-grid table td:nth-child(3){width:140px}
+.forn-grid table th:nth-child(4),.forn-grid table td:nth-child(4){width:50px}
+.forn-grid table th:nth-child(5),.forn-grid table td:nth-child(5){width:90px}
+.forn-grid table th:nth-child(6),.forn-grid table td:nth-child(6){width:160px;white-space:nowrap}
+.forn-grid table th:last-child,.forn-grid table td:last-child{width:auto}
+
+/* ── Mercado: layout análise de cobertura ─────────────── */
+.merc-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.merc-kpi-card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:1px solid rgba(229,231,235,.9)}
+.merc-kpi-card>span{color:#6b7280;font-size:12px;font-weight:700;display:block;margin-bottom:6px}
+.merc-kpi-card>strong{font-size:26px;font-weight:800;display:block;letter-spacing:-.02em}
+.merc-kpi-card>small{color:#6b7280;font-size:11px;margin-top:5px;display:block}
+.merc-split{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.7fr);gap:18px;align-items:start}
+.merc-panel{background:#fff;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:1px solid #e5e7eb;overflow:hidden}
+.merc-ph{padding:13px 17px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.merc-ph h3{margin:0;font-size:14px;font-weight:700}
+.merc-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:700;color:#6b7280}
+.merc-dot{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:4px;vertical-align:middle}
+.merc-tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.merc-tbl thead th{background:#f9fafb;color:#6b7280;font-size:11px;text-align:left;padding:10px 14px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+.merc-tbl th:nth-child(1){width:160px}
+.merc-tbl th:nth-child(2){width:110px}
+.merc-tbl th:nth-child(3){width:90px}
+.merc-tbl th:nth-child(4){width:90px}
+.merc-tbl th:nth-child(5){width:110px}
+.merc-tbl th:nth-child(6){width:auto}
+.merc-tbl th:nth-child(7){width:100px}
+.merc-tbl tbody td{padding:10px 14px;border-top:1px solid #f1f5f9;vertical-align:middle;font-size:13px}
+.merc-tbl tbody tr{cursor:pointer;transition:background .15s}
+.merc-tbl tbody tr:hover{background:#f8fafc}
+.merc-tbl tbody tr.merc-sel{background:#eff6ff!important}
+.merc-pill{border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;display:inline-block;white-space:nowrap}
+.merc-pill-ok{background:#dcfce7;color:#166534}
+.merc-pill-warn{background:#fef3c7;color:#92400e}
+.merc-pill-err{background:#fee2e2;color:#991b1b}
+.merc-pill-nil{background:#f1f5f9;color:#64748b}
+.merc-seg{height:18px;border-radius:4px;cursor:default;position:relative;display:block}
+.merc-seg.s-cov{background:#22c55e}
+.merc-seg.s-par{background:#f59e0b}
+.merc-seg.s-unc{background:#ef4444}
+.merc-seg.s-nil{background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 4px,#e2e8f0 4px,#e2e8f0 8px)}
+.merc-seg[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:10px;white-space:pre;padding:5px 9px;border-radius:7px;z-index:250;pointer-events:none;font-weight:600;line-height:1.5}
+.merc-tbl-wrap{overflow-x:auto}
+.merc-split > .merc-panel:last-child{position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
+.merc-db{padding:15px 17px;overflow-y:auto;flex:1}
+.merc-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.merc-mini{background:#f9fafb;border:1px solid #e5e7eb;border-radius:11px;padding:10px 12px}
+.merc-mini>span{display:block;color:#6b7280;font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.merc-mini>strong{font-size:15px;font-weight:800;color:var(--txt)}
+.merc-obox{margin-top:13px;border-radius:11px;background:#f8fafc;border:1px dashed #cbd5e1;padding:12px 14px}
+.merc-obox h4{margin:0 0 7px;font-size:13px;font-weight:700}
+.merc-oline{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:6px 0;border-top:1px solid #e5e7eb}
+.merc-oline:first-of-type{border-top:0}
+.merc-tl{display:flex;flex-direction:column;gap:7px;padding-right:3px;max-height:340px;overflow-y:auto}
+.merc-day{border:1px solid #e5e7eb;border-radius:11px;padding:9px 11px;display:grid;grid-template-columns:8px 1fr auto;gap:9px;align-items:center;background:#fff}
+.merc-day-mk{width:8px;min-height:38px;border-radius:999px;align-self:stretch}
+.merc-day-mk.s-cov{background:#22c55e}
+.merc-day-mk.s-par{background:#f59e0b}
+.merc-day-mk.s-unc{background:#ef4444}
+.merc-day-mk.s-nil{background:#cbd5e1}
+@media(max-width:1100px){
+  .merc-split{grid-template-columns:1fr}
+  .merc-kpi{grid-template-columns:repeat(2,1fr)}
+  .merc-split > .merc-panel:last-child{position:static;height:auto}
+  .merc-db{flex:none;max-height:60vh}
+}
+@media(max-width:640px){.merc-kpi{grid-template-columns:1fr 1fr}}
 
 /* ══════════════════════════════════════════════════════
    RESPONSIVIDADE MOBILE
@@ -125,7 +190,7 @@ tbody tr:hover td{background:#f0f5fc}
 @media(max-width:768px){
   /* Layout base */
   body{flex-direction:column;overflow-x:hidden;width:100%}
-  .main-content{padding-top:56px;width:100%;min-width:0;overflow-x:hidden}
+  .main-content{padding-top:56px;width:100%;min-width:0;overflow-x:hidden;margin-left:0}
 
   /* Topbar mobile */
   .mobile-topbar{
@@ -744,23 +809,25 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <button class="btn" style="background:#fff;color:#217346;border:1.5px solid #217346;font-weight:700;display:flex;align-items:center;gap:5px" onclick="exportarExcelMercado()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
   </div>
   <div class="seletor-bar" id="merc-seletor-bar">
-    <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">
       <div class="campo">
-        <label>Mês</label>
-        <select id="sel-mes-merc" onchange="mudarCicloMerc(this.value)"></select>
+        <label>Início do período</label>
+        <input type="date" id="merc-data-inicio" onchange="onMercDataInicioChange()" style="font-family:'Sora',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
       </div>
       <div class="campo">
-        <label>Semana (Seg – Sex)</label>
-        <select id="sel-sem-merc" onchange="renderMercado()" style="min-width:220px"></select>
+        <label>Fim do período</label>
+        <input type="date" id="merc-data-fim" onchange="renderMercado()" style="font-family:'Sora',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
       </div>
+      <div id="merc-range-info" style="font-size:12px;color:var(--txt2);padding-bottom:8px"></div>
     </div>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="validarEImprimir()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="exportarExcelMercado()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="registrarOrdemExpedida()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Registrar Ordem</button>
     <button class="btn btn-primary no-print" onclick="irParaPlanejamento()">← Planejamento</button>
+    <button class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="abrirPainelEstoque()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Painel de Estoque</button>
   </div>
 
-  <div class="stats-grid" id="stats-merc"></div>
+  <div class="stats-grid no-print" id="stats-merc" style="display:none"></div>
 
   <div class="card no-print" style="margin-bottom:20px">
     <div class="card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>Pratos da Semana</div>
@@ -788,7 +855,96 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
   </div>
 
-  <div class="forn-grid" id="forn-grid-dinamico"></div>
+  <!-- Novo layout de análise de cobertura (tela) -->
+  <div class="no-print" id="merc-analise">
+    <div class="merc-kpi" id="merc-kpi-cards"></div>
+    <div class="merc-split">
+      <!-- Painel esquerdo: tabela -->
+      <div class="merc-panel">
+        <div class="merc-ph">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3>Cobertura por item</h3>
+            <select id="merc-tipo-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Sora',sans-serif">
+              <option value="todos">Todos os itens</option>
+              <option value="semanal">Semanais (1 sem.)</option>
+              <option value="quinzenal">Quinzenais (2 sem.)</option>
+              <option value="trissemanais">Trissemanais (3 sem.)</option>
+              <option value="mensal">Mensais (4 sem.)</option>
+              <option value="comprar">Somente com compra</option>
+            </select>
+            <select id="merc-forn-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Sora',sans-serif">
+              <option value="todos">Todos os fornecedores</option>
+            </select>
+          </div>
+          <div class="merc-legend">
+            <span><i class="merc-dot" style="background:#22c55e"></i>Coberto</span>
+            <span><i class="merc-dot" style="background:#f59e0b"></i>Parcial</span>
+            <span><i class="merc-dot" style="background:#ef4444"></i>Descoberto</span>
+            <span><i class="merc-dot" style="background:#cbd5e1"></i>Sem consumo</span>
+          </div>
+        </div>
+        <div class="merc-tbl-wrap">
+          <table class="merc-tbl">
+            <thead><tr>
+              <th>Item</th><th>Fornecedor</th><th>Estoque</th><th>Necessidade</th><th>A Comprar</th><th>Cobertura</th><th>Status</th>
+            </tr></thead>
+            <tbody id="merc-tabela-body"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px">Selecione um mês e semana para ver a análise.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Painel direito: detalhe -->
+      <div class="merc-panel">
+        <div class="merc-ph">
+          <h3>Detalhe do item</h3>
+          <span id="merc-detail-hint" style="color:#9ca3af;font-size:12px">Clique em um item</span>
+        </div>
+        <div class="merc-db" id="merc-detail-body">
+          <div style="text-align:center;padding:40px 20px;color:#aaa;font-size:13px">Selecione um item na tabela para ver os detalhes de cobertura e o resumo da ordem.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout de impressão (visível só ao imprimir) -->
+  <div class="forn-grid print-only" id="forn-grid-dinamico"></div>
+</div>
+
+<!-- Modal: Drill-down de cobertura por item -->
+<div id="overlay-drilldown" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center;padding:24px 16px">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);color:#fff;padding:16px 22px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+      <div>
+        <div style="font-size:11px;font-weight:600;opacity:.75;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px">Cobertura de estoque</div>
+        <div id="drilldown-nome" style="font-size:16px;font-weight:800"></div>
+      </div>
+      <button onclick="fecharDrillDown()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;padding:0 4px">×</button>
+    </div>
+    <div id="drilldown-body" style="padding:20px 22px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- Modal: Painel de Estoque -->
+<div id="overlay-painel-estoque" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:900px;box-shadow:0 20px 60px rgba(0,0,0,.3);margin:auto">
+    <div style="background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);color:#fff;padding:16px 22px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1">
+      <div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Painel de Estoque — Visão Geral
+      </div>
+      <button onclick="fecharPainelEstoque()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;padding:0 4px">×</button>
+    </div>
+    <div style="padding:18px 22px">
+      <div style="display:flex;gap:16px;margin-bottom:16px;font-size:11.5px;flex-wrap:wrap;align-items:center">
+        <span style="color:var(--txt2);font-weight:600">Legenda:</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#16a34a;border-radius:2px"></span>Coberto</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#d97706;border-radius:2px"></span>Parcial (≥50%)</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#dc2626;border-radius:2px"></span>Crítico (&lt;50%)</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#9ca3af;border-radius:2px"></span>Sem estoque</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--txt2);font-style:italic">Ordenado por cobertura (críticos primeiro)</span>
+      </div>
+      <div id="painel-estoque-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal: ingredientes sem fornecedor -->
@@ -2023,6 +2179,7 @@ async function fazerLogin(){
       localStorage.setItem('merenda_ciclos_planos', '{}');
       localStorage.setItem('merenda_licitacoes', '[]');
       localStorage.setItem('merenda_merc_ajustes', '{}');
+      localStorage.setItem('merenda_estoque', '{}');
       // Grava TODAS as colunas limpas no Supabase imediatamente — evita que defaults de coluna
       // do Supabase apareçam em sessões posteriores (ex: após F5 dentro dos 2s do debounce)
       if(_supabase){ try { await _supabase.from('escola_dados').upsert({
@@ -2033,7 +2190,8 @@ async function fazerLogin(){
         cal_config: _defCal,
         precos: {},
         unidades: {},
-        embalagens: {}
+        embalagens: {},
+        estoque: {}
       }, { onConflict: 'user_id' }); } catch(e){} }
       // Marca conta como inicializada
       res.user.nova_conta = false;
@@ -2857,7 +3015,38 @@ let EMBALAGENS = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
 // Ajustes manuais da ordem de mercado: { [ciclo_sem]: { overrides:{ing:qtd|null}, extras:[{nome,qtd,af}] } }
 let MERC_AJUSTES = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
 function salvarMercAjustes(){ localStorage.setItem('merenda_merc_ajustes', JSON.stringify(MERC_AJUSTES)); }
-function getMercKey(){ return document.getElementById('sel-mes-merc').value + '_' + document.getElementById('sel-sem-merc').value; }
+function getMondayOf(dateIso){
+  const d = new Date(dateIso + 'T00:00:00');
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().substring(0, 10);
+}
+function getCicloForMonday(mondayIso){
+  const w = SEMANAS_CAL.find(s => s.monday === mondayIso);
+  if(w){ const mi = new Date(w.monday+'T00:00:00').getMonth()-1; if(mi>=0&&mi<MESES_NOMES.length) return MESES_NOMES[mi]; }
+  let best=null, bestDiff=Infinity;
+  SEMANAS_CAL.forEach(s=>{ const df=Math.abs(new Date(s.monday+'T00:00:00')-new Date(mondayIso+'T00:00:00')); if(df<bestDiff){bestDiff=df;best=s;} });
+  if(best){ const mi=new Date(best.monday+'T00:00:00').getMonth()-1; if(mi>=0&&mi<MESES_NOMES.length) return MESES_NOMES[mi]; }
+  return null;
+}
+function getMercDataInicio(){ return document.getElementById('merc-data-inicio')?.value||''; }
+function getMercDataFim(){    return document.getElementById('merc-data-fim')?.value||''; }
+function getMercMondayIso(){ const d=getMercDataInicio(); return d?getMondayOf(d):''; }
+function getMercCiclo(){     const m=getMercMondayIso(); return m?(getCicloForMonday(m)||''):''; }
+function getMercSemLabel(){
+  const mon=getMercMondayIso(); if(!mon) return '';
+  let fim=getMercDataFim();
+  if(!fim){ const d=new Date(mon+'T00:00:00'); d.setDate(d.getDate()+4); fim=d.toISOString().substring(0,10); }
+  return fmtDataCurta(mon)+' – '+fmtDataCurta(fim);
+}
+function onMercDataInicioChange(){
+  const inicio=getMercDataInicio(); if(!inicio){ renderMercado(); return; }
+  const fimEl=document.getElementById('merc-data-fim');
+  if(!fimEl.value){ const d=new Date(getMercMondayIso()+'T00:00:00'); d.setDate(d.getDate()+4); fimEl.value=d.toISOString().substring(0,10); }
+  renderMercado();
+}
+function getMercKey(){ const c=getMercCiclo(),m=getMercMondayIso(); return (c||'x')+'_'+(m||'x'); }
 function getMercAjuste(){ const k=getMercKey(); if(!MERC_AJUSTES[k]) MERC_AJUSTES[k]={overrides:{},extras:[],obs:{}}; if(!MERC_AJUSTES[k].obs) MERC_AJUSTES[k].obs={}; return MERC_AJUSTES[k]; }
 function salvarObsItemMerc(nome, texto){
   const aj = getMercAjuste();
@@ -2907,6 +3096,8 @@ let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades
   { id: 'per_5', nome: 'Por ciclo',       semanas: 5 },
 ];
 let ING_PERIODICIDADE = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
+let _MERC_DATA = null; // cache para renderMercadoTabela()
+let _MERC_SEL  = null; // item selecionado no painel
 function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
 function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
@@ -4081,9 +4272,9 @@ function cancelarOrdem(ordemId){
 }
 
 function registrarOrdemExpedida(){
-  const ciclo      = document.getElementById('sel-mes-merc').value;
-  const mondayIso  = document.getElementById('sel-sem-merc').value;
-  const semLabel   = document.getElementById('sel-sem-merc').selectedOptions[0]?.text?.trim() || mondayIso;
+  const ciclo      = getMercCiclo() || '';
+  const mondayIso  = getMercMondayIso();
+  const semLabel   = getMercSemLabel();
   const hoje = new Date().toISOString().split('T')[0];
 
   // Coleta itens já ajustados manualmente
@@ -4213,11 +4404,7 @@ function atualizarCiclos(){
   // Reconstrói semanas de calendário e repopula selector do Mercado
   if(typeof buildCalendarWeeks === 'function') {
     SEMANAS_CAL = buildCalendarWeeks();
-    if(typeof populateMesesMerc === 'function'){
-      populateMesesMerc();
-      const mesMerc = document.getElementById('sel-mes-merc')?.value;
-      if(mesMerc) populateSemanasMerc(mesMerc);
-    }
+    // populateMesesMerc/Semanas removidos — agora usa date picker
   }
 }
 atualizarCiclos();
@@ -4934,9 +5121,9 @@ function _gerarXmlFornecedores(escola, label, af_items, mc_items, mondayIso){
 }
 
 function exportarExcelMercado(){
-  const ciclo     = document.getElementById('sel-mes-merc').value;
-  const mondayIso = document.getElementById('sel-sem-merc').value;
-  const semLabel  = document.getElementById('sel-sem-merc').selectedOptions[0]?.text?.trim() || mondayIso;
+  const ciclo     = getMercCiclo() || '';
+  const mondayIso = getMercMondayIso();
+  const semLabel  = getMercSemLabel();
   const escola    = localStorage.getItem('merenda_escola') || '';
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
 
@@ -4984,10 +5171,10 @@ function irParaImprimirSemana(mondayIso, mesId){
   const mesIdx = d.getMonth() - 1;
   const mesNome = (mesIdx >= 0 && mesIdx < MESES_NOMES.length) ? MESES_NOMES[mesIdx] : null;
   if(!mesNome){ alert('Semana sem mês configurado.'); return; }
-  const selMes = document.getElementById('sel-mes-merc');
-  if(selMes){ selMes.value = mesNome; populateSemanasMerc(mesNome); }
-  const selSem = document.getElementById('sel-sem-merc');
-  if(selSem){ selSem.value = mondayIso; }
+  const iniciEl = document.getElementById('merc-data-inicio');
+  const fimEl   = document.getElementById('merc-data-fim');
+  if(iniciEl){ iniciEl.value = mondayIso; }
+  if(fimEl && !fimEl.value){ const d=new Date(mondayIso+'T00:00:00'); d.setDate(d.getDate()+4); fimEl.value=d.toISOString().substring(0,10); }
 
   // Troca de aba sem depender de event.currentTarget
   document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
@@ -5284,6 +5471,7 @@ function getItensMercado(ciclo, mondayIso){
     totais1['AÇÚCAR'] = (totais1['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg;
   }
   const totais2 = _somaTotaisSemanas(mondayIso, 2);
+  const totais3 = _somaTotaisSemanas(mondayIso, 3);
   const totais4 = _somaTotaisSemanas(mondayIso, 4);
 
   const ajuste = getMercAjuste();
@@ -5298,8 +5486,8 @@ function getItensMercado(ciclo, mondayIso){
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
 
     const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
-    const numSemanas = per === 'mensal' ? 4 : per === 'quinzenal' ? 2 : 1;
-    const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 2 ? totais2 : totais1;
+    const numSemanas = per === 'mensal' ? 4 : per === 'trissemanais' ? 3 : per === 'quinzenal' ? 2 : 1;
+    const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
 
     const est = ESTOQUE[nomeBase] || 0;
@@ -5347,21 +5535,34 @@ function renderMercado(){
   // Limpa título global para não aparecer "CICLO X SEMANA Y" ao imprimir o Mercado
   const _tg = document.getElementById('print-title-global');
   if(_tg) _tg.textContent = '';
-  const ciclo     = document.getElementById('sel-mes-merc').value;
-  const mondayIso = document.getElementById('sel-sem-merc').value;
+  const mondayIso = getMercMondayIso();
+  const ciclo     = getMercCiclo() || '';
 
-  if(!ciclo || !mondayIso){
-    const statsEl = document.getElementById('stats-merc');
+  if(!mondayIso){
     const listaEl = document.getElementById('lista-pratos-merc');
     const gridEl  = document.getElementById('forn-grid-dinamico');
-    if(statsEl) statsEl.innerHTML = '';
-    if(listaEl) listaEl.innerHTML = '<span style="color:#aaa;font-size:13px;padding:8px">Selecione um mês e uma semana para ver a ordem de mercado.</span>';
+    const kpiEl   = document.getElementById('merc-kpi-cards');
+    const tbody   = document.getElementById('merc-tabela-body');
+    if(listaEl) listaEl.innerHTML = '<span style="color:#aaa;font-size:13px;padding:8px">Selecione o período para ver a ordem de mercado.</span>';
     if(gridEl)  gridEl.innerHTML  = '';
+    if(kpiEl)   kpiEl.innerHTML   = '';
+    if(tbody)   tbody.innerHTML   = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px">Selecione o período para ver a análise.</td></tr>';
+    _MERC_DATA = null;
     return;
   }
+  const _dataFim = getMercDataFim();
+  const _infoEl = document.getElementById('merc-range-info');
+  if(_infoEl && _dataFim){
+    const _dias = Math.round((new Date(_dataFim+'T00:00:00')-new Date(mondayIso+'T00:00:00'))/86400000)+1;
+    _infoEl.textContent = `${_dias} dia${_dias!==1?'s':''} no período`;
+  } else if(_infoEl){ _infoEl.textContent=''; }
 
   const { dias, datas } = getCalWeekDiasAndDatas(mondayIso);
   const { totalAlunos } = calcularTotaisNiveis(dias);
+  const dailyTotais = dias.map((d, i) => {
+    if(!d || !datas[i]) return {};
+    return calcularTotaisNiveis([d]).totais;
+  });
 
   // Pratos da semana — apenas slots com data escolar
   const DIAS_SEMANA_NOMES = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5379,14 +5580,15 @@ function renderMercado(){
   const { af_items, mc_items, totalKg } = getItensMercado(ciclo, mondayIso);
   const todosItens = [...af_items, ...mc_items];
 
-  // Stats
-  const pratosCont = dias.filter(p=>p).length;
-  const statsEl = document.getElementById('stats-merc');
-  if(statsEl) statsEl.innerHTML = `
-    <div class="stat"><div class="stat-val">${pratosCont}</div><div class="stat-lbl">Pratos na semana</div></div>
-    <div class="stat verde"><div class="stat-val">${totalAlunos}</div><div class="stat-lbl">Total de Alunos</div><div id="niveis-summary-merc" style="margin-top:6px"></div></div>
-    <div class="stat amarelo"><div class="stat-val">${todosItens.filter(i=>!i.coberto).length}</div><div class="stat-lbl">Itens a comprar</div></div>
-    <div class="stat laranja"><div class="stat-val">${totalKg.toFixed(0)} kg</div><div class="stat-lbl">Volume total</div></div>`;
+  // KPI cards
+  const pratosCont   = dias.filter(p=>p).length;
+  const diasLetivos  = dias.filter((d,i) => d && datas[i]).length;
+  const kpiEl = document.getElementById('merc-kpi-cards');
+  if(kpiEl) kpiEl.innerHTML = `
+    <div class="merc-kpi-card"><span>Itens analisados</span><strong>${todosItens.length}</strong><small>Com consumo previsto no período</small></div>
+    <div class="merc-kpi-card"><span>Itens cobertos</span><strong style="color:#16a34a">${todosItens.filter(i=>i.coberto).length}</strong><small>Não precisam entrar na ordem</small></div>
+    <div class="merc-kpi-card"><span>Itens para comprar</span><strong style="color:#dc2626">${todosItens.filter(i=>!i.coberto).length}</strong><small>Possuem dias descobertos</small></div>
+    <div class="merc-kpi-card"><span>Dias letivos</span><strong>${diasLetivos}</strong><small id="niveis-summary-merc" style="font-size:11px"></small></div>`;
   atualizarResumoNivelMerc();
 
   // Agrupar por fornecedor
@@ -5399,6 +5601,33 @@ function renderMercado(){
     else semForn.push(it);
   });
 
+  // ── Novo layout de tela — pré-computa até 4 semanas ──
+  const weekData = [{ dias, datas, dailyTotais }]; // semana 1 já calculada
+  for(let _w = 1; _w < 4; _w++){
+    const _d = new Date(mondayIso + 'T00:00:00');
+    _d.setDate(_d.getDate() + 7 * _w);
+    const _wMon = _d.toISOString().substring(0, 10);
+    const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(_wMon);
+    weekData.push({
+      dias: _wd, datas: _wda,
+      dailyTotais: _wd.map((dd, i) => (!dd || !_wda[i]) ? {} : calcularTotaisNiveis([dd]).totais)
+    });
+  }
+  _MERC_DATA = { todosItens, mondayIso, weekData };
+  const fornFilterEl = document.getElementById('merc-forn-filter');
+  if(fornFilterEl){
+    const fornIds = [...new Set(todosItens.map(it => ING_FORNECEDORES[it.nomeBase]).filter(Boolean))];
+    const prevVal = fornFilterEl.value;
+    fornFilterEl.innerHTML = `<option value="todos">Todos os fornecedores</option>` +
+      fornIds.map(fid => {
+        const f = FORNECEDORES_CADASTRO.find(f => f.id === fid);
+        return f ? `<option value="${fid}">${esc(f.nome)}</option>` : '';
+      }).join('');
+    if(fornIds.includes(prevVal)) fornFilterEl.value = prevVal;
+  }
+  renderMercadoTabela();
+  // ────────────────────────────────────────────────────
+
   const _sub    = _subtitulo;
   const imgHtml = _imgData ? `<img src="${_imgData}" style="width:100%;height:auto;display:block">` : '';
 
@@ -5407,10 +5636,67 @@ function renderMercado(){
   const _obsMap = getMercAjuste().obs || {};
   const _perBadge = (it) => {
     if(it.periodicidade === 'semanal') return '';
-    const label = it.numSemanas === 4 ? '4 sem.' : '2 sem.';
+    const label = it.numSemanas === 4 ? '4 sem.' : it.numSemanas === 3 ? '3 sem.' : '2 sem.';
     const bg  = it.coberto ? '#bbf7d0' : '#bfdbfe';
     const cor = it.coberto ? '#14532d' : '#1e40af';
     return `<span style="font-size:9px;font-weight:700;background:${bg};color:${cor};border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${label}</span>`;
+  };
+
+  const _barraEstoque = (it) => {
+    const ABREV_DIA = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const getDayNec = (dayT) =>
+      Object.entries(dayT)
+        .filter(([k]) => k === it.nomeBase || k.startsWith(it.nomeBase + ' ___ '))
+        .reduce((s,[,v]) => s + v, 0);
+
+    let restante = it.est;
+    const segs = dias.map((d, i) => {
+      if(!datas[i] || !d) return null;
+      const nec = getDayNec(dailyTotais[i]);
+      const coberto  = nec > 0 && restante >= nec;
+      const parcial  = nec > 0 && !coberto && restante > 0;
+      const pctParcial = nec > 0 ? Math.min(1, restante / nec) : 0;
+      if(nec > 0) restante = Math.max(0, restante - nec);
+      const dow  = new Date(datas[i]+'T00:00:00').getDay();
+      const abrev = ABREV_DIA[dow === 0 ? 6 : dow - 1] || '';
+      const nome  = nomeNum(d)?.nome || d;
+      const label = nome.length > 12 ? nome.substring(0, 11) + '…' : nome;
+      return { coberto, parcial, pctParcial, nec, abrev, nome, label };
+    }).filter(Boolean);
+
+    if(!segs.length) return '';
+
+    const diasCob = segs.filter(s => s.coberto).length;
+    const cor = diasCob === segs.length ? '#16a34a'
+      : diasCob >= segs.length / 2   ? '#d97706'
+      : diasCob > 0                  ? '#dc2626'
+      : '#9ca3af';
+
+    const DW = 32; // px fixos por dia — barra mensal (20d) é 4× mais longa que semanal (5d)
+    const barW = segs.length * DW;
+
+    const segHtml = segs.map((seg, i) => {
+      const bg = seg.coberto ? cor : seg.parcial ? cor + '55' : '#e5e7eb';
+      const br = i < segs.length - 1 ? 'border-right:2px solid rgba(255,255,255,0.85);' : '';
+      return `<div style="width:${DW}px;flex-shrink:0;height:100%;background:${bg};${br}"></div>`;
+    }).join('');
+
+    const labelHtml = segs.map(seg =>
+      `<div style="width:${DW}px;flex-shrink:0;padding:0 1px;text-align:center">
+        <div style="font-size:8px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${seg.nome}">${seg.label}</div>
+        <div style="font-size:7.5px;color:#94a3b8;font-weight:600">${seg.abrev}</div>
+      </div>`
+    ).join('');
+
+    const _enc = it.nomeBase.replace(/'/g,"\\'");
+    return `<div style="min-width:160px;padding:2px 0">
+      <div style="font-size:10.5px;font-family:'DM Mono',monospace;color:var(--txt2);text-align:right;margin-bottom:3px">${fmtEsp(it.nomeBase, it.est)}</div>
+      <div style="overflow-x:auto;overflow-y:visible;cursor:pointer" onclick="abrirDrillDown('${_enc}')" title="Ver detalhes por dia">
+        <div style="display:inline-flex;width:${barW}px;height:8px;border-radius:4px;overflow:hidden">${segHtml}</div>
+        <div style="display:inline-flex;width:${barW}px;margin-top:2px">${labelHtml}</div>
+      </div>
+      <div style="font-size:10px;color:${cor};font-weight:700;text-align:right;margin-top:2px">${diasCob}/${segs.length} dias cobertos</div>
+    </div>`;
   };
 
   const buildRows = (items, fornId) => items.length === 0
@@ -5423,12 +5709,22 @@ function renderMercado(){
           : `<span class="tag-mc" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>MC</span>`;
 
         if(it.coberto){
-          return `<tr style="background:#f0fdf4;opacity:.9">
+          return `<tr style="background:#f0fdf4">
             <td style="text-align:center;font-weight:700;color:#aaa">${i+1}</td>
             <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}</td>
-            <td class="no-print" colspan="5" style="color:#16a34a;font-size:12px;font-style:italic">
-              ✅ Estoque cobre as próximas ${it.numSemanas} semanas — ${fmtEsp(it.nomeBase, it.est)} disponível
+            <td class="no-print">
+              <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
+                style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Sora',sans-serif;background:#f0fdf4"
+                onchange="salvarObsItemMerc('${enc}',this.value)">
+              <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
             </td>
+            <td class="no-print">${tipoTag}</td>
+            <td class="num no-print" style="color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)}</td>
+            <td class="num no-print">
+              <span style="color:#16a34a;font-size:12px;font-weight:700;white-space:nowrap">✓ Coberto</span>
+            </td>
+            <td class="no-print">${_barraEstoque(it)}</td>
+            <td class="print-only"></td>
           </tr>`;
         }
 
@@ -5448,7 +5744,6 @@ function renderMercado(){
           </td>
           <td>${tipoTag}</td>
           <td class="num no-print" style="color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)}</td>
-          <td class="num no-print" style="color:var(--verde2)">${fmtEsp(it.nomeBase,it.est)}</td>
           <td class="num no-print" style="white-space:nowrap">
             <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end">
               <input type="number" min="0" step="0.01" value="${arred}" style="${inputStyle}"
@@ -5460,6 +5755,7 @@ function renderMercado(){
                 onclick="adicionarItemMercForn('${enc}',this)" title="Trocar fornecedor" style="display:inline-flex;align-items:center;justify-content:center">${ico('users',11)}</button>
             </div>${pacInfo}${exInfo}
           </td>
+          <td class="no-print">${_barraEstoque(it)}</td>
           <td class="print-only" style="text-align:right;white-space:nowrap">
             <b style="color:var(--azul2)">${fmtEsp(it.nomeBase,arred)}</b>
           </td>
@@ -5520,7 +5816,7 @@ function renderMercado(){
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
-        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Observação</th><th>Tipo</th><th class="num">Necessidade</th><th class="num">Estoque</th><th class="num">A Comprar</th></tr></thead>
+        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Observação</th><th>Tipo</th><th class="num">Necessidade</th><th class="num">A Comprar</th><th>Estoque</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
 
       </div>
@@ -5538,6 +5834,386 @@ function renderMercado(){
   if(!html) html = `<div style="text-align:center;padding:48px;color:#aaa;font-size:14px">Nenhum item a comprar nesta semana.</div>`;
 
   document.getElementById('forn-grid-dinamico').innerHTML = html;
+}
+
+function renderMercadoTabela(){
+  if(!_MERC_DATA){ return; }
+  const { todosItens, weekData } = _MERC_DATA;
+  const tipoFilter = document.getElementById('merc-tipo-filter')?.value || 'todos';
+  const fornFilter = document.getElementById('merc-forn-filter')?.value || 'todos';
+
+  let items = [...todosItens];
+  if(tipoFilter === 'comprar')      items = items.filter(it => it.comprar > 0);
+  else if(tipoFilter !== 'todos')   items = items.filter(it => it.periodicidade === tipoFilter);
+  if(fornFilter !== 'todos')        items = items.filter(it => (ING_FORNECEDORES[it.nomeBase]||'') === fornFilter);
+
+  const _obsMap = getMercAjuste().obs || {};
+  const ABREV = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const inputSt = `width:66px;text-align:right;padding:3px 5px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--azul2)`;
+
+  const _buildSegBar = (it) => {
+    const wks = weekData.slice(0, it.numSemanas || 1);
+    const allDias        = wks.flatMap(w => w.dias);
+    const allDatas       = wks.flatMap(w => w.datas);
+    const allDailyTotais = wks.flatMap(w => w.dailyTotais);
+    const getDayNec = (dayT) => Object.entries(dayT)
+      .filter(([k]) => k === it.nomeBase || k.startsWith(it.nomeBase + ' ___ '))
+      .reduce((s,[,v]) => s + v, 0);
+    let restante = it.est;
+    const segs = allDias.map((d, i) => {
+      // Slot sem data = feriado/recesso — mantém barra para preservar o total fixo do ciclo
+      if(!allDatas[i]) return { cls:'s-nil', tip:'Sem aula' };
+      const nec = getDayNec(allDailyTotais[i]);
+      const dow  = new Date(allDatas[i]+'T00:00:00').getDay();
+      const abrev = ABREV[dow === 0 ? 6 : dow - 1] || '';
+      const dataFmt = fmtDataCurta(allDatas[i]);
+      const nomePrato = d ? (nomeNum(d)?.nome || d) : null;
+      if(!d || nec === 0){
+        return { cls:'s-nil', tip:`${dataFmt} — ${abrev}\nSem consumo` };
+      }
+      const coberto = restante >= nec;
+      const parcial = !coberto && restante > 0;
+      restante = Math.max(0, restante - nec);
+      const cls = coberto ? 's-cov' : parcial ? 's-par' : 's-unc';
+      const lbl = coberto ? 'Coberto' : parcial ? 'Parcial' : 'Descoberto';
+      const pratoLabel = nomePrato ? (nomePrato.length > 22 ? nomePrato.substring(0,21)+'…' : nomePrato) : '';
+      return { cls, tip:`${dataFmt} — ${abrev}\n${pratoLabel}\n${lbl}` };
+    });
+    if(!segs.length) return '';
+    const perLabel = it.numSemanas > 1 ? ` · ${it.numSemanas}×sem.` : '';
+    return `<div style="min-width:180px;width:100%">
+      <div style="display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px">` +
+      segs.map(s => `<div class="merc-seg ${s.cls}" data-tip="${s.tip.replace(/"/g,'&quot;')}"></div>`).join('') +
+      `</div>
+      <div style="font-size:10px;color:#9ca3af;margin-top:3px;text-align:right">${segs.length} dias${perLabel}</div>
+    </div>`;
+  };
+
+  const _getStatus = (it) => {
+    const wks = weekData.slice(0, it.numSemanas || 1);
+    const allDias        = wks.flatMap(w => w.dias);
+    const allDatas       = wks.flatMap(w => w.datas);
+    const allDailyTotais = wks.flatMap(w => w.dailyTotais);
+    const getDayNec = (dayT) => Object.entries(dayT)
+      .filter(([k]) => k === it.nomeBase || k.startsWith(it.nomeBase + ' ___ '))
+      .reduce((s,[,v]) => s + v, 0);
+    let restante = it.est; let covered = 0, total = 0;
+    allDias.forEach((d,i) => {
+      if(!allDatas[i] || !d) return;
+      const nec = getDayNec(allDailyTotais[i]);
+      if(nec === 0) return;
+      total++;
+      if(restante >= nec) covered++;
+      restante = Math.max(0, restante - nec);
+    });
+    if(total === 0) return { cls:'merc-pill-nil', label:'Sem consumo' };
+    if(covered === total) return { cls:'merc-pill-ok', label:'✓ Coberto' };
+    if(covered > 0)       return { cls:'merc-pill-warn', label:'⚠ Parcial' };
+    return { cls:'merc-pill-err', label:'✗ Descoberto' };
+  };
+
+  const tbody = document.getElementById('merc-tabela-body');
+  if(!tbody) return;
+  if(!items.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px">Nenhum item encontrado.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(it => {
+    const enc  = it.nomeBase.replace(/'/g,"\\'");
+    const encD = it.nomeBase.replace(/"/g,'&quot;');
+    const fid  = ING_FORNECEDORES[it.nomeBase];
+    const forn = fid && FORNECEDORES_CADASTRO.find(f => f.id === fid);
+    const fornTag = forn
+      ? `<span style="font-size:10px;font-weight:700;background:#f1f5f9;color:#475569;border-radius:4px;padding:1px 6px;white-space:nowrap;display:inline-block">${esc(forn.nome.substring(0,18)+(forn.nome.length>18?'…':''))}</span>`
+      : `<span style="font-size:10px;color:#aaa">—</span>`;
+    const tipoTag = isAF(it.nomeBase)
+      ? `<span style="font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;border-radius:4px;padding:1px 5px">AF</span>`
+      : `<span style="font-size:10px;font-weight:700;background:#dbeafe;color:#1e40af;border-radius:4px;padding:1px 5px">MC</span>`;
+    const _perLabel = { 1:'1 sem.', 2:'2 sem.', 3:'3 sem.', 4:'4 sem.' };
+    const perTag = it.numSemanas > 1
+      ? `<span style="font-size:9px;font-weight:700;background:#ede9fe;color:#4c1d95;border-radius:4px;padding:1px 5px">${_perLabel[it.numSemanas]||it.numSemanas+'×sem.'}</span>`
+      : '';
+    const { arred, nPacotes } = arredondarEmb(it.nomeBase, it.comprar);
+    const embTamanho = EMBALAGENS[it.nomeBase];
+    const pacInfo = nPacotes ? `<div style="font-size:10px;color:#666;margin-top:1px">${nPacotes} pct × ${embTamanho} ${it.unid}</div>` : '';
+    const comprarCel = it.coberto
+      ? `<span style="color:#16a34a;font-size:12px;font-weight:700">✓ Coberto</span>`
+      : `<div><div style="display:flex;align-items:center;gap:4px">
+          <input type="number" min="0" step="0.01" value="${arred}" style="${inputSt}"
+            onchange="ajustarQtdMerc('${enc}',this.value,${it.extra?'true':'false'})">
+          <span style="font-size:11px;color:var(--txt2)">${it.unid}</span>
+          <button class="emb-btn" style="color:#e74c3c;border-color:#e74c3c;padding:2px 5px"
+            onclick="event.stopPropagation();removerItemMerc('${enc}',${it.extra?'true':'false'})">✕</button>
+        </div>${pacInfo}</div>`;
+    const status = _getStatus(it);
+    const isSel  = _MERC_SEL === it.nomeBase;
+    return `<tr class="${isSel?'merc-sel':''}" data-item="${encD}" onclick="selecionarItemMerc('${enc}')">
+      <td><div style="font-weight:700;margin-bottom:3px">${it.nomeBase}</div><div style="display:flex;gap:4px;flex-wrap:wrap">${tipoTag}${perTag}</div></td>
+      <td>${fornTag}</td>
+      <td style="font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap">${fmtEsp(it.nomeBase,it.est)} <span style="font-size:11px;font-weight:400;color:var(--txt2)">${it.unid}</span></td>
+      <td style="color:var(--txt2);white-space:nowrap">${fmtEsp(it.nomeBase,it.nec)} <span style="font-size:11px">${it.unid}</span></td>
+      <td>${comprarCel}</td>
+      <td style="padding:8px 12px">${_buildSegBar(it)}</td>
+      <td><span class="merc-pill ${status.cls}">${status.label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function selecionarItemMerc(nomeBase){
+  _MERC_SEL = nomeBase;
+  document.querySelectorAll('#merc-tabela-body tr').forEach(tr => {
+    tr.classList.toggle('merc-sel', tr.getAttribute('data-item') === nomeBase);
+  });
+  abrirDrillDown(nomeBase);
+}
+
+function abrirPainelEstoque(){
+  const ciclo     = document.getElementById('sel-mes-merc').value;
+  const mondayIso = document.getElementById('sel-sem-merc').value;
+  if(!ciclo || !mondayIso){ alert('Selecione um mês e uma semana primeiro.'); return; }
+
+  const { dias, datas } = getCalWeekDiasAndDatas(mondayIso);
+  const dailyTotais = dias.map((d, i) => (!d || !datas[i]) ? {} : calcularTotaisNiveis([d]).totais);
+
+  const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
+  const todos = [...af_items, ...mc_items].filter(it => it.nec > 0 || it.est > 0);
+  todos.sort((a, b) => (a.nec > 0 ? a.est/a.nec : 1) - (b.nec > 0 ? b.est/b.nec : 1));
+
+  const ABREV_DIA = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const DW = 28;
+
+  const html = todos.map(it => {
+    const getDayNec = (dayT) =>
+      Object.entries(dayT)
+        .filter(([k]) => k === it.nomeBase || k.startsWith(it.nomeBase + ' ___ '))
+        .reduce((s,[,v]) => s + v, 0);
+
+    let restante = it.est;
+    const segs = dias.map((d, i) => {
+      if(!datas[i] || !d) return null;
+      const nec = getDayNec(dailyTotais[i]);
+      const coberto = nec > 0 && restante >= nec;
+      const parcial = nec > 0 && !coberto && restante > 0;
+      if(nec > 0) restante = Math.max(0, restante - nec);
+      const dow   = new Date(datas[i]+'T00:00:00').getDay();
+      const abrev = ABREV_DIA[dow === 0 ? 6 : dow - 1] || '';
+      const nome  = nomeNum(d)?.nome || d;
+      const label = nome.length > 10 ? nome.substring(0,9)+'…' : nome;
+      return { coberto, parcial, nome, label, abrev };
+    }).filter(Boolean);
+
+    if(!segs.length) return '';
+
+    const diasCob = segs.filter(s => s.coberto).length;
+    const cor = diasCob === segs.length ? '#16a34a' : diasCob >= segs.length/2 ? '#d97706' : diasCob > 0 ? '#dc2626' : '#9ca3af';
+    const fundoBorda = diasCob === segs.length ? '#bbf7d0' : diasCob >= segs.length/2 ? '#fde68a' : diasCob > 0 ? '#fca5a5' : '#e5e7eb';
+    const fundoCor   = diasCob === segs.length ? '#f0fdf4' : diasCob >= segs.length/2 ? '#fffbeb' : diasCob > 0 ? '#fff5f5' : '#f9fafb';
+    const barW = segs.length * DW;
+
+    const segHtml = segs.map((seg, i) => {
+      const bg = seg.coberto ? cor : seg.parcial ? cor+'55' : '#e5e7eb';
+      const br = i < segs.length-1 ? 'border-right:2px solid rgba(255,255,255,0.85);' : '';
+      return `<div style="width:${DW}px;flex-shrink:0;height:100%;background:${bg};${br}"></div>`;
+    }).join('');
+    const labelHtml = segs.map(seg =>
+      `<div style="width:${DW}px;flex-shrink:0;text-align:center;padding:0 1px">
+        <div style="font-size:7.5px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${seg.nome}">${seg.label}</div>
+        <div style="font-size:7px;color:#94a3b8;font-weight:600">${seg.abrev}</div>
+      </div>`
+    ).join('');
+
+    const tipoTag = isAF(it.nomeBase)
+      ? `<span style="font-size:9px;font-weight:700;background:#d1fae5;color:#065f46;border-radius:4px;padding:1px 5px">AF</span>`
+      : `<span style="font-size:9px;font-weight:700;background:#dbeafe;color:#1e40af;border-radius:4px;padding:1px 5px">MC</span>`;
+    const perTag = it.numSemanas > 1
+      ? `<span style="font-size:9px;font-weight:700;background:#ede9fe;color:#4c1d95;border-radius:4px;padding:1px 5px;margin-left:3px">${it.numSemanas}×sem.</span>`
+      : '';
+
+    const _enc2 = it.nomeBase.replace(/'/g,"\\'");
+    return `<div style="background:${fundoCor};border:1px solid ${fundoBorda};border-radius:8px;padding:12px 14px;cursor:pointer;transition:box-shadow .15s" onclick="abrirDrillDown('${_enc2}')" title="Ver detalhes por dia">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:6px">
+        <b style="font-size:12.5px;color:var(--txt);line-height:1.3">${it.nomeBase}</b>
+        <div style="display:flex;gap:3px;flex-shrink:0">${tipoTag}${perTag}</div>
+      </div>
+      <div style="overflow-x:auto">
+        <div style="display:inline-flex;width:${barW}px;height:10px;border-radius:4px;overflow:hidden">${segHtml}</div>
+        <div style="display:inline-flex;width:${barW}px;margin-top:2px">${labelHtml}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;margin-top:4px">
+        <span style="color:${cor};font-weight:700">${diasCob}/${segs.length} dias cobertos</span>
+        <span style="color:var(--txt2);font-family:'DM Mono',monospace">${fmtEsp(it.nomeBase,it.est)} / ${fmtEsp(it.nomeBase,it.nec)} ${it.unid}</span>
+      </div>
+    </div>`;
+  }).filter(Boolean).join('') || '<p style="color:#aaa;text-align:center;padding:32px;grid-column:1/-1">Nenhum item encontrado.</p>';
+
+  document.getElementById('painel-estoque-grid').innerHTML = html;
+  document.getElementById('overlay-painel-estoque').style.display = 'flex';
+}
+
+function fecharPainelEstoque(){
+  document.getElementById('overlay-painel-estoque').style.display = 'none';
+}
+
+function abrirDrillDown(nomeBase){
+  // Fecha painel de estoque se estiver aberto (e mostra detalhe inline)
+  fecharPainelEstoque();
+
+  const mondayIso = getMercMondayIso();
+  if(!mondayIso) return;
+
+  const est  = ESTOQUE[nomeBase] || 0;
+  const unid = DADOS.ingredientes[nomeBase]?.unidade || 'kg';
+  const _obsMap  = getMercAjuste().obs || {};
+  const obsAtual = (_obsMap[nomeBase] || '').replace(/"/g,'&quot;');
+  const enc = nomeBase.replace(/'/g,"\\'");
+
+  // Dados do item (necessidade, comprar, periodicidade, numSemanas)
+  const ciclo = getMercCiclo() || '';
+  const { af_items, mc_items } = ciclo ? getItensMercado(ciclo, mondayIso) : { af_items:[], mc_items:[] };
+  const itemData = [...af_items, ...mc_items].find(it => it.nomeBase === nomeBase);
+  const numSemanas = itemData?.numSemanas || 1;
+
+  // Usa dados pré-computados se disponíveis, senão calcula
+  let allDias, allDatas, allDailyTotais;
+  if(_MERC_DATA?.weekData){
+    const wks = _MERC_DATA.weekData.slice(0, numSemanas);
+    allDias        = wks.flatMap(w => w.dias);
+    allDatas       = wks.flatMap(w => w.datas);
+    allDailyTotais = wks.flatMap(w => w.dailyTotais);
+  } else {
+    allDias = []; allDatas = []; allDailyTotais = [];
+    for(let _w = 0; _w < numSemanas; _w++){
+      const _d = new Date(mondayIso + 'T00:00:00');
+      _d.setDate(_d.getDate() + 7 * _w);
+      const _wMon = _d.toISOString().substring(0, 10);
+      const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(_wMon);
+      allDias        = [...allDias, ..._wd];
+      allDatas       = [...allDatas, ..._wda];
+      allDailyTotais = [...allDailyTotais, ..._wd.map((dd,i) => (!dd||!_wda[i]) ? {} : calcularTotaisNiveis([dd]).totais)];
+    }
+  }
+
+  const getDayNec = (dayT) =>
+    Object.entries(dayT)
+      .filter(([k]) => k === nomeBase || k.startsWith(nomeBase + ' ___ '))
+      .reduce((s,[,v]) => s + v, 0);
+
+  const ABREV = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let restante = est;
+
+  const linhas = allDias.map((d,i) => {
+    if(!allDatas[i]) return null;
+    const nec     = getDayNec(allDailyTotais[i]);
+    const dow     = new Date(allDatas[i]+'T00:00:00').getDay();
+    const diaNome = ABREV[dow === 0 ? 6 : dow - 1] || '';
+    const dataFmt = fmtDataCurta(allDatas[i]);
+    const nomePrato = d ? (nomeNum(d)?.nome || d) : null;
+    if(nec === 0) return { dataFmt, diaNome, nomePrato, nec:0, saldoDepois:restante, status:'sem_consumo', pctParcial:null };
+    const coberto = restante >= nec;
+    const parcial = !coberto && restante > 0;
+    const pctParcial = parcial ? restante / nec : null;
+    restante = Math.max(0, restante - nec);
+    const status = coberto ? 'coberto' : parcial ? 'parcial' : 'descoberto';
+    return { dataFmt, diaNome, nomePrato, nec, saldoDepois:restante, status, pctParcial };
+  }).filter(Boolean);
+
+  const S = {
+    coberto:     { cls:'s-cov', emoji:'✅', label:'Coberto',     pillCls:'merc-pill-ok',   cor:'#16a34a' },
+    parcial:     { cls:'s-par', emoji:'⚠️', label:'Parcial',     pillCls:'merc-pill-warn', cor:'#d97706' },
+    descoberto:  { cls:'s-unc', emoji:'❌', label:'Descoberto',  pillCls:'merc-pill-err',  cor:'#dc2626' },
+    sem_consumo: { cls:'s-nil', emoji:'—',  label:'Sem consumo', pillCls:'merc-pill-nil',  cor:'#9ca3af' },
+  };
+
+  const diasComNec   = linhas.filter(r => r.status !== 'sem_consumo');
+  const diasCobertos = linhas.filter(r => r.status === 'coberto').length;
+  const saldoFinal   = restante;
+  const lastCobDay   = [...linhas].reverse().find(r => r.status === 'coberto');
+  const cobertoAte   = lastCobDay ? lastCobDay.dataFmt : 'Nenhum dia';
+
+  const globalStatus = diasCobertos === diasComNec.length ? S.coberto
+    : diasCobertos > 0 ? S.parcial
+    : diasComNec.length > 0 ? S.descoberto : S.sem_consumo;
+
+  const forn = (() => { const fid = ING_FORNECEDORES[nomeBase]; return fid ? FORNECEDORES_CADASTRO.find(f=>f.id===fid) : null; })();
+  const fornNome = forn ? forn.nome : 'Sem fornecedor definido';
+  const periLabel = itemData ? (
+    itemData.periodicidade === 'mensal' ? 'Mensal (4 sem.)' :
+    itemData.periodicidade === 'trissemanais' ? 'Trissemanais (3 sem.)' :
+    itemData.periodicidade === 'quinzenal' ? 'Quinzenal (2 sem.)' : 'Semanal') : '—';
+  const comprar = itemData ? itemData.comprar : 0;
+  const nec     = itemData ? itemData.nec : 0;
+
+  const timelineHtml = linhas.map(r => {
+    const s = S[r.status];
+    const necStr   = r.nec > 0 ? fmtEsp(nomeBase,r.nec)+' '+unid : '—';
+    const saldoStr = fmtEsp(nomeBase,r.saldoDepois)+' '+unid;
+    const pctStr   = r.pctParcial != null ? ` (${Math.round(r.pctParcial*100)}%)` : '';
+    const pratoHtml = r.nomePrato ? `<b>${r.nomePrato}</b>` : `<i style="color:#aaa">Recesso / Feriado</i>`;
+    const statusHtml = r.status !== 'sem_consumo'
+      ? `<span style="font-size:11px;font-weight:700;color:${s.cor}">${s.emoji} ${s.label}${pctStr}</span>`
+      : `<span style="font-size:11px;color:#94a3b8;font-style:italic">Sem consumo</span>`;
+    return `<div class="merc-day">
+      <div class="merc-day-mk ${s.cls}"></div>
+      <div>
+        <strong style="font-size:12px;display:block;margin-bottom:1px">${r.dataFmt} — ${r.diaNome}</strong>
+        <span style="color:#6b7280;font-size:12px">${pratoHtml}</span>
+      </div>
+      <div style="text-align:right;font-size:12px;flex-shrink:0">
+        <b style="display:block;font-size:13px;margin-bottom:1px;font-family:'DM Mono',monospace">${necStr}</b>
+        <span style="color:#9ca3af;font-size:11px">Saldo: ${saldoStr}</span><br>
+        ${statusHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  const bodyEl = document.getElementById('merc-detail-body');
+  const hintEl = document.getElementById('merc-detail-hint');
+  if(!bodyEl) return;
+
+  if(hintEl) hintEl.textContent = nomeBase;
+  bodyEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px">
+      <div>
+        <div style="font-size:16px;font-weight:800">${nomeBase}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:2px">${esc(fornNome)}</div>
+      </div>
+      <span class="merc-pill ${globalStatus.pillCls}" style="font-size:12px;flex-shrink:0">${globalStatus.emoji} ${globalStatus.label}</span>
+    </div>
+
+    <div class="merc-mini-grid">
+      <div class="merc-mini"><span>Estoque atual</span><strong style="font-family:'DM Mono',monospace">${fmtEsp(nomeBase,est)} ${unid}</strong></div>
+      <div class="merc-mini"><span>Necessidade</span><strong style="font-family:'DM Mono',monospace">${fmtEsp(nomeBase,nec)} ${unid}</strong></div>
+      <div class="merc-mini"><span>A comprar</span><strong style="font-family:'DM Mono',monospace;color:${comprar>0?'#dc2626':'#16a34a'}">${fmtEsp(nomeBase,comprar)} ${unid}</strong></div>
+      <div class="merc-mini"><span>Coberto até</span><strong>${cobertoAte}</strong></div>
+      <div class="merc-mini"><span>Dias cobertos</span><strong>${diasCobertos}/${diasComNec.length}</strong></div>
+      <div class="merc-mini"><span>Periodicidade</span><strong>${periLabel}</strong></div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Observação</label>
+      <input type="text" placeholder="Adicionar observação…" value="${obsAtual}"
+        style="width:100%;padding:7px 10px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;font-family:'Sora',sans-serif;color:#374151;box-sizing:border-box"
+        onchange="salvarObsItemMerc('${enc}',this.value)">
+    </div>
+
+    <div class="merc-obox">
+      <h4>Resumo da ordem</h4>
+      <div class="merc-oline"><span>Tipo de fornecimento</span><strong>${periLabel}</strong></div>
+      <div class="merc-oline"><span>Necessidade total</span><strong>${fmtEsp(nomeBase,nec)} ${unid}</strong></div>
+      <div class="merc-oline"><span>Saldo abatido</span><strong>${fmtEsp(nomeBase,est)} ${unid}</strong></div>
+      <div class="merc-oline"><span>Quantidade da ordem</span><strong style="color:${comprar>0?'#dc2626':'#16a34a'}">${fmtEsp(nomeBase,comprar)} ${unid}</strong></div>
+    </div>
+
+    <h4 style="margin:16px 0 10px;font-size:13px;font-weight:700">Linha do tempo</h4>
+    <div class="merc-tl">${timelineHtml || '<div style="color:#aaa;text-align:center;padding:20px;font-size:13px">Nenhum dado disponível.</div>'}</div>`;
+
+  // Scroll the detail panel to top
+  bodyEl.scrollTop = 0;
+}
+
+function fecharDrillDown(){
+  document.getElementById('overlay-drilldown').style.display = 'none';
 }
 
 function adicionarItemMercForn(nomeBase, btn){
@@ -6234,9 +6910,10 @@ function renderIngredientes(filtro=''){
         <select onchange="setIngPeriodicidade('${nome.replace(/'/g,"\\'")}',this.value)"
           style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_PERIODICIDADE[nome]?'#a5b4fc':'var(--borda)'};border-radius:6px;background:${ING_PERIODICIDADE[nome]?'#eef2ff':'#f8fafc'};width:100px;color:${ING_PERIODICIDADE[nome]?'#4338ca':'#94a3b8'}">
           <option value="">— Período —</option>
-          <option value="semanal"   ${ING_PERIODICIDADE[nome]==='semanal'  ?'selected':''}>Semanal</option>
-          <option value="quinzenal" ${ING_PERIODICIDADE[nome]==='quinzenal'?'selected':''}>Quinzenal</option>
-          <option value="mensal"    ${ING_PERIODICIDADE[nome]==='mensal'   ?'selected':''}>Mensal</option>
+          <option value="semanal"       ${ING_PERIODICIDADE[nome]==='semanal'      ?'selected':''}>Semanal (1 sem.)</option>
+          <option value="quinzenal"     ${ING_PERIODICIDADE[nome]==='quinzenal'    ?'selected':''}>Quinzenal (2 sem.)</option>
+          <option value="trissemanais"  ${ING_PERIODICIDADE[nome]==='trissemanais' ?'selected':''}>Trissemanais (3 sem.)</option>
+          <option value="mensal"        ${ING_PERIODICIDADE[nome]==='mensal'       ?'selected':''}>Mensal (4 sem.)</option>
         </select>
       </td>
       <td>
