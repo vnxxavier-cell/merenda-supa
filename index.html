@@ -5957,7 +5957,7 @@ function renderMercadoTabela(){
     const isSel = _MERC_SEL === it.nomeBase;
     return `<tr class="${isSel?'merc-sel':''}" data-item="${encD}" onclick="selecionarItemMerc('${enc}')">
       <td><div style="font-weight:700;margin-bottom:3px;color:var(--txt)">${it.nomeBase}</div><div style="display:flex;gap:4px;flex-wrap:wrap">${tipoTag}${perTag}</div></td>
-      <td style="font-family:'DM Mono',monospace;font-weight:600;text-align:right;white-space:nowrap;color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)} <span style="font-size:11px">${it.unid}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-weight:600;text-align:right;white-space:nowrap;color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)}${(it.nomeBase==='ALFACE'||it.nomeBase==='ÓLEO DE SOJA')?'':` <span style="font-size:11px">${it.unid}</span>`}</td>
       <td style="padding:8px 12px">${_buildSegBar(it)}</td>
     </tr>`;
   }).join('');
