@@ -109,7 +109,7 @@ tbody tr:hover td{background:#f0f5fc}
 .modal-body table thead th{background:#eef2f8}
 
 /* ── FORNECEDORES ── */
-.forn-grid{display:flex;flex-direction:column;gap:20px}
+.forn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
 .forn-grid table{width:100%;table-layout:fixed}
 .forn-grid table th:nth-child(1),.forn-grid table td:nth-child(1){width:38px}
 .forn-grid table th:nth-child(2),.forn-grid table td:nth-child(2){width:160px}
@@ -118,32 +118,29 @@ tbody tr:hover td{background:#f0f5fc}
 .forn-grid table th:nth-child(5),.forn-grid table td:nth-child(5){width:90px}
 .forn-grid table th:nth-child(6),.forn-grid table td:nth-child(6){width:160px;white-space:nowrap}
 .forn-grid table th:last-child,.forn-grid table td:last-child{width:auto}
+@media(max-width:900px){.forn-grid{grid-template-columns:1fr}}
 
 /* ── Mercado: layout análise de cobertura ─────────────── */
 .merc-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.merc-kpi-card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:1px solid rgba(229,231,235,.9)}
-.merc-kpi-card>span{color:#6b7280;font-size:12px;font-weight:700;display:block;margin-bottom:6px}
-.merc-kpi-card>strong{font-size:26px;font-weight:800;display:block;letter-spacing:-.02em}
-.merc-kpi-card>small{color:#6b7280;font-size:11px;margin-top:5px;display:block}
+.merc-kpi-card{background:#fff;border-radius:var(--r);padding:18px 20px;box-shadow:var(--sombra);border-left:4px solid var(--azul2)}
+.merc-kpi-card>span{color:var(--txt2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px}
+.merc-kpi-card>strong{font-size:26px;font-weight:800;color:var(--azul);font-family:'DM Mono',monospace;display:block;letter-spacing:-.02em}
+.merc-kpi-card>small{color:var(--txt2);font-size:11px;margin-top:5px;display:block}
 .merc-split{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.7fr);gap:18px;align-items:start}
-.merc-panel{background:#fff;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:1px solid #e5e7eb;overflow:hidden}
-.merc-ph{padding:13px 17px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.merc-ph h3{margin:0;font-size:14px;font-weight:700}
-.merc-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:700;color:#6b7280}
+.merc-panel{background:#fff;border-radius:var(--r);box-shadow:var(--sombra);border:1px solid var(--borda);overflow:hidden}
+.merc-ph{padding:14px 20px;border-bottom:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.merc-ph h3{margin:0;font-size:14px;font-weight:700;color:var(--azul)}
+.merc-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:700;color:var(--txt2)}
 .merc-dot{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:4px;vertical-align:middle}
 .merc-tbl{width:100%;border-collapse:collapse;table-layout:fixed}
-.merc-tbl thead th{background:#f9fafb;color:#6b7280;font-size:11px;text-align:left;padding:10px 14px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #e5e7eb;white-space:nowrap}
-.merc-tbl th:nth-child(1){width:160px}
-.merc-tbl th:nth-child(2){width:110px}
-.merc-tbl th:nth-child(3){width:90px}
-.merc-tbl th:nth-child(4){width:90px}
-.merc-tbl th:nth-child(5){width:110px}
-.merc-tbl th:nth-child(6){width:auto}
-.merc-tbl th:nth-child(7){width:100px}
-.merc-tbl tbody td{padding:10px 14px;border-top:1px solid #f1f5f9;vertical-align:middle;font-size:13px}
+.merc-tbl thead th{background:var(--cinza);color:var(--azul);font-size:12px;font-weight:700;text-align:left;padding:10px 12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--borda);white-space:nowrap}
+.merc-tbl th:nth-child(1){width:200px}
+.merc-tbl th:nth-child(2){width:130px;text-align:right}
+.merc-tbl th:nth-child(3){width:auto}
+.merc-tbl tbody td{padding:9px 12px;border-top:1px solid var(--borda);vertical-align:middle;font-size:13px}
 .merc-tbl tbody tr{cursor:pointer;transition:background .15s}
-.merc-tbl tbody tr:hover{background:#f8fafc}
-.merc-tbl tbody tr.merc-sel{background:#eff6ff!important}
+.merc-tbl tbody tr:hover td{background:#f0f5fc}
+.merc-tbl tbody tr.merc-sel td{background:#e8f0fc!important}
 .merc-pill{border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;display:inline-block;white-space:nowrap}
 .merc-pill-ok{background:#dcfce7;color:#166534}
 .merc-pill-warn{background:#fef3c7;color:#92400e}
@@ -154,6 +151,7 @@ tbody tr:hover td{background:#f0f5fc}
 .merc-seg.s-par{background:#f59e0b}
 .merc-seg.s-unc{background:#ef4444}
 .merc-seg.s-nil{background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 4px,#e2e8f0 4px,#e2e8f0 8px)}
+.merc-seg.s-off{background:#bfdbfe}
 .merc-seg[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:10px;white-space:pre;padding:5px 9px;border-radius:7px;z-index:250;pointer-events:none;font-weight:600;line-height:1.5}
 .merc-tbl-wrap{overflow-x:auto}
 .merc-split > .merc-panel:last-child{position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
@@ -276,9 +274,11 @@ tbody tr:hover td{background:#f0f5fc}
 
 /* ── IMPRESSÃO ── */
 .print-only{display:none}
+.screen-hidden{display:none}
 .admin-only{display:none!important}
 .print-hide{display:none!important}
 @media print{
+  .screen-hidden{display:block!important}
   @page{margin:20mm 24mm;size:A4}
   /* ── ocultar UI ── */
   nav,#nav-principal,.mobile-topbar,#mobile-topbar,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay{display:none!important}
@@ -791,7 +791,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </p>
       </div>
 
-      <div id="grid-pratos-plan" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px"></div>
+      <div id="grid-pratos-plan" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px"></div>
     </div>
   </div>
 
@@ -819,12 +819,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <input type="date" id="merc-data-fim" onchange="renderMercado()" style="font-family:'Sora',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
       </div>
       <div id="merc-range-info" style="font-size:12px;color:var(--txt2);padding-bottom:8px"></div>
+      <div class="campo no-print">
+        <label>Cálculo de quantidades</label>
+        <div style="display:flex;border:2px solid var(--borda);border-radius:8px;overflow:hidden;height:36px">
+          <button id="merc-modo-btn-periodo" onclick="setMercModo('periodo')"
+            style="flex:1;border:none;padding:0 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;color:var(--txt2);transition:.15s">Apenas período</button>
+          <button id="merc-modo-btn-reposicao" onclick="setMercModo('reposicao')"
+            style="flex:1;border:none;border-left:2px solid var(--borda);padding:0 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:var(--azul);color:#fff;transition:.15s">Reposição de estoque</button>
+        </div>
+      </div>
+      <button id="merc-view-toggle" class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="toggleMercadoViewMode()">Ver cobertura</button>
     </div>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="validarEImprimir()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="exportarExcelMercado()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="registrarOrdemExpedida()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Registrar Ordem</button>
     <button class="btn btn-primary no-print" onclick="irParaPlanejamento()">← Planejamento</button>
-    <button class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="abrirPainelEstoque()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Painel de Estoque</button>
   </div>
 
   <div class="stats-grid no-print" id="stats-merc" style="display:none"></div>
@@ -856,7 +865,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   </div>
 
   <!-- Novo layout de análise de cobertura (tela) -->
-  <div class="no-print" id="merc-analise">
+  <div class="no-print" id="merc-analise" style="display:none">
     <div class="merc-kpi" id="merc-kpi-cards"></div>
     <div class="merc-split">
       <!-- Painel esquerdo: tabela -->
@@ -886,9 +895,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="merc-tbl-wrap">
           <table class="merc-tbl">
             <thead><tr>
-              <th>Item</th><th>Fornecedor</th><th>Estoque</th><th>Necessidade</th><th>A Comprar</th><th>Cobertura</th><th>Status</th>
+              <th>Item</th><th style="text-align:right">Necessidade</th><th>Cobertura</th>
             </tr></thead>
-            <tbody id="merc-tabela-body"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px">Selecione um mês e semana para ver a análise.</td></tr></tbody>
+            <tbody id="merc-tabela-body"><tr><td colspan="3" style="text-align:center;color:#aaa;padding:24px">Selecione um mês e semana para ver a análise.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -905,8 +914,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
   </div>
 
-  <!-- Layout de impressão (visível só ao imprimir) -->
-  <div class="forn-grid print-only" id="forn-grid-dinamico"></div>
+  <!-- Layout de impressão / fornecedor (default) -->
+  <div class="forn-grid" id="forn-grid-dinamico"></div>
 </div>
 
 <!-- Modal: Drill-down de cobertura por item -->
@@ -920,30 +929,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button onclick="fecharDrillDown()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;padding:0 4px">×</button>
     </div>
     <div id="drilldown-body" style="padding:20px 22px;overflow-y:auto"></div>
-  </div>
-</div>
-
-<!-- Modal: Painel de Estoque -->
-<div id="overlay-painel-estoque" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto">
-  <div style="background:#fff;border-radius:14px;width:100%;max-width:900px;box-shadow:0 20px 60px rgba(0,0,0,.3);margin:auto">
-    <div style="background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);color:#fff;padding:16px 22px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1">
-      <div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Painel de Estoque — Visão Geral
-      </div>
-      <button onclick="fecharPainelEstoque()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;padding:0 4px">×</button>
-    </div>
-    <div style="padding:18px 22px">
-      <div style="display:flex;gap:16px;margin-bottom:16px;font-size:11.5px;flex-wrap:wrap;align-items:center">
-        <span style="color:var(--txt2);font-weight:600">Legenda:</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#16a34a;border-radius:2px"></span>Coberto</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#d97706;border-radius:2px"></span>Parcial (≥50%)</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#dc2626;border-radius:2px"></span>Crítico (&lt;50%)</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:16px;height:8px;background:#9ca3af;border-radius:2px"></span>Sem estoque</span>
-        <span style="margin-left:auto;font-size:11px;color:var(--txt2);font-style:italic">Ordenado por cobertura (críticos primeiro)</span>
-      </div>
-      <div id="painel-estoque-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px"></div>
-    </div>
   </div>
 </div>
 
@@ -3098,10 +3083,20 @@ let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades
 let ING_PERIODICIDADE = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
 let _MERC_DATA = null; // cache para renderMercadoTabela()
 let _MERC_SEL  = null; // item selecionado no painel
+let _MERC_MODO = 'reposicao'; // 'periodo' | 'reposicao'
+let MERCADO_VIEW_MODE = 'fornecedor';
 function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
 function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
 function salvarIngPeriodicidade(){ localStorage.setItem('merenda_ing_periodicidade', JSON.stringify(ING_PERIODICIDADE)); }
+function setMercModo(modo){
+  _MERC_MODO = modo;
+  const btnP = document.getElementById('merc-modo-btn-periodo');
+  const btnR = document.getElementById('merc-modo-btn-reposicao');
+  if(btnP){ btnP.style.background = modo==='periodo'?'var(--azul)':'#fff'; btnP.style.color = modo==='periodo'?'#fff':'var(--txt2)'; }
+  if(btnR){ btnR.style.background = modo==='reposicao'?'var(--azul)':'#fff'; btnR.style.color = modo==='reposicao'?'#fff':'var(--txt2)'; }
+  renderMercado();
+}
 function setIngPeriodicidade(nome, valor){
   if(valor) ING_PERIODICIDADE[nome] = valor;
   else delete ING_PERIODICIDADE[nome];
@@ -3111,6 +3106,24 @@ function setIngFornecedor(nome, fornId){
   if(fornId) ING_FORNECEDORES[nome] = fornId;
   else delete ING_FORNECEDORES[nome];
   salvarIngFornecedores();
+}
+function updateMercadoViewMode(){
+  const analiseEl = document.getElementById('merc-analise');
+  const fornGrid  = document.getElementById('forn-grid-dinamico');
+  const toggleBtn = document.getElementById('merc-view-toggle');
+  if(analiseEl) analiseEl.style.display = MERCADO_VIEW_MODE === 'analise' ? '' : 'none';
+  if(fornGrid){
+    if(MERCADO_VIEW_MODE === 'analise') fornGrid.classList.add('screen-hidden');
+    else fornGrid.classList.remove('screen-hidden');
+  }
+  if(toggleBtn) toggleBtn.textContent = MERCADO_VIEW_MODE === 'analise'
+    ? 'Ver lista por fornecedor'
+    : 'Ver cobertura';
+}
+function toggleMercadoViewMode(){
+  MERCADO_VIEW_MODE = MERCADO_VIEW_MODE === 'analise' ? 'fornecedor' : 'analise';
+  updateMercadoViewMode();
+  renderMercado();
 }
 
 // Inicializar estoque zero para ingredientes ainda sem valor salvo
@@ -5448,12 +5461,16 @@ function salvarServidoresConfigTab(){
 
 function _somaTotaisSemanas(mondayIso, n){
   const soma = {};
+  const _i = getMercDataInicio(), _f = getMercDataFim();
   for(let w = 0; w < n; w++){
     const d = new Date(mondayIso + 'T00:00:00');
     d.setDate(d.getDate() + w * 7);
     const mon = d.toISOString().split('T')[0];
-    const { dias: _d } = getCalWeekDiasAndDatas(mon);
-    const { totais: _t } = calcularTotaisNiveis(_d);
+    const { dias: _d, datas: _dt } = getCalWeekDiasAndDatas(mon);
+    const _dFilt = _MERC_MODO === 'periodo'
+      ? _d.map((dd, i) => (!_i || !_f || !_dt[i] || (_dt[i] >= _i && _dt[i] <= _f)) ? dd : '')
+      : _d;
+    const { totais: _t } = calcularTotaisNiveis(_dFilt);
     if(SERVIDORES_CONFIG.ativo){
       _t['CAFÉ']   = (_t['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg;
       _t['AÇÚCAR'] = (_t['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg;
@@ -5464,7 +5481,11 @@ function _somaTotaisSemanas(mondayIso, n){
 }
 
 function getItensMercado(ciclo, mondayIso){
-  const { dias } = getCalWeekDiasAndDatas(mondayIso);
+  const { dias: _db, datas: _dtb } = getCalWeekDiasAndDatas(mondayIso);
+  const _i = getMercDataInicio(), _f = getMercDataFim();
+  const dias = _MERC_MODO === 'periodo'
+    ? _db.map((d, i) => (!_i || !_f || !_dtb[i] || (_dtb[i] >= _i && _dtb[i] <= _f)) ? d : '')
+    : _db;
   const { totais: totais1 } = calcularTotaisNiveis(dias);
   if(SERVIDORES_CONFIG.ativo){
     totais1['CAFÉ']   = (totais1['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg;
@@ -5557,7 +5578,11 @@ function renderMercado(){
     _infoEl.textContent = `${_dias} dia${_dias!==1?'s':''} no período`;
   } else if(_infoEl){ _infoEl.textContent=''; }
 
-  const { dias, datas } = getCalWeekDiasAndDatas(mondayIso);
+  const { dias: _diasBrutos, datas: _datasBrutas } = getCalWeekDiasAndDatas(mondayIso);
+  const _ini = getMercDataInicio(), _fim = getMercDataFim();
+  const _inPeriodo = d => !d || !_ini || !_fim || (d >= _ini && d <= _fim);
+  const dias  = _diasBrutos.map((d, i) => _inPeriodo(_datasBrutas[i]) ? d : '');
+  const datas = _datasBrutas.map(d => _inPeriodo(d) ? d : null);
   const { totalAlunos } = calcularTotaisNiveis(dias);
   const dailyTotais = dias.map((d, i) => {
     if(!d || !datas[i]) return {};
@@ -5567,15 +5592,24 @@ function renderMercado(){
   // Pratos da semana — apenas slots com data escolar
   const DIAS_SEMANA_NOMES = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
   const listaMerc = document.getElementById('lista-pratos-merc');
-  if(listaMerc) listaMerc.innerHTML = dias.map((p, i) => {
-    if(!datas[i]) return ''; // dia sem aula nesta semana — não exibe
-    const dowStr  = DIAS_SEMANA_NOMES[new Date(datas[i]+'T00:00:00').getDay()-1] || '';
-    const dataFmt = `${dowStr} ${fmtDataCurta(datas[i])}`;
-    const isFer   = CAL_CONFIG.feriados.includes(datas[i]);
-    if(isFer || !p) return `<span style="background:#f0f0f0;padding:6px 12px;border-radius:6px;font-size:12px;color:#aaa">${dataFmt}: ${isFer?'Feriado':'Recesso'}</span>`;
-    const {nome} = nomeNum(p);
-    return `<span style="background:#eef5ff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer" onclick="abrirFicha('${p.replace(/'/g,"\\'")}')"><b style="color:var(--azul2)">${dataFmt}:</b> ${nome}</span>`;
-  }).filter(Boolean).join('');
+  if(listaMerc){
+    window._mercSemanaPratos = [];
+    const _cards = [];
+    dias.forEach((p, i) => {
+      if(!datas[i]) return;
+      const dowStr  = DIAS_SEMANA_NOMES[new Date(datas[i]+'T00:00:00').getDay()-1] || '';
+      const dataFmt = `${dowStr} ${fmtDataCurta(datas[i])}`;
+      const isFer   = CAL_CONFIG.feriados.includes(datas[i]);
+      if(isFer || !p){
+        _cards.push(`<div style="background:#f4f6f9;padding:10px 14px;border-radius:8px;border:1px solid var(--borda);min-width:110px"><div style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">${dataFmt}</div><div style="font-size:12px;color:#bbb;font-style:italic">${isFer?'Feriado':'Recesso'}</div></div>`);
+        return;
+      }
+      const {nome} = nomeNum(p);
+      const idx = window._mercSemanaPratos.push(p) - 1;
+      _cards.push(`<div style="background:#eef5ff;padding:10px 14px;border-radius:8px;border:1px solid #dbeafe;min-width:110px;cursor:pointer" onclick="abrirFicha(window._mercSemanaPratos[${idx}])"><div style="font-size:11px;font-weight:700;color:var(--azul2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">${dataFmt}</div><div style="font-size:14px;font-weight:700;color:var(--txt)">${nome}</div></div>`);
+    });
+    listaMerc.innerHTML = _cards.join('');
+  }
 
   const { af_items, mc_items, totalKg } = getItensMercado(ciclo, mondayIso);
   const todosItens = [...af_items, ...mc_items];
@@ -5625,7 +5659,7 @@ function renderMercado(){
       }).join('');
     if(fornIds.includes(prevVal)) fornFilterEl.value = prevVal;
   }
-  renderMercadoTabela();
+  if(MERCADO_VIEW_MODE === 'analise') renderMercadoTabela();
   // ────────────────────────────────────────────────────
 
   const _sub    = _subtitulo;
@@ -5672,29 +5706,9 @@ function renderMercado(){
       : diasCob > 0                  ? '#dc2626'
       : '#9ca3af';
 
-    const DW = 32; // px fixos por dia — barra mensal (20d) é 4× mais longa que semanal (5d)
-    const barW = segs.length * DW;
-
-    const segHtml = segs.map((seg, i) => {
-      const bg = seg.coberto ? cor : seg.parcial ? cor + '55' : '#e5e7eb';
-      const br = i < segs.length - 1 ? 'border-right:2px solid rgba(255,255,255,0.85);' : '';
-      return `<div style="width:${DW}px;flex-shrink:0;height:100%;background:${bg};${br}"></div>`;
-    }).join('');
-
-    const labelHtml = segs.map(seg =>
-      `<div style="width:${DW}px;flex-shrink:0;padding:0 1px;text-align:center">
-        <div style="font-size:8px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${seg.nome}">${seg.label}</div>
-        <div style="font-size:7.5px;color:#94a3b8;font-weight:600">${seg.abrev}</div>
-      </div>`
-    ).join('');
-
     const _enc = it.nomeBase.replace(/'/g,"\\'");
     return `<div style="min-width:160px;padding:2px 0">
       <div style="font-size:10.5px;font-family:'DM Mono',monospace;color:var(--txt2);text-align:right;margin-bottom:3px">${fmtEsp(it.nomeBase, it.est)}</div>
-      <div style="overflow-x:auto;overflow-y:visible;cursor:pointer" onclick="abrirDrillDown('${_enc}')" title="Ver detalhes por dia">
-        <div style="display:inline-flex;width:${barW}px;height:8px;border-radius:4px;overflow:hidden">${segHtml}</div>
-        <div style="display:inline-flex;width:${barW}px;margin-top:2px">${labelHtml}</div>
-      </div>
       <div style="font-size:10px;color:${cor};font-weight:700;text-align:right;margin-top:2px">${diasCob}/${segs.length} dias cobertos</div>
     </div>`;
   };
@@ -5723,7 +5737,6 @@ function renderMercado(){
             <td class="num no-print">
               <span style="color:#16a34a;font-size:12px;font-weight:700;white-space:nowrap">✓ Coberto</span>
             </td>
-            <td class="no-print">${_barraEstoque(it)}</td>
             <td class="print-only"></td>
           </tr>`;
         }
@@ -5755,7 +5768,6 @@ function renderMercado(){
                 onclick="adicionarItemMercForn('${enc}',this)" title="Trocar fornecedor" style="display:inline-flex;align-items:center;justify-content:center">${ico('users',11)}</button>
             </div>${pacInfo}${exInfo}
           </td>
-          <td class="no-print">${_barraEstoque(it)}</td>
           <td class="print-only" style="text-align:right;white-space:nowrap">
             <b style="color:var(--azul2)">${fmtEsp(it.nomeBase,arred)}</b>
           </td>
@@ -5816,7 +5828,7 @@ function renderMercado(){
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
-        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Observação</th><th>Tipo</th><th class="num">Necessidade</th><th class="num">A Comprar</th><th>Estoque</th></tr></thead>
+        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Observação</th><th>Tipo</th><th class="num">Necessidade</th><th class="num" style="width:100%">A Comprar</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
 
       </div>
@@ -5834,6 +5846,7 @@ function renderMercado(){
   if(!html) html = `<div style="text-align:center;padding:48px;color:#aaa;font-size:14px">Nenhum item a comprar nesta semana.</div>`;
 
   document.getElementById('forn-grid-dinamico').innerHTML = html;
+  updateMercadoViewMode();
 }
 
 function renderMercadoTabela(){
@@ -5862,7 +5875,7 @@ function renderMercadoTabela(){
     let restante = it.est;
     const segs = allDias.map((d, i) => {
       // Slot sem data = feriado/recesso — mantém barra para preservar o total fixo do ciclo
-      if(!allDatas[i]) return { cls:'s-nil', tip:'Sem aula' };
+      if(!allDatas[i]) return { cls:'s-off', tip:'Sem aula' };
       const nec = getDayNec(allDailyTotais[i]);
       const dow  = new Date(allDatas[i]+'T00:00:00').getDay();
       const abrev = ABREV[dow === 0 ? 6 : dow - 1] || '';
@@ -5915,47 +5928,25 @@ function renderMercadoTabela(){
   const tbody = document.getElementById('merc-tabela-body');
   if(!tbody) return;
   if(!items.length){
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px">Nenhum item encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#aaa;padding:24px">Nenhum item encontrado.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = items.map(it => {
     const enc  = it.nomeBase.replace(/'/g,"\\'");
     const encD = it.nomeBase.replace(/"/g,'&quot;');
-    const fid  = ING_FORNECEDORES[it.nomeBase];
-    const forn = fid && FORNECEDORES_CADASTRO.find(f => f.id === fid);
-    const fornTag = forn
-      ? `<span style="font-size:10px;font-weight:700;background:#f1f5f9;color:#475569;border-radius:4px;padding:1px 6px;white-space:nowrap;display:inline-block">${esc(forn.nome.substring(0,18)+(forn.nome.length>18?'…':''))}</span>`
-      : `<span style="font-size:10px;color:#aaa">—</span>`;
     const tipoTag = isAF(it.nomeBase)
-      ? `<span style="font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;border-radius:4px;padding:1px 5px">AF</span>`
-      : `<span style="font-size:10px;font-weight:700;background:#dbeafe;color:#1e40af;border-radius:4px;padding:1px 5px">MC</span>`;
-    const _perLabel = { 1:'1 sem.', 2:'2 sem.', 3:'3 sem.', 4:'4 sem.' };
+      ? `<span class="badge badge-verde" style="font-size:10px;padding:2px 6px">AF</span>`
+      : `<span class="badge badge-azul" style="font-size:10px;padding:2px 6px">MC</span>`;
+    const _perLabel = { 2:'2 sem.', 3:'3 sem.', 4:'4 sem.' };
     const perTag = it.numSemanas > 1
-      ? `<span style="font-size:9px;font-weight:700;background:#ede9fe;color:#4c1d95;border-radius:4px;padding:1px 5px">${_perLabel[it.numSemanas]||it.numSemanas+'×sem.'}</span>`
+      ? `<span class="badge badge-roxo" style="font-size:10px;padding:2px 6px">${_perLabel[it.numSemanas]||it.numSemanas+'×sem.'}</span>`
       : '';
-    const { arred, nPacotes } = arredondarEmb(it.nomeBase, it.comprar);
-    const embTamanho = EMBALAGENS[it.nomeBase];
-    const pacInfo = nPacotes ? `<div style="font-size:10px;color:#666;margin-top:1px">${nPacotes} pct × ${embTamanho} ${it.unid}</div>` : '';
-    const comprarCel = it.coberto
-      ? `<span style="color:#16a34a;font-size:12px;font-weight:700">✓ Coberto</span>`
-      : `<div><div style="display:flex;align-items:center;gap:4px">
-          <input type="number" min="0" step="0.01" value="${arred}" style="${inputSt}"
-            onchange="ajustarQtdMerc('${enc}',this.value,${it.extra?'true':'false'})">
-          <span style="font-size:11px;color:var(--txt2)">${it.unid}</span>
-          <button class="emb-btn" style="color:#e74c3c;border-color:#e74c3c;padding:2px 5px"
-            onclick="event.stopPropagation();removerItemMerc('${enc}',${it.extra?'true':'false'})">✕</button>
-        </div>${pacInfo}</div>`;
-    const status = _getStatus(it);
-    const isSel  = _MERC_SEL === it.nomeBase;
+    const isSel = _MERC_SEL === it.nomeBase;
     return `<tr class="${isSel?'merc-sel':''}" data-item="${encD}" onclick="selecionarItemMerc('${enc}')">
-      <td><div style="font-weight:700;margin-bottom:3px">${it.nomeBase}</div><div style="display:flex;gap:4px;flex-wrap:wrap">${tipoTag}${perTag}</div></td>
-      <td>${fornTag}</td>
-      <td style="font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap">${fmtEsp(it.nomeBase,it.est)} <span style="font-size:11px;font-weight:400;color:var(--txt2)">${it.unid}</span></td>
-      <td style="color:var(--txt2);white-space:nowrap">${fmtEsp(it.nomeBase,it.nec)} <span style="font-size:11px">${it.unid}</span></td>
-      <td>${comprarCel}</td>
+      <td><div style="font-weight:700;margin-bottom:3px;color:var(--txt)">${it.nomeBase}</div><div style="display:flex;gap:4px;flex-wrap:wrap">${tipoTag}${perTag}</div></td>
+      <td style="font-family:'DM Mono',monospace;font-weight:600;text-align:right;white-space:nowrap;color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)} <span style="font-size:11px">${it.unid}</span></td>
       <td style="padding:8px 12px">${_buildSegBar(it)}</td>
-      <td><span class="merc-pill ${status.cls}">${status.label}</span></td>
     </tr>`;
   }).join('');
 }
@@ -5968,97 +5959,8 @@ function selecionarItemMerc(nomeBase){
   abrirDrillDown(nomeBase);
 }
 
-function abrirPainelEstoque(){
-  const ciclo     = getMercCiclo() || '';
-  const mondayIso = getMercMondayIso();
-  if(!mondayIso){ alert('Selecione o período primeiro.'); return; }
-
-  const { dias, datas } = getCalWeekDiasAndDatas(mondayIso);
-  const dailyTotais = dias.map((d, i) => (!d || !datas[i]) ? {} : calcularTotaisNiveis([d]).totais);
-
-  const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
-  const todos = [...af_items, ...mc_items].filter(it => it.nec > 0 || it.est > 0);
-  todos.sort((a, b) => (a.nec > 0 ? a.est/a.nec : 1) - (b.nec > 0 ? b.est/b.nec : 1));
-
-  const ABREV_DIA = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const DW = 28;
-
-  const html = todos.map(it => {
-    const getDayNec = (dayT) =>
-      Object.entries(dayT)
-        .filter(([k]) => k === it.nomeBase || k.startsWith(it.nomeBase + ' ___ '))
-        .reduce((s,[,v]) => s + v, 0);
-
-    let restante = it.est;
-    const segs = dias.map((d, i) => {
-      if(!datas[i] || !d) return null;
-      const nec = getDayNec(dailyTotais[i]);
-      const coberto = nec > 0 && restante >= nec;
-      const parcial = nec > 0 && !coberto && restante > 0;
-      if(nec > 0) restante = Math.max(0, restante - nec);
-      const dow   = new Date(datas[i]+'T00:00:00').getDay();
-      const abrev = ABREV_DIA[dow === 0 ? 6 : dow - 1] || '';
-      const nome  = nomeNum(d)?.nome || d;
-      const label = nome.length > 10 ? nome.substring(0,9)+'…' : nome;
-      return { coberto, parcial, nome, label, abrev };
-    }).filter(Boolean);
-
-    if(!segs.length) return '';
-
-    const diasCob = segs.filter(s => s.coberto).length;
-    const cor = diasCob === segs.length ? '#16a34a' : diasCob >= segs.length/2 ? '#d97706' : diasCob > 0 ? '#dc2626' : '#9ca3af';
-    const fundoBorda = diasCob === segs.length ? '#bbf7d0' : diasCob >= segs.length/2 ? '#fde68a' : diasCob > 0 ? '#fca5a5' : '#e5e7eb';
-    const fundoCor   = diasCob === segs.length ? '#f0fdf4' : diasCob >= segs.length/2 ? '#fffbeb' : diasCob > 0 ? '#fff5f5' : '#f9fafb';
-    const barW = segs.length * DW;
-
-    const segHtml = segs.map((seg, i) => {
-      const bg = seg.coberto ? cor : seg.parcial ? cor+'55' : '#e5e7eb';
-      const br = i < segs.length-1 ? 'border-right:2px solid rgba(255,255,255,0.85);' : '';
-      return `<div style="width:${DW}px;flex-shrink:0;height:100%;background:${bg};${br}"></div>`;
-    }).join('');
-    const labelHtml = segs.map(seg =>
-      `<div style="width:${DW}px;flex-shrink:0;text-align:center;padding:0 1px">
-        <div style="font-size:7.5px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${seg.nome}">${seg.label}</div>
-        <div style="font-size:7px;color:#94a3b8;font-weight:600">${seg.abrev}</div>
-      </div>`
-    ).join('');
-
-    const tipoTag = isAF(it.nomeBase)
-      ? `<span style="font-size:9px;font-weight:700;background:#d1fae5;color:#065f46;border-radius:4px;padding:1px 5px">AF</span>`
-      : `<span style="font-size:9px;font-weight:700;background:#dbeafe;color:#1e40af;border-radius:4px;padding:1px 5px">MC</span>`;
-    const perTag = it.numSemanas > 1
-      ? `<span style="font-size:9px;font-weight:700;background:#ede9fe;color:#4c1d95;border-radius:4px;padding:1px 5px;margin-left:3px">${it.numSemanas}×sem.</span>`
-      : '';
-
-    const _enc2 = it.nomeBase.replace(/'/g,"\\'");
-    return `<div style="background:${fundoCor};border:1px solid ${fundoBorda};border-radius:8px;padding:12px 14px;cursor:pointer;transition:box-shadow .15s" onclick="abrirDrillDown('${_enc2}')" title="Ver detalhes por dia">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:6px">
-        <b style="font-size:12.5px;color:var(--txt);line-height:1.3">${it.nomeBase}</b>
-        <div style="display:flex;gap:3px;flex-shrink:0">${tipoTag}${perTag}</div>
-      </div>
-      <div style="overflow-x:auto">
-        <div style="display:inline-flex;width:${barW}px;height:10px;border-radius:4px;overflow:hidden">${segHtml}</div>
-        <div style="display:inline-flex;width:${barW}px;margin-top:2px">${labelHtml}</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;margin-top:4px">
-        <span style="color:${cor};font-weight:700">${diasCob}/${segs.length} dias cobertos</span>
-        <span style="color:var(--txt2);font-family:'DM Mono',monospace">${fmtEsp(it.nomeBase,it.est)} / ${fmtEsp(it.nomeBase,it.nec)} ${it.unid}</span>
-      </div>
-    </div>`;
-  }).filter(Boolean).join('') || '<p style="color:#aaa;text-align:center;padding:32px;grid-column:1/-1">Nenhum item encontrado.</p>';
-
-  document.getElementById('painel-estoque-grid').innerHTML = html;
-  document.getElementById('overlay-painel-estoque').style.display = 'flex';
-}
-
-function fecharPainelEstoque(){
-  document.getElementById('overlay-painel-estoque').style.display = 'none';
-}
 
 function abrirDrillDown(nomeBase){
-  // Fecha painel de estoque se estiver aberto (e mostra detalhe inline)
-  fecharPainelEstoque();
-
   const mondayIso = getMercMondayIso();
   if(!mondayIso) return;
 
@@ -7956,18 +7858,18 @@ function gerarSeletoresPratos(){
     const cur = plano[i] || '';
     const {num: curNum} = cur ? nomeNum(cur) : {num:''};
     const btnFicha = cur
-      ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${i})" style="flex-shrink:0;padding:7px 9px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center">${ico('folder',14)}</button>`
-      : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:7px 9px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;opacity:.4;display:flex;align-items:center;justify-content:center">${ico('folder',14)}</button>`;
-    items.push(`<div style="background:var(--cinza);border-radius:8px;padding:10px">
-      <div style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Prato ${i+1}</div>
-      <div style="display:flex;gap:6px;align-items:center">
+      ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${i})" style="flex-shrink:0;padding:5px 7px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center">${ico('folder',12)}</button>`
+      : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:5px 7px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;opacity:.4;display:flex;align-items:center;justify-content:center">${ico('folder',12)}</button>`;
+    items.push(`<div style="background:var(--cinza);border-radius:8px;padding:7px 8px">
+      <div style="font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Prato ${i+1}</div>
+      <div style="display:flex;gap:4px;align-items:center">
         <input type="number" class="plan-num" data-idx="${i}" value="${curNum||''}" min="1"
           placeholder="#"
-          style="width:52px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;padding:7px 6px;border:2px solid var(--borda);border-radius:6px;color:var(--azul2);background:#fff;outline:none;text-align:center;flex-shrink:0"
+          style="width:42px;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:5px 4px;border:2px solid var(--borda);border-radius:6px;color:var(--azul2);background:#fff;outline:none;text-align:center;flex-shrink:0"
           oninput="planSelecionarPorNumero(this)"
           onkeydown="if(event.key==='Enter'){this.blur();}">
         <select class="plan-sel" data-idx="${i}"
-          style="flex:1;min-width:0;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 8px;border:2px solid var(--borda);border-radius:6px;color:var(--azul);background:#fff;outline:none"
+          style="flex:1;min-width:0;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;padding:5px 6px;border:2px solid var(--borda);border-radius:6px;color:var(--azul);background:#fff;outline:none"
           onchange="planSelecionarPorSelect(this);atualizarBtnFicha(${i})">
           ${opts.replace(`value="${cur}"`, `value="${cur}" selected`)}
         </select>
