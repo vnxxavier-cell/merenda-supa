@@ -1756,7 +1756,11 @@ const _supaSync = {
         .single();
       if(error || !data || data.user_id !== userId) {
         console.info('Nenhum dado no Supabase para este usuário, criando registro...');
-        await _supabase.from('escola_dados').upsert({ user_id: userId }, { onConflict: 'user_id' });
+        // Inserir com config limpa explícita para não herdar defaults de coluna do Supabase
+        await _supabase.from('escola_dados').upsert({
+          user_id: userId,
+          config: { merenda_diretor:'', merenda_cargo:'Diretor(a) Escolar', merenda_escola:'', merenda_subtitulo:'', merenda_cardapio:{}, merenda_fornecedores:[], merenda_ing_fornecedores:{} }
+        }, { onConflict: 'user_id' });
         return false;
       }
 
