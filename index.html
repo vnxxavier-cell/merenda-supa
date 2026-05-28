@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prato Certo</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 :root {
   --azul:    #1A3A6B;
   --azul2:   #2E75B6;
@@ -24,7 +24,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{overflow-x:hidden}
-body{font-family:'Sora',sans-serif;background:#EEF2F8;color:var(--txt);min-height:100vh;display:flex;align-items:stretch;overflow-x:hidden}
+body{font-family:'Inter',sans-serif;background:#EEF2F8;color:var(--txt);min-height:100vh;display:flex;align-items:stretch;overflow-x:hidden}
 
 /* ── NAV ── */
 nav{background:var(--nav-bg);width:220px;min-width:220px;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0}
@@ -32,7 +32,7 @@ nav{background:var(--nav-bg);width:220px;min-width:220px;display:flex;flex-direc
 .nav-brand span{display:block;color:var(--amarelo);font-size:12px;margin-top:3px}
 .nav-brand svg{flex-shrink:0;opacity:.9}
 .nav-tabs{display:flex;flex-direction:column;gap:4px;width:100%}
-.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:12px 24px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:100%;display:flex;align-items:center;gap:10px}
+.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:12px 24px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:100%;display:flex;align-items:center;gap:10px}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,.05)}
 .nav-tab.ativo{color:#fff;border-left-color:var(--amarelo);background:rgba(255,255,255,.1)}
 .nav-tab svg{flex-shrink:0;opacity:.7;transition:.2s}
@@ -48,9 +48,9 @@ nav{background:var(--nav-bg);width:220px;min-width:220px;display:flex;flex-direc
 .seletor-bar{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:#fff;padding:18px 20px;border-radius:var(--r);box-shadow:var(--sombra);margin-bottom:20px}
 .campo{display:flex;flex-direction:column;gap:5px}
 .campo label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2)}
-.campo select,.campo input{font-family:'Sora',sans-serif;font-size:14px;padding:9px 14px;border:2px solid var(--borda);border-radius:7px;background:#fff;color:var(--azul);font-weight:600;outline:none;cursor:pointer;transition:.2s;min-width:160px}
+.campo select,.campo input{font-family:'Inter',sans-serif;font-size:14px;padding:9px 14px;border:2px solid var(--borda);border-radius:7px;background:#fff;color:var(--azul);font-weight:600;outline:none;cursor:pointer;transition:.2s;min-width:160px}
 .campo select:focus,.campo input:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(46,117,182,.15);outline:none}
-.btn{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;padding:10px 20px;border-radius:7px;border:none;cursor:pointer;transition:.15s;letter-spacing:.03em}
+.btn{font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:10px 20px;border-radius:7px;border:none;cursor:pointer;transition:.15s;letter-spacing:.03em}
 .btn-primary{background:var(--azul);color:#fff}
 .btn-primary:hover{background:var(--azul2)}
 .btn-verde{background:var(--verde);color:#fff}
@@ -363,7 +363,7 @@ tbody tr:hover td{background:#f0f5fc}
   height: 100%;
   border: none;
   background: transparent;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   cursor: pointer;
   outline: none;
@@ -402,7 +402,7 @@ tbody tr:hover td{background:#f0f5fc}
 @media print { .btn-swap { display: none !important; } }
 
 /* ── Botões de embalagem ── */
-.emb-btn{font-family:'Sora',sans-serif;font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;border:1.5px solid var(--borda);background:#f8fafc;color:var(--txt2);cursor:pointer;transition:.12s;white-space:nowrap}
+.emb-btn{font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;border:1.5px solid var(--borda);background:#f8fafc;color:var(--txt2);cursor:pointer;transition:.12s;white-space:nowrap}
 .emb-btn:hover{border-color:var(--azul2);color:var(--azul);background:#eef5ff}
 .emb-btn.emb-ativo{background:var(--azul);color:#fff;border-color:var(--azul)}
 .emb-btn.emb-livre{border-style:dashed;color:#aaa}
@@ -417,7 +417,7 @@ tr:hover .hover-info{display:block}
 .empty-state-td small{font-size:12px;color:#aaa}
 
 /* ── FILTRO ── */
-.filtro-input{font-family:'Sora',sans-serif;padding:8px 14px;border:2px solid var(--borda);border-radius:7px;font-size:13px;outline:none;width:220px}
+.filtro-input{font-family:'Inter',sans-serif;padding:8px 14px;border:2px solid var(--borda);border-radius:7px;font-size:13px;outline:none;width:220px}
 .filtro-input:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(46,117,182,.15)}
 
 /* ── AF / MC TAGS ── */
@@ -442,7 +442,7 @@ tr:hover .hover-info{display:block}
 .lic-progress-bar.vermelho{background:var(--vermelho)}
 .badge-ativa{background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
 .badge-encerrada{background:#f3f4f6;color:#6b7280;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.rec-btn{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid var(--borda);background:#fff;cursor:pointer;transition:.12s}
+.rec-btn{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid var(--borda);background:#fff;cursor:pointer;transition:.12s}
 .rec-btn.total{border-color:var(--verde2);color:var(--verde)}
 .rec-btn.total.ativo{background:var(--verde2);color:#fff;border-color:var(--verde2)}
 .rec-btn.parcial{border-color:var(--amarelo);color:#92400e}
@@ -461,7 +461,7 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .config-card-body{padding:24px}
 .config-field{margin-bottom:20px}
 .config-field label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:8px}
-.config-field input[type="text"]{font-family:'Sora',sans-serif;font-size:14px;padding:10px 16px;border:2px solid var(--borda);border-radius:8px;width:100%;outline:none;transition:.2s;color:var(--azul);font-weight:600}
+.config-field input[type="text"]{font-family:'Inter',sans-serif;font-size:14px;padding:10px 16px;border:2px solid var(--borda);border-radius:8px;width:100%;outline:none;transition:.2s;color:var(--azul);font-weight:600}
 .config-field input[type="text"]:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(46,117,182,.12)}
 .upload-area{border:2px dashed var(--borda);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:.25s;position:relative;background:#fafbfd}
 .upload-area:hover{border-color:var(--azul2);background:#f0f5fc}
@@ -532,7 +532,7 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .cal-day.day-school:hover{background:#f8faff}
 .cal-event{border-radius:5px;padding:6px 8px;font-size:12px;font-weight:700;color:rgba(0,0,0,.72);line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1}
 .cal-meal-empty{font-size:10px;color:#d1d5db;font-weight:600;flex:1;display:flex;align-items:center;gap:3px}
-.cal-sel{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-family:'Sora',sans-serif;font-size:12px}
+.cal-sel{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-family:'Inter',sans-serif;font-size:12px}
 /* Rodapé */
 .cal-semanas-list{border-top:1px solid var(--borda);padding:10px 16px;background:#f8fafc;display:flex;flex-direction:column;gap:6px}
 .cal-semana-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -561,7 +561,7 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .login-box .sub{font-size:13px;color:var(--txt2);margin-bottom:28px}
 .login-campo{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .login-campo label{font-size:12px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em}
-.login-campo input{font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;border:2px solid var(--borda);border-radius:8px;outline:none;transition:.15s}
+.login-campo input{font-family:'Inter',sans-serif;font-size:14px;padding:10px 14px;border:2px solid var(--borda);border-radius:8px;outline:none;transition:.15s}
 .login-campo input:focus{border-color:var(--azul2)}
 .login-senha-wrap{position:relative}
 .login-senha-wrap input{width:100%;padding-right:40px;box-sizing:border-box}
@@ -569,7 +569,7 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .login-capslock{font-size:11px;color:#92400e;font-weight:600;margin-top:4px;display:none}
 .login-capslock.visivel{display:flex}
 .login-erro{color:var(--vermelho);font-size:13px;font-weight:600;min-height:20px;margin-bottom:8px}
-.login-btn{width:100%;padding:12px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+.login-btn{width:100%;padding:12px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
 .login-btn:hover{background:var(--azul2)}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
 /* ── BANNER EXPIRAÇÃO ── */
@@ -579,7 +579,7 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 /* ── NAV LOGOUT ── */
 .nav-bottom{margin-top:auto;padding:0 16px 20px;display:flex;flex-direction:column;gap:6px}
 .nav-user{color:rgba(255,255,255,.7);font-size:11px;padding:0 8px;margin-bottom:4px}
-.btn-logout{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 12px;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:left;transition:.12s}
+.btn-logout{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:left;transition:.12s}
 .btn-logout:hover{background:rgba(255,255,255,.2)}
 /* ── ADMIN ── */
 .badge-admin{display:inline-flex;align-items:center;justify-content:center;background:var(--vermelho);color:#fff;border-radius:10px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:4px;min-width:18px}
@@ -818,20 +818,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">
       <div class="campo">
         <label>Início do período</label>
-        <input type="date" id="merc-data-inicio" onchange="onMercDataInicioChange()" style="font-family:'Sora',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
+        <input type="date" id="merc-data-inicio" onchange="onMercDataInicioChange()" style="font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
       </div>
       <div class="campo">
         <label>Fim do período</label>
-        <input type="date" id="merc-data-fim" onchange="renderMercado()" style="font-family:'Sora',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
+        <input type="date" id="merc-data-fim" onchange="renderMercado()" style="font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
       </div>
       <div id="merc-range-info" style="font-size:12px;color:var(--txt2);padding-bottom:8px"></div>
       <div class="campo no-print">
         <label>Cálculo de quantidades</label>
         <div style="display:flex;border:2px solid var(--borda);border-radius:8px;overflow:hidden;height:36px">
           <button id="merc-modo-btn-periodo" onclick="setMercModo('periodo')"
-            style="flex:1;border:none;padding:0 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;color:var(--txt2);transition:.15s">Apenas período</button>
+            style="flex:1;border:none;padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;color:var(--txt2);transition:.15s">Apenas período</button>
           <button id="merc-modo-btn-reposicao" onclick="setMercModo('reposicao')"
-            style="flex:1;border:none;border-left:2px solid var(--borda);padding:0 14px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:var(--azul);color:#fff;transition:.15s">Reposição de estoque</button>
+            style="flex:1;border:none;border-left:2px solid var(--borda);padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:var(--azul);color:#fff;transition:.15s">Reposição de estoque</button>
         </div>
       </div>
       <button id="merc-view-toggle" class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="toggleMercadoViewMode()">Ver cobertura</button>
@@ -859,11 +859,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <div id="serv-inputs" style="display:none;gap:12px;align-items:flex-end;flex-wrap:wrap">
         <div class="campo" style="margin:0">
           <label>Café em pó (kg/semana)</label>
-          <input type="number" id="serv-cafe" step="0.001" min="0" style="width:110px;font-family:'Sora',sans-serif;font-size:13px;padding:6px 10px;border:2px solid var(--borda);border-radius:7px;outline:none" oninput="salvarServidoresUI()">
+          <input type="number" id="serv-cafe" step="0.001" min="0" style="width:110px;font-family:'Inter',sans-serif;font-size:13px;padding:6px 10px;border:2px solid var(--borda);border-radius:7px;outline:none" oninput="salvarServidoresUI()">
         </div>
         <div class="campo" style="margin:0">
           <label>Açúcar (kg/semana)</label>
-          <input type="number" id="serv-acucar" step="0.01" min="0" style="width:110px;font-family:'Sora',sans-serif;font-size:13px;padding:6px 10px;border:2px solid var(--borda);border-radius:7px;outline:none" oninput="salvarServidoresUI()">
+          <input type="number" id="serv-acucar" step="0.01" min="0" style="width:110px;font-family:'Inter',sans-serif;font-size:13px;padding:6px 10px;border:2px solid var(--borda);border-radius:7px;outline:none" oninput="salvarServidoresUI()">
         </div>
         <div id="serv-qtd-info" style="font-size:12px;color:var(--txt2);align-self:center"></div>
       </div>
@@ -879,7 +879,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="merc-ph">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <h3>Cobertura por item</h3>
-            <select id="merc-tipo-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Sora',sans-serif">
+            <select id="merc-tipo-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Inter',sans-serif">
               <option value="todos">Todos os itens</option>
               <option value="semanal">Semanais (1 sem.)</option>
               <option value="quinzenal">Quinzenais (2 sem.)</option>
@@ -887,7 +887,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
               <option value="mensal">Mensais (4 sem.)</option>
               <option value="comprar">Somente com compra</option>
             </select>
-            <select id="merc-forn-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Sora',sans-serif">
+            <select id="merc-forn-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Inter',sans-serif">
               <option value="todos">Todos os fornecedores</option>
             </select>
           </div>
@@ -1358,7 +1358,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div id="cal-day-popup" style="display:none;position:fixed;z-index:2000;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);border:1.5px solid var(--borda);padding:10px;min-width:260px">
   <div style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;padding:0 2px 8px;border-bottom:1px solid var(--borda);margin-bottom:8px" id="cal-popup-titulo"></div>
   <select id="cal-popup-sel" onchange="aplicarEscolhaDia(this.value)"
-    style="width:100%;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;padding:8px 10px;border:2px solid var(--borda);border-radius:7px;color:var(--azul);background:#fff;outline:none;margin-bottom:4px"></select>
+    style="width:100%;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:8px 10px;border:2px solid var(--borda);border-radius:7px;color:var(--azul);background:#fff;outline:none;margin-bottom:4px"></select>
   <div id="cal-popup-sabado" style="display:none;padding-top:6px;border-top:1px solid var(--borda);margin-top:4px"></div>
 </div>
 
@@ -1372,22 +1372,22 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <input type="hidden" id="usuario-id">
       <div class="campo" style="margin-bottom:12px">
         <label>Nome da Escola</label>
-        <input type="text" id="usuario-nome" placeholder="Ex: E.E. Centro" style="font-family:'Sora',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+        <input type="text" id="usuario-nome" placeholder="Ex: E.E. Centro" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="campo">
           <label>Login</label>
-          <input type="text" id="usuario-login" placeholder="escola_centro" style="font-family:'Sora',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+          <input type="text" id="usuario-login" placeholder="escola_centro" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
         </div>
         <div class="campo">
           <label>Senha <span id="senha-hint" style="font-size:11px;color:#aaa">(obrigatória)</span></label>
-          <input type="password" id="usuario-senha" placeholder="••••••••" style="font-family:'Sora',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+          <input type="password" id="usuario-senha" placeholder="••••••••" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="campo">
           <label>Expiração</label>
-          <input type="date" id="usuario-expiracao" style="font-family:'Sora',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+          <input type="date" id="usuario-expiracao" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
         </div>
         <div class="campo" style="display:flex;flex-direction:column;justify-content:flex-end">
           <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1495,7 +1495,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="campo" style="margin:0;flex:1;min-width:200px">
           <label>Orçamento disponível (R$)</label>
           <input type="number" id="calc-orcamento" min="0" step="0.01" placeholder="Ex: 15000,00"
-            style="font-family:'Sora',sans-serif;font-size:14px;padding:10px 14px;border:2px solid var(--borda);border-radius:8px;outline:none;width:100%"
+            style="font-family:'Inter',sans-serif;font-size:14px;padding:10px 14px;border:2px solid var(--borda);border-radius:8px;outline:none;width:100%"
             oninput="executarCalculadora()">
         </div>
         <div style="font-size:12px;color:var(--txt2);padding-bottom:10px;white-space:nowrap">
@@ -1545,12 +1545,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="campo">
           <label>Nome / Número</label>
           <input type="text" id="lic-nome" placeholder="Ex: Contrato 001/2026"
-            style="font-family:'Sora',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
+            style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
         </div>
         <div class="campo">
           <label>Data de Início</label>
           <input type="date" id="lic-data-inicio"
-            style="font-family:'Sora',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
+            style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -1620,7 +1620,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <div style="background:var(--cinza);padding:16px;border-radius:8px;margin-bottom:20px">
         <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:8px;color:var(--txt2)">Adicionar Ingrediente</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <select id="sel-ing-novo" style="flex:2;padding:8px;border-radius:6px;border:2px solid var(--borda);font-family:'Sora';min-width:180px"></select>
+          <select id="sel-ing-novo" style="flex:2;padding:8px;border-radius:6px;border:2px solid var(--borda);font-family:'Inter';min-width:180px"></select>
           <input type="number" id="qtd-ing-novo" placeholder="g" style="width:70px;padding:8px;border-radius:6px;border:2px solid var(--borda)">
           <button class="btn btn-verde btn-sm" onclick="adicionarIngredienteAoPrato()">Adicionar</button>
         </div>
@@ -3397,7 +3397,7 @@ function renderPeriodicidades(){
   if(!tbody) return;
   tbody.innerHTML = PERIODICIDADES.map((p, i) => `<tr>
     <td><input type="text" value="${p.nome}" data-per-idx="${i}" data-per-campo="nome"
-      style="font-family:'Sora',sans-serif;font-size:13px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;width:160px"
+      style="font-family:'Inter',sans-serif;font-size:13px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;width:160px"
       oninput="atualizarPeriodicidade(${i},'nome',this.value)"></td>
     <td class="num"><input type="number" min="1" step="1" value="${p.semanas}" data-per-idx="${i}" data-per-campo="semanas"
       style="width:70px;text-align:right;font-family:'DM Mono',monospace;font-size:13px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px"
@@ -3476,7 +3476,7 @@ function renderFornecedoresCadastro(){
       <span onclick="abrirPaletaForn(${i},this)" title="Alterar cor"
         style="width:22px;height:22px;border-radius:50%;background:${cor};border:1.5px solid #94a3b8;cursor:pointer;display:inline-block;flex-shrink:0"></span>
       <input type="text" value="${f.nome.replace(/"/g,'&quot;')}" onchange="FORNECEDORES_CADASTRO[${i}].nome=this.value;salvarFornecedoresCadastro()"
-        style="font-family:'Sora',sans-serif;font-size:13px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;width:200px">
+        style="font-family:'Inter',sans-serif;font-size:13px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;width:200px">
     </td>
     <td><button onclick="removerFornecedorCadastro(${i})"
       style="background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px">✕</button></td>
@@ -4116,7 +4116,7 @@ function renderTbodyLicItens(){
     return `<tr>
       <td>
         <select onchange="atualizarItemLic(${idx},'ingrediente',this.value)"
-          style="font-family:'Sora',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;width:100%">
+          style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;width:100%">
           <option value="">— Selecione —</option>
           ${opts.replace(`value="${it.ingrediente}"`, `value="${it.ingrediente}" selected`)}
         </select>
@@ -5740,7 +5740,7 @@ function renderMercado(){
             <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}</td>
             <td class="no-print">
               <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
-                style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Sora',sans-serif;background:#f0fdf4"
+                style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Inter',sans-serif;background:#f0fdf4"
                 onchange="salvarObsItemMerc('${enc}',this.value)">
               <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
             </td>
@@ -5763,7 +5763,7 @@ function renderMercado(){
           <td><b>${it.displayNome}</b>${_perBadge(it)}</td>
           <td>
             <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
-              style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Sora',sans-serif;background:#fafafa"
+              style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Inter',sans-serif;background:#fafafa"
               onchange="salvarObsItemMerc('${enc}',this.value)">
             <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
           </td>
@@ -6107,7 +6107,7 @@ function abrirDrillDown(nomeBase){
     <div style="margin-bottom:12px">
       <label style="display:block;font-size:11px;font-weight:700;color:#6b7280;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Observação</label>
       <input type="text" placeholder="Adicionar observação…" value="${obsAtual}"
-        style="width:100%;padding:7px 10px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;font-family:'Sora',sans-serif;color:#374151;box-sizing:border-box"
+        style="width:100%;padding:7px 10px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;color:#374151;box-sizing:border-box"
         onchange="salvarObsItemMerc('${enc}',this.value)">
     </div>
 
@@ -6188,7 +6188,7 @@ function validarEImprimir(){
     return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9">
       <span style="flex:1;font-size:13px;font-weight:600">${it.displayNome} <span style="font-size:11px;color:#94a3b8">${tipoTag}</span></span>
       <select data-modal-ing="${enc}"
-        style="font-family:'Sora',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:150px">
+        style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:150px">
         <option value="">— Selecione —</option>
         ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}
       </select>
@@ -6252,7 +6252,7 @@ function adicionarItemMerc(af){
     <td colspan="5" style="padding:8px 10px;background:#f0f5ff">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <select id="add-ing-${af?'af':'mc'}"
-          style="flex:1;min-width:180px;font-family:'Sora',sans-serif;font-size:12px;padding:5px 8px;border:1.5px solid var(--azul2);border-radius:6px">
+          style="flex:1;min-width:180px;font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border:1.5px solid var(--azul2);border-radius:6px">
           ${opts}
         </select>
         <input type="number" id="add-qtd-${af?'af':'mc'}" min="0.01" step="0.01" placeholder="Qtd"
@@ -6460,7 +6460,7 @@ function renderFichaTable(prato){
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
         <div style="flex:2;min-width:160px">
           <div style="font-size:10px;color:var(--txt2);margin-bottom:3px">Ingrediente</div>
-          <select id="ficha-add-ing-sel" style="width:100%;padding:7px 8px;border-radius:6px;border:1.5px solid var(--borda);font-family:'Sora';font-size:12px">
+          <select id="ficha-add-ing-sel" style="width:100%;padding:7px 8px;border-radius:6px;border:1.5px solid var(--borda);font-family:'Inter';font-size:12px">
             <option value="">— Selecione —</option>${ingOpts}
           </select>
         </div>
@@ -6812,7 +6812,7 @@ function renderIngredientes(filtro=''){
       <td><b>${nome}</b></td>
       <td>
         <select onchange="salvarUnidade('${nome.replace(/'/g,"\\'")}', this.value)"
-          style="font-family:'Sora',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:var(--azul);font-weight:700;outline:none;cursor:pointer;min-width:80px">
+          style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:var(--azul);font-weight:700;outline:none;cursor:pointer;min-width:80px">
           ${UNIDADES_COMUNS.map(u=>`<option value="${u}" ${d.unidade===u?'selected':''}>${u}</option>`).join('')}
           ${!UNIDADES_COMUNS.includes(d.unidade)?`<option value="${d.unidade}" selected>${d.unidade}</option>`:''}
         </select>
@@ -6823,7 +6823,7 @@ function renderIngredientes(filtro=''){
       </td>
       <td>
         <select onchange="setIngPeriodicidade('${nome.replace(/'/g,"\\'")}',this.value)"
-          style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_PERIODICIDADE[nome]?'#a5b4fc':'var(--borda)'};border-radius:6px;background:${ING_PERIODICIDADE[nome]?'#eef2ff':'#f8fafc'};width:100px;color:${ING_PERIODICIDADE[nome]?'#4338ca':'#94a3b8'}">
+          style="font-family:'Inter',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_PERIODICIDADE[nome]?'#a5b4fc':'var(--borda)'};border-radius:6px;background:${ING_PERIODICIDADE[nome]?'#eef2ff':'#f8fafc'};width:100px;color:${ING_PERIODICIDADE[nome]?'#4338ca':'#94a3b8'}">
           <option value="">— Período —</option>
           <option value="semanal"       ${ING_PERIODICIDADE[nome]==='semanal'      ?'selected':''}>Semanal (1 sem.)</option>
           <option value="quinzenal"     ${ING_PERIODICIDADE[nome]==='quinzenal'    ?'selected':''}>Quinzenal (2 sem.)</option>
@@ -6833,7 +6833,7 @@ function renderIngredientes(filtro=''){
       </td>
       <td>
         <select onchange="setIngFornecedor('${nome.replace(/'/g,"\\'")}',this.value)"
-          style="font-family:'Sora',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_FORNECEDORES[nome]?'#7dd3fc':'var(--borda)'};border-radius:6px;background:${ING_FORNECEDORES[nome]?'#e0f2fe':'#f8fafc'};width:110px;color:${ING_FORNECEDORES[nome]?'#0369a1':'#94a3b8'}">
+          style="font-family:'Inter',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_FORNECEDORES[nome]?'#7dd3fc':'var(--borda)'};border-radius:6px;background:${ING_FORNECEDORES[nome]?'#e0f2fe':'#f8fafc'};width:110px;color:${ING_FORNECEDORES[nome]?'#0369a1':'#94a3b8'}">
           <option value="">— Fornecedor —</option>
           ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}" ${ING_FORNECEDORES[nome]===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}
         </select>
@@ -6890,7 +6890,7 @@ function renderEmbBotoes(nome, unidade){
     ${btns}
     <input type="number" min="0.001" step="any" placeholder="outro…"
       value="${valorCustom}"
-      style="width:70px;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;padding:3px 5px;border-radius:5px;border:1.5px solid var(--borda);background:#f8fafc;color:var(--txt2);outline:none"
+      style="width:70px;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:3px 5px;border-radius:5px;border:1.5px solid var(--borda);background:#f8fafc;color:var(--txt2);outline:none"
       onchange="salvarEmbalagem('${nomeEnc}',this.value)"
       title="Digite um valor personalizado e pressione Enter">
   </div>`;
@@ -7222,7 +7222,7 @@ function renderNiveis(){
         <input type="number" id="inp-nivel-${meta.id}" value="${cfg.alunos}" min="0" max="9999"
           ${cfg.ativo ? '' : 'disabled'}
           oninput="alterarAlunosNivel('${meta.id}', this.value)"
-          style="width:90px;font-family:'Sora',sans-serif;font-size:14px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:var(--azul)">
+          style="width:90px;font-family:'Inter',sans-serif;font-size:14px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:var(--azul)">
       </div>
     </div>`;
   }).join('');
@@ -7885,7 +7885,7 @@ function gerarSeletoresPratos(){
           oninput="planSelecionarPorNumero(this)"
           onkeydown="if(event.key==='Enter'){this.blur();}">
         <select class="plan-sel" data-idx="${i}"
-          style="flex:1;min-width:0;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;padding:5px 6px;border:2px solid var(--borda);border-radius:6px;color:var(--azul);background:#fff;outline:none"
+          style="flex:1;min-width:0;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;padding:5px 6px;border:2px solid var(--borda);border-radius:6px;color:var(--azul);background:#fff;outline:none"
           onchange="planSelecionarPorSelect(this);atualizarBtnFicha(${i})">
           ${opts.replace(`value="${cur}"`, `value="${cur}" selected`)}
         </select>
