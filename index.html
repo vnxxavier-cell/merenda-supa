@@ -5618,6 +5618,17 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     return calcularTotaisNiveis(wdFilt).totais;
   });
   const numSemanasSel = semanas.length || 1;
+  // Em reposição, expande com semanas futuras para respeitar a periodicidade
+  if(_MERC_MODO === 'reposicao' && semanas.length > 0 && semanas.length < 4){
+    const lastMon = semanas[semanas.length - 1];
+    for(let w = 1; w <= 4 - semanas.length; w++){
+      const d = new Date(lastMon + 'T00:00:00');
+      d.setDate(d.getDate() + w * 7);
+      const nextMon = d.toISOString().split('T')[0];
+      const { dias: wd } = getCalWeekDiasAndDatas(nextMon);
+      weekTotals.push(calcularTotaisNiveis(wd).totais);
+    }
+  }
   // Acumula N primeiras semanas
   const _acum = (n) => {
     const sum = {};
