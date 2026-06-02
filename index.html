@@ -3164,6 +3164,7 @@ let _MERC_MODO = 'periodo'; // 'periodo' | 'reposicao'
 let MERCADO_VIEW_MODE = 'fornecedor';
 let _MERC_SEMANAS_SEL = []; // semanas selecionadas no seletor multi-semanas
 var _mercMesAtual = 0; // 0=Fev ... 10=Dez
+var _mercInicializado = false;
 function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
 function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
@@ -5327,6 +5328,7 @@ function initTabAtiva(){
     _MERC_SEMANAS_SEL = [];
     document.getElementById('merc-data-inicio').value = '';
     document.getElementById('merc-data-fim').value = '';
+    _mercInicializado = true;
     renderMercado();
   }
 }
@@ -7191,7 +7193,7 @@ function ir(id, btn){
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); }
-  if(id==='mercado'){ _mercMesAtual = _getMesAtualDefault(); renderMercado(); }
+  if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
   if(id==='gastos') renderGastos();
   if(id==='admin') abrirAdmin();
   if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); }
@@ -7683,7 +7685,7 @@ function ir(id, btn){
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
-  if(id==='mercado'){ _mercMesAtual = _getMesAtualDefault(); _MERC_SEMANAS_SEL = []; document.getElementById('merc-data-inicio').value = ''; document.getElementById('merc-data-fim').value = ''; renderMercado(); }
+  if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
   if(id==='gastos') renderGastos();
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
