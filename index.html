@@ -5603,14 +5603,34 @@ function getItensMercado(ciclo, mondayIso){
 }
 
 function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
-  // Usa dados já agregados de múltiplas semanas
-  const { totais: totais1 } = calcularTotaisNiveis(dias);
-  const numSemanasSel = _MERC_SEMANAS_SEL.length || 1;
-  if(SERVIDORES_CONFIG.ativo){
-    totais1['CAFÉ']   = (totais1['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg * numSemanasSel;
-    totais1['AÇÚCAR'] = (totais1['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg * numSemanasSel;
-  }
-  const totais2 = totais1, totais3 = totais1, totais4 = totais1;
+  const semanas = _MERC_SEMANAS_SEL;
+  const _i = getMercDataInicio(), _f = getMercDataFim();
+  // Calcula totais de cada semana individual (já respeitando o modo período/reposição)
+  const weekTotals = semanas.map(mon => {
+    const { dias: wd, datas: wda } = getCalWeekDiasAndDatas(mon);
+    const wdFilt = _MERC_MODO === 'periodo'
+      ? wd.map((d, i) => (!_i || !_f || !wda[i] || (wda[i] >= _i && wda[i] <= _f)) ? d : '')
+      : wd;
+    return calcularTotaisNiveis(wdFilt).totais;
+  });
+  const numSemanasSel = semanas.length || 1;
+  // Acumula N primeiras semanas
+  const _acum = (n) => {
+    const sum = {};
+    for(let i = 0; i < Math.min(n, weekTotals.length); i++){
+      Object.entries(weekTotals[i]).forEach(([k, v]) => { sum[k] = (sum[k] || 0) + v; });
+    }
+    if(SERVIDORES_CONFIG.ativo){
+      const num = Math.min(n, numSemanasSel);
+      sum['CAFÉ']   = (sum['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg * num;
+      sum['AÇÚCAR'] = (sum['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg * num;
+    }
+    return sum;
+  };
+  const totais1 = _acum(1);
+  const totais2 = _acum(2);
+  const totais3 = _acum(3);
+  const totais4 = _acum(4);
   const ajuste = getMercAjuste();
   const af_items=[], mc_items=[];
   let totalKg = 0;
