@@ -7657,7 +7657,7 @@ function ir(id, btn){
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
-  if(id==='mercado'){ _mercMesAtual = _getMesAtualDefault(); renderMercado(); }
+  if(id==='mercado'){ _mercMesAtual = _getMesAtualDefault(); _MERC_SEMANAS_SEL = []; document.getElementById('merc-data-inicio').value = ''; document.getElementById('merc-data-fim').value = ''; renderMercado(); }
   if(id==='gastos') renderGastos();
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
