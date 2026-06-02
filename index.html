@@ -272,6 +272,26 @@ tbody tr:hover td{background:#f0f5fc}
   .no-print.btn-swap{padding:5px 8px;font-size:11px}
 }
 
+/* ── Grid de pratos responsivo ── */
+#grid-pratos-plan{overflow:hidden}
+#grid-pratos-plan > div{min-width:0;overflow:hidden}
+#grid-pratos-plan select{min-width:0;width:100%}
+#grid-pratos-plan input.plan-num{width:42px}
+@media(max-width:1150px){#grid-pratos-plan{grid-template-columns:repeat(4,1fr)!important}}
+@media(max-width:950px){#grid-pratos-plan{grid-template-columns:repeat(3,1fr)!important}}
+@media(max-width:650px){#grid-pratos-plan{grid-template-columns:repeat(2,1fr)!important}#grid-pratos-plan input.plan-num{width:36px}}
+@media(max-width:450px){#grid-pratos-plan{grid-template-columns:1fr!important}}
+
+/* ── Calendário do Mercado ── */
+#merc-calendario{margin:0 auto 20px;max-width:1000px}
+#merc-calendario .cal-day{min-height:80px!important;padding:5px 6px!important;gap:3px}
+#merc-calendario .cal-day .cal-event{-webkit-line-clamp:2;font-size:10px;padding:3px 5px}
+#merc-calendario .cal-top{padding:12px 16px 10px!important}
+#merc-calendario .cal-mes-nome{font-size:18px!important}
+#merc-calendario .cal-wk-hdr span{padding:5px 2px!important;font-size:9px!important}
+#merc-calendario .cal-nav-wrapper,.merc-leg-meses{justify-content:center}
+.merc-leg-meses{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+
 /* ── IMPRESSÃO ── */
 .print-only{display:none}
 .screen-hidden{display:none}
@@ -822,7 +842,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
       <div class="campo">
         <label>Fim do período</label>
-        <input type="date" id="merc-data-fim" onchange="renderMercado()" style="font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
+        <input type="date" id="merc-data-fim" onchange="onMercDataFimChange()" style="font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;border:2px solid var(--borda);border-radius:8px;outline:none;color:var(--txt)">
       </div>
       <div id="merc-range-info" style="font-size:12px;color:var(--txt2);padding-bottom:8px"></div>
       <div class="campo no-print">
@@ -837,10 +857,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button id="merc-view-toggle" class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="toggleMercadoViewMode()">Ver cobertura</button>
     </div>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="validarEImprimir()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
-    <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="exportarExcelMercado()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="registrarOrdemExpedida()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Registrar Ordem</button>
-    <button class="btn btn-primary no-print" onclick="irParaPlanejamento()">← Planejamento</button>
   </div>
+
+  <div id="merc-calendario"></div>
 
   <div class="stats-grid no-print" id="stats-merc" style="display:none"></div>
 
@@ -3045,6 +3065,41 @@ function onMercDataInicioChange(){
   const inicio=getMercDataInicio(); if(!inicio){ renderMercado(); return; }
   const fimEl=document.getElementById('merc-data-fim');
   if(!fimEl.value){ const d=new Date(getMercMondayIso()+'T00:00:00'); d.setDate(d.getDate()+4); fimEl.value=d.toISOString().substring(0,10); }
+  _MERC_SEMANAS_SEL = [];
+  renderMercado();
+}
+function onMercDataFimChange(){
+  _MERC_SEMANAS_SEL = [];
+  renderMercado();
+}
+function toggleMercWeek(mon){
+  const idx = _MERC_SEMANAS_SEL.indexOf(mon);
+  if(idx >= 0) _MERC_SEMANAS_SEL.splice(idx, 1);
+  else _MERC_SEMANAS_SEL.push(mon);
+  _MERC_SEMANAS_SEL.sort();
+  if(_MERC_SEMANAS_SEL.length > 0){
+    const firstMon = _MERC_SEMANAS_SEL[0];
+    const lastWeek = SEMANAS_CAL.find(w => w.monday === _MERC_SEMANAS_SEL[_MERC_SEMANAS_SEL.length - 1]);
+    const lastDay = lastWeek ? lastWeek.days[lastWeek.days.length - 1] : '';
+    document.getElementById('merc-data-inicio').value = firstMon;
+    if(lastDay) document.getElementById('merc-data-fim').value = lastDay;
+  }
+  renderMercado();
+}
+function selTodasSemanas(){
+  const _ini=getMercDataInicio(), _fim=getMercDataFim();
+  const weeks = _ini&&_fim ? SEMANAS_CAL.filter(w => w.days.some(d => d>=_ini && d<=_fim)) : [];
+  if(weeks.every(w => _MERC_SEMANAS_SEL.includes(w.monday))){
+    _MERC_SEMANAS_SEL = [];
+  } else {
+    weeks.forEach(w => { if(!_MERC_SEMANAS_SEL.includes(w.monday)) _MERC_SEMANAS_SEL.push(w.monday); });
+    _MERC_SEMANAS_SEL.sort();
+    const firstMon = _MERC_SEMANAS_SEL[0];
+    const lastWeek = SEMANAS_CAL.find(w => w.monday === _MERC_SEMANAS_SEL[_MERC_SEMANAS_SEL.length - 1]);
+    const lastDay = lastWeek ? lastWeek.days[lastWeek.days.length - 1] : '';
+    document.getElementById('merc-data-inicio').value = firstMon;
+    if(lastDay) document.getElementById('merc-data-fim').value = lastDay;
+  }
   renderMercado();
 }
 function getMercKey(){ const c=getMercCiclo(),m=getMercMondayIso(); return (c||'x')+'_'+(m||'x'); }
@@ -3101,6 +3156,8 @@ let _MERC_DATA = null; // cache para renderMercadoTabela()
 let _MERC_SEL  = null; // item selecionado no painel
 let _MERC_MODO = 'reposicao'; // 'periodo' | 'reposicao'
 let MERCADO_VIEW_MODE = 'fornecedor';
+let _MERC_SEMANAS_SEL = []; // semanas selecionadas no seletor multi-semanas
+var _mercMesAtual = 0; // 0=Fev ... 10=Dez
 function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
 function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
@@ -5545,6 +5602,133 @@ function getItensMercado(ciclo, mondayIso){
   return { af_items, mc_items, totalKg, dias, totaisNiveis: calcularTotaisNiveis(dias) };
 }
 
+function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
+  // Usa dados já agregados de múltiplas semanas
+  const { totais: totais1 } = calcularTotaisNiveis(dias);
+  const numSemanasSel = _MERC_SEMANAS_SEL.length || 1;
+  if(SERVIDORES_CONFIG.ativo){
+    totais1['CAFÉ']   = (totais1['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg * numSemanasSel;
+    totais1['AÇÚCAR'] = (totais1['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg * numSemanasSel;
+  }
+  const totais2 = totais1, totais3 = totais1, totais4 = totais1;
+  const ajuste = getMercAjuste();
+  const af_items=[], mc_items=[];
+  let totalKg = 0;
+  Object.entries(totais1).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([chave, necSem1]) => {
+    const temDetalhe = chave.includes(' ___ ');
+    const nomeBase = temDetalhe ? chave.split(' ___ ')[0] : chave;
+    if(ajuste.overrides[nomeBase] === null) return;
+    const detalheText = temDetalhe ? chave.split(' ___ ')[1] : '';
+    const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
+    const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
+    const numSemanas = per === 'mensal' ? 4 : per === 'trissemanais' ? 3 : per === 'quinzenal' ? 2 : 1;
+    const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
+    const nec = totaisAcum[chave] || 0;
+    const est = ESTOQUE[nomeBase] || 0;
+    const coberto = nec > 0 && est >= nec;
+    const comprarBase = Math.max(0, nec - est);
+    const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
+    totalKg += necSem1;
+    if(comprar <= 0 && ajuste.overrides[nomeBase] == null && !coberto) return;
+    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto};
+    (isAF(nomeBase) ? af_items : mc_items).push(obj);
+  });
+  (ajuste.extras||[]).forEach(ex => {
+    const obj = {nomeBase: ex.nome, displayNome: ex.nome, nec:0, est:0, comprar: ex.qtd, unid: DADOS.ingredientes[ex.nome]?.unidade||'kg', manual:true, extra:true, periodicidade:'semanal', numSemanas:1, coberto:false};
+    (ex.af ? af_items : mc_items).push(obj);
+  });
+  return { af_items, mc_items, totalKg, dias, totaisNiveis: calcularTotaisNiveis(dias) };
+}
+
+function renderCalendarioMercado(){
+  const container = document.getElementById('merc-calendario');
+  if(!container) return;
+  const MESES_DISPLAY = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  const WK = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  // Atalhos dos meses
+  const legHtml = MESES_DISPLAY.map((mes, idx) => {
+    const ativo = idx === _mercMesAtual;
+    return `<button onclick="_mercMesAtual=${idx};renderCalendarioMercado();renderMercado()"
+      style="padding:4px 12px;background:${ativo?'var(--azul2)':'#f8fafc'};border-radius:50px;border:1.5px solid ${ativo?'var(--azul2)':'var(--borda)'};font-size:11px;font-weight:700;color:${ativo?'#fff':'#475569'};cursor:pointer;transition:.12s;font-family:inherit">${mes}</button>`;
+  }).join('');
+
+  const m = _mercMesAtual + 1;
+  const mesNome = MESES_DISPLAY[_mercMesAtual];
+  const firstDow = new Date(2026, m, 1).getDay();
+  const daysInMonth = new Date(2026, m+1, 0).getDate();
+
+  let days = '';
+  for(let i=0; i<firstDow; i++) days += '<div class="cal-day day-off" style="min-height:80px"></div>';
+
+  for(let day=1; day<=daysInMonth; day++){
+    const date = new Date(2026, m, day);
+    const iso = date.toISOString().split('T')[0];
+    const dow = date.getDay();
+    const isHoliday = CAL_CONFIG.feriados.includes(iso);
+    const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
+    if(letIdx !== -1){
+      const cor = getCorDia(iso, letIdx);
+      const curP = getMealByDate(iso) || getPratoFromCiclo(iso);
+      const {nome} = curP ? nomeNum(curP) : {nome:''};
+      days += `<div class="cal-day day-school" style="min-height:80px;cursor:default">
+        <span style="font-size:11px;font-weight:700;color:#475569;flex-shrink:0">${day}</span>
+        ${curP ? `<div class="cal-event" style="background:${cor};font-size:10px;padding:4px 6px;border-radius:4px">${nome}</div>` : '<div class="cal-meal-empty" style="font-size:9px">—</div>'}
+      </div>`;
+    } else if(isHoliday){
+      days += `<div class="cal-day day-holiday" style="min-height:80px"><span style="font-size:11px;font-weight:700;color:#f87171">${day}</span><span class="cal-feriado-tag" style="font-size:8px">Feriado</span></div>`;
+    } else if(dow===6){
+      days += `<div class="cal-day day-off" style="min-height:80px"><span style="font-size:11px;font-weight:700;color:#d1d5db">${day}</span></div>`;
+    } else if(dow===0){
+      const nextDate = new Date(2026, m, day + 1);
+      const mondayIso = nextDate.toISOString().split('T')[0];
+      const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
+      const semana = semanaIdx >= 0 ? SEMANAS_CAL[semanaIdx] : null;
+      const checked = _MERC_SEMANAS_SEL.includes(mondayIso);
+      const cbHtml = semana ? `
+        <div style="display:flex;flex-direction:column;gap:2px;margin-top:4px">
+          <span style="font-size:9px;font-weight:800;color:#94a3b8">Sem ${(semanaIdx%5)+1}</span>
+          <label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:10px;font-weight:600;color:${checked?'#1e40af':'#64748b'};user-select:none;background:${checked?'#eef5ff':'transparent'};padding:2px 4px;border-radius:4px;border:1px solid ${checked?'#3b82f6':'transparent'};transition:.1s">
+            <input type="checkbox" ${checked?'checked':''} onchange="toggleMercWeek('${mondayIso}')" style="width:14px;height:14px;cursor:pointer;accent-color:#3b82f6">
+            Sel.
+          </label>
+        </div>` : '';
+      days += `<div class="cal-day day-off" style="min-height:80px"><span style="font-size:11px;font-weight:700;color:#d1d5db">${day}</span>${cbHtml}</div>`;
+    } else {
+      days += `<div class="cal-day day-nletivo" style="min-height:80px"><span style="font-size:11px;font-weight:700;color:#94a3b8">${day}</span></div>`;
+    }
+  }
+
+  const navPrev = _mercMesAtual > 0
+    ? `<button class="cal-nav-btn" onclick="_mercMesAtual--;renderCalendarioMercado();renderMercado()" style="padding:5px 18px;font-size:12px">‹ Anterior</button>`
+    : `<button class="cal-nav-btn" disabled style="padding:5px 18px;font-size:12px">‹ Anterior</button>`;
+  const navNext = _mercMesAtual < 10
+    ? `<button class="cal-nav-btn" onclick="_mercMesAtual++;renderCalendarioMercado();renderMercado()" style="padding:5px 18px;font-size:12px">Próximo ›</button>`
+    : `<button class="cal-nav-btn" disabled style="padding:5px 18px;font-size:12px">Próximo ›</button>`;
+
+  container.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div class="merc-leg-meses">${legHtml}</div>
+      <div class="cal-nav-wrapper" style="margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">${navPrev}${navNext}</div>
+    </div>
+    <div class="cal-grid" style="gap:0">
+      <div class="cal-month">
+        <div class="cal-top" style="padding:12px 18px 10px">
+          <span class="cal-mes-nome" style="font-size:20px">${mesNome}</span>
+          <span class="cal-ano" style="font-size:12px">2026</span>
+        </div>
+        <div style="padding:0">
+          <div style="display:flex;min-height:0">
+            <div style="flex:1;min-width:0">
+              <div class="cal-wk-hdr" style="font-size:9px">${WK.map(d=>`<span style="padding:6px 2px;font-size:9px">${d}</span>`).join('')}</div>
+              <div class="cal-days">${days}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderMercado(){
   renderServidoresCard();
 
@@ -5575,30 +5759,40 @@ function renderMercado(){
   const mondayIso = getMercMondayIso();
   const ciclo     = getMercCiclo() || '';
 
-  if(!mondayIso){
+  renderCalendarioMercado();
+  if(!mondayIso && !_MERC_SEMANAS_SEL.length){
     const listaEl = document.getElementById('lista-pratos-merc');
     const gridEl  = document.getElementById('forn-grid-dinamico');
     const kpiEl   = document.getElementById('merc-kpi-cards');
     const tbody   = document.getElementById('merc-tabela-body');
-    if(listaEl) listaEl.innerHTML = '<span style="color:#aaa;font-size:13px;padding:8px">Selecione o período para ver a ordem de mercado.</span>';
+    if(listaEl) listaEl.innerHTML = '<span style="color:#aaa;font-size:13px;padding:8px">Marque as semanas no calendário acima para ver a ordem de mercado.</span>';
     if(gridEl)  gridEl.innerHTML  = '';
     if(kpiEl)   kpiEl.innerHTML   = '';
-    if(tbody)   tbody.innerHTML   = '<tr><td colspan="7" class="empty-state-td"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--azul2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><strong>Nenhum dado para exibir</strong><small>Selecione o período para ver a análise</small></td></tr>';
+    if(tbody)   tbody.innerHTML   = '<tr><td colspan="7" class="empty-state-td"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--azul2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><strong>Marque as semanas no calendário</strong><small>Selecione as semanas desejadas para ver a lista de ingredientes</small></td></tr>';
     _MERC_DATA = null;
     return;
   }
   const _dataFim = getMercDataFim();
   const _infoEl = document.getElementById('merc-range-info');
   if(_infoEl && _dataFim){
-    const _dias = Math.round((new Date(_dataFim+'T00:00:00')-new Date(mondayIso+'T00:00:00'))/86400000)+1;
+    const _dias = Math.round((new Date(_dataFim+'T00:00:00')-new Date((_MERC_SEMANAS_SEL[0]||mondayIso)+'T00:00:00'))/86400000)+1;
     _infoEl.textContent = `${_dias} dia${_dias!==1?'s':''} no período`;
   } else if(_infoEl){ _infoEl.textContent=''; }
 
-  const { dias: _diasBrutos, datas: _datasBrutas } = getCalWeekDiasAndDatas(mondayIso);
   const _ini = getMercDataInicio(), _fim = getMercDataFim();
   const _inPeriodo = d => !d || !_ini || !_fim || (d >= _ini && d <= _fim);
-  const dias  = _diasBrutos.map((d, i) => _inPeriodo(_datasBrutas[i]) ? d : '');
-  const datas = _datasBrutas.map(d => _inPeriodo(d) ? d : null);
+  const semanas = _MERC_SEMANAS_SEL.length > 0 ? _MERC_SEMANAS_SEL : [mondayIso];
+  const _diasBrutos = [], _datasBrutas = [];
+  semanas.forEach(mon => {
+    const { dias: wd, datas: wda } = getCalWeekDiasAndDatas(mon);
+    wd.forEach((d, i) => {
+      const data = wda[i];
+      _diasBrutos.push(_inPeriodo(data) ? d : '');
+      _datasBrutas.push(_inPeriodo(data) ? data : null);
+    });
+  });
+  const dias = _diasBrutos;
+  const datas = _datasBrutas;
   const { totalAlunos } = calcularTotaisNiveis(dias);
   const dailyTotais = dias.map((d, i) => {
     if(!d || !datas[i]) return {};
@@ -5627,7 +5821,11 @@ function renderMercado(){
     listaMerc.innerHTML = _cards.join('');
   }
 
-  const { af_items, mc_items, totalKg } = getItensMercado(ciclo, mondayIso);
+  // Usa dados agregados quando multi-semanas, senão mantém o comportamento original
+  const isMulti = _MERC_SEMANAS_SEL.length > 0;
+  const { af_items, mc_items, totalKg } = isMulti
+    ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
+    : getItensMercado(ciclo, mondayIso);
   const todosItens = [...af_items, ...mc_items];
 
   // KPI cards
@@ -5651,18 +5849,25 @@ function renderMercado(){
     else semForn.push(it);
   });
 
-  // ── Novo layout de tela — pré-computa até 4 semanas ──
-  const weekData = [{ dias, datas, dailyTotais }]; // semana 1 já calculada
-  for(let _w = 1; _w < 4; _w++){
-    const _d = new Date(mondayIso + 'T00:00:00');
-    _d.setDate(_d.getDate() + 7 * _w);
-    const _wMon = _d.toISOString().substring(0, 10);
-    const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(_wMon);
+  // ── Dados semanais (usado na análise de cobertura) ──
+  const weekData = [];
+  const semanasWD = isMulti ? _MERC_SEMANAS_SEL : [mondayIso, null, null, null].slice(0,4);
+  const _ini2 = getMercDataInicio(), _fim2 = getMercDataFim();
+  const _inPer2 = d => !d || !_ini2 || !_fim2 || (d >= _ini2 && d <= _fim2);
+  semanasWD.forEach((mon, wi) => {
+    if(!mon) {
+      const _d = new Date(mondayIso + 'T00:00:00');
+      _d.setDate(_d.getDate() + 7 * wi);
+      mon = _d.toISOString().substring(0, 10);
+    }
+    const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(mon);
+    const _wdF = _wd.map((dd, i) => _inPer2(_wda[i]) ? dd : '');
+    const _wdaF = _wda.map(d => _inPer2(d) ? d : null);
     weekData.push({
-      dias: _wd, datas: _wda,
-      dailyTotais: _wd.map((dd, i) => (!dd || !_wda[i]) ? {} : calcularTotaisNiveis([dd]).totais)
+      dias: _wdF, datas: _wdaF,
+      dailyTotais: _wdF.map((dd, i) => (!dd || !_wdaF[i]) ? {} : calcularTotaisNiveis([dd]).totais)
     });
-  }
+  });
   _MERC_DATA = { todosItens, mondayIso, weekData };
   const fornFilterEl = document.getElementById('merc-forn-filter');
   if(fornFilterEl){
@@ -6827,7 +7032,7 @@ function renderIngredientes(filtro=''){
       </td>
       <td>
         <select onchange="setIngPeriodicidade('${nome.replace(/'/g,"\\'")}',this.value)"
-          style="font-family:'Inter',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_PERIODICIDADE[nome]?'#a5b4fc':'var(--borda)'};border-radius:6px;background:${ING_PERIODICIDADE[nome]?'#eef2ff':'#f8fafc'};width:100px;color:${ING_PERIODICIDADE[nome]?'#4338ca':'#94a3b8'}">
+          style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:var(--azul);font-weight:700;outline:none;cursor:pointer;min-width:100px">
           <option value="">— Período —</option>
           <option value="semanal"       ${ING_PERIODICIDADE[nome]==='semanal'      ?'selected':''}>Semanal (1 sem.)</option>
           <option value="quinzenal"     ${ING_PERIODICIDADE[nome]==='quinzenal'    ?'selected':''}>Quinzenal (2 sem.)</option>
@@ -6837,7 +7042,7 @@ function renderIngredientes(filtro=''){
       </td>
       <td>
         <select onchange="setIngFornecedor('${nome.replace(/'/g,"\\'")}',this.value)"
-          style="font-family:'Inter',sans-serif;font-size:11px;padding:3px 4px;border:1.5px solid ${ING_FORNECEDORES[nome]?'#7dd3fc':'var(--borda)'};border-radius:6px;background:${ING_FORNECEDORES[nome]?'#e0f2fe':'#f8fafc'};width:110px;color:${ING_FORNECEDORES[nome]?'#0369a1':'#94a3b8'}">
+          style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:var(--azul);font-weight:700;outline:none;cursor:pointer;min-width:110px">
           <option value="">— Fornecedor —</option>
           ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}" ${ING_FORNECEDORES[nome]===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}
         </select>
@@ -6939,7 +7144,7 @@ function ir(id, btn){
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); }
-  if(id==='mercado') renderMercado();
+  if(id==='mercado'){ _mercMesAtual = _getMesAtualDefault(); renderMercado(); }
   if(id==='gastos') renderGastos();
   if(id==='admin') abrirAdmin();
   if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); }
@@ -7431,7 +7636,7 @@ function ir(id, btn){
   document.getElementById('pg-'+id).classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
-  if(id==='mercado') renderMercado();
+  if(id==='mercado'){ _mercMesAtual = _getMesAtualDefault(); renderMercado(); }
   if(id==='gastos') renderGastos();
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
