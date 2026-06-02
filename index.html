@@ -3084,6 +3084,9 @@ function toggleMercWeek(mon){
     const lastDay = lastWeek ? lastWeek.days[lastWeek.days.length - 1] : '';
     document.getElementById('merc-data-inicio').value = firstMon;
     if(lastDay) document.getElementById('merc-data-fim').value = lastDay;
+  } else {
+    document.getElementById('merc-data-inicio').value = '';
+    document.getElementById('merc-data-fim').value = '';
   }
   renderMercado();
 }
