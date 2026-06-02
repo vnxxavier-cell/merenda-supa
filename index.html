@@ -2053,6 +2053,7 @@ function recarregarDados(){
   // Variáveis lidas no init do script que também precisam ser recarregadas com prefixo
   AF_LIST = JSON.parse(localStorage.getItem('merenda_af_custom')) || AF_LIST;
   CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}');
+  { const card = localStorage.getItem('merenda_cardapio'); if(card) DADOS.cardapio = JSON.parse(card); }
   SERVIDORES_CONFIG = JSON.parse(localStorage.getItem('merenda_servidores_config') || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45 };
   if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
   if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
