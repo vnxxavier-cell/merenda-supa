@@ -2240,6 +2240,8 @@ async function fazerLogin(){
     gerarSeletoresPratos();
     _step = 'carregarConfig';
     carregarConfig();
+    _step = 'initTabAtiva';
+    initTabAtiva();
     _step = 'alertaExpiracao';
     renderAlertaExpiracao();
   } catch(e){
@@ -5318,6 +5320,16 @@ function _getMesAtualDefault(){
   const m = new Date().getMonth(); // 0=Jan ... 11=Dez
   return Math.max(0, Math.min(10, m - 1)); // Fev(1)=0 ... Dez(11)=10; Jan→0
 }
+function initTabAtiva(){
+  const ativa = document.querySelector('.pagina.ativa');
+  if(ativa && ativa.id === 'pg-mercado'){
+    _mercMesAtual = _getMesAtualDefault();
+    _MERC_SEMANAS_SEL = [];
+    document.getElementById('merc-data-inicio').value = '';
+    document.getElementById('merc-data-fim').value = '';
+    renderMercado();
+  }
+}
 
 function renderCardapio(){
   const grid = document.getElementById('grid-calendario');
@@ -8269,6 +8281,7 @@ if(!window._AUTH_BLOCKED){
   init();
   gerarSeletoresPratos();
   carregarConfig();
+  initTabAtiva();
 }
 
 // ── Ajuda por aba ──────────────────────────────────────────
