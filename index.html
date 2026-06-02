@@ -849,9 +849,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <label>Cálculo de quantidades</label>
         <div style="display:flex;border:2px solid var(--borda);border-radius:8px;overflow:hidden;height:36px">
           <button id="merc-modo-btn-periodo" onclick="setMercModo('periodo')"
-            style="flex:1;border:none;padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;color:var(--txt2);transition:.15s">Apenas período</button>
+            style="flex:1;border:none;padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:var(--azul);color:#fff;transition:.15s">Apenas período</button>
           <button id="merc-modo-btn-reposicao" onclick="setMercModo('reposicao')"
-            style="flex:1;border:none;border-left:2px solid var(--borda);padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:var(--azul);color:#fff;transition:.15s">Reposição de estoque</button>
+            style="flex:1;border:none;border-left:2px solid var(--borda);padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;color:var(--txt2);transition:.15s">Reposição de estoque</button>
         </div>
       </div>
       <button id="merc-view-toggle" class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="toggleMercadoViewMode()">Ver cobertura</button>
@@ -3158,7 +3158,7 @@ let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades
 let ING_PERIODICIDADE = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
 let _MERC_DATA = null; // cache para renderMercadoTabela()
 let _MERC_SEL  = null; // item selecionado no painel
-let _MERC_MODO = 'reposicao'; // 'periodo' | 'reposicao'
+let _MERC_MODO = 'periodo'; // 'periodo' | 'reposicao'
 let MERCADO_VIEW_MODE = 'fornecedor';
 let _MERC_SEMANAS_SEL = []; // semanas selecionadas no seletor multi-semanas
 var _mercMesAtual = 0; // 0=Fev ... 10=Dez
