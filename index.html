@@ -111,13 +111,23 @@ tbody tr:hover td{background:#f0f5fc}
 /* ── FORNECEDORES ── */
 .forn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
 .forn-grid table{width:100%;table-layout:fixed}
-.forn-grid table th:nth-child(1),.forn-grid table td:nth-child(1){width:38px}
-.forn-grid table th:nth-child(2),.forn-grid table td:nth-child(2){width:160px}
-.forn-grid table th:nth-child(3),.forn-grid table td:nth-child(3){width:140px}
-.forn-grid table th:nth-child(4),.forn-grid table td:nth-child(4){width:50px}
-.forn-grid table th:nth-child(5),.forn-grid table td:nth-child(5){width:90px}
-.forn-grid table th:nth-child(6),.forn-grid table td:nth-child(6){width:160px;white-space:nowrap}
-.forn-grid table th:last-child,.forn-grid table td:last-child{width:auto}
+.forn-grid .card.no-print table{border-collapse:collapse}
+.forn-grid .card.no-print table th,.forn-grid .card.no-print table td{border:1px solid #C8D0DC;padding:6px 10px}
+.forn-grid .card.no-print table thead th{background:#f0f2f5;color:#1A3A6B;font-weight:700;font-size:12px;text-align:left}
+.forn-grid .card.no-print table thead th.num{text-align:right}
+/* borda externa mais forte nas células periféricas */
+.forn-grid .card.no-print table th:first-child,.forn-grid .card.no-print table td:first-child{border-left:1.5px solid #1A3A6B}
+.forn-grid .card.no-print table th:last-child,.forn-grid .card.no-print table td:last-child{border-right:1.5px solid #1A3A6B}
+.forn-grid .card.no-print table thead th{border-top:1.5px solid #1A3A6B}
+.forn-grid .card.no-print table tbody tr:last-child td{border-bottom:1.5px solid #1A3A6B}
+.forn-grid .card.no-print table th:nth-child(1),.forn-grid .card.no-print table td:nth-child(1){width:38px;text-align:center}
+.forn-grid .card.no-print table th:nth-child(2),.forn-grid .card.no-print table td:nth-child(2){width:160px}
+.forn-grid .card.no-print table th:nth-child(3),.forn-grid .card.no-print table td:nth-child(3){width:140px}
+.forn-grid .card.no-print table th:nth-child(4),.forn-grid .card.no-print table td:nth-child(4){width:50px;text-align:center}
+.forn-grid .card.no-print table th:nth-child(5),.forn-grid .card.no-print table td:nth-child(5){width:90px;text-align:right}
+.forn-grid .card.no-print table th:nth-child(6),.forn-grid .card.no-print table td:nth-child(6){width:160px;white-space:nowrap;text-align:right}
+.forn-grid .card.no-print table th:last-child,.forn-grid .card.no-print table td:last-child{width:auto}
+.forn-grid .card.no-print table tbody tr:nth-child(even) td{background:#F5F8FD}
 @media(max-width:900px){.forn-grid{grid-template-columns:1fr}}
 
 /* ── Mercado: layout análise de cobertura ─────────────── */
@@ -333,7 +343,7 @@ tbody tr:hover td{background:#f0f5fc}
   .print-footer{position:fixed;bottom:8mm;left:0;right:0;font-size:7.5pt;color:#aaa;text-align:center;border-top:0.5px solid #ddd;padding-top:3px}
   /* ══ MERCADO — impressão formal ══ */
   .forn-grid{display:block!important;width:100%!important}
-  .forn-page{display:block!important;page-break-after:always;padding:0;margin:0}
+  .forn-page{display:block!important;page-break-after:always;break-after:page;padding:0;margin:0}
   .forn-page:last-child{page-break-after:auto}
   .forn-page .no-print{display:none!important}
 
@@ -353,21 +363,20 @@ tbody tr:hover td{background:#f0f5fc}
   .forn-info span strong{color:#1A3A6B}
 
   /* tabela formal */
-  .forn-tabela{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:0}
+  .forn-tabela{width:100%;font-size:10pt;margin-bottom:0}
   .forn-tabela thead tr{background:linear-gradient(135deg,#1A3A6B 0%,#2E75B6 100%);color:#fff}
   .forn-tabela thead th{
-    padding:7px 10px;border:1px solid #1A3A6B;
+    padding:7px 10px;
     font-weight:700;text-transform:uppercase;font-size:9pt;letter-spacing:.04em
   }
-  .forn-tabela thead th:nth-child(1){width:42px;text-align:center}
+  .forn-tabela thead th:first-child{width:42px;text-align:center}
   .forn-tabela thead th:nth-child(3){width:80px;text-align:right}
   .forn-tabela thead th:nth-child(4){width:50px;text-align:center}
-  .forn-tabela tbody td{padding:6px 10px;border:1px solid #C8D0DC;vertical-align:middle}
+  .forn-tabela tbody td{padding:6px 10px;vertical-align:middle}
   .forn-tabela tbody tr:nth-child(even) td{background:#F5F8FD}
-  .forn-tabela td:nth-child(1){text-align:center;color:#888;font-size:9pt}
+  .forn-tabela td:first-child{text-align:center;color:#888;font-size:9pt}
   .forn-tabela td:nth-child(3){text-align:right;font-family:'DM Mono',monospace;font-weight:700}
   .forn-tabela td:nth-child(4){text-align:center}
-
   /* assinatura */
   .forn-assinatura{margin-top:28mm;text-align:center;page-break-inside:avoid}
   .forn-assinatura-linha{
@@ -779,9 +788,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="margin-bottom:30px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
       <span style="display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Atalhos dos Meses</span>
-      <button class="btn btn-primary admin-only" onclick="window.print()" style="background:#fff; color:var(--azul2); font-size:12px; padding:6px 12px; display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Calendário Anual</button>
-      <button class="btn btn-primary admin-only" onclick="imprimirPoster()" style="background:#fff; color:var(--verde); border:1.5px solid var(--verde); font-size:12px; padding:6px 12px; display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Imprimir Pôster</button>
-      <button class="btn btn-primary admin-only" onclick="exportarExcel()" style="background:#fff; color:#217346; border:1.5px solid #217346; font-size:12px; padding:6px 12px; display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Exportar Excel</button>
     </div>
     <div style="padding:14px 20px; display:flex; gap:8px; flex-wrap:wrap" id="legenda-ciclos"></div>
   </div>
@@ -815,6 +821,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <p style="font-size:12px;color:var(--txt2);margin-bottom:16px">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;flex-shrink:0"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Os pratos são distribuídos em rotação pelos dias letivos do ciclo selecionado. Após escolher os pratos, selecione o ciclo de início e clique em <strong>Distribuir a partir deste Ciclo</strong> para aplicar ao calendário.
         </p>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;color:#64748b">
+        ${Object.entries(GRUPOS_CORES).map(([id, g]) =>
+          `<span style="display:inline-flex;align-items:center;gap:4px">
+            <span style="width:10px;height:10px;border-radius:3px;background:${g.cor};display:inline-block"></span>
+            G${id} — ${g.nome}
+          </span>`
+        ).join('')}
       </div>
 
       <div id="grid-pratos-plan" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px"></div>
@@ -985,6 +1000,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
     <button class="btn btn-outline" style="align-self:flex-end;color:#991b1b;border-color:#fca5a5;display:flex;align-items:center;gap:5px" onclick="restaurarTodasFichas()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Restaurar tudo ao padrão PNAE</button>
     <button class="btn btn-primary" style="margin-left:auto;align-self:flex-end;display:flex;align-items:center;gap:5px" onclick="abrirModalNovoPrato()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Prato</button>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;color:#64748b;padding:0 4px">
+    ${Object.entries(GRUPOS_CORES).map(([id, g]) =>
+      `<span style="display:inline-flex;align-items:center;gap:4px">
+        <span style="width:10px;height:10px;border-radius:3px;background:${g.cor};display:inline-block"></span>
+        G${id} — ${g.nome}
+      </span>`
+    ).join('')}
   </div>
   <div id="grid-fichas" style="display:grid;grid-template-columns:repeat(3,minmax(250px,1fr));gap:16px"></div>
 </div>
@@ -1441,21 +1464,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div id="pg-estoque" class="pagina">
   <h2 class="titulo">📦 Gestão de Estoque</h2>
 
-  <!-- Bloco 1: Alertas -->
-  <div id="est-alertas" style="margin-bottom:24px"></div>
-
   <!-- Bloco 2: Tabela de previsão -->
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
       <span>Previsão de Reposição</span>
-      <div style="display:flex;gap:8px;flex-wrap:wrap" onclick="event.stopPropagation()">
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="filtrarEstoque('todos')">Todos</button>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="filtrarEstoque('atencao')">⚠️ Atenção</button>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="filtrarEstoque('ok')">✅ OK</button>
-        <button id="btn-corrigir-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="toggleCorrecaoEstoque()">✏️ Corrigir Estoque</button>
-      </div>
+      <button id="btn-corrigir-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="toggleCorrecaoEstoque()">✏️ Corrigir Estoque</button>
     </div>
-    <div style="padding:0">
+    <div style="overflow-x:auto;padding:0">
       <table id="tabela-previsao">
         <thead>
           <tr>
@@ -1491,6 +1506,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Quantidades por Turno por Fase de Ensino</h2>
   <div class="seletor-bar">
     <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="window.print()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Guia</button>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;color:#64748b;padding:0 4px">
+    ${Object.entries(GRUPOS_CORES).map(([id, g]) =>
+      `<span style="display:inline-flex;align-items:center;gap:4px">
+        <span style="width:10px;height:10px;border-radius:3px;background:${g.cor};display:inline-block"></span>
+        G${id} — ${g.nome}
+      </span>`
+    ).join('')}
   </div>
   <div id="prep-conteudo"></div>
 </div>
@@ -1603,6 +1626,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button class="modal-close" onclick="fecharOverlayRec()">×</button>
     </div>
     <div class="modal-body" id="modal-body-recebimento"></div>
+  </div>
+</div>
+
+<!-- Modal Seleção de Contrato para Ordem -->
+<div class="overlay" id="overlay-sel-contrato" onclick="fecharOverlaySelContrato(event)">
+  <div class="modal" style="max-width:650px">
+    <div class="modal-header" style="background:var(--verde)">
+      <h3>Selecionar Contrato(s) para a Ordem</h3>
+      <button class="modal-close" onclick="fecharOverlaySelContrato()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body-sel-contrato"></div>
   </div>
 </div>
 
@@ -2004,7 +2038,6 @@ function recarregarDados(){
   LICITACOES      = JSON.parse(localStorage.getItem('merenda_licitacoes') || '[]');
   ORDENS_EXPEDIDAS= JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
   RECEBIMENTOS    = JSON.parse(localStorage.getItem('merenda_recebimentos') || '[]');
-  LOTES              = JSON.parse(localStorage.getItem('merenda_lotes') || '{}');
   ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque') || '{}');
   SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas') || '[]');
   MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
@@ -3129,7 +3162,6 @@ function salvarRecebimentos(){ localStorage.setItem('merenda_recebimentos',  JSO
 function gerarId(prefix){ return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 
 // Estoque
-let LOTES              = JSON.parse(localStorage.getItem('merenda_lotes')              || '{}');
 let ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque')             || '{}');
 let SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas')  || '[]');
 let SERVIDORES_CONFIG  = JSON.parse(localStorage.getItem('merenda_servidores_config')   || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45 };
@@ -3209,7 +3241,6 @@ function toggleMercadoViewMode(){
 // Inicializar estoque zero para ingredientes ainda sem valor salvo
 Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
 
-function salvarLotes(){            localStorage.setItem('merenda_lotes',              JSON.stringify(LOTES)); }
 function salvarEstoque(){          localStorage.setItem('merenda_estoque',             JSON.stringify(ESTOQUE)); }
 function salvarSemanasConsumidas(){ localStorage.setItem('merenda_semanas_consumidas', JSON.stringify(SEMANAS_CONSUMIDAS)); }
 
@@ -3250,11 +3281,9 @@ function aplicarConsumoSemanas(){
 // { semanasCoberta, dataEsgotamento, dataPedido, status, consumoSemanalMedio }
 function calcularPrevisaoIngrediente(nome){
   const estoqueAtual = ESTOQUE[nome] || 0;
-  const lote = LOTES[nome] || 0;
   const hoje = new Date().toISOString().split('T')[0];
   const totalSemanas = Math.ceil(DIAS_LETIVOS_ARRAY.length / 5);
 
-  // Encontra a semana atual (primeira semana cujo último dia >= hoje)
   let semanaAtual = 0;
   for(let wi = 0; wi < totalSemanas; wi++){
     const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
@@ -3262,7 +3291,6 @@ function calcularPrevisaoIngrediente(nome){
     semanaAtual = wi + 1;
   }
 
-  // Calcula consumo médio das próximas 4 semanas
   let somaConsumo = 0;
   let contagemSemanas = 0;
   for(let wi = semanaAtual; wi < Math.min(semanaAtual + 4, totalSemanas); wi++){
@@ -3279,11 +3307,7 @@ function calcularPrevisaoIngrediente(nome){
   }
   const consumoSemanalMedio = contagemSemanas > 0 ? somaConsumo / contagemSemanas : 0;
 
-  if(!lote) return { semanasCoberta: null, dataEsgotamento: null, dataPedido: null, status: 'sem_lote', consumoSemanalMedio };
-
-  // Projeta semana a semana até esgotamento
   let saldoProjetado = estoqueAtual;
-  const limiarSeguranca = lote * 0.2;
   let semanasCoberta = 0;
   let dataEsgotamento = null;
 
@@ -3297,7 +3321,7 @@ function calcularPrevisaoIngrediente(nome){
       if(n === nome) consumoSemana += qtd;
     });
     saldoProjetado -= consumoSemana;
-    if(saldoProjetado <= limiarSeguranca){
+    if(saldoProjetado <= 0){
       const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
       dataEsgotamento = DIAS_LETIVOS_ARRAY[lastDayIdx] || null;
       break;
@@ -3324,62 +3348,32 @@ function calcularPrevisaoIngrediente(nome){
 // ══════════════════════════════════════════════════════
 // ESTOQUE — UI
 // ══════════════════════════════════════════════════════
-let _estFiltro = 'todos';
 let _estCorrigindo = false;
 
+function toggleCorrecaoEstoque(){
+  _estCorrigindo = !_estCorrigindo;
+  const btn = document.getElementById('btn-corrigir-estoque');
+  if(btn) btn.textContent = _estCorrigindo ? '✅ Concluir' : '✏️ Corrigir Estoque';
+  renderEstoque();
+}
+
 function renderEstoque(){
-  const ings = Object.keys(DADOS.ingredientes).sort();
-
-  // Bloco 1: alertas
-  const alertEl = document.getElementById('est-alertas');
-  if(alertEl){
-    const criticos = [], atencaos = [];
-    ings.forEach(nome => {
-      const p = calcularPrevisaoIngrediente(nome);
-      if(p.status === 'critico') criticos.push({ nome, p });
-      if(p.status === 'atencao') atencaos.push({ nome, p });
-    });
-    if(!criticos.length && !atencaos.length){
-      alertEl.innerHTML = '<div style="background:#d1fae5;border:1.5px solid var(--verde2);border-radius:10px;padding:14px 18px;color:#065f46;font-weight:600;font-size:13px">✅ Estoque em dia — nenhum ingrediente precisa de pedido no momento.</div>';
-    } else {
-      alertEl.innerHTML =
-        criticos.map(({nome, p}) => `
-          <div class="est-alert-card critico">
-            <span>🔴 <b>${nome}</b>${p.dataPedido ? ` — pedir até ${fmtDataBR(p.dataPedido)}` : ' — pedir agora'}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:12px">${fmt(ESTOQUE[nome]||0)} ${DADOS.ingredientes[nome]?.unidade||'kg'}</span>
-          </div>`).join('') +
-        atencaos.map(({nome, p}) => `
-          <div class="est-alert-card atencao">
-            <span>🟡 <b>${nome}</b>${p.dataPedido ? ` — pedir até ${fmtDataBR(p.dataPedido)}` : ''}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:12px">${fmt(ESTOQUE[nome]||0)} ${DADOS.ingredientes[nome]?.unidade||'kg'}</span>
-          </div>`).join('');
-    }
-  }
-
-  // Bloco 2: tabela de previsão
+  const ings = Object.keys(DADOS.ingredientes).sort();  // Bloco 2: tabela de previsão
   const tbody = document.getElementById('tbody-previsao');
   if(tbody){
     const rows = ings
       .map(nome => {
         const p = calcularPrevisaoIngrediente(nome);
         const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
-        const cobertaPct = (LOTES[nome] && p.semanasCoberta != null)
-          ? Math.min(100, (p.semanasCoberta / 8) * 100) : 0;
         const corBar = p.status === 'critico' ? 'critico' : p.status === 'atencao' ? 'atencao' : 'ok';
         const statusBadge =
           p.status === 'critico'  ? '<span style="color:var(--vermelho);font-weight:700">🔴 Crítico</span>' :
           p.status === 'atencao'  ? '<span style="color:#92400e;font-weight:700">🟡 Atenção</span>' :
-          p.status === 'sem_lote' ? '<span style="color:#aaa">— sem lote</span>' :
                                     '<span style="color:var(--verde);font-weight:700">✅ OK</span>';
-        return { nome, p, unid, cobertaPct, corBar, statusBadge, status: p.status };
-      })
-      .filter(r =>
-        _estFiltro === 'todos' ||
-        (_estFiltro === 'atencao' && (r.status === 'critico' || r.status === 'atencao')) ||
-        (_estFiltro === 'ok'     && r.status === 'ok')
-      );
+        return { nome, p, unid, corBar, statusBadge, status: p.status };
+      });
 
-    tbody.innerHTML = rows.map(({nome, p, unid, cobertaPct, corBar, statusBadge}) => `
+    tbody.innerHTML = rows.map(({nome, p, unid, corBar, statusBadge}) => `
       <tr>
         <td><b>${nome}</b></td>
         <td class="num">
@@ -3396,7 +3390,7 @@ function renderEstoque(){
         <td class="num">
           ${p.semanasCoberta != null ? `
             <div style="font-weight:700">${p.semanasCoberta} sem.</div>
-            <div class="est-progress"><div class="est-progress-bar ${corBar}" style="width:${cobertaPct}%"></div></div>` : '—'}
+            <div class="est-progress"><div class="est-progress-bar ${corBar}" style="width:${Math.min(100, (p.semanasCoberta / 8) * 100)}%"></div></div>` : '—'}
         </td>
         <td class="num" style="font-size:12px">${p.dataPedido ? fmtDataBR(p.dataPedido) : p.dataEsgotamento ? '<span style="color:var(--vermelho);font-weight:700">Agora</span>' : '—'}</td>
         <td>${statusBadge}</td>
@@ -3404,59 +3398,6 @@ function renderEstoque(){
       '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">Nenhum ingrediente para este filtro.</td></tr>';
   }
 
-  // Bloco 3: configuração de lotes
-  const tbodyLotes = document.getElementById('tbody-lotes');
-  if(tbodyLotes){
-    tbodyLotes.innerHTML = Object.keys(DADOS.ingredientes).sort().map(nome => {
-      const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
-      const perId = ING_PERIODICIDADE[nome] || '';
-      const per = PERIODICIDADES.find(p => p.id === perId);
-      const consumoSemanal = calcularPrevisaoIngrediente(nome)?.consumoSemanalMedio || 0;
-      const sugerido = per && consumoSemanal > 0
-        ? (consumoSemanal * per.semanas).toFixed(2).replace('.',',') + ' ' + unid
-        : '<span style="color:#aaa">—</span>';
-      return `<tr>
-        <td>${nome}</td>
-        <td>${unid}</td>
-        <td class="num" id="lote-sugerido-${nome.replace(/[^a-zA-Z0-9]/g,'_')}" style="color:var(--txt2);font-size:12px">${sugerido}</td>
-        <td class="num">
-          <input type="number" step="0.01" min="0" value="${LOTES[nome]||''}"
-            data-ing="${nome}" placeholder="0" id="lote-input-${nome.replace(/[^a-zA-Z0-9]/g,'_')}"
-            style="width:80px;text-align:right;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px">
-        </td>
-      </tr>`;
-    }).join('');
-  }
-}
-
-function filtrarEstoque(filtro){
-  _estFiltro = filtro;
-  renderEstoque();
-}
-
-function toggleCorrecaoEstoque(){
-  _estCorrigindo = !_estCorrigindo;
-  const btn = document.getElementById('btn-corrigir-estoque');
-  if(btn){
-    btn.textContent = _estCorrigindo ? '✅ Concluir Correção' : '✏️ Corrigir Estoque';
-    btn.style.background = _estCorrigindo ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.15)';
-    btn.style.fontWeight = _estCorrigindo ? '700' : '';
-  }
-  document.querySelectorAll('[data-est-ing]').forEach(input => {
-    if(_estCorrigindo){
-      input.removeAttribute('readonly');
-      input.style.border = '1.5px solid var(--azul2)';
-      input.style.color = 'var(--azul2)';
-      input.style.background = '#fff';
-      input.style.cursor = 'text';
-    } else {
-      input.setAttribute('readonly', '');
-      input.style.border = '1.5px solid transparent';
-      input.style.color = 'var(--txt)';
-      input.style.background = 'transparent';
-      input.style.cursor = 'default';
-    }
-  });
 }
 
 // ── Periodicidades ────────────────────────────────────
@@ -3504,35 +3445,8 @@ function aplicarPeriodicidadeIngrediente(nome, perId){
   if(perId) ING_PERIODICIDADE[nome] = perId;
   else delete ING_PERIODICIDADE[nome];
   salvarIngPeriodicidade();
-
-  const per = PERIODICIDADES.find(p => p.id === perId);
-  const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
-  const consumoSemanal = calcularPrevisaoIngrediente(nome)?.consumoSemanalMedio || 0;
-  const idSafe = nome.replace(/[^a-zA-Z0-9]/g,'_');
-
-  const sugeridoEl = document.getElementById('lote-sugerido-' + idSafe);
-  const inputEl    = document.getElementById('lote-input-' + idSafe);
-
-  if(per && consumoSemanal > 0){
-    const sugerido = consumoSemanal * per.semanas;
-    if(sugeridoEl) sugeridoEl.innerHTML = sugerido.toFixed(2).replace('.',',') + ' ' + unid;
-    if(inputEl && !inputEl.value) inputEl.value = sugerido.toFixed(2);
-  } else {
-    if(sugeridoEl) sugeridoEl.innerHTML = '<span style="color:#aaa">—</span>';
-  }
 }
 
-function salvarLotesForm(){
-  document.querySelectorAll('#tbody-lotes input[data-ing]').forEach(inp => {
-    const nome = inp.getAttribute('data-ing');
-    const val  = parseFloat(inp.value) || 0;
-    if(val > 0) LOTES[nome] = val;
-    else delete LOTES[nome];
-  });
-  salvarLotes();
-  renderEstoque();
-  alert('✅ Lotes salvos!');
-}
 
 function renderFornecedoresCadastro(){
   const tbody = document.getElementById('tbody-forn-cadastro');
@@ -4364,6 +4278,11 @@ function cancelarOrdem(ordemId){
   renderLicitacoes();
 }
 
+function fecharOverlaySelContrato(ev){
+  if(!ev || ev.target === document.getElementById('overlay-sel-contrato'))
+    document.getElementById('overlay-sel-contrato').classList.remove('aberto');
+}
+
 function registrarOrdemExpedida(){
   const ciclo      = getMercCiclo() || '';
   const mondayIso  = getMercMondayIso();
@@ -4374,29 +4293,100 @@ function registrarOrdemExpedida(){
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
   const todosItens = [...af_items, ...mc_items];
 
+  // Para cada contrato ativo, lista quais itens da ordem ele cobre
+  const licMap = {}; // licId → { nome, itens: [{ ingrediente, qtd }] }
   const itensSemLic = [];
-  const itensPorLic = {};
+  const itensComLicSet = new Set();
 
   todosItens.forEach(it => {
     if(it.comprar <= 0) return;
     const lics = licitacoesAtivasParaIngrediente(it.nomeBase, hoje);
     if(!lics.length){ itensSemLic.push(it.nomeBase); return; }
-    const licId = lics[0].id;
-    if(!itensPorLic[licId]) itensPorLic[licId] = [];
-    itensPorLic[licId].push({ ingrediente: it.nomeBase, qtd_solicitada: parseFloat(it.comprar.toFixed(3)) });
+    itensComLicSet.add(it.nomeBase);
+    lics.forEach(lic => {
+      if(!licMap[lic.id]) licMap[lic.id] = { nome: lic.nome, itens: [] };
+      // Evita duplicar o mesmo ingrediente no mesmo contrato
+      if(!licMap[lic.id].itens.some(x => x.ingrediente === it.nomeBase))
+        licMap[lic.id].itens.push({ ingrediente: it.nomeBase, qtd: parseFloat(it.comprar.toFixed(3)) });
+    });
   });
 
-  if(!Object.keys(itensPorLic).length){
+  if(!Object.keys(licMap).length){
     alert('Nenhum item desta ordem está vinculado a um contrato ativo.\nCadastre um contrato com data de início igual ou anterior a hoje.');
     return;
   }
 
-  let aviso = '';
-  if(itensSemLic.length) aviso = `\n⚠️ Atenção: ${itensSemLic.length} item(ns) sem contrato ativo foram ignorados:\n${itensSemLic.join(', ')}`;
+  // Monta modal de seleção
+  const body = document.getElementById('modal-body-sel-contrato');
+  const licIds = Object.keys(licMap);
+  body.innerHTML = `
+    <p style="margin:0 0 12px;font-size:13px;color:#475569">
+      Ciclo: <b>${esc(ciclo)}</b> — Semana: <b>${esc(semLabel)}</b>
+    </p>
+    <p style="margin:0 0 12px;font-size:13px;color:#475569">
+      Selecione o(s) contrato(s) para os quais deseja registrar a ordem:
+    </p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${licIds.map(licId => {
+        const lic = licMap[licId];
+        const licFull = LICITACOES.find(l => l.id === licId);
+        return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:8px;cursor:pointer;background:#fff">
+          <input type="checkbox" checked data-lic-id="${esc(licId)}" style="margin-top:3px;width:16px;height:16px;accent-color:var(--verde)">
+          <div>
+            <div style="font-weight:700;font-size:14px;color:var(--verde)">${esc(lic.nome)}</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px">
+              ${lic.itens.length} item(ns):
+              ${lic.itens.map(it => `<b>${esc(it.ingrediente)}</b> (${it.qtd.toFixed(3)} kg)`).join(', ')}
+            </div>
+            ${licFull ? `<div style="font-size:11px;color:#94A3B8;margin-top:2px">Início: ${fmtDataBR(licFull.data_inicio)}</div>` : ''}
+          </div>
+        </label>`;
+      }).join('')}
+    </div>
+    ${itensSemLic.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
+      ⚠️ ${itensSemLic.length} item(ns) sem contrato ativo: ${itensSemLic.map(esc).join(', ')}
+    </div>` : ''}
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #E2E8F0">
+      <button class="btn btn-outline" onclick="fecharOverlaySelContrato()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarOrdemContratoSelecionado('${esc(ciclo)}','${esc(semLabel)}','${hoje}')">Registrar Ordem</button>
+    </div>
+  `;
 
-  if(!confirm(`Registrar ordem expedida para ${ciclo} — ${semLabel}?${aviso}`)) return;
+  // Pausa o registro da ordem para mostrar o modal (sem usar async)
+  _ordemPendente = { ciclo, semLabel, hoje, mondayIso, itensSemLic };
+  document.getElementById('overlay-sel-contrato').classList.add('aberto');
+}
 
-  Object.entries(itensPorLic).forEach(([licId, itens]) => {
+let _ordemPendente = null;
+
+function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
+  const checks = document.querySelectorAll('#modal-body-sel-contrato input[type=checkbox]:checked');
+  if(!checks.length){ alert('Selecione ao menos um contrato.'); return; }
+
+  // Recupera o mondayIso armazenado ao abrir o modal
+  const mondayIso = _ordemPendente ? _ordemPendente.mondayIso : '';
+
+  const contratosSelecionados = [];
+  checks.forEach(cb => {
+    const licId = cb.getAttribute('data-lic-id');
+    const lic = LICITACOES.find(l => l.id === licId);
+    if(!lic) return;
+    // Coleta itens que este contrato cobre
+    const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
+    const todosItens = [...af_items, ...mc_items];
+    const itensOrdem = todosItens
+      .filter(it => it.comprar > 0 && lic.itens.some(li => li.ingrediente === it.nomeBase))
+      .map(it => ({ ingrediente: it.nomeBase, qtd_solicitada: parseFloat(it.comprar.toFixed(3)) }));
+    if(itensOrdem.length)
+      contratosSelecionados.push({ licId, itens: itensOrdem, nome: lic.nome });
+  });
+
+  if(!contratosSelecionados.length){
+    alert('Nenhum contrato selecionado possui itens disponíveis.');
+    return;
+  }
+
+  contratosSelecionados.forEach(({ licId, itens }) => {
     ORDENS_EXPEDIDAS.push({
       id: gerarId('ord'),
       licitacao_id: licId,
@@ -4407,7 +4397,8 @@ function registrarOrdemExpedida(){
     });
   });
   salvarOrdens();
-  alert('✅ Ordem registrada com sucesso!');
+  fecharOverlaySelContrato();
+  alert(`✅ ${contratosSelecionados.length} ordem(ns) registrada(s) com sucesso!`);
 }
 
 // Arredonda para cima ao múltiplo da embalagem; retorna {arred, nPacotes}
@@ -4697,6 +4688,43 @@ function alterarPrato(ciclo, semIdx, diaIdx, novoPrato, skipRender = false){
 }
 
 const PRATOS_LISTA = Object.keys(DADOS.ficha).sort();
+
+// Grupos de preparações com cores
+const GRUPOS_CORES = {
+  1:  { cor: '#FF6B35', nome: 'Arroz Temperado' },
+  2:  { cor: '#4ECDC4', nome: 'Diversas' },
+  3:  { cor: '#7C3AED', nome: 'Feijão' },
+  4:  { cor: '#F59E0B', nome: 'Canjica/Mingau/Polenta/Sopa' },
+  5:  { cor: '#EC4899', nome: 'Doces' },
+  6:  { cor: '#8B5CF6', nome: 'Doces Regionais' },
+  7:  { cor: '#EF4444', nome: 'Datas Comemorativas' }
+};
+// Mapeia número do cardápio → grupo
+const PRATO_PARA_GRUPO = {};
+function montarMapaGrupos(){
+  const ranges = [
+    [1,  14, 1],  // Cardápios 1-14  → Grupo 1
+    [15, 47, 2],  // 15-47 → Grupo 2
+    [48, 56, 3],  // 48-56 → Grupo 3
+    [57, 72, 4],  // 57-72 → Grupo 4
+    [73, 85, 5],  // 73-85 → Grupo 5
+    [86, 90, 6],  // 86-90 → Grupo 6
+    [91, 98, 7]   // 91-98 → Grupo 7
+  ];
+  ranges.forEach(([start, end, grupo]) => {
+    for(let n = start; n <= end; n++) PRATO_PARA_GRUPO[String(n)] = grupo;
+  });
+}
+montarMapaGrupos();
+function getGrupoPrato(pratoKey){
+  const m = pratoKey.match(/^(\d+)/);
+  if(!m) return { id: 0, cor: '#94A3B8', nome: 'Sem grupo' };
+  const num = parseInt(m[1], 10);
+  // Se estiver além do range 1-98, classifica como Grupo 2 (Diversas)
+  if(num > 98){ const g = GRUPOS_CORES[2]; return g ? { id: 2, ...g } : null; }
+  const g = PRATO_PARA_GRUPO[String(num)];
+  return g ? { id: g, ...GRUPOS_CORES[g] } : null;
+}
 
 function sincronizarSeletores(ciclo, sem, skipRender = false){
   const agora = new Date();
@@ -5412,8 +5440,6 @@ function renderCardapio(){
       const botoesWeek = semana ? `
         <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
           <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
-          <button class="cal-sem-btn cal-sem-btn-print" style="display:inline-flex;align-items:center;gap:4px" onclick="irParaImprimirSemana('${mondayIso}','${mesId}');event.stopPropagation()" title="Imprimir lista de mercado">${ico('printer',11)}Imprimir</button>
-          <button class="cal-sem-btn cal-sem-btn-xls" style="display:inline-flex;align-items:center;gap:4px" onclick="exportarExcelSemanaCal('${mondayIso}');event.stopPropagation()" title="Exportar Excel">${ico('chart',11)}Excel</button>
         </div>` : '';
       days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
     } else {
@@ -5766,7 +5792,7 @@ function renderCalendarioMercado(){
           <span class="cal-mes-nome" style="font-size:20px">${mesNome}</span>
           <span class="cal-ano" style="font-size:12px">2026</span>
         </div>
-        <div style="padding:0">
+    <div style="overflow-x:auto;padding:0">
           <div style="display:flex;min-height:0">
             <div style="flex:1;min-width:0">
               <div class="cal-wk-hdr" style="font-size:9px">${WK.map(d=>`<span style="padding:6px 2px;font-size:9px">${d}</span>`).join('')}</div>
@@ -5819,6 +5845,7 @@ function renderMercado(){
     if(kpiEl)   kpiEl.innerHTML   = '';
     if(tbody)   tbody.innerHTML   = '<tr><td colspan="7" class="empty-state-td"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--azul2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><strong>Marque as semanas no calendário</strong><small>Selecione as semanas desejadas para ver a lista de ingredientes</small></td></tr>';
     _MERC_DATA = null;
+    renderDetalhamentoMercado();
     return;
   }
   const _dataFim = getMercDataFim();
@@ -5864,8 +5891,9 @@ function renderMercado(){
         return;
       }
       const {nome} = nomeNum(p);
+      const g = getGrupoPrato(p);
       const idx = window._mercSemanaPratos.push(p) - 1;
-      _cards.push(`<div style="background:#eef5ff;padding:10px 14px;border-radius:8px;border:1px solid #dbeafe;min-width:110px;cursor:pointer" onclick="abrirFicha(window._mercSemanaPratos[${idx}])"><div style="font-size:11px;font-weight:700;color:var(--azul2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">${dataFmt}</div><div style="font-size:14px;font-weight:700;color:var(--txt)">${nome}</div></div>`);
+      _cards.push(`<div style="background:#eef5ff;padding:10px 14px;border-radius:8px;border:1px solid #dbeafe;min-width:110px;cursor:pointer;position:relative" onclick="abrirFicha(window._mercSemanaPratos[${idx}])">${g ? `<div style="position:absolute;top:0;left:0;right:0;height:3px;background:${g.cor};border-radius:8px 8px 0 0"></div>` : ''}<div style="font-size:11px;font-weight:700;color:var(--azul2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;padding-top:${g?'3px':'0'}">${dataFmt}</div><div style="font-size:14px;font-weight:700;color:var(--txt)">${nome}</div></div>`);
     });
     listaMerc.innerHTML = _cards.join('');
   }
@@ -5918,6 +5946,7 @@ function renderMercado(){
     });
   });
   _MERC_DATA = { todosItens, mondayIso, weekData };
+  renderDetalhamentoMercado();
   const fornFilterEl = document.getElementById('merc-forn-filter');
   if(fornFilterEl){
     const fornIds = [...new Set(todosItens.map(it => ING_FORNECEDORES[it.nomeBase]).filter(Boolean))];
@@ -6061,33 +6090,30 @@ function renderMercado(){
       const obsImp = (_obsMap[it.nomeBase] || '').trim();
       const perLabel = it.periodicidade !== 'semanal' ? ` (${it.numSemanas} sem.)` : '';
       return `<tr>
-        <td>${i+1}</td>
-        <td>${it.displayNome}${perLabel}</td>
-        <td style="font-style:italic;color:#555;font-size:10.5px">${esc(obsImp)}</td>
-        <td>${qtd}</td>
-        <td>${it.unid}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 10px;text-align:center">${i+1}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.displayNome}${perLabel}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 10px;font-style:italic;color:#555;font-size:10.5px">${esc(obsImp)}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 10px">${qtd}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.unid}</td>
       </tr>`;
     }).join('');
 
     return `<div class="forn-page">
       <!-- impressão formal -->
       <div class="print-only forn-print-doc">
-        ${_imgData
-          ? `<div class="forn-timbre"><img src="${_imgData}" style="width:100%;height:auto;display:block"></div>`
-          : `<div style="border-bottom:2.5px solid #1A3A6B;padding-bottom:10px;margin-bottom:14px;text-align:center">
-              <div style="font-size:14pt;font-weight:800;color:#1A3A6B;letter-spacing:.02em">${esc(_escola)}</div>
-              <div style="font-size:9pt;color:#555;margin-top:3px">${esc(_subtitulo)}</div>
-            </div>`
-        }
+        <div style="border-bottom:2.5px solid #1A3A6B;padding-bottom:10px;margin-bottom:14px;text-align:center">
+          <div style="font-size:14pt;font-weight:800;color:#1A3A6B;letter-spacing:.02em">${esc(_escola)}</div>
+          <div style="font-size:9pt;color:#555;margin-top:3px">${esc(_subtitulo)}</div>
+        </div>
         <div class="forn-titulo">ORDEM DE FORNECIMENTO Nº ${_numOrdem}</div>
         <div class="forn-info">
           <span><strong>Fornecedor:</strong> ${titulo}</span>
           <span><strong>Data:</strong> ${hoje}</span>
         </div>
-        <table class="forn-tabela">
-          <thead><tr><th>ITEM</th><th>DESCRIÇÃO</th><th>OBSERVAÇÃO</th><th>QTD</th><th>UN</th></tr></thead>
+        <div class="forn-tabela-wrap" style="border:1px solid #1A3A6B"><table class="forn-tabela" style="border-collapse:separate;border-spacing:0;width:100%">
+          <thead><tr><th style="border:1px solid #1A3A6B;padding:7px 10px">ITEM</th><th style="border:1px solid #1A3A6B;padding:7px 10px">DESCRIÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">OBSERVAÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">QTD</th><th style="border:1px solid #1A3A6B;padding:7px 10px">UN</th></tr></thead>
           <tbody>${printRows}</tbody>
-        </table>
+        </table></div>
         <div class="forn-assinatura">
           <div class="forn-assinatura-linha">${_diretor || '________________________'}</div>
           <div class="forn-assinatura-cargo">${_cargo}</div>
@@ -6425,6 +6451,102 @@ function confirmarAddItemForn(nomeBase, btn){
   renderMercado();
 }
 
+function renderDetalhamentoMercado(){
+  const tabela = document.getElementById('tabela-previsao');
+  const tbody  = document.getElementById('tbody-previsao');
+  if(!tabela || !tbody) return;
+
+  // Se não há dados do mercado, a Previsão original (renderEstoque) já está na tabela
+  if(!_MERC_DATA || !_MERC_DATA.todosItens || !_MERC_DATA.weekData){
+    // Garante cabeçalho original para a Previsão de Estoque
+    const thead = tabela.querySelector('thead');
+    thead.innerHTML = `<tr>
+      <th>Ingrediente</th>
+      <th class="num">Estoque Atual</th>
+      <th class="num">Semanas Cobertas</th>
+      <th class="num">Próximo Pedido</th>
+      <th>Status</th>
+    </tr>`;
+    return;
+  }
+
+  const { todosItens, weekData } = _MERC_DATA;
+  if(!todosItens.length) return;
+
+  // Collect all day-meal pairs with their totals
+  const dayMeals = [];
+  const uniqDates = new Set();
+  weekData.forEach(w => {
+    w.dias.forEach((mealCode, i) => {
+      if(!mealCode || !w.datas[i]) return;
+      const dt = w.datas[i];
+      if(uniqDates.has(dt)) return;
+      uniqDates.add(dt);
+      const { nome } = nomeNum(mealCode);
+      const totais = w.dailyTotais[i] || {};
+      dayMeals.push({ date: dt, dateStr: fmtDataCurta(dt), mealCode, mealName: nome, totais });
+    });
+  });
+
+  if(!dayMeals.length) return;
+
+  const hoje = new Date().toISOString().split('T')[0];
+  const dayClasses = dayMeals.map(dm => {
+    if(dm.date < hoje) return 'passado';
+    if(dm.date === hoje) return 'hoje';
+    return 'futuro';
+  });
+
+  const cellBg = { passado: '#F1F5F9', hoje: '#FEF3C7', futuro: '#fff' };
+  const thBg   = { passado: '#64748B', hoje: '#D97706', futuro: '#1A3A6B' };
+
+  // Substitui cabeçalho — mostra só data, nome da preparação no hover
+  const thead = tabela.querySelector('thead');
+  const ths = [
+    `<th style="border:1px solid #C8D0DC;padding:4px 6px;background:#1A3A6B;color:#fff;text-align:left;white-space:nowrap;font-size:11px">Item</th>`,
+    ...dayMeals.map((dm, i) => {
+      const bg = thBg[dayClasses[i]];
+      return `<th style="border:1px solid #C8D0DC;padding:4px 6px;background:${bg};color:#fff;text-align:center;white-space:nowrap;font-size:11px;width:48px" title="${esc(dm.mealName)}">${dm.dateStr}</th>`;
+    }),
+    `<th style="border:1px solid #C8D0DC;padding:4px 6px;background:#1A3A6B;color:#fff;text-align:right;white-space:nowrap;font-size:11px">Total</th>`,
+    `<th style="border:1px solid #C8D0DC;padding:4px 6px;background:#1A3A6B;color:#fff;text-align:right;white-space:nowrap;font-size:11px">Saldo Estoque</th>`,
+    `<th style="border:1px solid #C8D0DC;padding:4px 6px;background:#1A3A6B;color:#fff;text-align:left;white-space:nowrap;font-size:11px">Obs</th>`
+  ];
+  thead.innerHTML = `<tr>${ths.join('')}</tr>`;
+
+  // Build rows per item
+  const rows = todosItens.filter(it => it.comprar > 0).map(it => {
+    const getSubtotal = (dayTotais) =>
+      Object.entries(dayTotais)
+        .filter(([k]) => k === it.nomeBase || k.startsWith(it.nomeBase + ' ___ '))
+        .reduce((s, [,v]) => s + v, 0);
+
+    const subtotais = dayMeals.map(dm => getSubtotal(dm.totais));
+    const totalSub = subtotais.reduce((s, v) => s + v, 0);
+    const diff = Math.abs(totalSub - it.comprar);
+    const obs = diff > 0.001
+      ? `Divergência: total ordem ${it.comprar.toFixed(3)} kg, soma dias ${totalSub.toFixed(3)} kg`
+      : '';
+
+    const consumido = subtotais.reduce((s, v, i) => dayClasses[i] === 'passado' ? s + v : s, 0);
+    const estoqueAtual = parseFloat(ESTOQUE[it.nomeBase] || 0);
+    const saldo = estoqueAtual - consumido;
+
+    return `<tr>
+      <td style="border:1px solid #C8D0DC;padding:5px 8px;font-weight:700">${it.displayNome}</td>
+      ${subtotais.map((v, i) => {
+        const bg = cellBg[dayClasses[i]];
+        return `<td style="border:1px solid #C8D0DC;padding:4px 6px;text-align:right;font-family:'DM Mono',monospace;font-size:11px;background:${bg}">${v ? v.toFixed(3) : '0'}</td>`;
+      }).join('')}
+      <td style="border:1px solid #C8D0DC;padding:4px 6px;text-align:right;font-weight:700;font-family:'DM Mono',monospace;font-size:11px">${totalSub.toFixed(3)}</td>
+      <td style="border:1px solid #C8D0DC;padding:4px 6px;text-align:right;font-weight:700;font-family:'DM Mono',monospace;font-size:11px;color:${saldo < 0 ? '#dc2626' : '#16a34a'}">${saldo.toFixed(3)}</td>
+      <td style="border:1px solid #C8D0DC;padding:4px 6px;font-size:10px;color:${obs ? '#dc2626' : '#6b7280'};font-style:italic">${obs || '—'}</td>
+    </tr>`;
+  }).join('');
+
+  tbody.innerHTML = rows;
+}
+
 function validarEImprimir(){
   const ciclo     = getMercCiclo() || '';
   const mondayIso = getMercMondayIso();
@@ -6591,9 +6713,10 @@ function renderFichas(filtro=''){
       if(partes.length) diffResumo = `<div style="font-size:11px;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px">${partes.join('')}</div>`;
     }
     return `
-    <div class="card" style="cursor:pointer;${cardBorder}" onclick="abrirFicha('${pratoEnc}')">
+    <div class="card" style="cursor:pointer;${cardBorder}${(()=>{const g=getGrupoPrato(p);return g?`border-left:4px solid ${g.cor};`:''})()}" onclick="abrirFicha('${pratoEnc}')">
       <div class="card-header" style="padding:12px 16px;${headerExtra}">
         <span style="font-size:20px;font-weight:800;opacity:.4;margin-right:8px">${num}</span>${nome}
+        ${(()=>{ const g=getGrupoPrato(p); return g ? `<span style="margin-left:8px;font-size:9px;font-weight:700;color:${g.cor};text-transform:uppercase">GRUPO ${g.id}: ${g.nome}</span>` : ''; })()}
         ${modificado ? `<span style="margin-left:8px;font-size:10px;font-weight:700;background:#f59e0b;color:#fff;border-radius:10px;padding:2px 8px;vertical-align:middle;display:inline-flex;align-items:center;gap:3px">${ico('edit',10)}Modificado</span>` : ''}
       </div>
       <div style="padding:12px 16px">
@@ -7196,7 +7319,7 @@ function ir(id, btn){
   if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
   if(id==='gastos') renderGastos();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); }
+  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
   if(id==='licitacoes') renderLicitacoes();
   if(id==='preparo') renderPreparo();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
@@ -7378,8 +7501,10 @@ function renderPreparo(){
       : '';
 
     return `<div class="card" style="margin-bottom:20px;${cardBorder}">
+      ${(()=>{ const g=getGrupoPrato(prato); return g ? `<div style="height:4px;background:${g.cor};border-radius:8px 8px 0 0"></div>` : ''; })()}
       <div class="card-header" style="background:${headerBg}">
         #${num} ${nome}${badge}
+        ${(()=>{ const g=getGrupoPrato(prato); return g ? `<span style="margin-left:10px;font-size:10px;font-weight:700;opacity:.7;display:inline-flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:3px;background:${g.cor};display:inline-block"></span>GRUPO ${g.id}: ${g.nome}</span>` : ''; })()}
       </div>
       <div style="overflow-x:auto">
       <table>
@@ -7689,7 +7814,7 @@ function ir(id, btn){
   if(id==='gastos') renderGastos();
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); }
+  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
@@ -7730,14 +7855,32 @@ function abrirPopupDia(iso, e){
 
   titulo.textContent = `${d}/${m}/${y} — Prato do dia`;
 
+  // Legenda de grupos com cores
+  const legendaGrupos = Object.entries(GRUPOS_CORES).map(([id, g]) =>
+    `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px;font-size:11px">
+      <span style="width:10px;height:10px;border-radius:3px;background:${g.cor};display:inline-block"></span>
+      G${id}
+    </span>`
+  ).join('');
+
   // Select: apenas pratos (sem opção feriado — isso é feito pelo número)
   let opts = `<option value=""${!curPrato?' selected':''}>— Sem merenda —</option>`;
   opts    += PRATOS_LISTA.map(p => {
     const {num, nome} = nomeNum(p);
+    const g = getGrupoPrato(p);
+    const grupoTag = g ? ` [G${g.id}]` : '';
     return `<option value="${p.replace(/"/g,'&quot;')}"${curPrato===p?' selected':''}>` +
-           `${num?num+' - ':''}${nome}</option>`;
+           `${num?num+' - ':''}${nome}${grupoTag}</option>`;
   }).join('');
   sel.innerHTML = opts;
+  // Insere legenda antes do select
+  if(!document.getElementById('grupo-legenda')){
+    const leg = document.createElement('div');
+    leg.id = 'grupo-legenda';
+    leg.style.cssText = 'margin-bottom:8px;font-size:11px;color:#64748b';
+    leg.innerHTML = 'Grupos: ' + legendaGrupos;
+    sel.parentNode.insertBefore(leg, sel);
+  }
   sabDiv.style.display = 'none';
 
   const rect = (e.target||e.currentTarget).getBoundingClientRect();
@@ -8116,7 +8259,9 @@ function gerarSeletoresPratos(){
   const opts = `<option value="">— Sem prato —</option>` +
     PRATOS_LISTA.map(p => {
       const {num, nome} = nomeNum(p);
-      return `<option value="${p.replace(/"/g,'&quot;')}">${num?num+' - ':''}${nome}</option>`;
+      const g = getGrupoPrato(p);
+      const grupoTag = g ? ` [G${g.id}]` : '';
+      return `<option value="${p.replace(/"/g,'&quot;')}">${num?num+' - ':''}${nome}${grupoTag}</option>`;
     }).join('');
 
   const items = [];
@@ -8131,11 +8276,13 @@ function gerarSeletoresPratos(){
     }
     const cur = plano[i] || '';
     const {num: curNum} = cur ? nomeNum(cur) : {num:''};
+    const g = cur ? getGrupoPrato(cur) : null;
+    const slotBorder = g ? `border-left:4px solid ${g.cor};` : '';
     const btnFicha = cur
       ? `<button title="Ver ficha técnica" onclick="abrirFichaPlano(${i})" style="flex-shrink:0;padding:5px 7px;background:#EEF5FF;border:2px solid var(--azul2);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center">${ico('folder',12)}</button>`
       : `<button disabled title="Selecione um prato" style="flex-shrink:0;padding:5px 7px;background:#f1f5f9;border:2px solid var(--borda);border-radius:6px;cursor:not-allowed;opacity:.4;display:flex;align-items:center;justify-content:center">${ico('folder',12)}</button>`;
-    items.push(`<div style="background:var(--cinza);border-radius:8px;padding:7px 8px">
-      <div style="font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Prato ${i+1}</div>
+    items.push(`<div style="background:var(--cinza);border-radius:8px;padding:7px 8px;${slotBorder}">
+      <div style="font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Prato ${i+1}${g ? ` <span style="color:${g.cor};font-weight:700">GRUPO ${g.id}</span>` : ''}</div>
       <div style="display:flex;gap:4px;align-items:center">
         <input type="number" class="plan-num" data-idx="${i}" value="${curNum||''}" min="1"
           placeholder="#"
