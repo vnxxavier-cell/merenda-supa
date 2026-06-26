@@ -7351,7 +7351,7 @@ function salvarPreco(nome, valor){
 }
 
 function adicionarIngrediente(){
-  document.getElementById('overlay-novo-ing').classList.add('show');
+  document.getElementById('overlay-novo-ing').style.display = 'flex';
   setTimeout(()=>document.getElementById('novo-ing-nome')?.focus(),100);
 }
 function salvarNovoIngrediente(){
@@ -7364,11 +7364,11 @@ function salvarNovoIngrediente(){
   const custom = JSON.parse(localStorage.getItem('merenda_ing_custom') || '{}');
   custom[nome] = { unidade: unid };
   localStorage.setItem('merenda_ing_custom', JSON.stringify(custom));
-  document.getElementById('overlay-novo-ing').classList.remove('show');
+  document.getElementById('overlay-novo-ing').style.display = 'none';
   document.getElementById('novo-ing-nome').value = '';
   renderIngredientes();
 }
-function fecharNovoIng(){document.getElementById('overlay-novo-ing').classList.remove('show')}
+function fecharNovoIng(){document.getElementById('overlay-novo-ing').style.display = 'none'}
 function filtrarIngredientes(v){renderIngredientes(v)}
 function filtrarIngredientesForn(v){filtroIngForn=v;renderIngredientes()}
 
