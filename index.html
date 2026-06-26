@@ -1065,7 +1065,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="overflow:visible">
     <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;border-radius:var(--r) var(--r) 0 0">
       <span>Lista de Ingredientes <span style="font-weight:400;font-size:12px;opacity:.8" id="cnt-ings"></span></span>
-      <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar embalagens como padrão</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="adicionarIngrediente()">+ Adicionar Ingrediente</button>
+        <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar embalagens como padrão</button>
+      </div>
     </div>
     <table>
       <thead><tr><th>Ingrediente</th><th>Unidade</th><th>Tipo</th><th>Periodicidade</th><th title="Fornecedor cadastrado para este ingrediente">Fornecedor</th><th style="text-align:center" title="Tamanho do pacote comercial (ex: 1 kg, 5 kg). O total de compra será arredondado para o múltiplo mais próximo.">Pacote</th><th style="text-align:right">Preço</th></tr></thead>
@@ -1526,6 +1529,33 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- ══════════════════════════════════════════════════════
      MODAIS / OVERLAYS
 ══════════════════════════════════════════════════════ -->
+<!-- Modal Novo Ingrediente -->
+<div class="overlay" id="overlay-novo-ing" onclick="if(event.target===this)fecharNovoIng()">
+  <div class="modal" style="max-width:460px">
+    <div style="font-size:16px;font-weight:700;margin-bottom:16px">Novo Ingrediente</div>
+    <div class="campo" style="margin-bottom:12px">
+      <label>Nome do ingrediente</label>
+      <input id="novo-ing-nome" placeholder="Ex: ABÓBORA JAPONESA" style="width:100%;padding:8px 10px;border:1.5px solid var(--borda);border-radius:6px;font-size:13px;font-family:inherit">
+    </div>
+    <div class="campo" style="margin-bottom:16px">
+      <label>Unidade de medida</label>
+      <select id="novo-ing-unid" style="width:100%;padding:8px 10px;border:1.5px solid var(--borda);border-radius:6px;font-size:13px;font-family:inherit">
+        <option value="kg">kg (Quilograma)</option>
+        <option value="g">g (Grama)</option>
+        <option value="L">L (Litro)</option>
+        <option value="ml">ml (Mililitro)</option>
+        <option value="un">un (Unidade)</option>
+        <option value="maço">maço (Maço)</option>
+        <option value="pacote">pacote</option>
+        <option value="dúzia">dúzia (Dúzia)</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" style="background:var(--bg);color:var(--txt)" onclick="fecharNovoIng()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNovoIngrediente()">Adicionar</button>
+    </div>
+  </div>
+</div>
 <!-- Modal Calculadora por Orçamento -->
 <div class="overlay" id="overlay-calculadora" onclick="fecharCalculadora(event)">
   <div class="modal" style="max-width:760px">
@@ -3069,6 +3099,16 @@ let EMBALAGENS = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
   const u = JSON.parse(localStorage.getItem('merenda_unidades') || '{}');
   Object.entries(u).forEach(([nome, unidade]) => {
     if(DADOS.ingredientes[nome]) DADOS.ingredientes[nome].unidade = unidade;
+  });
+})();
+// Mesclar ingredientes customizados adicionados pelo usuário
+(function(){
+  const c = JSON.parse(localStorage.getItem('merenda_ing_custom') || '{}');
+  Object.entries(c).forEach(([nome, data]) => {
+    if(!DADOS.ingredientes[nome]) {
+      DADOS.ingredientes[nome] = data;
+      if(ESTOQUE[nome] === undefined) ESTOQUE[nome] = 0;
+    }
   });
 })();
 
@@ -7309,6 +7349,26 @@ function salvarPreco(nome, valor){
     setTimeout(()=> el.classList.remove('show'), 2000);
   }
 }
+
+function adicionarIngrediente(){
+  document.getElementById('overlay-novo-ing').classList.add('show');
+  setTimeout(()=>document.getElementById('novo-ing-nome')?.focus(),100);
+}
+function salvarNovoIngrediente(){
+  const nome = document.getElementById('novo-ing-nome')?.value?.trim().toUpperCase();
+  const unid = document.getElementById('novo-ing-unid')?.value;
+  if(!nome){ alert('Digite o nome do ingrediente.'); return; }
+  if(DADOS.ingredientes[nome]){ alert('Este ingrediente já existe.'); return; }
+  DADOS.ingredientes[nome] = { unidade: unid, estoque: 0, preco: 0 };
+  if(ESTOQUE[nome] === undefined) ESTOQUE[nome] = 0;
+  const custom = JSON.parse(localStorage.getItem('merenda_ing_custom') || '{}');
+  custom[nome] = { unidade: unid };
+  localStorage.setItem('merenda_ing_custom', JSON.stringify(custom));
+  document.getElementById('overlay-novo-ing').classList.remove('show');
+  document.getElementById('novo-ing-nome').value = '';
+  renderIngredientes();
+}
+function fecharNovoIng(){document.getElementById('overlay-novo-ing').classList.remove('show')}
 function filtrarIngredientes(v){renderIngredientes(v)}
 function filtrarIngredientesForn(v){filtroIngForn=v;renderIngredientes()}
 
