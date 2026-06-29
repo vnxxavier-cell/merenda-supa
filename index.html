@@ -4373,17 +4373,45 @@ function registrarOrdemExpedida(){
       ${licIds.map(licId => {
         const lic = licMap[licId];
         const licFull = LICITACOES.find(l => l.id === licId);
-        return `<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:8px;cursor:pointer;background:#fff">
-          <input type="checkbox" checked data-lic-id="${esc(licId)}" style="margin-top:3px;width:16px;height:16px;accent-color:var(--verde)">
-          <div>
-            <div style="font-weight:700;font-size:14px;color:var(--verde)">${esc(lic.nome)}</div>
-            <div style="font-size:12px;color:#64748b;margin-top:4px">
-              ${lic.itens.length} item(ns):
-              ${lic.itens.map(it => `<b>${esc(it.ingrediente)}</b> (${it.qtd.toFixed(3)} kg)`).join(', ')}
+        const precoMap = {};
+        if(licFull) licFull.itens.forEach(it => { precoMap[it.ingrediente] = it.preco_unitario || 0; });
+        const totalLic = lic.itens.reduce((s, it) => s + it.qtd * (precoMap[it.ingrediente]||0), 0);
+        return `<div style="border:1.5px solid #CBD5E1;border-radius:8px;overflow:hidden">
+          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:#fff">
+            <input type="checkbox" checked data-lic-id="${esc(licId)}" style="width:16px;height:16px;accent-color:var(--verde)">
+            <div style="flex:1">
+              <span style="font-weight:700;font-size:14px;color:var(--verde)">${esc(lic.nome)}</span>
+              ${licFull ? `<span style="font-size:11px;color:#94A3B8;margin-left:8px">Início: ${fmtDataBR(licFull.data_inicio)}</span>` : ''}
             </div>
-            ${licFull ? `<div style="font-size:11px;color:#94A3B8;margin-top:2px">Início: ${fmtDataBR(licFull.data_inicio)}</div>` : ''}
+            <span style="font-weight:700;font-size:13px;color:#1e293b">R$ ${totalLic.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+          </label>
+          <div style="overflow-x:auto;border-top:1px solid #E2E8F0">
+            <table style="width:100%;border-collapse:collapse;font-size:11px">
+              <thead><tr>
+                <th style="padding:4px 8px;text-align:left;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Ingrediente</th>
+                <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Qtd (kg)</th>
+                <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Preço unit.</th>
+                <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Subtotal</th>
+              </tr></thead>
+              <tbody>
+                ${lic.itens.map(it => {
+                  const pu = precoMap[it.ingrediente]||0;
+                  const sub = it.qtd * pu;
+                  return `<tr>
+                    <td style="padding:3px 8px;border-bottom:1px solid #F1F5F9">${esc(it.ingrediente)}</td>
+                    <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-family:'DM Mono',monospace">${it.qtd.toFixed(3)}</td>
+                    <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9">R$ ${pu.toFixed(2).replace('.',',')}</td>
+                    <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-weight:600">R$ ${sub.toFixed(2).replace('.',',')}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+              <tfoot><tr>
+                <td colspan="3" style="padding:5px 8px;text-align:right;font-weight:700;font-size:12px">Total</td>
+                <td class="num" style="padding:5px 8px;text-align:right;font-weight:700;font-size:12px;color:var(--verde)">R$ ${totalLic.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+              </tr></tfoot>
+            </table>
           </div>
-        </label>`;
+        </div>`;
       }).join('')}
     </div>
     ${itensSemLic.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
