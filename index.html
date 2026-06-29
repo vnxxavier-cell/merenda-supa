@@ -4105,6 +4105,10 @@ function registrarOrdemExpedida(){
   // Coleta itens já ajustados manualmente
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
   const todosItens = [...af_items, ...mc_items];
+  if(!todosItens.length){
+    alert('Nenhum item para registrar ordem. Verifique se:\n• Há uma semana selecionada no calendário\n• Há receitas cadastradas nas Fichas Técnicas\n• O período está dentro do ano letivo');
+    return;
+  }
 
   // Para cada contrato ativo, lista quais itens da ordem ele cobre
   const licMap = {}; // licId → { nome, itens: [{ ingrediente, qtd }] }
@@ -4125,7 +4129,10 @@ function registrarOrdemExpedida(){
   });
 
   if(!Object.keys(licMap).length){
-    alert('Nenhum item desta ordem está vinculado a um contrato ativo.\nCadastre um contrato com data de início igual ou anterior a hoje.');
+    console.warn('Ordem sem vínculo com contrato. Itens da ordem:', todosItens.map(i=>i.nomeBase+'('+i.comprar+'kg)'));
+    console.warn('Contratos ativos:', LICITACOES.filter(l=>l.status==='ativa').map(l=>l.nome+' itens:'+l.itens.map(x=>x.ingrediente).join(',')));
+    console.warn('itensSemLic:', itensSemLic);
+    alert('Nenhum item desta ordem está vinculado a um contrato ativo.\n\nMotivos comuns:\n• A data de início do contrato é posterior a hoje?\n• O nome do ingrediente no contrato está escrito igual ao da receita?\n• Nenhuma semana selecionada no calendário da Lista de Compras?\n\nVeja o console (F12) para mais detalhes.');
     return;
   }
 
