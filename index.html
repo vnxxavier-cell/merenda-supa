@@ -269,7 +269,6 @@ tbody tr:hover td{background:#f0f5fc}
   #banner-demo button{width:100%;text-align:center}
 
   /* Onboarding modal */
-  #overlay-boas-vindas .modal{border-radius:14px 14px 0 0}
 
   /* Títulos */
   h2.titulo{font-size:18px;margin-bottom:16px}
@@ -710,7 +709,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   </div>
   <div class="nav-bottom">
     <div class="nav-user" id="nav-user-nome"></div>
-    <button class="btn-logout" style="background:none;border:1px solid var(--borda);color:var(--txt2);margin-bottom:6px;font-size:11px;display:flex;align-items:center;gap:6px" onclick="abrirGuiaInicio(true)"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Guia de início</button>
     <button class="btn-logout" style="display:flex;align-items:center;gap:6px" onclick="logout()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</button>
   </div>
 </nav>
@@ -722,9 +720,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div>
     <div style="font-weight:700;color:#92400e;font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Você está usando a configuração de demonstração</div>
     <div style="font-size:12px;color:#78350f">Os dados exibidos são exemplos. Substitua pelas informações reais da sua escola antes de usar o sistema de verdade.</div>
-  </div>
-  <div style="display:flex;gap:8px;flex-shrink:0">
-    <button onclick="iniciarConfiguracaoManual()" style="font-size:12px;padding:7px 14px;background:#f59e0b;color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurar meu sistema</button>
   </div>
 </div>
 
@@ -1296,23 +1291,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 </div>
 
 <!-- Modal Boas-vindas / Onboarding -->
-<div class="overlay" id="overlay-boas-vindas" style="align-items:center">
-  <div class="modal" style="max-width:580px;overflow:hidden">
-    <div class="modal-header" style="background:var(--verde)">
-      <h3 style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg><span id="onb-titulo-txt">Bem-vindo ao Prato Certo!</span></h3>
-      <button class="modal-close" onclick="fecharBoasVindas()">×</button>
-    </div>
-    <div class="modal-body" style="padding:0">
 
-      <!-- Indicadores de etapa -->
-      <div style="display:flex;justify-content:center;gap:8px;padding:14px 0 0">
-        <span id="onb-dot-1" onclick="onbGoto(1)" style="display:block;width:10px;height:10px;border-radius:50%;background:var(--verde);cursor:pointer;transition:background .2s"></span>
-        <span id="onb-dot-2" onclick="onbGoto(2)" style="display:block;width:10px;height:10px;border-radius:50%;background:#cbd5e1;cursor:pointer;transition:background .2s"></span>
-        <span id="onb-dot-3" onclick="onbGoto(3)" style="display:block;width:10px;height:10px;border-radius:50%;background:#cbd5e1;cursor:pointer;transition:background .2s"></span>
-      </div>
-
-      <!-- Página 1: O que é o Prato Certo -->
-      <div id="onb-pg-1" style="padding:0">
         <!-- Hero banner -->
         <div style="background:linear-gradient(135deg,#166534 0%,#15803d 100%);padding:26px 28px 22px;color:#fff">
           <div style="font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:7px">Prato Certo</div>
@@ -1352,55 +1331,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
       </div>
 
-      <!-- Página 2: Ferramentas -->
-      <div id="onb-pg-2" style="display:none;padding:0">
-        <div style="background:#f8fafc;border-bottom:1px solid var(--borda);padding:18px 26px 16px">
-          <div style="font-size:17px;font-weight:900;color:var(--txt);letter-spacing:-.3px;margin-bottom:4px">Tudo em um só sistema</div>
-          <div style="font-size:12px;color:var(--txt2)">Cada módulo resolve uma parte do seu trabalho diário</div>
-        </div>
-        <div style="padding:16px 26px 10px">
-          <div id="onb-features-grid"></div>
-        </div>
-      </div>
-
-      <!-- Página 3: Configurar (conteúdo original) -->
-      <div id="onb-pg-3" style="display:none;padding:20px 26px 10px">
-        <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Para usar o sistema, escolha uma das opções abaixo:</p>
-        <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:16px;margin-bottom:14px">
-          <div style="font-weight:700;color:#166534;margin-bottom:4px;font-size:14px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Opção A — Configuração de demonstração</div>
-          <div style="font-size:12px;color:#166534;margin-bottom:12px">Carrega automaticamente alunos, preços, ciclos e cardápio de exemplo. Ideal para conhecer o sistema antes de inserir seus dados reais.</div>
-          <button class="btn" style="background:#16a34a;color:#fff;width:100%;font-size:13px;font-weight:700" onclick="carregarDemostracao()">Usar configuração de demonstração</button>
-        </div>
-        <div style="background:#f8faff;border:2px solid var(--borda);border-radius:10px;padding:16px">
-          <div style="font-weight:700;color:var(--txt);margin-bottom:4px;font-size:14px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Opção B — Configurar manualmente</div>
-          <div style="font-size:12px;color:var(--txt2);margin-bottom:12px">Preencha as informações reais da sua escola. Clique em cada item abaixo para ser guiado à tela de configuração correspondente.</div>
-          <div id="onboarding-checklist" style="display:flex;flex-direction:column;gap:8px"></div>
-          <div id="onboarding-iniciar" style="margin-top:12px"></div>
-        </div>
-        <div style="margin-top:14px;text-align:center">
-          <button class="btn btn-outline" style="font-size:13px;color:var(--txt2);border-color:var(--borda)" onclick="fecharBoasVindas()">Fechar e ir para o sistema</button>
-        </div>
-      </div>
-
-      <!-- Navegação -->
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 26px;border-top:1px solid var(--borda);margin-top:10px">
-        <button id="onb-btn-prev" onclick="onbGoto(_onbPag-1)" class="btn btn-outline btn-sm" style="visibility:hidden;font-size:12px">← Anterior</button>
-        <button id="onb-btn-skip" onclick="onbGoto(3)" style="background:none;border:none;font-size:12px;color:var(--txt2);cursor:pointer;text-decoration:underline">Pular apresentação</button>
-        <button id="onb-btn-next" onclick="onbGoto(_onbPag+1)" class="btn btn-primary btn-sm" style="font-size:12px">Próximo →</button>
-      </div>
-      <!-- Opção de não mostrar mais -->
-      <div style="text-align:center;padding:0 26px 14px">
-        <label style="font-size:11px;color:var(--txt2);display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none">
-          <input type="checkbox" id="chk-nao-mostrar" style="cursor:pointer;accent-color:var(--azul)">
-          Não mostrar automaticamente ao entrar
-        </label>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- Modal Criar/Editar Usuário -->
 <!-- Popup de configuração de dia no calendário -->
 <div id="cal-day-popup" style="display:none;position:fixed;z-index:2000;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);border:1.5px solid var(--borda);padding:10px;min-width:260px">
   <div style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;padding:0 2px 8px;border-bottom:1px solid var(--borda);margin-bottom:8px" id="cal-popup-titulo"></div>
@@ -2283,7 +2213,6 @@ async function fazerLogin(){
       }, { onConflict: 'user_id' }); } catch(e){} }
       // Marca conta como inicializada
       res.user.nova_conta = false;
-      window._primeiroLogin = true;
       const _ls = window._origLS || localStorage;
       _ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS.map(u => u.id === res.user.id ? {...u, nova_conta: false} : u)));
       if(_supabase){ try { await _supabase.from('usuarios').update({ nova_conta: false }).eq('id', res.user.id); } catch(e){} }
@@ -2699,181 +2628,10 @@ function configuracaoCompleta(){
 function verificarOnboarding(){
   const uid = window._SESSAO && window._SESSAO.user_id;
   if(uid === 'usr_admin' || uid === 'usr_admin_rede') return;
-  if(window._primeiroLogin){ window._primeiroLogin = false; abrirGuiaInicio(); return; }
   if(localStorage.getItem('merenda_ocultar_boasvindas') === '1') return;
   const demoAtivo = !!localStorage.getItem('merenda_usando_demo');
   if(demoAtivo || configuracaoCompleta()) return;
-  abrirGuiaInicio();
-}
 
-var _onbPag = 1;
-
-function abrirGuiaInicio(irParaSetup){
-  _onbPag = 1;
-  document.getElementById('overlay-boas-vindas').classList.add('aberto');
-  onbGoto(irParaSetup ? 3 : 1);
-  const chk = document.getElementById('chk-nao-mostrar');
-  if(chk) chk.checked = localStorage.getItem('merenda_ocultar_boasvindas') === '1';
-}
-
-function onbGoto(n){
-  if(n < 1 || n > 3) return;
-  _onbPag = n;
-  for(var i = 1; i <= 3; i++){
-    var pg = document.getElementById('onb-pg-'+i);
-    if(pg) pg.style.display = (i === n) ? '' : 'none';
-    var dot = document.getElementById('onb-dot-'+i);
-    if(dot) dot.style.background = (i <= n) ? 'var(--verde)' : '#cbd5e1';
-  }
-  if(n === 2){
-    var grid = document.getElementById('onb-features-grid');
-    if(grid && !grid.children.length) renderOnbFeatures();
-  }
-  if(n === 3) renderChecklistOnboarding();
-  var titles = ['Bem-vindo ao Prato Certo!','O que você pode fazer','Como você prefere começar?'];
-  var t = document.getElementById('onb-titulo-txt');
-  if(t) t.textContent = titles[n-1];
-  var prev = document.getElementById('onb-btn-prev');
-  var next = document.getElementById('onb-btn-next');
-  var skip = document.getElementById('onb-btn-skip');
-  if(prev) prev.style.visibility = n > 1 ? 'visible' : 'hidden';
-  if(next){
-    next.style.display = n < 3 ? '' : 'none';
-    next.textContent = n === 2 ? 'Configurar →' : 'Próximo →';
-  }
-  if(skip) skip.style.display = n < 3 ? '' : 'none';
-}
-
-function renderOnbFeatures(){
-  var features = [
-    {key:'cal',    title:'Cardápio Anual',    desc:'Planejamento por ciclos com calendário letivo', bg:'#eff6ff',bc:'#93c5fd',tc:'#1e40af'},
-    {key:'folder', title:'Fichas Técnicas',   desc:'Receitas PNAE com per capita por nível',        bg:'#f0fdf4',bc:'#86efac',tc:'#166534'},
-    {key:'chart',  title:'Lista de Compras',   desc:'Compras semanais calculadas automaticamente',   bg:'#faf5ff',bc:'#d8b4fe',tc:'#7e22ce'},
-    {key:'alert',  title:'Estoque',           desc:'Monitoramento com alertas de nível crítico',    bg:'#fffbeb',bc:'#fcd34d',tc:'#b45309'},
-    {key:'edit',   title:'Contratos',          desc:'Controle de contratos, pedidos e recebimentos', bg:'#fff1f2',bc:'#fda4af',tc:'#be123c'},
-    {key:'chart', title:'Quantidades por Turno',   desc:'Quantidades para cozinhar no dia por turno',   bg:'#fdf4ff',bc:'#e9d5ff',tc:'#86198f'},
-    {key:'users',  title:'Ingredientes',      desc:'Preços, unidades, pacotes e fornecedores',      bg:'#f0fdfa',bc:'#99f6e4',tc:'#0f766e'},
-    {key:'key',    title:'Configurações',     desc:'Escola, calendário, níveis e cabeçalho',        bg:'#f8fafc',bc:'#cbd5e1',tc:'#475569'},
-  ];
-  document.getElementById('onb-features-grid').innerHTML =
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
-    features.map(function(f){
-      return '<div style="display:flex;align-items:flex-start;gap:10px;background:'+f.bg+';border:1.5px solid '+f.bc+';border-radius:8px;padding:10px 12px">' +
-        '<span style="color:'+f.tc+';flex-shrink:0;margin-top:1px">'+ico(f.key,16)+'</span>' +
-        '<div><div style="font-size:12px;font-weight:700;color:'+f.tc+'">'+f.title+'</div>' +
-        '<div style="font-size:11px;color:var(--txt2);margin-top:2px">'+f.desc+'</div></div></div>';
-    }).join('') +
-    '</div>';
-}
-
-function renderChecklistOnboarding(){
-  const steps = [
-    {
-      label: '1. Níveis de ensino e quantidade de alunos',
-      desc: 'Ative os níveis (F I, F II, Médio, EJA) e informe o número de alunos de cada um',
-      ok: NIVEIS_CONFIG.some(n => n.ativo && n.alunos > 0) && !!localStorage.getItem('merenda_niveis'),
-      acao: () => { fecharBoasVindas(); ir2('config'); }
-    },
-    {
-      label: '2. Preços dos ingredientes',
-      desc: 'Informe o preço de compra de cada ingrediente para calcular orçamentos',
-      ok: Object.keys(JSON.parse(localStorage.getItem('merenda_precos')||'{}')).length > 3,
-      acao: () => { fecharBoasVindas(); ir2('ingredientes'); }
-    },
-    {
-      label: '3. Calendário escolar',
-      desc: 'Defina o período letivo, feriados e sábados letivos',
-      ok: !!localStorage.getItem('merenda_cal_config') && !!CAL_CONFIG.inicio,
-      acao: () => { fecharBoasVindas(); ir2('cardapio'); }
-    },
-    {
-      label: '4. Ciclo do cardápio',
-      desc: 'Monte os ciclos de pratos e distribua no calendário anual',
-      ok: Object.values(JSON.parse(localStorage.getItem('merenda_ciclos_planos')||'{}')).some(v=>Array.isArray(v)&&v.some(p=>p)),
-      acao: () => { fecharBoasVindas(); ir2('cardapio'); }
-    },
-    {
-      label: '5. Fichas técnicas',
-      desc: 'Já vêm configuradas com o padrão PNAE — ajuste se necessário',
-      ok: true,
-      acao: () => { fecharBoasVindas(); ir2('ficha'); }
-    },
-  ];
-
-  const el = document.getElementById('onboarding-checklist');
-  if(!el) return;
-  el.innerHTML = steps.map((s,i) => `
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:${s.ok?'#f0fdf4':'#f9fafb'};border:1.5px solid ${s.ok?'#86efac':'var(--borda)'};border-radius:8px;cursor:${s.ok?'default':'pointer'}" onclick="${s.ok?'':('_onbStep('+i+')')}">
-      <span style="font-size:18px;flex-shrink:0;margin-top:1px">${s.ok?ico('checkCircle',18):dot('#9ca3af')}</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:${s.ok?'#166534':'var(--txt)'}">${s.label}</div>
-        <div style="font-size:11px;color:var(--txt2)">${s.desc}</div>
-      </div>
-      ${!s.ok?`<span style="margin-left:auto;font-size:11px;color:var(--azul2);white-space:nowrap;align-self:center">Configurar →</span>`:''}
-    </div>`).join('');
-
-  // Guarda ações para chamar por índice
-  window._onbSteps = steps;
-
-  // Botão "Iniciar" — só aparece quando tudo está configurado
-  const iniciarEl = document.getElementById('onboarding-iniciar');
-  if(iniciarEl){
-    const tudo = steps.every(s => s.ok);
-    iniciarEl.innerHTML = tudo
-      ? `<button class="btn btn-primary" style="width:100%;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px" onclick="concluirOnboarding()">${ico('checkCircle',15)}Tudo configurado — Iniciar o sistema →</button>`
-      : `<div style="text-align:center;font-size:12px;color:var(--txt2);padding:8px;background:#f1f5f9;border-radius:7px;border:1.5px dashed #cbd5e1">Complete os itens acima para iniciar o sistema</div>`;
-  }
-}
-
-function _onbStep(i){
-  if(window._onbSteps && window._onbSteps[i]) window._onbSteps[i].acao();
-}
-
-function fecharBoasVindas(){
-  const chk = document.getElementById('chk-nao-mostrar');
-  if(chk?.checked){
-    localStorage.setItem('merenda_ocultar_boasvindas', '1');
-  } else {
-    localStorage.removeItem('merenda_ocultar_boasvindas');
-  }
-  document.getElementById('overlay-boas-vindas').classList.remove('aberto');
-}
-
-function concluirOnboarding(){
-  localStorage.setItem('merenda_onboarding_visto', '1');
-  document.getElementById('overlay-boas-vindas').classList.remove('aberto');
-}
-
-function iniciarConfiguracaoManual(){
-  // Limpa todos os dados de demonstração / configurações prévias
-  const chaves = [
-    'merenda_usando_demo',
-    'merenda_niveis',
-    'merenda_precos',
-    'merenda_ciclos_planos',
-    'merenda_cardapio',
-    'merenda_cal_config',
-    'merenda_onboarding_visto',
-    'merenda_percapta',
-    'merenda_embalagens',
-  ];
-  chaves.forEach(k => localStorage.removeItem(k));
-
-  // Reinicializa dados em memória com padrão vazio
-  NIVEIS_CONFIG = [
-    { id:'f1',    alunos:0, ativo:false },
-    { id:'f2',    alunos:0, ativo:false },
-    { id:'medio', alunos:0, ativo:false },
-    { id:'eja',   alunos:0, ativo:false },
-  ];
-  CICLOS_PLANOS = {};
-  DADOS.cardapio = {};
-
-  recarregarDados();
-  init();
-  atualizarBannerDemo();
-  abrirGuiaInicio();
-}
 
 function ir2(id){
   // Navega para uma aba pelo id sem depender de event
@@ -2995,7 +2753,6 @@ function carregarDemostracao(){
 
   localStorage.setItem('merenda_usando_demo', '1');
 
-  concluirOnboarding();
   recarregarDados();
   init();
   gerarSeletoresPratos();
