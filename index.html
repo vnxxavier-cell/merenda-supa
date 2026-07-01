@@ -730,6 +730,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div class="print-only print-header" id="print-header" style="display:none">
   <img id="print-header-img" src="" alt="" style="display:none">
 </div>
+<div id="print-assinatura" class="print-only" style="display:none"></div>
 <div class="print-only print-title" id="print-title-global"></div>
 
 
@@ -7405,15 +7406,16 @@ function imprimirPrepAtual(){
 }
 
 function atualizarPrintGlobal(){
-  const isMercado = document.getElementById('pg-mercado').classList.contains('ativa');
+  const isMercado = document.getElementById('pg-mercado')?.classList.contains('ativa');
   const gh = document.getElementById('print-header');
   const ga = document.getElementById('print-assinatura');
+  if(!gh) return;
   if(isMercado){
     gh.classList.add('print-hide');
-    ga.classList.add('print-hide');
+    if(ga) ga.classList.add('print-hide');
   } else {
     gh.classList.remove('print-hide');
-    ga.classList.remove('print-hide');
+    if(ga) ga.classList.remove('print-hide');
   }
 }
 
