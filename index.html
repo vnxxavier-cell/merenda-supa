@@ -5953,9 +5953,10 @@ function renderMercado(){
     let totalValor = 0;
     const printRows = itensContrato.map((it,i) => {
       const {arred} = arredondarEmb(it.nomeBase, it.comprar);
-      const qtd = typeof arred === 'number'
-        ? arred.toLocaleString('pt-BR', {maximumFractionDigits:3})
-        : arred;
+      const _qtdKg = typeof arred === 'number' ? arred : 0;
+      const isConv = it.nomeBase==='OVO'||it.nomeBase==='PÃO FRANCÊS'||it.nomeBase==='PÃO DE SAL';
+      const gramatura = isConv ? (JSON.parse(localStorage.getItem('merenda_gramatura')||'{}')[it.nomeBase] || 50) : 0;
+      const qtd = isConv ? Math.ceil(_qtdKg*1000/gramatura)+' un' : _qtdKg.toLocaleString('pt-BR', {maximumFractionDigits:3});
       const obsImp = (_obsMap[it.nomeBase] || '').trim();
       if(typeof arred === 'number'){
         const lic = LICITACOES.find(l => l.status==='ativa' && l.data_inicio<=hojeLic && l.itens.some(x=>x.ingrediente===it.nomeBase));
@@ -5966,7 +5967,7 @@ function renderMercado(){
         <td style="border:1px solid #C8D0DC;padding:6px 10px;text-align:center">${i+1}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.displayNome}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${qtd}</td>
-        <td style="border:1px solid #C8D0DC;padding:6px 10px">${unidDisplay(it.nomeBase)}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 10px">${isConv?'—':unidDisplay(it.nomeBase)}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px;font-style:italic;color:#555;font-size:10.5px;width:40%">${esc(obsImp)}</td>
       </tr>`;
     }).join('');
