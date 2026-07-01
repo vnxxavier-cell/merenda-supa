@@ -5940,16 +5940,12 @@ function renderMercado(){
         : arred;
       const obsImp = (_obsMap[it.nomeBase] || '').trim();
       const perLabel = it.periodicidade !== 'semanal' ? ` (${it.numSemanas} sem.)` : '';
-      const precoUnit = precosSalvos[it.nomeBase] || 0;
-      const subtotal = typeof arred === 'number' ? arred * precoUnit : 0;
       return `<tr>
         <td style="border:1px solid #C8D0DC;padding:6px 10px;text-align:center">${i+1}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.displayNome}${perLabel}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px;font-style:italic;color:#555;font-size:10.5px">${esc(obsImp)}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${qtd}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.unid}</td>
-        <td style="border:1px solid #C8D0DC;padding:6px 10px;text-align:right">R$ ${precoUnit.toFixed(2).replace('.',',')}</td>
-        <td style="border:1px solid #C8D0DC;padding:6px 10px;text-align:right;font-weight:700">R$ ${subtotal.toFixed(2).replace('.',',')}</td>
       </tr>`;
     }).join('');
     const totalValor = items.filter(it => !it.coberto).reduce((s,it) => {
@@ -5971,13 +5967,12 @@ function renderMercado(){
           <span><strong>Data:</strong> ${hoje}</span>
         </div>
         <div class="forn-tabela-wrap" style="border:1px solid #1A3A6B"><table class="forn-tabela" style="border-collapse:separate;border-spacing:0;width:100%">
-          <thead><tr><th style="border:1px solid #1A3A6B;padding:7px 10px">ITEM</th><th style="border:1px solid #1A3A6B;padding:7px 10px">DESCRIÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">OBSERVAÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">QTD</th><th style="border:1px solid #1A3A6B;padding:7px 10px">UN</th><th style="border:1px solid #1A3A6B;padding:7px 10px">PREÇO UNIT.</th><th style="border:1px solid #1A3A6B;padding:7px 10px">VALOR</th></tr></thead>
+          <thead><tr><th style="border:1px solid #1A3A6B;padding:7px 10px">ITEM</th><th style="border:1px solid #1A3A6B;padding:7px 10px">DESCRIÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">OBSERVAÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">QTD</th><th style="border:1px solid #1A3A6B;padding:7px 10px">UN</th></tr></thead>
           <tbody>${printRows}</tbody>
-          <tfoot><tr><td colspan="5" style="border:1px solid #1A3A6B;padding:7px 10px;font-weight:700;text-align:right">TOTAL</td>
-            <td style="border:1px solid #1A3A6B;padding:7px 10px"></td>
-            <td style="border:1px solid #1A3A6B;padding:7px 10px;text-align:right;font-weight:700">R$ ${totalValor.toFixed(2).replace('.',',')}</td>
-          </tr></tfoot>
         </table></div>
+        <div style="text-align:right;font-size:11pt;font-weight:700;margin-top:10px;padding:6px 12px;border:1px solid #1A3A6B;border-top:none;background:#f0f4fc">
+          Valor Total: R$ ${totalValor.toFixed(2).replace('.',',')}
+        </div>
         <div class="forn-assinatura">
           <div class="forn-assinatura-linha">${_diretor || '________________________'}</div>
           <div class="forn-assinatura-cargo">${_cargo}</div>
