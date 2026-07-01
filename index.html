@@ -5965,14 +5965,12 @@ function renderMercado(){
         <div class="forn-info">
           <span><strong>Fornecedor:</strong> ${titulo}</span>
           <span><strong>Data:</strong> ${hoje}</span>
+          <span style="font-weight:700">Valor Total: R$ ${totalValor.toFixed(2).replace('.',',')}</span>
         </div>
         <div class="forn-tabela-wrap" style="border:1px solid #1A3A6B"><table class="forn-tabela" style="border-collapse:separate;border-spacing:0;width:100%">
           <thead><tr><th style="border:1px solid #1A3A6B;padding:7px 10px">ITEM</th><th style="border:1px solid #1A3A6B;padding:7px 10px">DESCRIÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">OBSERVAÇÃO</th><th style="border:1px solid #1A3A6B;padding:7px 10px">QTD</th><th style="border:1px solid #1A3A6B;padding:7px 10px">UN</th></tr></thead>
           <tbody>${printRows}</tbody>
         </table></div>
-        <div style="text-align:right;font-size:11pt;font-weight:700;margin-top:10px;padding:6px 12px;border:1px solid #1A3A6B;border-top:none;background:#f0f4fc">
-          Valor Total: R$ ${totalValor.toFixed(2).replace('.',',')}
-        </div>
         <div class="forn-assinatura">
           <div class="forn-assinatura-linha">${_diretor || '________________________'}</div>
           <div class="forn-assinatura-cargo">${_cargo}</div>
