@@ -310,7 +310,7 @@ tbody tr:hover td{background:#f0f5fc}
   .screen-hidden{display:block!important}
   @page{margin:20mm 24mm;size:A4}
   /* ── ocultar UI ── */
-  nav,#nav-principal,.mobile-topbar,#mobile-topbar,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay,#merc-calendario{display:none!important}
+  nav,#nav-principal,.mobile-topbar,#mobile-topbar,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay,#merc-calendario,#btn-ajuda-tab,[onclick*="baixarBackup"]{display:none!important}
   h2.titulo{display:none!important}
   /* ── layout base ── */
   body{background:#fff;font-size:10.5pt;color:#000;padding:0;margin:0;display:block!important}
@@ -5810,7 +5810,6 @@ function renderMercado(){
   // ────────────────────────────────────────────────────
 
   const _sub    = _subtitulo;
-  const imgHtml = _imgData ? `<img src="${_imgData}" style="width:100%;height:auto;display:block">` : '';
 
   const inputStyle = `width:72px;text-align:right;padding:3px 5px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--azul2)`;
 
@@ -5950,10 +5949,11 @@ function renderMercado(){
       <!-- impressão formal -->
       <div class="print-only forn-print-doc">
         <div style="border-bottom:2.5px solid #1A3A6B;padding-bottom:10px;margin-bottom:14px;text-align:center">
+          ${_imgData ? `<img src="${_imgData}" style="max-width:100%;height:auto;display:block;margin:0 auto 8px">` : ''}
           <div style="font-size:14pt;font-weight:800;color:#1A3A6B;letter-spacing:.02em">${esc(_escola)}</div>
           <div style="font-size:9pt;color:#555;margin-top:3px">${esc(_subtitulo)}</div>
         </div>
-        <div class="forn-titulo">ORDEM DE FORNECIMENTO Nº ${_numOrdem}</div>
+        <div class="forn-titulo">ORDEM DE FORNECIMENTO</div>
         <div class="forn-info">
           <span><strong>Fornecedor:</strong> ${titulo}</span>
           <span><strong>Data:</strong> ${hoje}</span>
