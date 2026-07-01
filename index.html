@@ -5950,7 +5950,11 @@ function renderMercado(){
     }).join('');
     const totalValor = items.filter(it => !it.coberto).reduce((s,it) => {
       const {arred} = arredondarEmb(it.nomeBase, it.comprar);
-      return s + (typeof arred === 'number' ? arred * (precosSalvos[it.nomeBase]||0) : 0);
+      if(typeof arred !== 'number') return s;
+      const hoje = new Date().toISOString().split('T')[0];
+      const lic = LICITACOES.find(l => l.status==='ativa' && l.data_inicio<=hoje && l.itens.some(x=>x.ingrediente===it.nomeBase));
+      const preco = lic ? (lic.itens.find(x=>x.ingrediente===it.nomeBase)?.preco_unitario||0) : 0;
+      return s + arred * preco;
     }, 0);
 
     return `<div class="forn-page">
