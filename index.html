@@ -5656,9 +5656,6 @@ function renderCalendarioMercado(){
 function renderMercado(){
   renderServidoresCard();
 
-  // Preços para calcular valor total da ordem
-  const precosSalvos = JSON.parse(localStorage.getItem('merenda_precos') || '{}');
-
   // Preenche cabeçalho e assinatura de impressão com dados das Configurações
   const _escola    = localStorage.getItem('merenda_escola')    || '';
   const _subtitulo = localStorage.getItem('merenda_subtitulo') || 'Programa Nacional de Alimentação Escolar — PNAE';
@@ -5933,13 +5930,21 @@ function renderMercado(){
     const hdrTxt = cor ? '#1A3A6B' : '#fff';
     const hdrBorder = cor ? `border-bottom:2px solid #1A3A6B` : '';
 
-    const printRows = items.filter(it => !it.coberto).map((it,i) => {
+    const hojeLic = new Date().toISOString().split('T')[0];
+    const itensContrato = items.filter(it => !it.coberto && LICITACOES.some(l => l.status==='ativa' && l.data_inicio<=hojeLic && l.itens.some(x=>x.ingrediente===it.nomeBase)));
+    let totalValor = 0;
+    const printRows = itensContrato.map((it,i) => {
       const {arred} = arredondarEmb(it.nomeBase, it.comprar);
       const qtd = typeof arred === 'number'
         ? arred.toLocaleString('pt-BR', {maximumFractionDigits:3})
         : arred;
       const obsImp = (_obsMap[it.nomeBase] || '').trim();
       const perLabel = it.periodicidade !== 'semanal' ? ` (${it.numSemanas} sem.)` : '';
+      if(typeof arred === 'number'){
+        const lic = LICITACOES.find(l => l.status==='ativa' && l.data_inicio<=hojeLic && l.itens.some(x=>x.ingrediente===it.nomeBase));
+        const preco = lic ? (lic.itens.find(x=>x.ingrediente===it.nomeBase)?.preco_unitario||0) : 0;
+        totalValor += arred * preco;
+      }
       return `<tr>
         <td style="border:1px solid #C8D0DC;padding:6px 10px;text-align:center">${i+1}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.displayNome}${perLabel}</td>
@@ -5948,14 +5953,6 @@ function renderMercado(){
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.unid}</td>
       </tr>`;
     }).join('');
-    const totalValor = items.filter(it => !it.coberto).reduce((s,it) => {
-      const {arred} = arredondarEmb(it.nomeBase, it.comprar);
-      if(typeof arred !== 'number') return s;
-      const hoje = new Date().toISOString().split('T')[0];
-      const lic = LICITACOES.find(l => l.status==='ativa' && l.data_inicio<=hoje && l.itens.some(x=>x.ingrediente===it.nomeBase));
-      const preco = lic ? (lic.itens.find(x=>x.ingrediente===it.nomeBase)?.preco_unitario||0) : 0;
-      return s + arred * preco;
-    }, 0);
 
     return `<div class="forn-page">
       <!-- impressão formal -->
