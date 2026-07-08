@@ -5898,11 +5898,19 @@ function renderMercado(){
         const tipoTag  = isAF(it.nomeBase)
           ? `<span class="tag-af" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/><path d="M6.168 9a10 10 0 0 0 11.664 0"/></svg>AF</span>`
           : `<span class="tag-mc" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>MC</span>`;
+        const contratoOk = (()=>{
+          const fid = ING_FORNECEDORES[it.nomeBase];
+          if(!fid) return 0; // sem fornecedor
+          const hoje = new Date().toISOString().split('T')[0];
+          return LICITACOES.some(l => l.status==='ativa' && l.data_inicio<=hoje && l.fornecedor_id===fid && l.itens.some(x=>x.ingrediente===it.nomeBase)) ? 1 : -1;
+        })();
+        const contratoTag = contratoOk === 1 ? `<span style="font-size:10px;color:#16a34a;font-weight:600;margin-left:4px" title="Contrato ativo">📋</span>`
+          : contratoOk === -1 ? `<span style="font-size:10px;color:#dc2626;font-weight:600;margin-left:4px" title="Sem contrato ativo para este fornecedor">⚠️</span>` : '';
 
         if(it.coberto){
           return `<tr style="background:#f0fdf4">
             <td style="text-align:center;font-weight:700;color:#aaa">${i+1}</td>
-            <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}</td>
+            <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}${contratoTag}</td>
             <td class="no-print">
               <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
                 style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Inter',sans-serif;background:#f0fdf4"
@@ -5925,9 +5933,8 @@ function renderMercado(){
         const exInfo  = foiArred ? `<div class="hover-info no-print" style="font-size:10px;color:#aaa">exato: ${fmtEsp(it.nomeBase,it.comprar)}</div>` : '';
         return `<tr>
           <td style="text-align:center;font-weight:700;color:#666">${i+1}</td>
-          <td><b>${it.displayNome}</b>${_perBadge(it)}</td>
+          <td><b>${it.displayNome}</b>${_perBadge(it)}${contratoTag}</td>
           <td>
-            <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
               style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Inter',sans-serif;background:#fafafa"
               onchange="salvarObsItemMerc('${enc}',this.value)">
             <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
