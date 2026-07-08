@@ -4647,6 +4647,20 @@ function init(){
     PRATOS_LISTA.sort();
   }
 
+  // Corrige ficha técnica do Cardápio 79 (dados trocados)
+  if(DADOS.ficha['79 - Leite Achocolatado e Pão']){
+    const f = DADOS.ficha['79 - Leite Achocolatado e Pão'];
+    if(f.length === 3 && f[0].i === 'MAÇÃ / FRUTA DA ESTAÇÃO'){
+      DADOS.ficha['79 - Leite Achocolatado e Pão'] = [
+        {i:'ACHOCOLATADO EM PÓ',g:6.5,f1:4.5,f2:6.5,medio:7.5,eja:6.5},
+        {i:'LEITE INTEGRAL',g:230,f1:160,f2:230,medio:260,eja:230},
+        {i:'MAÇÃ / FRUTA DA ESTAÇÃO',g:90,f1:65,f2:90,medio:120,eja:90},
+        {i:'MARGARINA',g:5,f1:3,f2:5,medio:5,eja:5},
+        {i:'PÃO FRANCÊS',g:75,f1:50,f2:75,medio:75,eja:75}
+      ];
+    }
+  }
+
   atualizarCiclos();
 
   popularMesesGastos();
