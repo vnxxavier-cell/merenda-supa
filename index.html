@@ -5842,7 +5842,7 @@ function renderMercado(){
 
   const _sub    = _subtitulo;
 
-  const inputStyle = `width:72px;text-align:right;padding:3px 5px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--azul2)`;
+  const inputStyle = `width:55px;text-align:right;padding:2px 4px;border:1.5px solid var(--borda);border-radius:5px;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--azul2)`;
 
   const _obsMap = getMercAjuste().obs || {};
   const _perBadge = (it) => {
@@ -5919,8 +5919,8 @@ function renderMercado(){
               <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
             </td>
             <td class="no-print">${tipoTag}</td>
-            <td class="num no-print" style="color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)}</td>
-            <td class="num no-print">
+            <td class="num no-print" style="color:var(--txt2);overflow:hidden">${fmtEsp(it.nomeBase,it.nec)}</td>
+            <td class="num no-print" style="overflow:hidden">
               <span style="color:#16a34a;font-size:12px;font-weight:700;white-space:nowrap">✓ Coberto</span>
             </td>
             <td class="print-only"></td>
@@ -5943,15 +5943,15 @@ function renderMercado(){
             <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
           </td>
           <td>${tipoTag}</td>
-          <td class="num no-print" style="color:var(--txt2)">${fmtEsp(it.nomeBase,it.nec)}</td>
-          <td class="num no-print" style="white-space:nowrap">
-            <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end">
+          <td class="num no-print" style="color:var(--txt2);overflow:hidden">${fmtEsp(it.nomeBase,it.nec)}</td>
+          <td class="num no-print" style="white-space:nowrap;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:3px;justify-content:flex-end">
               <input type="number" min="0" step="0.01" value="${arred}" style="${inputStyle}"
                 onchange="ajustarQtdMerc('${enc}',this.value,${it.extra?'true':'false'})">
               <span style="font-size:11px;color:var(--txt2)">${it.unid}</span>
-              <button class="emb-btn no-print" style="color:#e74c3c;border-color:#e74c3c;padding:2px 6px"
+              <button class="emb-btn no-print" style="color:#e74c3c;border-color:#e74c3c;padding:1px 4px;font-size:11px"
                 onclick="removerItemMerc('${enc}',${it.extra?'true':'false'})">✕</button>
-              <button class="emb-btn no-print" style="color:#0369a1;border-color:#7dd3fc;padding:2px 6px"
+              <button class="emb-btn no-print" style="color:#0369a1;border-color:#7dd3fc;padding:1px 4px"
                 onclick="adicionarItemMercForn('${enc}',this)" title="Trocar fornecedor" style="display:inline-flex;align-items:center;justify-content:center">${ico('users',11)}</button>
             </div>${pacInfo}${exInfo}
           </td>
