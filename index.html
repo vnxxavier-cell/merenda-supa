@@ -5891,7 +5891,7 @@ function renderMercado(){
   };
 
   const buildRows = (items, fornId) => items.length === 0
-    ? `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px">Nenhum item</td></tr>`
+    ? `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:16px">Nenhum item</td></tr>`
     : items.map((it,i) => {
         const enc      = it.nomeBase.replace(/'/g,"\\'");
         const obsAtual = (_obsMap[it.nomeBase] || '').replace(/"/g,'&quot;');
@@ -5910,7 +5910,8 @@ function renderMercado(){
         if(it.coberto){
           return `<tr style="background:#f0fdf4">
             <td style="text-align:center;font-weight:700;color:#aaa">${i+1}</td>
-            <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}${contratoTag}</td>
+            <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}</td>
+            <td style="text-align:center">${contratoTag}</td>
             <td class="no-print">
               <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
                 style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Inter',sans-serif;background:#f0fdf4"
@@ -5933,8 +5934,10 @@ function renderMercado(){
         const exInfo  = foiArred ? `<div class="hover-info no-print" style="font-size:10px;color:#aaa">exato: ${fmtEsp(it.nomeBase,it.comprar)}</div>` : '';
         return `<tr>
           <td style="text-align:center;font-weight:700;color:#666">${i+1}</td>
-          <td><b>${it.displayNome}</b>${_perBadge(it)}${contratoTag}</td>
+          <td><b>${it.displayNome}</b>${_perBadge(it)}</td>
+          <td style="text-align:center">${contratoTag}</td>
           <td>
+            <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
               style="width:100%;padding:3px 7px;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;font-family:'Inter',sans-serif;background:#fafafa"
               onchange="salvarObsItemMerc('${enc}',this.value)">
             <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
@@ -6019,7 +6022,7 @@ function renderMercado(){
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
-        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Observação</th><th>Tipo</th><th class="num">Necessidade</th><th class="num" style="width:100%">A Comprar</th></tr></thead>
+        <table><thead><tr><th>Nº</th><th>Ingrediente</th><th>Contrato</th><th>Observação</th><th>Tipo</th><th class="num">Necessidade</th><th class="num" style="width:100%">A Comprar</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
 
       </div>
