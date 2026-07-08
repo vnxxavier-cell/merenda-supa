@@ -1550,7 +1550,7 @@ function restaurarBackup(){
       <button class="modal-close" onclick="fecharOverlayLic()">×</button>
     </div>
     <div class="modal-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="campo">
           <label>Nome / Número</label>
           <input type="text" id="lic-nome" placeholder="Ex: Contrato 001/2026"
@@ -1560,6 +1560,14 @@ function restaurarBackup(){
           <label>Data de Início</label>
           <input type="date" id="lic-data-inicio"
             style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
+        </div>
+        <div class="campo">
+          <label>Fornecedor</label>
+          <select id="lic-fornecedor"
+            style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%;background:#fff">
+            <option value="">— Selecione —</option>
+            ${FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join('')}
+          </select>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -3462,6 +3470,7 @@ function renderLicitacoes(){
       <div class="card-header" style="background:var(--verde);cursor:pointer" onclick="toggleLicitacao('${lic.id}')">
         <span>${lic.nome}</span>
         <span style="font-weight:400;font-size:12px;opacity:.8">
+          ${(()=>{const f=FORNECEDORES_CADASTRO.find(x=>x.id===lic.fornecedor_id);return f?esc(f.nome)+' &nbsp;|&nbsp; ':'';})()}
           Início: ${fmtDataBR(lic.data_inicio)} &nbsp;|&nbsp; ${ordens.length} ordem(ns) &nbsp;|&nbsp;
           <span class="badge-${lic.status==='ativa'?'ativa':'encerrada'}">${lic.status==='ativa'?'Ativa':'Encerrada'}</span>
         </span>
@@ -3860,6 +3869,8 @@ function abrirNovaLicitacao(){
   document.getElementById('lic-modal-titulo').textContent = 'Novo Contrato';
   document.getElementById('lic-nome').value = '';
   document.getElementById('lic-data-inicio').value = '';
+  const sf = document.getElementById('lic-fornecedor');
+  if(sf){ sf.innerHTML = '<option value="">— Selecione —</option>' + FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join(''); sf.value = ''; }
   renderTbodyLicItens();
   document.getElementById('overlay-licitacao').classList.add('aberto');
 }
@@ -3872,6 +3883,8 @@ function editarLicitacao(id){
   document.getElementById('lic-modal-titulo').textContent = 'Editar Contrato';
   document.getElementById('lic-nome').value = lic.nome;
   document.getElementById('lic-data-inicio').value = lic.data_inicio;
+  const sf = document.getElementById('lic-fornecedor');
+  if(sf){ sf.innerHTML = '<option value="">— Selecione —</option>' + FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join(''); sf.value = lic.fornecedor_id || ''; }
   renderTbodyLicItens();
   document.getElementById('overlay-licitacao').classList.add('aberto');
 }
@@ -3957,6 +3970,7 @@ function sugerirItensLicitacao(){
 function salvarLicitacaoForm(){
   const nome = document.getElementById('lic-nome').value.trim();
   const dataInicio = document.getElementById('lic-data-inicio').value;
+  const fornecedorId = document.getElementById('lic-fornecedor').value;
   if(!nome){ alert('Informe o nome do contrato.'); return; }
   if(!dataInicio){ alert('Informe a data de início.'); return; }
   const itensValidos = _licItens.filter(it => it.ingrediente && it.qtd_contratada > 0);
@@ -3966,9 +3980,10 @@ function salvarLicitacaoForm(){
     const lic = LICITACOES.find(l => l.id === _licEditandoId);
     lic.nome = nome;
     lic.data_inicio = dataInicio;
+    lic.fornecedor_id = fornecedorId || null;
     lic.itens = itensValidos;
   } else {
-    LICITACOES.push({ id: gerarId('lic'), nome, data_inicio: dataInicio, status: 'ativa', itens: itensValidos });
+    LICITACOES.push({ id: gerarId('lic'), nome, data_inicio: dataInicio, fornecedor_id: fornecedorId || null, status: 'ativa', itens: itensValidos });
   }
   salvarLicitacoes();
   fecharOverlayLic();
