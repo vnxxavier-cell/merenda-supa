@@ -2012,10 +2012,10 @@ function logout(){
 function recarregarDados(){
   // Re-lê todas as variáveis globais do localStorage (agora com proxy ativo)
   NIVEIS_CONFIG = JSON.parse(localStorage.getItem('merenda_niveis') || 'null') || [
-    { id:'f1', alunos:0, ativo:false },
-    { id:'f2', alunos:0, ativo:false },
-    { id:'medio', alunos:0, ativo:false },
-    { id:'eja', alunos:0, ativo:false }
+    { id:'f1', alunos:0, ativo:false, margem:0 },
+    { id:'f2', alunos:0, ativo:false, margem:0 },
+    { id:'medio', alunos:0, ativo:false, margem:0 },
+    { id:'eja', alunos:0, ativo:false, margem:0 }
   ];
   PERCAPTA_CUSTOM = JSON.parse(localStorage.getItem('merenda_percapta') || '{}');
   { const salvos = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
@@ -2842,10 +2842,10 @@ const NIVEIS_DISPONIVEIS = [
 ];
 
 let NIVEIS_CONFIG = JSON.parse(localStorage.getItem('merenda_niveis') || 'null') || [
-  { id: 'f1',    alunos: 0, ativo: false },
-  { id: 'f2',    alunos: 0, ativo: false },
-  { id: 'medio', alunos: 0, ativo: false },
-  { id: 'eja',   alunos: 0, ativo: false },
+  { id:'f1',    alunos:0, ativo:false, margem:0 },
+  { id:'f2',    alunos:0, ativo:false, margem:0 },
+  { id:'medio', alunos:0, ativo:false, margem:0 },
+  { id:'eja',   alunos:0, ativo:false, margem:0 },
 ];
 
 // Per capita customizado pelo usuário (sobrepõe valores PNAE por nível)
@@ -4704,13 +4704,14 @@ function calcularTotaisNiveis(dias) {
   }
   ativos.forEach(nivel => {
     totalAlunos += nivel.alunos;
+    const mult = 1 + (nivel.margem || 0) / 100;
     dias.forEach(p => {
       if (!p || !DADOS.ficha[p]) return;
       DADOS.ficha[p].forEach(ing => {
         const {i, g, d} = ing;
         const perCapita = getPC(p, i, nivel.id, ing);
         const chave = d ? `${i} ___ ${d}` : i;
-        totais[chave] = (totais[chave] || 0) + perCapita * nivel.alunos / 1000;
+        totais[chave] = (totais[chave] || 0) + perCapita * nivel.alunos * mult / 1000;
       });
     });
   });
@@ -7578,7 +7579,7 @@ function renderNiveis(){
   const refIng = DADOS.ficha[refPrato]?.find(x => x.i === 'ARROZ');
 
   list.innerHTML = NIVEIS_DISPONIVEIS.map(meta => {
-    const cfg = NIVEIS_CONFIG.find(n => n.id === meta.id) || { alunos: 0, ativo: false };
+    const cfg = NIVEIS_CONFIG.find(n => n.id === meta.id) || { alunos: 0, ativo: false, margem: 0 };
     const funcCount = (SERVIDORES_CONFIG.func_nivel && SERVIDORES_CONFIG.func_nivel[meta.id]) || 0;
     let exGrams = null;
     if(refIng){
@@ -7586,7 +7587,7 @@ function renderNiveis(){
       if(v != null) exGrams = v.toFixed(1);
     }
     return `
-    <div id="row-nivel-${meta.id}" style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;padding:14px 16px;background:${cfg.ativo ? '#f0f9ff' : '#fafafa'};border:2px solid ${cfg.ativo ? 'var(--azul2)' : 'var(--borda)'};border-radius:10px;transition:.2s">
+    <div id="row-nivel-${meta.id}" style="display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:10px;padding:12px 14px;background:${cfg.ativo ? '#f0f9ff' : '#fafafa'};border:2px solid ${cfg.ativo ? 'var(--azul2)' : 'var(--borda)'};border-radius:10px;transition:.2s">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;min-width:0">
         <input type="checkbox" id="chk-nivel-${meta.id}" ${cfg.ativo ? 'checked' : ''}
           onchange="toggleNivel('${meta.id}', this.checked)"
@@ -7597,17 +7598,23 @@ function renderNiveis(){
         </div>
       </label>
       <div class="campo" style="margin:0;flex-shrink:0">
-        <label style="font-size:10px">Nº de Alunos</label>
+        <label style="font-size:10px">Alunos</label>
         <input type="number" id="inp-nivel-${meta.id}" value="${cfg.alunos}" min="0" max="9999"
           ${cfg.ativo ? '' : 'disabled'}
           oninput="alterarAlunosNivel('${meta.id}', this.value)"
-          style="width:80px;font-family:'Inter',sans-serif;font-size:14px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:var(--azul)">
+          style="width:60px;font-family:'Inter',sans-serif;font-size:13px;padding:6px 8px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:var(--azul)">
       </div>
       <div class="campo" style="margin:0;flex-shrink:0">
-        <label style="font-size:10px">Funcionários</label>
+        <label style="font-size:10px">Func.</label>
         <input type="number" id="inp-func-${meta.id}" value="${funcCount}" min="0" max="9999"
           oninput="alterarFuncNivel('${meta.id}', this.value)"
-          style="width:80px;font-family:'Inter',sans-serif;font-size:14px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:var(--txt)">
+          style="width:55px;font-family:'Inter',sans-serif;font-size:13px;padding:6px 8px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:var(--txt)">
+      </div>
+      <div class="campo" style="margin:0;flex-shrink:0">
+        <label style="font-size:10px">Margem %</label>
+        <input type="number" id="inp-margem-${meta.id}" value="${cfg.margem || 0}" min="0" max="100" step="0.5"
+          oninput="alterarMargemNivel('${meta.id}', this.value)"
+          style="width:55px;font-family:'Inter',sans-serif;font-size:13px;padding:6px 8px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:#92400e">
       </div>
     </div>`;
   }).join('');
@@ -7646,6 +7653,13 @@ function alterarFuncNivel(id, valor){
   atualizarTotalNiveis();
 }
 
+function alterarMargemNivel(id, valor){
+  const cfg = NIVEIS_CONFIG.find(n => n.id === id);
+  if(cfg) cfg.margem = parseFloat(valor) || 0;
+  salvarNiveis();
+  if(document.getElementById('pg-mercado')?.classList.contains('ativa')) renderMercado();
+}
+
 
 
 
@@ -7663,7 +7677,8 @@ function atualizarTotalNiveis(){
   const total = ativos.reduce((s, n) => s + n.alunos, 0);
   const partes = ativos.map(nivel => {
     const meta = NIVEIS_DISPONIVEIS.find(n => n.id === nivel.id);
-    return `<b>${meta.nome}</b>: ${nivel.alunos} alunos`;
+    const mg = nivel.margem || 0;
+    return `<b>${meta.nome}</b>: ${nivel.alunos} alunos${mg > 0 ? ` +${mg}%` : ''}`;
   }).join(' · ');
   const funcTotal = Object.values(SERVIDORES_CONFIG.func_nivel || {}).reduce((a,b) => a + b, 0);
   el.innerHTML = `Total de alunos: <b style="color:var(--azul);font-size:14px">${total}</b> &nbsp;|&nbsp; ${partes}${funcTotal > 0 ? ` &nbsp;|&nbsp; <b style="color:var(--txt)">${funcTotal} funcionário${funcTotal !== 1 ? 's' : ''}</b>` : ''}`;
