@@ -162,8 +162,10 @@ tbody tr:hover td{background:#f0f5fc}
 .merc-seg.s-unc{background:#ef4444}
 .merc-seg.s-nil{background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 4px,#e2e8f0 4px,#e2e8f0 8px)}
 .merc-seg.s-off{background:#bfdbfe}
-.merc-seg[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:10px;white-space:pre;padding:5px 9px;border-radius:7px;z-index:250;pointer-events:none;font-weight:600;line-height:1.5}
+.merc-seg[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:10px;white-space:pre;padding:5px 9px;border-radius:7px;z-index:9999;pointer-events:none;font-weight:600;line-height:1.5}
 .merc-tbl-wrap{overflow-x:auto}
+.merc-tbl-wrap table td,.merc-tbl-wrap table th{overflow:visible}
+.merc-tbl-wrap thead{position:relative;z-index:100}
 .merc-split > .merc-panel:last-child{position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
 .merc-db{padding:15px 17px;overflow-y:auto;flex:1}
 .merc-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
