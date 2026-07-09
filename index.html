@@ -7611,10 +7611,11 @@ function renderNiveis(){
           style="width:55px;font-family:'Inter',sans-serif;font-size:13px;padding:6px 8px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:var(--txt)">
       </div>
       <div class="campo" style="margin:0;flex-shrink:0">
-        <label style="font-size:10px">Margem %</label>
+        <label style="font-size:10px">Extra %</label>
         <input type="number" id="inp-margem-${meta.id}" value="${cfg.margem || 0}" min="0" max="100" step="0.5"
           oninput="alterarMargemNivel('${meta.id}', this.value)"
           style="width:55px;font-family:'Inter',sans-serif;font-size:13px;padding:6px 8px;border:2px solid var(--borda);border-radius:7px;outline:none;font-weight:700;color:#92400e">
+        ${cfg.margem > 0 ? `<div style="font-size:9px;color:#92400e;text-align:center;margin-top:2px">+${Math.round(cfg.margem * (cfg.alunos||0) / 100)} ref.</div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -7678,7 +7679,7 @@ function atualizarTotalNiveis(){
   const partes = ativos.map(nivel => {
     const meta = NIVEIS_DISPONIVEIS.find(n => n.id === nivel.id);
     const mg = nivel.margem || 0;
-    return `<b>${meta.nome}</b>: ${nivel.alunos} alunos${mg > 0 ? ` +${mg}%` : ''}`;
+    return `<b>${meta.nome}</b>: ${nivel.alunos} alunos${mg > 0 ? ` +${mg}% extra` : ''}`;
   }).join(' · ');
   const funcTotal = Object.values(SERVIDORES_CONFIG.func_nivel || {}).reduce((a,b) => a + b, 0);
   el.innerHTML = `Total de alunos: <b style="color:var(--azul);font-size:14px">${total}</b> &nbsp;|&nbsp; ${partes}${funcTotal > 0 ? ` &nbsp;|&nbsp; <b style="color:var(--txt)">${funcTotal} funcionário${funcTotal !== 1 ? 's' : ''}</b>` : ''}`;
