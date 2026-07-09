@@ -1116,6 +1116,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 
     <div class="config-card">
+      <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Funcionários por Turno</div>
+      <div class="config-card-body">
+        <p style="font-size:13px;color:var(--txt2);margin-bottom:14px">Informe a quantidade de funcionários em cada turno. O consumo de ingredientes será calculado usando o per capita do <b>Ensino Médio</b> para todos os funcionários, independente do turno, e somado à lista de compras.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+          <div class="campo"><label>Manhã</label><input type="number" id="cfg-func-mat" min="0" step="1" value="0" oninput="salvarFuncConfig()" style="width:100%;padding:8px 10px;border:1.5px solid var(--borda);border-radius:6px;font-size:13px;font-family:inherit"></div>
+          <div class="campo"><label>Tarde</label><input type="number" id="cfg-func-tarde" min="0" step="1" value="0" oninput="salvarFuncConfig()" style="width:100%;padding:8px 10px;border:1.5px solid var(--borda);border-radius:6px;font-size:13px;font-family:inherit"></div>
+          <div class="campo"><label>Noite</label><input type="number" id="cfg-func-noite" min="0" step="1" value="0" oninput="salvarFuncConfig()" style="width:100%;padding:8px 10px;border:1.5px solid var(--borda);border-radius:6px;font-size:13px;font-family:inherit"></div>
+        </div>
+        <div style="font-size:12px;color:var(--txt2);padding:8px 12px;background:#F1F5F9;border-radius:6px" id="cfg-func-preview">Total: 0 funcionários</div>
+      </div>
+    </div>
+
+    <div class="config-card">
       <div class="config-card-header" style="display:flex;align-items:center;gap:7px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Assinatura do Diretor</div>
       <div class="config-card-body">
         <div class="config-field">
@@ -2204,7 +2217,7 @@ async function fazerLogin(){
       // Grava defaults explícitos com proxy ativo — evita herdar dados residuais do localStorage
       // ou defaults de coluna do Supabase em sessões posteriores
       const _defNiveis = [{id:'f1',alunos:0,ativo:false},{id:'f2',alunos:0,ativo:false},{id:'medio',alunos:0,ativo:false},{id:'eja',alunos:0,ativo:false}];
-      const _defServ  = {ativo:false,cafe_kg:0,acucar_kg:0,qtd_servidores:0,cafe_g_por_serv:16.5,acucar_g_por_serv:45};
+      const _defServ  = {ativo:false,cafe_kg:0,acucar_kg:0,qtd_servidores:0,cafe_g_por_serv:16.5,acucar_g_por_serv:45,func_mat:0,func_tarde:0,func_noite:0,func_total:0};
       const _defCal   = {inicio:'',fim:'',feriados:[],recesso:[],sabados:[]};
       const _defCfg   = {merenda_cardapio:{},merenda_diretor:'',merenda_cargo:'Diretor(a) Escolar',merenda_escola:'',merenda_subtitulo:'',merenda_fornecedores:[],merenda_ing_fornecedores:{}};
       localStorage.removeItem('merenda_header_img');
@@ -2987,11 +3000,11 @@ function gerarId(prefix){ return prefix + '_' + Date.now() + '_' + Math.random()
 // Estoque
 let ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque')             || '{}');
 let SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas')  || '[]');
-let SERVIDORES_CONFIG  = JSON.parse(localStorage.getItem('merenda_servidores_config')   || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45 };
-// Garante campos novos em configs salvas antigas
+let SERVIDORES_CONFIG  = JSON.parse(localStorage.getItem('merenda_servidores_config')   || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45, func_mat: 0, func_tarde: 0, func_noite: 0, func_total: 0 };
 if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
 if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
 if(SERVIDORES_CONFIG.acucar_g_por_serv === undefined) SERVIDORES_CONFIG.acucar_g_por_serv = 45;
+if(SERVIDORES_CONFIG.func_total === undefined) { SERVIDORES_CONFIG.func_mat = 0; SERVIDORES_CONFIG.func_tarde = 0; SERVIDORES_CONFIG.func_noite = 0; SERVIDORES_CONFIG.func_total = 0; }
 
 // ── Fornecedores cadastrados ───────────────────────────
 let FORNECEDORES_CADASTRO = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
@@ -4714,6 +4727,19 @@ function calcularTotaisNiveis(dias) {
       });
     });
   });
+  // Adiciona consumo dos funcionários (per capita do Ensino Médio)
+  const funcTotal = SERVIDORES_CONFIG.func_total || 0;
+  if(funcTotal > 0){
+    dias.forEach(p => {
+      if (!p || !DADOS.ficha[p]) return;
+      DADOS.ficha[p].forEach(ing => {
+        const {i, d} = ing;
+        const perCapita = getPC(p, i, 'medio', ing);
+        const chave = d ? `${i} ___ ${d}` : i;
+        totais[chave] = (totais[chave] || 0) + perCapita * funcTotal / 1000;
+      });
+    });
+  }
   return { totais, totalAlunos };
 }
 
@@ -5453,6 +5479,29 @@ function salvarServidoresConfigTab(){
   _atualizarPreviewServidores();
   // Atualiza o mercado se estiver visível
   if(document.getElementById('pg-mercado')?.classList.contains('ativa')) renderMercado();
+}
+
+function salvarFuncConfig(){
+  const mat = parseInt(document.getElementById('cfg-func-mat')?.value) || 0;
+  const tarde = parseInt(document.getElementById('cfg-func-tarde')?.value) || 0;
+  const noite = parseInt(document.getElementById('cfg-func-noite')?.value) || 0;
+  const total = mat + tarde + noite;
+  SERVIDORES_CONFIG.func_mat = mat;
+  SERVIDORES_CONFIG.func_tarde = tarde;
+  SERVIDORES_CONFIG.func_noite = noite;
+  SERVIDORES_CONFIG.func_total = total;
+  salvarServidoresConfig();
+  const el = document.getElementById('cfg-func-preview');
+  if(el) el.textContent = `Total: ${total} funcionário${total !== 1 ? 's' : ''} (Manhã: ${mat}, Tarde: ${tarde}, Noite: ${noite})`;
+  if(document.getElementById('pg-mercado')?.classList.contains('ativa')) renderMercado();
+}
+function carregarFuncConfig(){
+  const elMat = document.getElementById('cfg-func-mat');
+  if(!elMat) return;
+  elMat.value = SERVIDORES_CONFIG.func_mat || 0;
+  document.getElementById('cfg-func-tarde').value = SERVIDORES_CONFIG.func_tarde || 0;
+  document.getElementById('cfg-func-noite').value = SERVIDORES_CONFIG.func_noite || 0;
+  salvarFuncConfig();
 }
 
 function _somaTotaisSemanas(mondayIso, n){
@@ -7765,6 +7814,7 @@ function atualizarBannerDemo(){
 
 function carregarConfig(){
   atualizarBannerDemo();
+  carregarFuncConfig();
   const diretor = localStorage.getItem('merenda_diretor') || '';
   const cargo = localStorage.getItem('merenda_cargo') || 'Diretor(a) Escolar';
   const escola = localStorage.getItem('merenda_escola') || '';
