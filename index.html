@@ -6098,7 +6098,7 @@ function renderMercadoTabela(){
       const cls = coberto ? 's-cov' : parcial ? 's-par' : 's-unc';
       const lbl = coberto ? 'Coberto' : parcial ? 'Parcial' : 'Descoberto';
       const pratoLabel = nomePrato ? (nomePrato.length > 22 ? nomePrato.substring(0,21)+'…' : nomePrato) : '';
-      return { cls, tip:`${dataFmt} — ${abrev}\n${pratoLabel}\n${lbl}` };
+      return { cls, tip:`${dataFmt} — ${abrev}\n${pratoLabel}\n${lbl}\n${nec.toFixed(3)} kg` };
     });
     if(!segs.length) return '';
     const perLabel = it.numSemanas > 1 ? ` · ${it.numSemanas}×sem.` : '';
