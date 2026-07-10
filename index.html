@@ -7589,7 +7589,7 @@ function renderNiveis(){
       if(v != null) exGrams = v.toFixed(1);
     }
     return `
-    <div id="row-nivel-${meta.id}" style="display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:10px;padding:12px 14px;background:${cfg.ativo ? '#f0f9ff' : '#fafafa'};border:2px solid ${cfg.ativo ? 'var(--azul2)' : 'var(--borda)'};border-radius:10px;transition:.2s">
+    <div id="row-nivel-${meta.id}" style="display:grid;grid-template-columns:1fr auto auto auto;align-items:start;gap:10px;padding:12px 14px;background:${cfg.ativo ? '#f0f9ff' : '#fafafa'};border:2px solid ${cfg.ativo ? 'var(--azul2)' : 'var(--borda)'};border-radius:10px;transition:.2s">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;min-width:0">
         <input type="checkbox" id="chk-nivel-${meta.id}" ${cfg.ativo ? 'checked' : ''}
           onchange="toggleNivel('${meta.id}', this.checked)"
