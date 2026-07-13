@@ -1455,6 +1455,7 @@ function restaurarBackup(){
       </select>
     </div>
     <button class="btn btn-sm" onclick="imprimirPrepAtual()" style="display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Selecionado</button>
+    <button class="btn btn-sm" onclick="imprimirRegistroSaidas()" style="display:flex;align-items:center;gap:5px;background:#fff;color:#92400e;border:1.5px solid #f59e0b"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reg. Saídas</button>
   </div>
   <div id="prep-conteudo"></div>
 </div>
@@ -7466,6 +7467,70 @@ function imprimirPrepAtual(){
     +'@page{margin:18mm 20mm}'
     +'@media print{body{color:#000}}'
     +'</style></head><body>'+printHtml+'</body></html>');
+  w.document.close();
+  setTimeout(()=>{w.print();w.close()},300);
+}
+
+function imprimirRegistroSaidas(){
+  const sel = document.getElementById('sel-cardapio-print');
+  const filtroTexto = (document.querySelector('.filtro-input')?.value||'').toLowerCase();
+  let lista = CD;
+  if(filtroTexto) lista = lista.filter(c=>c[1].toLowerCase().includes(filtroTexto));
+  if(sel&&sel.value) lista = lista.filter(c=>c[0]==parseInt(sel.value));
+  if(!lista.length){ alert('Nenhum cardápio encontrado para gerar o registro.'); return; }
+  const niveles = NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0);
+  const colMeta = [{id:'f1'},{id:'f2'},{id:'medio'},{id:'eja'}];
+  const hasAlunos = niveles.length>0;
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const LINHAS_EXTRAS = 5;
+  let html = '';
+  lista.forEach(c => {
+    const id=c[0], nome=c[1], ings=c[4];
+    let rows = '';
+    for(let i=0;i<ings.length;i+=5){
+      const inome=ings[i], vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
+      const total = hasAlunos
+        ? (vF1 * (niveles.find(n=>n.id==='f1')?.alunos||0) + vF2 * (niveles.find(n=>n.id==='f2')?.alunos||0) + vMed * (niveles.find(n=>n.id==='medio')?.alunos||0) + vEja * (niveles.find(n=>n.id==='eja')?.alunos||0)) / 1000
+        : (vF1+vF2+vMed+vEja)/4;
+      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;font-size:10pt">'+inome+'</td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px;text-align:right;font-weight:700">'+total.toFixed(2).replace('.',',')+' kg</td></tr>';
+    }
+    for(let e=0;e<LINHAS_EXTRAS;e++){
+      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;font-size:10pt;color:#999;font-style:italic">______________________</td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td></tr>';
+    }
+    html += '<div style="border:1px solid #000;margin-bottom:24px;font-family:Arial,Helvetica,sans-serif;page-break-inside:avoid;padding:0">'
+      + '<div style="background:#1A3A6B;color:#fff;padding:8px 12px;font-weight:700;font-size:13pt;text-align:center">Cardápio '+id+' – '+nome+'</div>'
+      + '<div style="display:flex;gap:20px;padding:10px 12px;border-bottom:1px solid #000;font-size:11pt">'
+      + '<span><strong>Data:</strong> _____/_____/_________</span>'
+      + '<span><strong>Registrador:</strong> _________________________</span></div>'
+      + '<table style="width:100%;border-collapse:collapse">'
+      + '<thead><tr>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:left;font-size:10pt">Ingrediente</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Manhã</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Tarde</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Noite</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:16%">Total (previsto)</th>'
+      + '</tr></thead><tbody>'+rows+'</tbody></table>'
+      + '<div style="padding:8px 12px;border-top:1px solid #000;font-size:10pt;display:flex;justify-content:space-between">'
+      + '<span><strong>Observações:</strong> _______________________________________________</span>'
+      + '<span><strong>Visto:</strong> _________________</span></div>'
+      + '</div>';
+  });
+  const w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;margin:20px;color:#000}'
+    +'table{width:100%;border-collapse:collapse}'
+    +'th,td{border:1px solid #000;padding:4px 8px}'
+    +'@page{margin:15mm}'
+    +'</style></head><body><h2 style="text-align:center;margin-bottom:20px;font-size:14pt">REGISTRO DIÁRIO DE SAÍDA DE INGREDIENTES</h2>'
+    +html+'</body></html>');
   w.document.close();
   setTimeout(()=>{w.print();w.close()},300);
 }
