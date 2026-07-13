@@ -4695,6 +4695,14 @@ function init(){
   renderFichas();
   renderIngredientes();
   renderNiveis();
+  // Pré-popula dropdown de cardápios da aba Quantidades por Turno
+  if(typeof CD !== 'undefined' && CD && CD.length){
+    const sel = document.getElementById('sel-cardapio-print');
+    if(sel && !sel.dataset.populated){
+      sel.innerHTML = '<option value="">— Todos —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
+      sel.dataset.populated = '1';
+    }
+  }
   carregarConfig();
   aplicarConsumoSemanas();
 }
