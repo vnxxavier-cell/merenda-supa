@@ -6014,7 +6014,7 @@ function renderMercado(){
   const buildPage = (titulo, info, items, fornId, cor) => {
     const hdrBg  = cor || '#1A3A6B';
     const hdrTxt = cor ? '#1A3A6B' : '#fff';
-    const hdrBorder = cor ? `border-bottom:2px solid #1A3A6B` : '';
+    const hdrBorder = cor ? `border-bottom:1px solid #C8D0DC` : '';
 
     const hojeLic = new Date().toISOString().split('T')[0];
     const itensPrint = items.filter(it => !it.coberto);
@@ -6064,7 +6064,7 @@ function renderMercado(){
         </div>
       </div>
       <!-- tela interativa -->
-      <div class="card no-print">
+        <div class="card no-print" style="border:1px solid #C8D0DC">
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
