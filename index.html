@@ -113,7 +113,8 @@ tbody tr:hover td{background:#f0f5fc}
 .modal-body table thead th{background:#eef2f8}
 
 /* ── FORNECEDORES ── */
-.forn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.forn-grid{display:flex;flex-wrap:wrap;gap:16px}
+.forn-grid > .forn-page{flex:1 1 350px;min-width:0}
 .forn-grid table{width:100%}
 .forn-grid .card.no-print{border:1px solid #C8D0DC;min-width:0}
 .forn-grid .card.no-print > table{border-collapse:collapse;font-size:11px}
