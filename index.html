@@ -6017,9 +6017,9 @@ function renderMercado(){
     const hdrBorder = cor ? `border-bottom:2px solid #1A3A6B` : '';
 
     const hojeLic = new Date().toISOString().split('T')[0];
-    const itensContrato = items.filter(it => !it.coberto && LICITACOES.some(l => l.status==='ativa' && l.data_inicio<=hojeLic && l.itens.some(x=>x.ingrediente===it.nomeBase)));
+    const itensPrint = items.filter(it => !it.coberto);
     let totalValor = 0;
-    const printRows = itensContrato.map((it,i) => {
+    const printRows = itensPrint.map((it,i) => {
       const {arred} = arredondarEmb(it.nomeBase, it.comprar);
       const qtd = typeof arred === 'number'
         ? arred.toLocaleString('pt-BR', {maximumFractionDigits:3})
