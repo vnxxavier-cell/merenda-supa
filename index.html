@@ -1806,7 +1806,7 @@ const _supaSync = {
         columnToKey[col].push(k);
       });
 
-      const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
+    const configFields = ['merenda_cardapio','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
 
       Object.entries(data).forEach(([col, val]) => {
         if(col === 'user_id' || col === 'updated_at' || val === null) return;
