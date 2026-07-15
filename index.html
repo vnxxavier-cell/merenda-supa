@@ -113,7 +113,7 @@ tbody tr:hover td{background:#f0f5fc}
 .modal-body table thead th{background:#eef2f8}
 
 /* ── FORNECEDORES ── */
-.forn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.forn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px}
 .forn-grid table{width:100%}
 .forn-grid .card.no-print{border:1px solid #C8D0DC;min-width:0}
 .forn-grid .card.no-print > table{border-collapse:collapse;font-size:11px}
@@ -122,6 +122,7 @@ tbody tr:hover td{background:#f0f5fc}
 .forn-grid .card.no-print table thead th.num{text-align:right}
 .forn-grid .card.no-print table tbody tr:nth-child(even) td{background:#F5F8FD}
 .forn-grid .card.no-print .card-header{font-size:13px;padding:10px 14px}
+@media(max-width:1100px){.forn-grid{grid-template-columns:1fr}}
 
 /* ── Mercado: layout análise de cobertura ─────────────── */
 .merc-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
