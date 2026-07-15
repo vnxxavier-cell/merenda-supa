@@ -5950,8 +5950,8 @@ function renderMercado(){
           const hoje = new Date().toISOString().split('T')[0];
           return LICITACOES.some(l => l.status==='ativa' && l.data_inicio<=hoje && l.fornecedor_id===fid && l.itens.some(x=>x.ingrediente===it.nomeBase)) ? 1 : -1;
         })();
-        const contratoTag = contratoOk === 1 ? `<span style="font-size:10px;color:#16a34a;font-weight:600;margin-left:4px" title="Contrato ativo">📋</span>`
-          : contratoOk === -1 ? `<span style="font-size:10px;color:#dc2626;font-weight:600;margin-left:4px" title="Sem contrato ativo para este fornecedor">⚠️</span>` : '';
+        const contratoTag = contratoOk === 1 ? `<span style="font-size:10px;color:#16a34a;font-weight:600;display:inline-flex;align-items:center;gap:2px" title="Contrato ativo">${ico('checkCircle',12)}</span>`
+          : contratoOk === -1 ? `<span style="font-size:10px;color:#dc2626;font-weight:600;display:inline-flex;align-items:center;gap:2px" title="Sem contrato ativo para este fornecedor">${ico('xCircle',12)}</span>` : '';
 
         if(it.coberto){
           return `<tr style="background:#f0fdf4">
