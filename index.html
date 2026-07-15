@@ -1150,8 +1150,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
               <div class="mock-header-text">
                 <h1 id="preview-escola"></h1>
                 <p id="preview-subtitulo">Programa Nacional de Alimentação Escolar — PNAE</p>
-              </div>
-            </div>
+    </div>
+    <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;display:flex;align-items:center;gap:4px;white-space:nowrap">📋 Só usados no ciclo</button>
+  </div>
             <div class="mock-body"></div>
             <div class="mock-sig" id="preview-sig">Diretor(a) Escolar</div>
           </div>
@@ -7097,6 +7098,18 @@ function removerPrato(key){
 // INGREDIENTES
 // ══════════════════════════════════════════════════════
 let filtroIngForn = '';
+let _filtroApenasUsados = false;
+
+function toggleFiltrarUsados(){
+  _filtroApenasUsados = !_filtroApenasUsados;
+  const btn = document.getElementById('btn-filtrar-usados');
+  if(btn){
+    btn.style.background = _filtroApenasUsados ? '#1e40af' : '#f0f7ff';
+    btn.style.color = _filtroApenasUsados ? '#fff' : '#1e40af';
+  }
+  renderIngredientes(document.querySelector('#pg-ingredientes .filtro-input')?.value || '');
+}
+
 function salvarEmbalagensPadrao(){
   const raw = JSON.stringify(EMBALAGENS);
   // Salva fora do proxy (real localStorage, vale para todos os perfis)
@@ -7118,9 +7131,18 @@ function renderIngredientes(filtro=''){
   EMBALAGENS = Object.assign({}, padrao, salvos);
   const precosSalvos = JSON.parse(localStorage.getItem('merenda_precos') || '{}');
   
+  // Pré-computa ingredientes usados no ciclo
+  const usadosSet = new Set();
+  if(_filtroApenasUsados){
+    Object.values(CICLOS_PLANOS).forEach(arr => (arr||[]).forEach(p => {
+      if(p && DADOS.ficha[p]) DADOS.ficha[p].forEach(x => usadosSet.add(x.i));
+    }));
+  }
+  
   const ings = Object.entries(DADOS.ingredientes)
     .filter(([n])=>!filtro||n.toLowerCase().includes(filtro.toLowerCase()))
     .filter(([n])=>!filtroIngForn||(filtroIngForn==='AF'?isAF(n):!isAF(n)))
+    .filter(([n])=>!_filtroApenasUsados||usadosSet.has(n))
     .sort((a,b)=>a[0].localeCompare(b[0]));
 
   document.getElementById('cnt-ings').textContent = `(${ings.length} itens)`;
