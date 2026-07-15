@@ -5942,8 +5942,8 @@ function renderMercado(){
         const enc      = it.nomeBase.replace(/'/g,"\\'");
         const obsAtual = (_obsMap[it.nomeBase] || '').replace(/"/g,'&quot;');
         const tipoTag  = isAF(it.nomeBase)
-          ? `<span class="tag-af" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/><path d="M6.168 9a10 10 0 0 0 11.664 0"/></svg>AF</span>`
-          : `<span class="tag-mc" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>MC</span>`;
+          ? `<span class="tag-af" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/><path d="M17 13a3 3 0 0 1-5 2.3"/></svg>AF</span>`
+          : `<span class="tag-mc" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>MC</span>`;
         const contratoOk = (()=>{
           const fid = ING_FORNECEDORES[it.nomeBase];
           if(!fid) return 0; // sem fornecedor
@@ -6176,8 +6176,8 @@ function renderMercadoTabela(){
     const enc  = it.nomeBase.replace(/'/g,"\\'");
     const encD = it.nomeBase.replace(/"/g,'&quot;');
     const tipoTag = isAF(it.nomeBase)
-      ? `<span class="badge badge-verde" style="font-size:10px;padding:2px 6px">AF</span>`
-      : `<span class="badge badge-azul" style="font-size:10px;padding:2px 6px">MC</span>`;
+      ? `<span class="badge badge-verde" style="font-size:10px;padding:2px 6px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/><path d="M17 13a3 3 0 0 1-5 2.3"/></svg>AF</span>`
+      : `<span class="badge badge-azul" style="font-size:10px;padding:2px 6px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>MC</span>`;
     const _perLabel = { 2:'2 sem.', 3:'3 sem.', 4:'4 sem.' };
     const perTag = it.numSemanas > 1
       ? `<span class="badge badge-roxo" style="font-size:10px;padding:2px 6px">${_perLabel[it.numSemanas]||it.numSemanas+'×sem.'}</span>`
