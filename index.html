@@ -4652,6 +4652,13 @@ function fmtEsp(nome, val){
   if(nome==='ÓLEO DE SOJA') return val>0?Math.ceil(val/0.9)+' unid.':'-';
   return fmt(val);
 }
+function fmtUnid(unid){
+  const m={'un':'Un','unid':'Un','unidade':'Un','und':'Un','unid.':'Un','unida':'Un','und.':'Un',
+    'kg':'kg','g':'g','L':'L','l':'L','ml':'ml','mL':'mL','maço':'maço','maco':'maço',
+    'pacote':'pacote','lata':'lata','fardo':'fardo','saco':'saco','pote':'pote',
+    'garrafa':'garrafa','bisnaga':'bisnaga','dz':'dz','dúzia':'dz','duzia':'dz','cx':'cx','caixa':'cx'};
+  return m[String(unid).toLowerCase().trim()] || unid;
+}
 function nomeNum(prato){
   const m=prato.match(/^(\d+)\s*-\s*(.*)/);
   return m?{num:m[1],nome:m[2]}:{num:'',nome:prato};
@@ -5143,7 +5150,7 @@ function _gerarXmlFornecedores(escola, label, af_items, mc_items, mondayIso){
     items.forEach((it,i) => {
       const {arred} = arredondarEmb(it.nomeBase, it.comprar);
       const qtd = typeof arred === 'number' ? arred : parseFloat(arred) || arred;
-      rows.push(`<Row ss:Height="18">${cell(i+1,'sNum','Number')}${cell(it.nomeBase,'sIng')}${cell(qtd,'sQty','Number')}${cell(it.unid,'sUn')}</Row>`);
+      rows.push(`<Row ss:Height="18">${cell(i+1,'sNum','Number')}${cell(it.nomeBase,'sIng')}${cell(qtd,'sQty','Number')}${cell(fmtUnid(it.unid),'sUn')}</Row>`);
     });
     rows.push(`<Row ss:Height="50"/>`);
     rows.push(`<Row ss:Height="18">${cellM(' ','sSig',3)}</Row>`);
@@ -5969,7 +5976,7 @@ function renderMercado(){
         const {arred, nPacotes} = arredondarEmb(it.nomeBase, it.comprar);
         const embTamanho = EMBALAGENS[it.nomeBase];
         const foiArred = nPacotes !== null && arred !== it.comprar;
-        const pacInfo = nPacotes ? `<div class="hover-info no-print" style="font-size:10px;color:#666;margin-top:2px">${nPacotes} pct × ${embTamanho} ${it.unid}</div>` : '';
+        const pacInfo = nPacotes ? `<div class="hover-info no-print" style="font-size:10px;color:#666;margin-top:2px">${nPacotes} pct × ${embTamanho} ${fmtUnid(it.unid)}</div>` : '';
         const exInfo  = foiArred ? `<div class="hover-info no-print" style="font-size:10px;color:#aaa">exato: ${fmtEsp(it.nomeBase,it.comprar)}</div>` : '';
         return `<tr>
           <td style="text-align:center;font-weight:700;color:#666">${i+1}</td>
@@ -5987,7 +5994,7 @@ function renderMercado(){
             <div style="display:flex;align-items:center;gap:3px;justify-content:flex-end">
               <input type="number" min="0" step="0.01" value="${arred}" style="${inputStyle}"
                 onchange="ajustarQtdMerc('${enc}',this.value,${it.extra?'true':'false'})">
-              <span style="font-size:11px;color:var(--txt2)">${it.unid}</span>
+              <span style="font-size:11px;color:var(--txt2)">${fmtUnid(it.unid)}</span>
               <button class="emb-btn no-print" style="color:#e74c3c;border-color:#e74c3c;padding:1px 4px;font-size:11px"
                 onclick="removerItemMerc('${enc}',${it.extra?'true':'false'})">✕</button>
               <button class="emb-btn no-print" style="color:#0369a1;border-color:#7dd3fc;padding:1px 4px"
@@ -6029,7 +6036,7 @@ function renderMercado(){
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.displayNome}${perLabel}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px;font-style:italic;color:#555;font-size:10.5px">${esc(obsImp)}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 10px">${qtd}</td>
-        <td style="border:1px solid #C8D0DC;padding:6px 10px">${it.unid}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 10px">${fmtUnid(it.unid)}</td>
       </tr>`;
     }).join('');
 
