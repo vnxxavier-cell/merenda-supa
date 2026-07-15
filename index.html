@@ -1748,36 +1748,46 @@ const _supaSync = {
 
     // Coletar 'config' como um bundle
     const hasConfig = [...this._pendingFields].some(k => configFields.includes(k));
-    if(hasConfig) {
-      const configObj = {};
-      configFields.forEach(k => {
+    const otherUpdates = {};
+    const configObj = {};
+
+    this._pendingFields.forEach(k => {
+      if(configFields.includes(k)) {
         const val = localStorage.getItem(k);
         if(val !== null) configObj[k] = val;
-      });
-      updates.config = configObj;
-    }
-
-    // Coletar campos individuais
-    this._pendingFields.forEach(k => {
-      if(configFields.includes(k)) return; // já tratado acima
+        return;
+      }
       const col = this.keyToColumn[k];
       if(!col) return;
       const raw = localStorage.getItem(k);
-      try { updates[col] = raw ? JSON.parse(raw) : null; }
-      catch(e) { updates[col] = raw; }
+      try { otherUpdates[col] = raw ? JSON.parse(raw) : null; }
+      catch(e) { otherUpdates[col] = raw; }
     });
 
     this._pendingFields.clear();
 
-    try {
-      const { error } = await _supabase
-        .from('escola_dados')
-        .upsert({ user_id: this._userId, ...updates }, { onConflict: 'user_id' });
-      if(error) console.warn('Supabase sync error:', error.message);
-      else console.info('☁️ Dados sincronizados com Supabase');
-    } catch(e) {
-      console.warn('Supabase sync failed:', e.message);
+    // Salva configurações (exceto merenda_header_img que é grande demais)
+    if(hasConfig) {
+      try {
+        const { error } = await _supabase.from('escola_dados').upsert(
+          { user_id: this._userId, config: configObj },
+          { onConflict: 'user_id' }
+        );
+        if(error) console.warn('Supabase config sync error:', error.message);
+      } catch(e) { console.warn('Falha ao sincronizar config:', e.message); }
     }
+
+    // Salva demais colunas individualmente
+    for(const [col, val] of Object.entries(otherUpdates)) {
+      try {
+        const { error } = await _supabase.from('escola_dados').upsert(
+          { user_id: this._userId, [col]: val },
+          { onConflict: 'user_id' }
+        );
+        if(error) console.warn(`Supabase sync error (${col}):`, error.message);
+      } catch(e) { console.warn(`Falha ao sincronizar ${col}:`, e.message); }
+    }
+    if(hasConfig || Object.keys(otherUpdates).length) console.info('☁️ Dados sincronizados com Supabase');
   },
 
   // Carrega todos os dados do Supabase para o localStorage
