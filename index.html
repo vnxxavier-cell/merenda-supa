@@ -27,16 +27,20 @@ html{overflow-x:hidden}
 body{font-family:'Inter',sans-serif;background:#EEF2F8;color:var(--txt);min-height:100vh;display:flex;align-items:stretch;overflow-x:hidden}
 
 /* ── NAV ── */
-nav{background:var(--nav-bg);width:220px;min-width:220px;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0}
-.nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 24px 32px;letter-spacing:.02em;line-height:1.4;display:flex;align-items:center;gap:10px}
+nav{background:var(--nav-bg);width:52px;min-width:52px;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0;overflow:hidden;transition:width .2s}
+nav:hover{width:210px;overflow:visible;box-shadow:4px 0 24px rgba(0,0,0,.2)}
+nav:hover ~ .main-content{margin-left:210px}
+.main-content{margin-left:52px;transition:margin-left .2s}
+.nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 24px 32px;letter-spacing:.02em;line-height:1.4;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .nav-brand span{display:block;color:var(--amarelo);font-size:12px;margin-top:3px}
 .nav-brand svg{flex-shrink:0;opacity:.9}
-.nav-tabs{display:flex;flex-direction:column;gap:4px;width:100%}
-.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:12px 24px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:100%;display:flex;align-items:center;gap:10px}
+.nav-tabs{display:flex;flex-direction:column;gap:4px;width:210px}
+.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:12px 24px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:210px;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,.05)}
 .nav-tab.ativo{color:#fff;border-left-color:var(--amarelo);background:rgba(255,255,255,.1)}
 .nav-tab svg{flex-shrink:0;opacity:.7;transition:.2s;width:18px;height:18px}
 .nav-tab:hover svg,.nav-tab.ativo svg{opacity:1}
+.nav-bottom{width:210px;white-space:nowrap}
 
 /* ── PÁGINAS ── */
 .main-content{flex:1;min-width:0;overflow-y:auto;margin-left:220px;height:100vh}
@@ -109,26 +113,15 @@ tbody tr:hover td{background:#f0f5fc}
 .modal-body table thead th{background:#eef2f8}
 
 /* ── FORNECEDORES ── */
-.forn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.forn-grid table{width:100%;table-layout:fixed}
+.forn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.forn-grid table{width:100%}
+.forn-grid .card.no-print{border:1px solid #C8D0DC}
 .forn-grid .card.no-print table{border-collapse:collapse}
-.forn-grid .card.no-print table th,.forn-grid .card.no-print table td{border:1px solid #C8D0DC;padding:6px 10px}
-.forn-grid .card.no-print table thead th{background:#f0f2f5;color:#1A3A6B;font-weight:700;font-size:12px;text-align:left}
+.forn-grid .card.no-print table th,.forn-grid .card.no-print table td{border:1px solid #C8D0DC;padding:5px 8px}
+.forn-grid .card.no-print table thead th{background:#f0f2f5;color:#1A3A6B;font-weight:700;font-size:11px;text-align:left}
 .forn-grid .card.no-print table thead th.num{text-align:right}
-/* borda externa mais forte nas células periféricas */
-.forn-grid .card.no-print table th:first-child,.forn-grid .card.no-print table td:first-child{border-left:1.5px solid #1A3A6B}
-.forn-grid .card.no-print table th:last-child,.forn-grid .card.no-print table td:last-child{border-right:1.5px solid #1A3A6B}
-.forn-grid .card.no-print table thead th{border-top:1.5px solid #1A3A6B}
-.forn-grid .card.no-print table tbody tr:last-child td{border-bottom:1.5px solid #1A3A6B}
-.forn-grid .card.no-print table th:nth-child(1),.forn-grid .card.no-print table td:nth-child(1){width:38px;text-align:center}
-.forn-grid .card.no-print table th:nth-child(2),.forn-grid .card.no-print table td:nth-child(2){width:160px}
-.forn-grid .card.no-print table th:nth-child(3),.forn-grid .card.no-print table td:nth-child(3){width:140px}
-.forn-grid .card.no-print table th:nth-child(4),.forn-grid .card.no-print table td:nth-child(4){width:50px;text-align:center}
-.forn-grid .card.no-print table th:nth-child(5),.forn-grid .card.no-print table td:nth-child(5){width:90px;text-align:right}
-.forn-grid .card.no-print table th:nth-child(6),.forn-grid .card.no-print table td:nth-child(6){width:160px;white-space:nowrap;text-align:right}
-.forn-grid .card.no-print table th:last-child,.forn-grid .card.no-print table td:last-child{width:auto}
 .forn-grid .card.no-print table tbody tr:nth-child(even) td{background:#F5F8FD}
-@media(max-width:900px){.forn-grid{grid-template-columns:1fr}}
+@media(max-width:1100px){.forn-grid{grid-template-columns:1fr}}
 
 /* ── Mercado: layout análise de cobertura ─────────────── */
 .merc-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
@@ -6064,7 +6057,7 @@ function renderMercado(){
         </div>
       </div>
       <!-- tela interativa -->
-        <div class="card no-print" style="border:1px solid #C8D0DC">
+        <div class="card no-print">
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
