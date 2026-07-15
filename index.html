@@ -6070,8 +6070,9 @@ function renderMercado(){
         </div>
         <table><thead><tr><th style="width:32px;font-size:10px;text-align:center">Nº</th><th>Ingrediente</th><th style="width:38px;font-size:10px;text-align:center">Cont.</th><th style="width:45%">Observação</th><th style="width:38px;font-size:10px;text-align:center">Tipo</th><th class="num" style="width:80px">Necessidade</th><th class="num" style="width:140px">A Comprar</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
-
-      </div>
+        <div style="padding:8px 12px;border-top:1px solid var(--borda);text-align:center">
+          <button class="btn btn-outline btn-sm" onclick="adicionarItemMercCard('${esc(titulo)}')" style="display:inline-flex;align-items:center;gap:4px;font-size:11px">+ Adicionar ingrediente</button>
+        </div>
     </div>`;
   };
 
@@ -6612,6 +6613,47 @@ function cancelarAdicionarItemMerc(af){
   const el = document.getElementById(formId);
   if(el) el.remove();
 }
+
+function adicionarItemMercCard(fornNome){
+  const forn = FORNECEDORES_CADASTRO.find(f => f.nome === fornNome);
+  if(!forn){ alert('Fornecedor não encontrado.'); return; }
+  const opts = Object.keys(DADOS.ingredientes).sort().map(n => `<option value="${n}">${n}</option>`).join('');
+  const formId = 'form-add-card';
+  if(document.getElementById(formId)) return;
+  const html = `<div id="${formId}" class="no-print" style="padding:10px 14px;background:#f0f5ff;border-top:1px solid var(--borda)">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select id="add-ing-card" style="flex:1;min-width:160px;font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border:1.5px solid var(--azul2);border-radius:6px">${opts}</select>
+      <input type="number" id="add-qtd-card" min="0.01" step="0.01" placeholder="Qtd (kg)"
+        style="width:70px;padding:5px 8px;border:1.5px solid var(--borda);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px">
+      <button class="btn btn-primary btn-sm" onclick="confirmarAddItemCard('${forn.id}')">✓ Adicionar</button>
+      <button class="btn btn-outline btn-sm" onclick="cancelarAddItemCard()">Cancelar</button>
+    </div>
+  </div>`;
+  const cards = document.querySelectorAll('.forn-page .card.no-print');
+  for(const card of cards){
+    if(card.querySelector('.card-header')?.textContent.trim() === fornNome){
+      card.insertAdjacentHTML('beforeend', html);
+      break;
+    }
+  }
+}
+function confirmarAddItemCard(fornId){
+  const sel = document.getElementById('add-ing-card');
+  const inp = document.getElementById('add-qtd-card');
+  if(!sel || !inp) return;
+  const nome = sel.value;
+  const qtd = parseFloat(inp.value) || 0;
+  if(qtd <= 0){ alert('Informe uma quantidade válida.'); return; }
+  ING_FORNECEDORES[nome] = fornId;
+  salvarIngFornecedores();
+  const aj = getMercAjuste();
+  if(!aj.extras) aj.extras = [];
+  aj.extras = aj.extras.filter(e => e.nome !== nome);
+  aj.extras.push({ nome, qtd, af: isAF(nome) });
+  salvarMercAjustes();
+  renderMercado();
+}
+function cancelarAddItemCard(){ const el = document.getElementById('form-add-card'); if(el) el.remove(); }
 
 // ══════════════════════════════════════════════════════
 // FICHAS TÉCNICAS
