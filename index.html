@@ -1067,7 +1067,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="overflow:visible">
     <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;border-radius:var(--r) var(--r) 0 0">
       <span>Lista de Ingredientes <span style="font-weight:400;font-size:12px;opacity:.8" id="cnt-ings"></span></span>
-      <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">📋 Só usados no ciclo</button>
+      <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">📋 Filtrar usados no ciclo</button>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="adicionarIngrediente()">+ Adicionar Ingrediente</button>
         <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar embalagens como padrão</button>
@@ -7105,6 +7105,7 @@ function toggleFiltrarUsados(){
   if(btn){
     btn.style.background = _filtroApenasUsados ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.2)';
     btn.style.fontWeight = _filtroApenasUsados ? '700' : '';
+    btn.innerHTML = _filtroApenasUsados ? '📋 Todos os ingredientes' : '📋 Filtrar usados no ciclo';
   }
   renderIngredientes(document.querySelector('.filtro-input')?.value || '');
 }
