@@ -27,15 +27,15 @@ html{overflow-x:hidden}
 body{font-family:'Inter',sans-serif;background:#EEF2F8;color:var(--txt);min-height:100vh;display:flex;align-items:stretch;overflow-x:hidden}
 
 /* ── NAV ── */
-nav{background:var(--nav-bg);width:52px;min-width:52px;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0;overflow:hidden;transition:width .2s,box-shadow .2s}
+nav{background:var(--nav-bg);width:52px;min-width:52px;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:4px 0 12px rgba(0,0,0,.15);padding:24px 0;overflow:hidden;transition:width .2s}
 nav:hover{width:210px;overflow:visible;box-shadow:4px 0 24px rgba(0,0,0,.2)}
-.main-content{margin-left:52px;transition:margin-left .2s}
 nav:hover ~ .main-content{margin-left:210px}
-.nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 18px 32px;letter-spacing:.02em;line-height:1.4;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
+.main-content{margin-left:52px;transition:margin-left .2s}
+.nav-brand{color:#fff;font-size:14px;font-weight:700;padding:0 24px 32px;letter-spacing:.02em;line-height:1.4;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .nav-brand span{display:block;color:var(--amarelo);font-size:12px;margin-top:3px}
 .nav-brand svg{flex-shrink:0;opacity:.9}
 .nav-tabs{display:flex;flex-direction:column;gap:4px;width:210px}
-.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:12px 17px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:210px;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.nav-tab{background:none;border:none;color:rgba(255,255,255,.65);padding:12px 24px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-left:4px solid transparent;transition:.2s;text-align:left;width:210px;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .nav-tab:hover{color:#fff;background:rgba(255,255,255,.05)}
 .nav-tab.ativo{color:#fff;border-left-color:var(--amarelo);background:rgba(255,255,255,.1)}
 .nav-tab svg{flex-shrink:0;opacity:.7;transition:.2s;width:18px;height:18px}
@@ -115,13 +115,12 @@ tbody tr:hover td{background:#f0f5fc}
 /* ── FORNECEDORES ── */
 .forn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .forn-grid table{width:100%}
-.forn-grid .card.no-print{border:1px solid #C8D0DC;min-width:0}
-.forn-grid .card.no-print > table{border-collapse:collapse;font-size:11px}
-.forn-grid .card.no-print table th,.forn-grid .card.no-print table td{border:1px solid #C8D0DC;padding:4px 5px}
-.forn-grid .card.no-print table thead th{background:#f0f2f5;color:#1A3A6B;font-weight:700;font-size:10px;text-align:left}
+.forn-grid .card.no-print{border:1px solid #C8D0DC}
+.forn-grid .card.no-print table{border-collapse:collapse}
+.forn-grid .card.no-print table th,.forn-grid .card.no-print table td{border:1px solid #C8D0DC;padding:5px 8px}
+.forn-grid .card.no-print table thead th{background:#f0f2f5;color:#1A3A6B;font-weight:700;font-size:11px;text-align:left}
 .forn-grid .card.no-print table thead th.num{text-align:right}
 .forn-grid .card.no-print table tbody tr:nth-child(even) td{background:#F5F8FD}
-.forn-grid .card.no-print .card-header{font-size:13px;padding:10px 14px}
 @media(max-width:1100px){.forn-grid{grid-template-columns:1fr}}
 
 /* ── Mercado: layout análise de cobertura ─────────────── */
@@ -5882,7 +5881,7 @@ function renderMercado(){
 
   const _sub    = _subtitulo;
 
-  const inputStyle = `width:42px;text-align:right;padding:2px 3px;border:1.5px solid var(--borda);border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--azul2)`;
+  const inputStyle = `width:55px;text-align:right;padding:2px 4px;border:1.5px solid var(--borda);border-radius:5px;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--azul2)`;
 
   const _obsMap = getMercAjuste().obs || {};
   const _perBadge = (it) => {
@@ -6062,7 +6061,7 @@ function renderMercado(){
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
-        <table><thead><tr><th style="width:26px;font-size:9px;text-align:center">Nº</th><th>Ingrediente</th><th style="width:30px;font-size:9px;text-align:center">Ct</th><th style="width:40%">Obs</th><th style="width:38px;font-size:9px;text-align:center">Tipo</th><th class="num" style="width:55px;font-size:9px">Nec</th><th class="num" style="width:110px;font-size:9px">Comprar</th></tr></thead>
+        <table><thead><tr><th style="width:32px;font-size:10px;text-align:center">Nº</th><th>Ingrediente</th><th style="width:36px;font-size:10px;text-align:center">Cont.</th><th style="width:45%">Observação</th><th style="width:44px;font-size:10px;text-align:center">Tipo</th><th class="num" style="width:72px;font-size:10px">Necessidade</th><th class="num" style="width:140px">A Comprar</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
         <div style="padding:8px 12px;border-top:1px solid var(--borda);text-align:center">
           <button class="btn btn-outline btn-sm" onclick="adicionarItemMercCard('${esc(titulo)}')" style="display:inline-flex;align-items:center;gap:4px;font-size:11px">+ Adicionar ingrediente</button>
