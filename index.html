@@ -1150,7 +1150,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
               <div class="mock-header-text">
                 <h1 id="preview-escola"></h1>
                 <p id="preview-subtitulo">Programa Nacional de Alimentação Escolar — PNAE</p>
-    </div>
+              </div>
+            </div>
             <div class="mock-body"></div>
             <div class="mock-sig" id="preview-sig">Diretor(a) Escolar</div>
           </div>
@@ -3197,10 +3198,8 @@ function toggleCorrecaoEstoque(){
 }
 
 function renderEstoque(){
-  console.log('DEBUG renderEstoque called');
   const ings = Object.keys(DADOS.ingredientes).sort();  // Bloco 2: tabela de previsão
   const tbody = document.getElementById('tbody-previsao');
-  console.log('DEBUG renderEstoque tbody:', tbody, 'ings:', ings.length);
   if(tbody){
     const rows = ings
       .map(nome => {
@@ -3469,9 +3468,7 @@ function sugerirQuantidades(lic_id){
 // LICITAÇÕES
 // ══════════════════════════════════════════════════════
 function renderLicitacoes(){
-  console.log('DEBUG renderLicitacoes called, LICITACOES:', LICITACOES);
   const el = document.getElementById('lista-licitacoes');
-  console.log('DEBUG renderLicitacoes el:', el);
   if(!el) return;
   if(!LICITACOES.length){
     el.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">Nenhum contrato cadastrado. Clique em "Novo Contrato" para começar.</div>';
@@ -7391,11 +7388,9 @@ function popularSemanasGastos(){
 }
 
 function renderGastos(){
-  console.log('DEBUG renderGastos called');
   const mesNome = document.getElementById('sel-mes-gastos')?.value;
   const semSel  = parseInt(document.getElementById('sel-sem-gastos')?.value || 0);
-  console.log('DEBUG renderGastos mesNome:', mesNome, 'semSel:', semSel);
-  if(!mesNome) { console.log('DEBUG renderGastos: no mesNome, returning'); return; }
+  if(!mesNome) return;
 
   const sufixo = semSel > 0 ? ` — Semana ${semSel}` : '';
   document.getElementById('detalhe-periodo').textContent = mesNome + sufixo;
@@ -7465,10 +7460,8 @@ function renderGastos(){
 
 
 function renderPreparo(filtro){
-  console.log('DEBUG renderPreparo called, CD:', CD?.length, 'filtro:', filtro);
   const el = document.getElementById('prep-conteudo');
-  console.log('DEBUG renderPreparo el:', el);
-  if(!CD||!CD.length){ console.log('DEBUG renderPreparo: CD empty'); el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio carregado.</div>'; return; }
+  if(!CD||!CD.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio carregado.</div>'; return; }
   
   // Populate dropdown
   const sel = document.getElementById('sel-cardapio-print');
