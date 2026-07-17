@@ -1452,12 +1452,11 @@ function restaurarBackup(){
       <label>Cardápio</label>
       <select id="sel-cardapio-print" onchange="renderPreparo()" style="font-family:'Inter',sans-serif;font-size:13px;padding:5px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:200px;background:#fff">
         <option value="">— Todos —</option>
+        <option value="ciclo">— Todos do Ciclo —</option>
       </select>
     </div>
     <button class="btn btn-sm" onclick="imprimirPrepAtual()" style="display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Selecionado</button>
     <button class="btn btn-sm" onclick="imprimirRegistroSaidas()" style="display:flex;align-items:center;gap:5px;background:#fff;color:#92400e;border:1.5px solid #f59e0b"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reg. Saídas</button>
-    <button class="btn btn-sm" onclick="imprimirPreparoCicloQt()" style="display:flex;align-items:center;gap:5px;background:#1A3A6B;color:#fff;border:1.5px solid #1A3A6B" title="Imprimir Quantidades por Turno de todos os cardápios do ciclo atual"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Qt. Turno do Ciclo</button>
-    <button class="btn btn-sm" onclick="imprimirSaidasCiclo()" style="display:flex;align-items:center;gap:5px;background:#fff;color:#1A3A6B;border:1.5px solid #1A3A6B" title="Imprimir Registro de Saídas de todos os cardápios do ciclo atual"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reg. Saídas do Ciclo</button>
   </div>
   <div id="prep-conteudo"></div>
 </div>
@@ -4718,7 +4717,7 @@ function init(){
   if(typeof CD !== 'undefined' && CD && CD.length){
     const sel = document.getElementById('sel-cardapio-print');
     if(sel && !sel.dataset.populated){
-      sel.innerHTML = '<option value="">— Todos —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
+      sel.innerHTML = '<option value="">— Todos —</option><option value="ciclo">— Todos do Ciclo —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
       sel.dataset.populated = '1';
     }
   }
@@ -7468,7 +7467,7 @@ function renderPreparo(filtro){
   // Populate dropdown
   const sel = document.getElementById('sel-cardapio-print');
   if(sel&&!sel.dataset.populated){
-    sel.innerHTML = '<option value="">— Todos —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
+    sel.innerHTML = '<option value="">— Todos —</option><option value="ciclo">— Todos do Ciclo —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
     sel.dataset.populated = '1';
   }
   
@@ -7477,8 +7476,13 @@ function renderPreparo(filtro){
   const filtroId = sel?sel.value:'';
   
   let lista = CD;
+  if(filtroId === 'ciclo'){
+    const cicloIds = getCicloCardapios();
+    if(!cicloIds.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.</div>'; return; }
+    lista = lista.filter(c=>cicloIds.includes(c[0]));
+  }
   if(filtroTexto) lista = lista.filter(c=>c[1].toLowerCase().includes(filtroTexto));
-  if(filtroId) lista = lista.filter(c=>c[0]==parseInt(filtroId));
+  if(filtroId && filtroId !== 'ciclo') lista = lista.filter(c=>c[0]==parseInt(filtroId));
   
   const niveles = NIVEIS_CONFIG?NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0):[];
   const colMeta = [
@@ -7570,8 +7574,14 @@ function imprimirRegistroSaidas(){
   const sel = document.getElementById('sel-cardapio-print');
   const filtroTexto = (document.querySelector('.filtro-input')?.value||'').toLowerCase();
   let lista = CD;
+  if(sel&&sel.value === 'ciclo'){
+    const cicloIds = getCicloCardapios();
+    if(!cicloIds.length){ alert('Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.'); return; }
+    lista = lista.filter(c=>cicloIds.includes(c[0]));
+  } else if(sel&&sel.value) {
+    lista = lista.filter(c=>c[0]==parseInt(sel.value));
+  }
   if(filtroTexto) lista = lista.filter(c=>c[1].toLowerCase().includes(filtroTexto));
-  if(sel&&sel.value) lista = lista.filter(c=>c[0]==parseInt(sel.value));
   if(!lista.length){ alert('Nenhum cardápio encontrado para gerar o registro.'); return; }
   const BLANK_ROWS = 6;
   let formsHtml = '';
@@ -7692,142 +7702,17 @@ function imprimirPreparoCiclo(){
   setTimeout(()=>{w.print();w.close()},300);
 }
 
-function getCicloPratos(){
+function getCicloCardapios(){
   const sel = document.getElementById('plan-ciclo');
   const cicloNome = sel ? sel.value : '';
-  if(!cicloNome || !CICLOS_PLANOS[cicloNome] || !CICLOS_PLANOS[cicloNome].length){
-    alert('Nenhum prato planejado para o ciclo "'+cicloNome+'". Configure o ciclo na aba Cardápio Anual antes de imprimir.'); return null;
-  }
-  const pratos = CICLOS_PLANOS[cicloNome];
+  if(!cicloNome || !CICLOS_PLANOS[cicloNome] || !CICLOS_PLANOS[cicloNome].length) return [];
   const ids = new Set();
-  pratos.forEach(pratoStr => {
+  CICLOS_PLANOS[cicloNome].forEach(pratoStr => {
     const {num} = nomeNum(pratoStr);
     const c = CD.find(x => x[0]==parseInt(num));
     if(c) ids.add(c[0]);
   });
-  return { cicloNome, ids: [...ids] };
-}
-
-function imprimirPreparoCicloQt(){
-  const data = getCicloPratos();
-  if(!data) return;
-  const cicloIds = new Set(data.ids);
-  const sel = document.getElementById('sel-cardapio-print');
-  if(sel) sel.value = '';
-  const niveles = NIVEIS_CONFIG?NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0):[];
-  const colMeta = [{id:'f1',nome:'Fundamental 1',sub:'6 a 10 anos'},{id:'f2',nome:'Fundamental 2',sub:'11 a 15 anos'},{id:'medio',nome:'Médio',sub:''},{id:'eja',nome:'EJA',sub:''}];
-  const hasAlunos = niveles.length>0;
-  let html = '';
-  CD.filter(c=>cicloIds.has(c[0])).forEach(c=>{
-    const id=c[0], nome=c[1], tipo=c[2], ings=c[4], modo=c[5], sugest=c[6];
-    let rows = '';
-    for(let i=0;i<ings.length;i+=5){
-      const inome=ings[i], vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
-      const vals=[vF1,vF2,vMed,vEja];
-      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:12px">'+inome+'</td>';
-      colMeta.forEach((m,ci)=>{
-        let raw = parseFloat(vals[ci])||0;
-        let total = hasAlunos ? raw * (niveles.find(n=>n.id===m.id)?.alunos||0) : raw;
-        const isLiq = /\b(óleo|leite|molho|água|suco|café|achocolatado|iogurte|coco)\b/i.test(inome);
-        let val;
-        if(total >= 1000) val = (total/1000).toFixed(total%1000===0?0:2).replace('.',',')+(isLiq?' L':' kg');
-        else val = total.toFixed(total%1===0?0:2).replace('.',',')+(isLiq?' ml':' g');
-        rows += '<td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:12px">'+val+'</td>';
-      });
-      rows += '</tr>';
-    }
-    let modoHtml = '';
-    if(modo){
-      const items = modo.split(/[;.]+/).filter(s=>s.trim());
-      modoHtml = '<div style="margin-top:10px"><div style="font-weight:700;text-decoration:underline;font-size:14px;margin-bottom:4px">Modo de Preparar:</div>'
-        + items.map(s=>'<div style="font-size:12px;margin-left:14px;text-indent:-10px;line-height:1.6">• '+s.trim()+(s===items[items.length-1]?'.':';')+'</div>').join('')+'</div>';
-    }
-    let sugHtml = '';
-    if(sugest){
-      const items = sugest.split(/[;.]+/).filter(s=>s.trim());
-      sugHtml = '<div style="margin-top:8px"><div style="font-weight:700;text-decoration:underline;font-size:14px;margin-bottom:4px">Sugestões:</div>'
-        + items.map(s=>'<div style="font-size:12px;margin-left:14px;text-indent:-10px;line-height:1.6">• '+s.trim()+(s===items[items.length-1]?'.':';')+'</div>').join('')+'</div>';
-    }
-    html += '<div style="border:1px solid #000;margin-bottom:20px;font-family:Arial,Helvetica,sans-serif;page-break-inside:avoid;break-inside:avoid;padding:14px 16px">'
-      + '<div style="font-weight:700;font-size:16px;color:#000;margin-bottom:2px">Cardápio '+id+' – '+nome+'</div>'
-      + '<div style="font-size:13px;color:#000;margin-bottom:6px">Tipo de preparação – '+tipo+'</div>'
-      + '<table style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif"><thead>'
-      + '<tr><th style="border:2px solid #000;border-right:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:14px">Cardápio '+id+'</th>'
-      + '<th colspan="4" style="border:2px solid #000;border-left:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:14px">Quantidade Total por Categoria Escolar</th></tr>'
-      + '<tr><th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:13px">Ingredientes</th>'
-      + colMeta.map(m=>'<th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:13px">'+m.nome+(m.sub?'<br>'+m.sub:'')+'</th>').join('')
-      + '</tr></thead><tbody>'+rows+'</tbody></table>'
-      + modoHtml+sugHtml+'</div>';
-  });
-  if(!html){ alert('Nenhum cardápio do ciclo encontrado.'); return; }
-  const w = window.open('','_blank');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
-    +'body{font-family:Arial,Helvetica,sans-serif;font-size:12pt;margin:0;padding:0;color:#000}'
-    +'table{width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif}'
-    +'th,td{border:1px solid #000;padding:5px 8px;font-size:11pt;text-align:center}'
-    +'th{font-weight:700;background:#fff;color:#000}td{background:#fff;color:#000}'
-    +'@page{margin:18mm 20mm}@media print{body{color:#000}}'
-    +'</style></head><body><h2 style="text-align:center;margin-bottom:16px;font-size:14pt">'+data.cicloNome+' — Quantidades por Turno</h2>'+html+'</body></html>');
-  w.document.close();
-  setTimeout(()=>{w.print();w.close()},300);
-}
-
-function imprimirSaidasCiclo(){
-  const data = getCicloPratos();
-  if(!data) return;
-  const cicloIds = new Set(data.ids);
-  const BLANK_ROWS = 6;
-  let formsHtml = '';
-  CD.filter(c=>cicloIds.has(c[0])).forEach(c => {
-    const id=c[0], nome=c[1], ings=c[4];
-    let rows = '';
-    for(let i=0;i<ings.length;i+=5){
-      const inome=ings[i];
-      rows += '<tr><td>'+inome+'</td><td></td><td></td><td></td><td></td></tr>';
-    }
-    for(let e=0;e<BLANK_ROWS;e++){
-      rows += '<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>';
-    }
-    rows += '<tr><td><b>Quant. de prep. serv.</b></td><td></td><td></td><td></td><td></td></tr>';
-    const form = '<div class="rs-form">'
-      + '<div class="rs-title">Cardápio '+id+' – '+nome+'</div>'
-      + '<table><thead><tr>'
-      + '<th class="rs-ing">Ingredientes</th>'
-      + '<th class="rs-col">Saída<br>Manhã</th>'
-      + '<th class="rs-col">Saída<br>Tarde</th>'
-      + '<th class="rs-col">Saída<br>Noite</th>'
-      + '<th class="rs-col">Total</th>'
-      + '</tr></thead><tbody>'+rows+'</tbody></table>'
-      + '<div class="rs-assinaturas">'
-      + '<div class="rs-assinatura"><span>Manhã:</span> <span class="rs-linha"></span></div>'
-      + '<div class="rs-assinatura"><span>Tarde:</span> <span class="rs-linha"></span></div>'
-      + '<div class="rs-assinatura"><span>Noite:</span> <span class="rs-linha"></span></div>'
-      + '</div></div>';
-    formsHtml += form + '<div class="rs-gap"></div>' + form;
-  });
-  if(!formsHtml){ alert('Nenhum cardápio do ciclo encontrado.'); return; }
-  const w = window.open('','_blank');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
-    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#000;margin:12mm 16mm}'
-    +'.rs-form{page-break-inside:avoid}'
-    +'.rs-title{text-align:center;font-weight:700;font-size:14pt;margin-bottom:10px}'
-    +'table{width:100%;border-collapse:collapse}'
-    +'th,td{border:1px solid #000;padding:5px 6px;font-size:11pt}'
-    +'th{text-align:center;font-weight:700}'
-    +'.rs-ing{width:42%;text-align:left}'
-    +'.rs-col{width:14.5%;text-align:center}'
-    +'tbody td{height:24px;text-align:center}'
-    +'tbody td:first-child{text-align:left}'
-    +'.rs-assinaturas{margin-top:8px;display:flex;gap:12px;justify-content:space-between}'
-    +'.rs-assinatura{flex:1;font-size:11pt;display:flex;align-items:flex-end;gap:4px}'
-    +'.rs-assinatura span:first-child{font-weight:700;white-space:nowrap}'
-    +'.rs-linha{flex:1;border-bottom:1px solid #000;min-width:60px}'
-    +'.rs-gap{height:16px}'
-    +'@page{size:A4 portrait;margin:12mm 16mm}'
-    +'@media print{body{margin:10mm 14mm}}'
-    +'</style></head><body><h2 style="text-align:center;margin-bottom:14px;font-size:14pt">'+data.cicloNome+' — REGISTRO DE SAÍDA</h2>'+formsHtml+'</body></html>');
-  w.document.close();
-  setTimeout(()=>{w.print();w.close()},300);
+  return [...ids];
 }
 
 function atualizarPrintGlobal(){
