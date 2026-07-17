@@ -2897,6 +2897,13 @@ let EMBALAGENS = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
     if(DADOS.ingredientes[nome]) DADOS.ingredientes[nome].unidade = unidade;
   });
 })();
+
+// Licitações e Estoque — declarados aqui para evitar TDZ (acessados em IIFEs abaixo)
+let LICITACOES       = JSON.parse(localStorage.getItem('merenda_licitacoes')      || '[]');
+let ORDENS_EXPEDIDAS = JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
+let RECEBIMENTOS     = JSON.parse(localStorage.getItem('merenda_recebimentos')     || '[]');
+let ESTOQUE          = JSON.parse(localStorage.getItem('merenda_estoque')         || '{}');
+
 // Mesclar ingredientes customizados adicionados pelo usuário
 (function(){
   const c = JSON.parse(localStorage.getItem('merenda_ing_custom') || '{}');
@@ -2990,18 +2997,11 @@ function salvarObsItemMerc(nome, texto){
   renderMercado();
 }
 
-// Licitações
-let LICITACOES       = JSON.parse(localStorage.getItem('merenda_licitacoes')      || '[]');
-let ORDENS_EXPEDIDAS = JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
-let RECEBIMENTOS     = JSON.parse(localStorage.getItem('merenda_recebimentos')     || '[]');
-
 function salvarLicitacoes(){ localStorage.setItem('merenda_licitacoes',      JSON.stringify(LICITACOES)); }
 function salvarOrdens(){     localStorage.setItem('merenda_ordens_expedidas', JSON.stringify(ORDENS_EXPEDIDAS)); }
 function salvarRecebimentos(){ localStorage.setItem('merenda_recebimentos',  JSON.stringify(RECEBIMENTOS)); }
 function gerarId(prefix){ return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 
-// Estoque
-let ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque')             || '{}');
 let SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas')  || '[]');
 let SERVIDORES_CONFIG  = JSON.parse(localStorage.getItem('merenda_servidores_config')   || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45, func_nivel: {}, func_total: 0 };
 if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
