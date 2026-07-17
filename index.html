@@ -14,6 +14,7 @@
   --verde2:  #27AE60;
   --amarelo: #F2A900;
   --laranja: #E67E22;
+  --roxo:    #7C3AED;
   --vermelho:#C0392B;
   --cinza:   #F4F6F9;
   --borda:   #D8E3F0;
@@ -1239,6 +1240,12 @@ function restaurarBackup(){
         <svg style="opacity:.18;flex-shrink:0;margin-top:2px" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       </div>
     </div>
+    <div class="stat roxo">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="stat-val" id="gasto-ciclo">R$ 0,00</div><div class="stat-lbl">Gasto Estimado no Ciclo</div></div>
+        <svg style="opacity:.18;flex-shrink:0;margin-top:2px" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--roxo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+    </div>
     <div class="stat laranja">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div><div class="stat-val" id="gasto-ano">R$ 0,00</div><div class="stat-lbl">Gasto Estimado no Ano (2026)</div></div>
@@ -1262,7 +1269,7 @@ function restaurarBackup(){
       <tbody id="tbody-gastos"></tbody>
       <tfoot style="background:var(--cinza);font-weight:700">
         <tr>
-          <td colspan="4" style="text-align:right;padding:12px">TOTAL DO CICLO:</td>
+          <td colspan="4" style="text-align:right;padding:12px">TOTAL DO MÊS:</td>
           <td class="num" id="total-gastos-mes" style="font-size:16px;color:var(--azul)">R$ 0,00</td>
         </tr>
       </tfoot>
@@ -7450,11 +7457,40 @@ function renderGastos(){
     });
   });
 
+  // Cálculo do ciclo atual
+  let custoCiclo = 0;
+  const selCiclo = document.getElementById('plan-ciclo');
+  const cicloNome = selCiclo ? selCiclo.value : '';
+  if(cicloNome && CICLOS_PLANOS[cicloNome] && CICLOS_PLANOS[cicloNome].length){
+    const totaisCiclo = {};
+    const ativos = NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0);
+    CICLOS_PLANOS[cicloNome].forEach(pratoStr => {
+      const {num} = nomeNum(pratoStr);
+      const c = CD.find(x => x[0]==parseInt(num));
+      if(!c) return;
+      const nivel = c[2]; // tipo
+      ativos.forEach(nivelConf => {
+        const mult = 1 + (nivelConf.margem || 0) / 100;
+        const ings = c[4];
+        for(let i=0;i<ings.length;i+=5){
+          const nomeIng = ings[i];
+          const perCapita = ings[i+({f1:1,f2:2,medio:3,eja:4}[nivelConf.id]||2)] || 0;
+          const chave = nomeIng;
+          totaisCiclo[chave] = (totaisCiclo[chave] || 0) + (perCapita * nivelConf.alunos * mult) / 1000;
+        }
+      });
+    });
+    for(const [ing, qtd] of Object.entries(totaisCiclo)){
+      custoCiclo += qtd * (precos[ing] || 0);
+    }
+  }
+
   document.getElementById('tbody-gastos').innerHTML = rows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:#aaa">Nenhum dado para este mês</td></tr>';
   const lblSem = semSel > 0 ? `Gasto na Semana ${semSel}` : 'Gasto Total do Mês';
   document.getElementById('gasto-semana-lbl').textContent = lblSem;
   document.getElementById('gasto-semana').textContent = 'R$ ' + custoSemana.toLocaleString('pt-BR', {minimumFractionDigits:2});
   document.getElementById('gasto-mes').textContent    = 'R$ ' + custoMes.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('gasto-ciclo').textContent  = 'R$ ' + custoCiclo.toLocaleString('pt-BR', {minimumFractionDigits:2});
   document.getElementById('gasto-ano').textContent    = 'R$ ' + custoAno.toLocaleString('pt-BR', {minimumFractionDigits:2});
   document.getElementById('total-gastos-mes').textContent = 'R$ ' + custoMes.toLocaleString('pt-BR', {minimumFractionDigits:2});
 }
