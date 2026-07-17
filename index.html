@@ -7571,65 +7571,55 @@ function imprimirRegistroSaidas(){
   if(filtroTexto) lista = lista.filter(c=>c[1].toLowerCase().includes(filtroTexto));
   if(sel&&sel.value) lista = lista.filter(c=>c[0]==parseInt(sel.value));
   if(!lista.length){ alert('Nenhum cardápio encontrado para gerar o registro.'); return; }
-  const niveles = NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0);
-  const colMeta = [{id:'f1'},{id:'f2'},{id:'medio'},{id:'eja'}];
-  const hasAlunos = niveles.length>0;
-  const hoje = new Date().toLocaleDateString('pt-BR');
-  const LINHAS_EXTRAS = 5;
-  let html = '';
+  const BLANK_ROWS = 6;
+  let formsHtml = '';
   lista.forEach(c => {
     const id=c[0], nome=c[1], ings=c[4];
     let rows = '';
     for(let i=0;i<ings.length;i+=5){
-      const inome=ings[i], vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
-      const total = hasAlunos
-        ? (vF1 * (niveles.find(n=>n.id==='f1')?.alunos||0) + vF2 * (niveles.find(n=>n.id==='f2')?.alunos||0) + vMed * (niveles.find(n=>n.id==='medio')?.alunos||0) + vEja * (niveles.find(n=>n.id==='eja')?.alunos||0)) / 1000
-        : (vF1+vF2+vMed+vEja)/4;
-      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;font-size:10pt">'+inome+'</td>'
-        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
-        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
-        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
-        + '<td style="border:1px solid #000;padding:5px 8px;text-align:right;font-weight:700">'+total.toFixed(2).replace('.',',')+' kg</td></tr>';
+      const inome=ings[i];
+      rows += '<tr><td>'+inome+'</td><td></td><td></td><td></td><td></td></tr>';
     }
-    for(let e=0;e<LINHAS_EXTRAS;e++){
-      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;font-size:10pt;color:#999;font-style:italic">______________________</td>'
-        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
-        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
-        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
-        + '<td style="border:1px solid #000;padding:5px 8px"></td></tr>';
+    for(let e=0;e<BLANK_ROWS;e++){
+      rows += '<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>';
     }
-    html += '<div style="border:1px solid #000;margin-bottom:24px;font-family:Arial,Helvetica,sans-serif;page-break-inside:avoid;padding:0">'
-      + '<div style="background:#1A3A6B;color:#fff;padding:8px 12px;font-weight:700;font-size:13pt;text-align:center">Cardápio '+id+' – '+nome+'</div>'
-      + '<div style="display:flex;gap:20px;padding:10px 12px;border-bottom:1px solid #000;font-size:11pt">'
-      + '<span><strong>Data:</strong> _____/_____/_________</span>'
-      + '<span><strong>Registrador:</strong> _________________________</span></div>'
-      + '<div style="display:flex;gap:20px;padding:8px 12px;border-bottom:1px solid #000;font-size:11pt;background:#f8fafc">'
-      + '<span><strong>Refeições servidas:</strong></span>'
-      + '<span>Manhã: _________</span>'
-      + '<span>Tarde: _________</span>'
-      + '<span>Noite: _________</span>'
-      + '<span style="margin-left:auto;color:#666">Total: _________</span></div>'
-      + '<table style="width:100%;border-collapse:collapse">'
-      + '<thead><tr>'
-      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:left;font-size:10pt">Ingrediente</th>'
-      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Manhã</th>'
-      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Tarde</th>'
-      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Noite</th>'
-      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:16%">Total (previsto)</th>'
+    rows += '<tr><td><b>Quant. de prep. serv.</b></td><td></td><td></td><td></td><td></td></tr>';
+    const form = '<div class="rs-form">'
+      + '<div class="rs-title">Cardápio '+id+' – '+nome+'</div>'
+      + '<table><thead><tr>'
+      + '<th class="rs-ing">Ingredientes</th>'
+      + '<th class="rs-col">Saída<br>Manhã</th>'
+      + '<th class="rs-col">Saída<br>Tarde</th>'
+      + '<th class="rs-col">Saída<br>Noite</th>'
+      + '<th class="rs-col">Total</th>'
       + '</tr></thead><tbody>'+rows+'</tbody></table>'
-      + '<div style="padding:8px 12px;border-top:1px solid #000;font-size:10pt;display:flex;justify-content:space-between">'
-      + '<span><strong>Observações:</strong> _______________________________________________</span>'
-      + '<span><strong>Visto:</strong> _________________</span></div>'
-      + '</div>';
+      + '<div class="rs-assinaturas">'
+      + '<div class="rs-assinatura"><span>Manhã:</span> <span class="rs-linha"></span></div>'
+      + '<div class="rs-assinatura"><span>Tarde:</span> <span class="rs-linha"></span></div>'
+      + '<div class="rs-assinatura"><span>Noite:</span> <span class="rs-linha"></span></div>'
+      + '</div></div>';
+    formsHtml += form + '<div class="rs-gap"></div>' + form;
   });
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
-    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;margin:20px;color:#000}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;margin:12mm 16mm}'
+    +'.rs-form{page-break-inside:avoid}'
+    +'.rs-title{text-align:center;font-weight:700;font-size:12pt;margin-bottom:6px}'
     +'table{width:100%;border-collapse:collapse}'
-    +'th,td{border:1px solid #000;padding:4px 8px}'
-    +'@page{margin:15mm}'
-    +'</style></head><body><h2 style="text-align:center;margin-bottom:20px;font-size:14pt">REGISTRO DIÁRIO DE SAÍDA DE INGREDIENTES</h2>'
-    +html+'</body></html>');
+    +'th,td{border:1px solid #000;padding:4px 6px;font-size:10pt}'
+    +'th{text-align:center;font-weight:700}'
+    +'.rs-ing{width:42%;text-align:left}'
+    +'.rs-col{width:14.5%;text-align:center}'
+    +'tbody td{height:20px;text-align:center}'
+    +'tbody td:first-child{text-align:left}'
+    +'.rs-assinaturas{margin-top:8px;display:flex;gap:12px;justify-content:space-between}'
+    +'.rs-assinatura{flex:1;font-size:10pt;display:flex;align-items:flex-end;gap:4px}'
+    +'.rs-assinatura span:first-child{font-weight:700;white-space:nowrap}'
+    +'.rs-linha{flex:1;border-bottom:1px solid #000;min-width:60px}'
+    +'.rs-gap{height:16px}'
+    +'@page{size:A4 portrait;margin:12mm 16mm}'
+    +'@media print{body{margin:10mm 14mm}}'
+    +'</style></head><body>'+formsHtml+'</body></html>');
   w.document.close();
   setTimeout(()=>{w.print();w.close()},300);
 }
