@@ -7490,18 +7490,18 @@ function renderPreparo(filtro){
   let html = '';
   lista.forEach(c=>{
     const id=c[0], nome=c[1], tipo=c[2], ings=c[4], modo=c[5], sugest=c[6];
-    let hdr1 = '<tr><th style="border:2px solid #000;border-right:1px solid #000;padding:6px 10px;text-align:center;font-weight:700;font-size:12px;background:#fff;color:#000">Cardápio '+id+'</th>'
-      + '<th colspan="4" style="border:2px solid #000;border-left:1px solid #000;padding:6px 10px;text-align:center;font-weight:700;font-size:12px;background:#fff;color:#000">Quantidade Total por Categoria Escolar</th></tr>';
-    let hdr2 = '<tr><th style="border:1px solid #000;padding:5px 8px;text-align:center;font-weight:700;font-size:11px;background:#fff;color:#000">Ingredientes</th>';
-    colMeta.forEach(m=>{
-      hdr2 += '<th style="border:1px solid #000;padding:5px 8px;text-align:center;font-weight:700;font-size:11px;background:#fff;color:#000">'+m.nome+(m.sub?'<br>'+m.sub:'')+'</th>';
+      let hdr1 = '<tr><th style="border:2px solid #000;border-right:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:14px;background:#fff;color:#000">Cardápio '+id+'</th>'
+        + '<th colspan="4" style="border:2px solid #000;border-left:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:14px;background:#fff;color:#000">Quantidade Total por Categoria Escolar</th></tr>';
+      let hdr2 = '<tr><th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:13px;background:#fff;color:#000">Ingredientes</th>';
+      colMeta.forEach(m=>{
+        hdr2 += '<th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:13px;background:#fff;color:#000">'+m.nome+(m.sub?'<br>'+m.sub:'')+'</th>';
     });
     hdr2 += '</tr>';
     let rows = '';
     for(let i=0;i<ings.length;i+=5){
       const inome=ings[i], vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
       const vals=[vF1,vF2,vMed,vEja];
-      rows += '<tr><td style="border:1px solid #000;padding:4px 8px;text-align:center;font-size:11px;font-weight:400;background:#fff;color:#000">'+inome+'</td>';
+        rows += '<tr><td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:12px;font-weight:400;background:#fff;color:#000">'+inome+'</td>';
       colMeta.forEach((m,ci)=>{
         let raw = parseFloat(vals[ci])||0;
         let total = hasAlunos ? raw * (niveles.find(n=>n.id===m.id)?.alunos||0) : raw;
@@ -7512,22 +7512,22 @@ function renderPreparo(filtro){
         } else {
           val = total.toFixed(total%1===0?0:2).replace('.',',') + (isLiq?' ml':' g');
         }
-        rows += '<td style="border:1px solid #000;padding:4px 8px;text-align:center;font-size:11px;font-weight:400;background:#fff;color:#000">'+val+'</td>';
+        rows += '<td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:12px;font-weight:400;background:#fff;color:#000">'+val+'</td>';
       });
       rows += '</tr>';
     }
     let modoHtml = '';
     if(modo){
       const items = modo.split(/[;.]+/).filter(s=>s.trim());
-      modoHtml = '<div style="margin-top:10px"><div style="font-weight:700;text-decoration:underline;font-size:12px;margin-bottom:4px">Modo de Preparar:</div>'
-        + items.map(s=>'<div style="font-size:11px;margin-left:14px;text-indent:-10px;line-height:1.6">• '+s.trim()+(s===items[items.length-1]?'.':';')+'</div>').join('')
+        modoHtml = '<div style="margin-top:10px"><div style="font-weight:700;text-decoration:underline;font-size:14px;margin-bottom:4px">Modo de Preparar:</div>'
+          + items.map(s=>'<div style="font-size:12px;margin-left:14px;text-indent:-10px;line-height:1.6">• '+s.trim()+(s===items[items.length-1]?'.':';')+'</div>').join('')
         + '</div>';
     }
     let sugHtml = '';
     if(sugest){
       const items = sugest.split(/[;.]+/).filter(s=>s.trim());
-      sugHtml = '<div style="margin-top:8px"><div style="font-weight:700;text-decoration:underline;font-size:12px;margin-bottom:4px">Sugestões:</div>'
-        + items.map(s=>'<div style="font-size:11px;margin-left:14px;text-indent:-10px;line-height:1.6">• '+s.trim()+(s===items[items.length-1]?'.':';')+'</div>').join('')
+        sugHtml = '<div style="margin-top:8px"><div style="font-weight:700;text-decoration:underline;font-size:14px;margin-bottom:4px">Sugestões:</div>'
+          + items.map(s=>'<div style="font-size:12px;margin-left:14px;text-indent:-10px;line-height:1.6">• '+s.trim()+(s===items[items.length-1]?'.':';')+'</div>').join('')
         + '</div>';
     }
     html += '<div class="card prep-card" style="margin-bottom:20px;border:1px solid #ddd;border-radius:0;box-shadow:none;font-family:Arial,Helvetica,sans-serif;page-break-inside:avoid;break-inside:avoid">'
@@ -7551,7 +7551,7 @@ function imprimirPrepAtual(){
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">'
     +'<style>'
-    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;margin:0;padding:0;color:#000}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:12pt;margin:0;padding:0;color:#000}'
     +'.prep-card{font-family:Arial,Helvetica,sans-serif;max-width:100%}'
     +'table{width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif}'
     +'th,td{border:1px solid #000;padding:4px 8px;font-size:10pt;text-align:center}'
@@ -7602,18 +7602,18 @@ function imprimirRegistroSaidas(){
   });
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
-    +'body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;margin:12mm 16mm}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#000;margin:12mm 16mm}'
     +'.rs-form{page-break-inside:avoid}'
-    +'.rs-title{text-align:center;font-weight:700;font-size:12pt;margin-bottom:6px}'
+    +'.rs-title{text-align:center;font-weight:700;font-size:14pt;margin-bottom:6px}'
     +'table{width:100%;border-collapse:collapse}'
-    +'th,td{border:1px solid #000;padding:4px 6px;font-size:10pt}'
+    +'th,td{border:1px solid #000;padding:5px 6px;font-size:11pt}'
     +'th{text-align:center;font-weight:700}'
     +'.rs-ing{width:42%;text-align:left}'
     +'.rs-col{width:14.5%;text-align:center}'
-    +'tbody td{height:20px;text-align:center}'
+    +'tbody td{height:24px;text-align:center}'
     +'tbody td:first-child{text-align:left}'
     +'.rs-assinaturas{margin-top:8px;display:flex;gap:12px;justify-content:space-between}'
-    +'.rs-assinatura{flex:1;font-size:10pt;display:flex;align-items:flex-end;gap:4px}'
+    +'.rs-assinatura{flex:1;font-size:11pt;display:flex;align-items:flex-end;gap:4px}'
     +'.rs-assinatura span:first-child{font-weight:700;white-space:nowrap}'
     +'.rs-linha{flex:1;border-bottom:1px solid #000;min-width:60px}'
     +'.rs-gap{height:16px}'
@@ -7680,9 +7680,9 @@ function imprimirPreparoCiclo(){
   if(!html){ alert('Nenhuma preparação encontrada para este ciclo.'); return; }
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
-    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;margin:0;padding:0;color:#000}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:12pt;margin:0;padding:0;color:#000}'
     +'table{width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif}'
-    +'th,td{border:1px solid #000;padding:4px 8px;font-size:10pt;text-align:center}'
+    +'th,td{border:1px solid #000;padding:5px 8px;font-size:11pt;text-align:center}'
     +'th{font-weight:700;background:#fff;color:#000}td{background:#fff;color:#000}'
     +'@page{margin:18mm 20mm}@media print{body{color:#000}}'
     +'</style></head><body>'+html+'</body></html>');
