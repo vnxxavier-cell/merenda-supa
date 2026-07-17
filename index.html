@@ -7571,67 +7571,65 @@ function imprimirRegistroSaidas(){
   if(filtroTexto) lista = lista.filter(c=>c[1].toLowerCase().includes(filtroTexto));
   if(sel&&sel.value) lista = lista.filter(c=>c[0]==parseInt(sel.value));
   if(!lista.length){ alert('Nenhum cardápio encontrado para gerar o registro.'); return; }
-  const nAtivos = NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0);
-  const BLANK_ROWS = 6;
-  let formsHtml = '';
+  const niveles = NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0);
+  const colMeta = [{id:'f1'},{id:'f2'},{id:'medio'},{id:'eja'}];
+  const hasAlunos = niveles.length>0;
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const LINHAS_EXTRAS = 5;
+  let html = '';
   lista.forEach(c => {
     const id=c[0], nome=c[1], ings=c[4];
     let rows = '';
     for(let i=0;i<ings.length;i+=5){
       const inome=ings[i], vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
-      rows += '<tr>'
-        + '<td class="ing-name">'+inome+'</td>'
-        + '<td></td><td></td><td></td>'
-        + '<td class="col-total"></td>'
-        + '</tr>';
+      const total = hasAlunos
+        ? (vF1 * (niveles.find(n=>n.id==='f1')?.alunos||0) + vF2 * (niveles.find(n=>n.id==='f2')?.alunos||0) + vMed * (niveles.find(n=>n.id==='medio')?.alunos||0) + vEja * (niveles.find(n=>n.id==='eja')?.alunos||0)) / 1000
+        : (vF1+vF2+vMed+vEja)/4;
+      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;font-size:10pt">'+inome+'</td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px;text-align:right;font-weight:700">'+total.toFixed(2).replace('.',',')+' kg</td></tr>';
     }
-    for(let e=0;e<BLANK_ROWS;e++){
-      rows += '<tr>'
-        + '<td class="ing-name">&nbsp;</td>'
-        + '<td></td><td></td><td></td><td></td>'
-        + '</tr>';
+    for(let e=0;e<LINHAS_EXTRAS;e++){
+      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;font-size:10pt;color:#999;font-style:italic">______________________</td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td>'
+        + '<td style="border:1px solid #000;padding:5px 8px"></td></tr>';
     }
-    rows += '<tr>'
-      + '<td class="ing-name"><b>Quant. de prep. serv.</b></td>'
-      + '<td></td><td></td><td></td><td></td>'
-      + '</tr>';
-    rows += '<tr>'
-      + '<td class="ing-name"><b>Assinatura</b></td>'
-      + '<td></td><td></td><td></td>'
-      + '<td style="border-bottom:1px solid #000;font-size:9pt;color:#888">____________________</td>'
-      + '</tr>';
-    const form = '<div class="registro-form">'
-      + '<div class="registro-titulo">Cardápio '+id+' – '+nome+'</div>'
-      + '<table class="registro-tabela">'
+    html += '<div style="border:1px solid #000;margin-bottom:24px;font-family:Arial,Helvetica,sans-serif;page-break-inside:avoid;padding:0">'
+      + '<div style="background:#1A3A6B;color:#fff;padding:8px 12px;font-weight:700;font-size:13pt;text-align:center">Cardápio '+id+' – '+nome+'</div>'
+      + '<div style="display:flex;gap:20px;padding:10px 12px;border-bottom:1px solid #000;font-size:11pt">'
+      + '<span><strong>Data:</strong> _____/_____/_________</span>'
+      + '<span><strong>Registrador:</strong> _________________________</span></div>'
+      + '<div style="display:flex;gap:20px;padding:8px 12px;border-bottom:1px solid #000;font-size:11pt;background:#f8fafc">'
+      + '<span><strong>Refeições servidas:</strong></span>'
+      + '<span>Manhã: _________</span>'
+      + '<span>Tarde: _________</span>'
+      + '<span>Noite: _________</span>'
+      + '<span style="margin-left:auto;color:#666">Total: _________</span></div>'
+      + '<table style="width:100%;border-collapse:collapse">'
       + '<thead><tr>'
-      + '<th class="col-ing">Ingredientes</th>'
-      + '<th class="col-turno">Saída Manhã</th>'
-      + '<th class="col-turno">Saída Tarde</th>'
-      + '<th class="col-turno">Saída Noite</th>'
-      + '<th class="col-total-hdr">Total</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:left;font-size:10pt">Ingrediente</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Manhã</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Tarde</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:12%">Noite</th>'
+      + '<th style="border:1px solid #000;padding:6px 8px;background:#EBF0F8;text-align:center;font-size:10pt;width:16%">Total (previsto)</th>'
       + '</tr></thead><tbody>'+rows+'</tbody></table>'
+      + '<div style="padding:8px 12px;border-top:1px solid #000;font-size:10pt;display:flex;justify-content:space-between">'
+      + '<span><strong>Observações:</strong> _______________________________________________</span>'
+      + '<span><strong>Visto:</strong> _________________</span></div>'
       + '</div>';
-    formsHtml += form + '<div class="registro-sep"></div>' + form;
   });
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
-    + 'body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;margin:0;padding:15mm 18mm}'
-    + '.registro-form{page-break-inside:avoid;margin-bottom:0}'
-    + '.registro-titulo{text-align:center;font-weight:700;font-size:12pt;margin-bottom:8px;padding:4px 0}'
-    + '.registro-tabela{width:100%;border-collapse:collapse;margin-bottom:0}'
-    + '.registro-tabela th,.registro-tabela td{border:1px solid #000;padding:5px 6px;font-size:10pt}'
-    + '.registro-tabela th{text-align:center;font-weight:700;background:#fff}'
-    + '.col-ing{width:40%;text-align:left}'
-    + '.col-turno{width:15%;text-align:center}'
-    + '.col-total-hdr{width:15%;text-align:center}'
-    + '.ing-name{text-align:left;font-size:10pt;height:22px}'
-    + '.col-total{text-align:center}'
-    + '.registro-tabela tbody td{text-align:center;height:22px}'
-    + '.registro-tabela tbody td.ing-name{text-align:left}'
-    + '.registro-sep{height:18px}'
-    + '@page{size:A4 portrait;margin:15mm 18mm}'
-    + '@media print{body{margin:0;padding:12mm 16mm}}'
-    + '</style></head><body>'+formsHtml+'</body></html>');
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;margin:20px;color:#000}'
+    +'table{width:100%;border-collapse:collapse}'
+    +'th,td{border:1px solid #000;padding:4px 8px}'
+    +'@page{margin:15mm}'
+    +'</style></head><body><h2 style="text-align:center;margin-bottom:20px;font-size:14pt">REGISTRO DIÁRIO DE SAÍDA DE INGREDIENTES</h2>'
+    +html+'</body></html>');
   w.document.close();
   setTimeout(()=>{w.print();w.close()},300);
 }
