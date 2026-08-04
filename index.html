@@ -7623,9 +7623,9 @@ function renderPreparo(filtro){
   
   const niveles = NIVEIS_CONFIG?NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0):[];
   const allMeta = [
-    { id:'f1', nome:'Fundamental 1', sub:'6 a 10 anos' },
-    { id:'f2', nome:'Fundamental 2', sub:'11 a 15 anos' },
-    { id:'medio', nome:'Médio', sub:'' },
+    { id:'f1', nome:'Ens. Fund. I', sub:'6 a 10 anos' },
+    { id:'f2', nome:'Ens. Fund. II', sub:'11 a 15 anos' },
+    { id:'medio', nome:'Ens. Médio', sub:'' },
     { id:'eja', nome:'EJA', sub:'' }
   ];
   const colMeta = allMeta.filter(m=>niveles.some(n=>n.id===m.id));
@@ -7778,7 +7778,7 @@ function imprimirPreparoCiclo(){
   }
   const pratos = CICLOS_PLANOS[cicloNome];
   const niveles = NIVEIS_CONFIG?NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0):[];
-  const allMeta = [{id:'f1',nome:'Fundamental 1',sub:'6 a 10 anos'},{id:'f2',nome:'Fundamental 2',sub:'11 a 15 anos'},{id:'medio',nome:'Médio',sub:''},{id:'eja',nome:'EJA',sub:''}];
+  const allMeta = [{id:'f1',nome:'Ens. Fund. I',sub:'6 a 10 anos'},{id:'f2',nome:'Ens. Fund. II',sub:'11 a 15 anos'},{id:'medio',nome:'Ens. Médio',sub:''},{id:'eja',nome:'EJA',sub:''}];
   const colMeta = allMeta.filter(m=>niveles.some(n=>n.id===m.id));
   if(!colMeta.length) colMeta.push(...allMeta);
   const hasAlunos = niveles.length>0;
