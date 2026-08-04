@@ -348,9 +348,11 @@ tbody tr:hover td{background:#f0f5fc}
   .print-footer{position:fixed;bottom:8mm;left:0;right:0;font-size:7.5pt;color:#aaa;text-align:center;border-top:0.5px solid #ddd;padding-top:3px}
   /* ══ MERCADO — impressão formal ══ */
   .forn-grid{display:block!important;width:100%!important}
-  .forn-page{display:block!important;page-break-after:always;break-after:page;padding:0;margin:0}
-  .forn-page:last-child{page-break-after:auto}
+  .forn-page{display:block!important;page-break-after:always;break-after:page;page-break-before:always;break-before:page;padding:0;margin:0}
+  .forn-page:first-child{page-break-before:auto;break-before:auto}
+  .forn-page:last-child{page-break-after:auto;break-after:auto}
   .forn-page .no-print{display:none!important}
+  .forn-print-doc{page-break-inside:avoid}
 
   /* timbre */
   .forn-timbre{margin-bottom:14px}
@@ -6083,7 +6085,7 @@ function renderMercado(){
 
     return `<div class="forn-page">
       <!-- impressão formal -->
-      <div class="print-only forn-print-doc">
+      <div class="print-only forn-print-doc" style="page-break-before:always;page-break-inside:avoid">
         <div style="border-bottom:2.5px solid #C8D0DC;padding-bottom:10px;margin-bottom:14px;text-align:center">
           ${_imgData ? `<img src="${_imgData}" style="max-width:100%;height:auto;display:block;margin:0 auto 8px">` : ''}
           <div style="font-size:14pt;font-weight:800;color:#1A3A6B;letter-spacing:.02em">${esc(_escola)}</div>
