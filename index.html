@@ -880,7 +880,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
       <button id="merc-view-toggle" class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="toggleMercadoViewMode()">Ver cobertura</button>
     </div>
-    <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="validarEImprimir()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+    <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="imprimirFornecedorSelecionado()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+    <select id="merc-sel-forn-print" class="no-print" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:160px;background:#fff"><option value="">— Selecione o fornecedor —</option></select>
     <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap"><input type="checkbox" id="merc-mostrar-preco" checked onchange="_mercMostrarPreco=this.checked"> Mostrar preços</label>
     <button class="btn btn-primary no-print" style="display:flex;align-items:center;gap:5px" onclick="registrarOrdemExpedida()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Registrar Ordem</button>
   </div>
@@ -6131,6 +6132,19 @@ function renderMercado(){
   if(!html) html = `<div style="text-align:center;padding:48px;color:#aaa;font-size:14px">Nenhum item a comprar nesta semana.</div>`;
 
   document.getElementById('forn-grid-dinamico').innerHTML = html;
+  // Atualizar seletor de fornecedor para impressão individual
+  const selPrint = document.getElementById('merc-sel-forn-print');
+  if(selPrint){
+    const fornecedoresComItens = new Set();
+    todosItens.forEach(it => {
+      const fid = ING_FORNECEDORES[it.nomeBase];
+      if(fid) fornecedoresComItens.add(fid);
+    });
+    const curVal = selPrint.value;
+    selPrint.innerHTML = '<option value="">— Selecione o fornecedor —</option>'
+      + FORNECEDORES_CADASTRO.filter(f => fornecedoresComItens.has(f.id))
+        .map(f => `<option value="${f.id}"${f.id===curVal?' selected':''}>${esc(f.nome)}</option>`).join('');
+  }
   updateMercadoViewMode();
 }
 
@@ -6564,6 +6578,26 @@ function validarEImprimir(){
     </div>`;
   }).join('');
   document.getElementById('modal-sem-forn').style.display = 'flex';
+}
+
+function imprimirFornecedorSelecionado(){
+  const sel = document.getElementById('merc-sel-forn-print');
+  const fornId = sel ? sel.value : '';
+  if(!fornId){ alert('Selecione um fornecedor antes de imprimir.'); return; }
+  const cards = document.querySelectorAll('.forn-page');
+  cards.forEach(card => {
+    const hdr = card.querySelector('.card-header');
+    if(hdr && hdr.textContent.trim() === FORNECEDORES_CADASTRO.find(f=>f.id===fornId)?.nome){
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  atualizarPrintGlobal();
+  setTimeout(() => {
+    window.print();
+    cards.forEach(card => card.style.display = '');
+  }, 200);
 }
 
 function salvarAssocModalEImprimir(){
