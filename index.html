@@ -6584,20 +6584,21 @@ function imprimirFornecedorSelecionado(){
   const sel = document.getElementById('merc-sel-forn-print');
   const fornId = sel ? sel.value : '';
   if(!fornId){ alert('Selecione um fornecedor antes de imprimir.'); return; }
+  const fornNome = (FORNECEDORES_CADASTRO.find(f=>f.id===fornId)||{}).nome || '';
+  if(!fornNome){ alert('Fornecedor não encontrado.'); return; }
   const cards = document.querySelectorAll('.forn-page');
+  const origDisplays = [];
   cards.forEach(card => {
+    origDisplays.push(card.style.cssText);
     const hdr = card.querySelector('.card-header');
-    if(hdr && hdr.textContent.trim() === FORNECEDORES_CADASTRO.find(f=>f.id===fornId)?.nome){
-      card.style.display = '';
-    } else {
-      card.style.display = 'none';
-    }
+    const match = hdr && hdr.textContent.trim() === fornNome;
+    if(!match) card.style.cssText = 'display:none!important';
   });
   atualizarPrintGlobal();
   setTimeout(() => {
     window.print();
-    cards.forEach(card => card.style.display = '');
-  }, 200);
+    setTimeout(() => cards.forEach((card, i) => card.style.cssText = origDisplays[i]), 500);
+  }, 400);
 }
 
 function salvarAssocModalEImprimir(){
