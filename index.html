@@ -1141,7 +1141,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <div class="config-field">
           <label>Subtítulo do cabeçalho</label>
-          <input type="text" id="inp-subtitulo" placeholder="Programa Nacional de Alimentação Escolar — PNAE" oninput="salvarConfig()">
+          <input type="text" id="inp-subtitulo" placeholder="Subtítulo do documento" oninput="salvarConfig()">
         </div>
       </div>
     </div>
@@ -1156,7 +1156,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
               <img id="preview-header-img" src="" alt="" style="display:none">
               <div class="mock-header-text">
                 <h1 id="preview-escola"></h1>
-                <p id="preview-subtitulo">Programa Nacional de Alimentação Escolar — PNAE</p>
+                <p id="preview-subtitulo"></p>
               </div>
             </div>
             <div class="mock-body"></div>
@@ -5777,7 +5777,7 @@ function renderMercado(){
 
   // Preenche cabeçalho e assinatura de impressão com dados das Configurações
   const _escola    = localStorage.getItem('merenda_escola')    || '';
-  const _subtitulo = localStorage.getItem('merenda_subtitulo') || 'Programa Nacional de Alimentação Escolar — PNAE';
+  const _subtitulo = localStorage.getItem('merenda_subtitulo') || '';
   const _diretor   = localStorage.getItem('merenda_diretor')   || '';
   const _cargo     = localStorage.getItem('merenda_cargo')     || 'Diretor(a) Escolar';
   const _imgData   = localStorage.getItem('merenda_header_img');
@@ -8049,7 +8049,7 @@ function atualizarPreviews(){
   const diretor = localStorage.getItem('merenda_diretor') || '';
   const cargo = localStorage.getItem('merenda_cargo') || 'Diretor(a) Escolar';
   const escola = localStorage.getItem('merenda_escola') || '';
-  const subtitulo = localStorage.getItem('merenda_subtitulo') || 'Programa Nacional de Alimentação Escolar — PNAE';
+  const subtitulo = localStorage.getItem('merenda_subtitulo') || '';
 
   // Upload area state
   const uploadArea = document.getElementById('upload-area');
@@ -8125,7 +8125,7 @@ function carregarConfig(){
   const diretor = localStorage.getItem('merenda_diretor') || '';
   const cargo = localStorage.getItem('merenda_cargo') || 'Diretor(a) Escolar';
   const escola = localStorage.getItem('merenda_escola') || '';
-  const subtitulo = localStorage.getItem('merenda_subtitulo') || 'Programa Nacional de Alimentação Escolar — PNAE';
+  const subtitulo = localStorage.getItem('merenda_subtitulo') || '';
   document.getElementById('inp-diretor').value = diretor;
   document.getElementById('inp-cargo').value = cargo;
   document.getElementById('inp-nome-escola').value = escola;
