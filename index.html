@@ -7737,9 +7737,9 @@ function imprimirRegistroSaidas(){
       + '<th class="rs-col">Total</th>'
       + '</tr></thead><tbody>'+rows+'</tbody></table>'
       + '<div class="rs-assinaturas">'
-      + '<div class="rs-assinatura"><span>Manhã:</span> <span class="rs-linha"></span></div>'
-      + '<div class="rs-assinatura"><span>Tarde:</span> <span class="rs-linha"></span></div>'
-      + '<div class="rs-assinatura"><span>Noite:</span> <span class="rs-linha"></span></div>'
+      + '<div class="rs-assinatura"><span>Manhã:</span> <span class="rs-linha"></span><span style="font-size:9pt;color:#666">Assinatura</span></div>'
+      + '<div class="rs-assinatura"><span>Tarde:</span> <span class="rs-linha"></span><span style="font-size:9pt;color:#666">Assinatura</span></div>'
+      + '<div class="rs-assinatura"><span>Noite:</span> <span class="rs-linha"></span><span style="font-size:9pt;color:#666">Assinatura</span></div>'
       + '</div></div>';
     formsHtml += form + '<div class="rs-gap"></div>' + form;
   });
@@ -7755,7 +7755,7 @@ function imprimirRegistroSaidas(){
     +'.rs-col{width:14.5%;text-align:center}'
     +'tbody td{height:24px;text-align:center}'
     +'tbody td:first-child{text-align:left}'
-    +'.rs-assinaturas{margin-top:20px;display:flex;gap:12px;justify-content:space-between}'
+    +'.rs-assinaturas{margin-top:40px;display:flex;gap:12px;justify-content:space-between}'
     +'.rs-assinatura{flex:1;font-size:11pt;display:flex;align-items:flex-end;gap:4px}'
     +'.rs-assinatura span:first-child{font-weight:700;white-space:nowrap}'
     +'.rs-linha{flex:1;border-bottom:1px solid #000;min-width:60px}'
