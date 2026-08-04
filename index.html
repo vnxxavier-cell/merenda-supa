@@ -6592,11 +6592,7 @@ function imprimirFornecedorSelecionado(){
     origDisplays.push(card.style.cssText);
     const hdr = card.querySelector('.card-header');
     const match = hdr && hdr.textContent.trim() === fornNome;
-    if(match){
-      card.style.cssText = 'display:block!important;break-before:auto!important;page-break-before:auto!important';
-    } else {
-      card.style.cssText = 'display:none!important';
-    }
+    if(!match) card.style.cssText = 'display:none!important';
   });
   atualizarPrintGlobal();
   setTimeout(() => {
