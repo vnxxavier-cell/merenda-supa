@@ -6074,11 +6074,11 @@ function renderMercado(){
         totalValor += arred * preco;
       }
       return `<tr>
-        <td style="border:1px solid #C8D0DC;padding:6px 4px;text-align:center;width:30px">${i+1}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 2px;text-align:center;width:24px">${i+1}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 8px;width:28%">${it.displayNome}</td>
         <td style="border:1px solid #C8D0DC;padding:6px 8px">${obsImp || '&nbsp;'}</td>
-        <td style="border:1px solid #C8D0DC;padding:6px 4px;text-align:center">${typeof arred==='number' ? qtd : arred}</td>
-        <td style="border:1px solid #C8D0DC;padding:6px 2px;text-align:center;width:28px">${fmtUnid(it.unid)}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 2px;text-align:center">${typeof arred==='number' ? qtd : arred}</td>
+        <td style="border:1px solid #C8D0DC;padding:6px 1px;text-align:center;width:22px">${fmtUnid(it.unid)}</td>
       </tr>`;
     }).join('');
 
@@ -6097,7 +6097,7 @@ function renderMercado(){
           <span style="font-weight:700">Valor Total: R$ ${totalValor.toFixed(2).replace('.',',')}</span>
         </div>
         <div class="forn-tabela-wrap" style="border:1px solid #C8D0DC"><table class="forn-tabela" style="border-collapse:separate;border-spacing:0;width:100%">
-          <thead><tr><th style="border:1px solid #C8D0DC;padding:7px 6px;background:#1A3A6B;color:#fff;width:30px">Nº</th><th style="border:1px solid #C8D0DC;padding:7px 8px;background:#1A3A6B;color:#fff;width:28%">DESCRIÇÃO</th><th style="border:1px solid #C8D0DC;padding:7px 8px;background:#1A3A6B;color:#fff">OBSERVAÇÃO</th><th style="border:1px solid #C8D0DC;padding:7px 2px;background:#1A3A6B;color:#fff;width:36px;text-align:center">QTD</th><th style="border:1px solid #C8D0DC;padding:7px 2px;background:#1A3A6B;color:#fff;width:28px;text-align:center">UN</th></tr></thead>
+          <thead><tr><th style="border:1px solid #C8D0DC;padding:7px 2px;background:#1A3A6B;color:#fff;width:24px;text-align:center">Nº</th><th style="border:1px solid #C8D0DC;padding:7px 8px;background:#1A3A6B;color:#fff;width:28%">DESCRIÇÃO</th><th style="border:1px solid #C8D0DC;padding:7px 8px;background:#1A3A6B;color:#fff">OBSERVAÇÃO</th><th style="border:1px solid #C8D0DC;padding:7px 2px;background:#1A3A6B;color:#fff;width:28px;text-align:center">QTD</th><th style="border:1px solid #C8D0DC;padding:7px 2px;background:#1A3A6B;color:#fff;width:22px;text-align:center">UN</th></tr></thead>
           <tbody>${printRows}</tbody>
         </table></div>
         <div class="forn-assinatura">
