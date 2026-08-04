@@ -7689,7 +7689,7 @@ function imprimirPrepAtual(){
     +'th,td{border:1px solid #000;padding:4px 8px;font-size:10pt;text-align:center}'
     +'th{font-weight:700;background:#fff;color:#000}'
     +'td{background:#fff;color:#000}'
-    +'@page{margin:18mm 20mm}'
+    +'@page{margin:14mm 16mm}'
     +'@media print{body{color:#000}}'
     +'</style></head><body>'+printHtml+'</body></html>');
   w.document.close();
@@ -7740,7 +7740,7 @@ function imprimirRegistroSaidas(){
   });
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
-    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#000;margin:12mm 16mm}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#000;margin:10mm 14mm}'
     +'.rs-form{page-break-inside:avoid}'
     +'.rs-title{text-align:center;font-weight:700;font-size:14pt;margin-bottom:10px}'
     +'table{width:100%;border-collapse:collapse}'
@@ -7755,8 +7755,8 @@ function imprimirRegistroSaidas(){
     +'.rs-assinatura span:first-child{font-weight:700;white-space:nowrap}'
     +'.rs-linha{flex:1;border-bottom:1px solid #000;min-width:60px}'
     +'.rs-gap{height:16px}'
-    +'@page{size:A4 portrait;margin:12mm 16mm}'
-    +'@media print{body{margin:10mm 14mm}}'
++'@page{size:A4 portrait;margin:10mm 14mm}'
++'@media print{body{margin:8mm 12mm}}'
     +'</style></head><body>'+formsHtml+'</body></html>');
   w.document.close();
   setTimeout(()=>{w.print();w.close()},300);
@@ -7823,7 +7823,7 @@ function imprimirPreparoCiclo(){
     +'table{width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif}'
     +'th,td{border:1px solid #000;padding:5px 8px;font-size:11pt;text-align:center}'
     +'th{font-weight:700;background:#fff;color:#000}td{background:#fff;color:#000}'
-    +'@page{margin:18mm 20mm}@media print{body{color:#000}}'
+    +'@page{margin:14mm 16mm}@media print{body{color:#000}}'
     +'</style></head><body>'+html+'</body></html>');
   w.document.close();
   setTimeout(()=>{w.print();w.close()},300);
