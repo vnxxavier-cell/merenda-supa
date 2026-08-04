@@ -7622,19 +7622,21 @@ function renderPreparo(filtro){
   if(filtroId && filtroId !== 'ciclo') lista = lista.filter(c=>c[0]==parseInt(filtroId));
   
   const niveles = NIVEIS_CONFIG?NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0):[];
-  const colMeta = [
+  const allMeta = [
     { id:'f1', nome:'Fundamental 1', sub:'6 a 10 anos' },
     { id:'f2', nome:'Fundamental 2', sub:'11 a 15 anos' },
     { id:'medio', nome:'Médio', sub:'' },
     { id:'eja', nome:'EJA', sub:'' }
   ];
+  const colMeta = allMeta.filter(m=>niveles.some(n=>n.id===m.id));
+  if(!colMeta.length) colMeta.push(...allMeta);
   const hasAlunos = niveles.length>0;
   
   let html = '';
   lista.forEach(c=>{
     const id=c[0], nome=c[1], tipo=c[2], ings=c[4], modo=c[5], sugest=c[6];
       let hdr1 = '<tr><th style="border:2px solid #000;border-right:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:15px;background:#fff;color:#000">Cardápio '+id+'</th>'
-        + '<th colspan="4" style="border:2px solid #000;border-left:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:15px;background:#fff;color:#000">Quantidade Total por Categoria Escolar</th></tr>';
+        + '<th colspan="'+colMeta.length+'" style="border:2px solid #000;border-left:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:15px;background:#fff;color:#000">Quantidade Total por Categoria Escolar</th></tr>';
       let hdr2 = '<tr><th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:14px;background:#fff;color:#000">Ingredientes</th>';
       colMeta.forEach(m=>{
         hdr2 += '<th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:14px;background:#fff;color:#000">'+m.nome+(m.sub?'<br>'+m.sub:'')+'</th>';
@@ -7776,7 +7778,9 @@ function imprimirPreparoCiclo(){
   }
   const pratos = CICLOS_PLANOS[cicloNome];
   const niveles = NIVEIS_CONFIG?NIVEIS_CONFIG.filter(n=>n.ativo&&n.alunos>0):[];
-  const colMeta = [{id:'f1',nome:'Fundamental 1',sub:'6 a 10 anos'},{id:'f2',nome:'Fundamental 2',sub:'11 a 15 anos'},{id:'medio',nome:'Médio',sub:''},{id:'eja',nome:'EJA',sub:''}];
+  const allMeta = [{id:'f1',nome:'Fundamental 1',sub:'6 a 10 anos'},{id:'f2',nome:'Fundamental 2',sub:'11 a 15 anos'},{id:'medio',nome:'Médio',sub:''},{id:'eja',nome:'EJA',sub:''}];
+  const colMeta = allMeta.filter(m=>niveles.some(n=>n.id===m.id));
+  if(!colMeta.length) colMeta.push(...allMeta);
   const hasAlunos = niveles.length>0;
   let html = '';
   pratos.forEach(pratoStr => {
@@ -7810,7 +7814,7 @@ function imprimirPreparoCiclo(){
       + '<div style="font-size:13px;color:#000;margin-bottom:6px">Tipo de preparação – '+tipo+'</div>'
       + '<table style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif"><thead>'
       + '<tr><th style="border:2px solid #000;border-right:1px solid #000;padding:6px 10px;text-align:center;font-weight:700;font-size:13px">Cardápio '+id+'</th>'
-      + '<th colspan="4" style="border:2px solid #000;border-left:1px solid #000;padding:6px 10px;text-align:center;font-weight:700;font-size:13px">Quantidade Total por Categoria Escolar</th></tr>'
+      + '<th colspan="'+colMeta.length+'" style="border:2px solid #000;border-left:1px solid #000;padding:6px 10px;text-align:center;font-weight:700;font-size:13px">Quantidade Total por Categoria Escolar</th></tr>'
       + '<tr><th style="border:1px solid #000;padding:5px 8px;text-align:center;font-weight:700;font-size:12px">Ingredientes</th>'
       + colMeta.map(m=>'<th style="border:1px solid #000;padding:5px 8px;text-align:center;font-weight:700;font-size:12px">'+m.nome+(m.sub?'<br>'+m.sub:'')+'</th>').join('')
       + '</tr></thead><tbody>'+rows+'</tbody></table>'
