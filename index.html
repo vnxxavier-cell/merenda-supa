@@ -349,6 +349,7 @@ tbody tr:hover td{background:#f0f5fc}
   /* ══ MERCADO — impressão formal ══ */
   .forn-grid{display:block!important;width:100%!important}
   .forn-page{display:block!important;page-break-after:always;break-after:page;padding:0;margin:0}
+  .forn-page + .forn-page{page-break-before:always;break-before:page}
   .forn-page:last-child{page-break-after:auto;break-after:auto}
   .forn-page .no-print{display:none!important}
   .forn-print-doc{page-break-inside:avoid}
@@ -384,7 +385,7 @@ tbody tr:hover td{background:#f0f5fc}
   .forn-tabela td:nth-child(3){text-align:right;font-family:'DM Mono',monospace;font-weight:700}
   .forn-tabela td:nth-child(4){text-align:center}
   /* assinatura */
-  .forn-assinatura{margin-top:28mm;text-align:center;page-break-inside:avoid}
+  .forn-assinatura{margin-top:14mm;text-align:center;page-break-inside:avoid}
   .forn-assinatura-linha{
     display:inline-block;width:280px;
     border-top:1.5px solid #000;padding-top:6px;margin-top:0;
