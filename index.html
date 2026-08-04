@@ -6586,9 +6586,6 @@ function imprimirFornecedorSelecionado(){
   if(!fornId){ alert('Selecione um fornecedor antes de imprimir.'); return; }
   const fornNome = (FORNECEDORES_CADASTRO.find(f=>f.id===fornId)||{}).nome || '';
   if(!fornNome){ alert('Fornecedor não encontrado.'); return; }
-  // Esconder tudo que não é o fornecedor selecionado
-  document.querySelectorAll('.pagina:not(#pg-mercado)').forEach(p => p.style.display = 'none');
-  document.querySelectorAll('#pg-mercado .no-print, #pg-mercado .card:not(:has(.forn-page)), #pg-mercado #merc-calendario, #pg-mercado #lista-pratos-merc, #pg-mercado #stats-merc, #pg-mercado #merc-analise').forEach(el => el.style.display = 'none');
   const cards = document.querySelectorAll('.forn-page');
   const origDisplays = [];
   cards.forEach(card => {
@@ -6604,11 +6601,7 @@ function imprimirFornecedorSelecionado(){
   atualizarPrintGlobal();
   setTimeout(() => {
     window.print();
-    setTimeout(() => {
-      cards.forEach((card, i) => card.style.cssText = origDisplays[i]);
-      document.querySelectorAll('.pagina').forEach(p => p.style.display = '');
-      document.querySelectorAll('#pg-mercado .no-print, #pg-mercado .card, #pg-mercado #merc-calendario, #pg-mercado #lista-pratos-merc, #pg-mercado #stats-merc, #pg-mercado #merc-analise').forEach(el => el.style.display = '');
-    }, 500);
+    setTimeout(() => cards.forEach((card, i) => card.style.cssText = origDisplays[i]), 500);
   }, 400);
 }
 
