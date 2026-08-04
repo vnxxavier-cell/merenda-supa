@@ -7567,15 +7567,15 @@ function renderRegistroSaidas(){
     }
     rows += '<tr><td><b>Quant. de prep. serv.</b></td><td></td><td></td><td></td><td></td></tr>';
     html += '<div style="border:1px solid var(--borda);border-radius:8px;margin-bottom:16px;font-family:Arial,Helvetica,sans-serif;background:#fff;overflow:hidden">'
-      + '<div style="background:var(--azul);color:#fff;padding:10px 14px;font-weight:700;font-size:16pt;text-align:center">Cardápio '+id+' – '+nome+'</div>'
-      + '<table style="width:100%;border-collapse:collapse;font-size:14pt"><thead><tr>'
-      + '<th style="border:1px solid #ddd;padding:8px 10px;background:#f8fafc;text-align:left;font-size:14pt;width:40%">Ingredientes</th>'
-      + '<th style="border:1px solid #ddd;padding:8px 10px;background:#f8fafc;text-align:center;font-size:14pt;width:15%">Saída Manhã</th>'
-      + '<th style="border:1px solid #ddd;padding:8px 10px;background:#f8fafc;text-align:center;font-size:14pt;width:15%">Saída Tarde</th>'
-      + '<th style="border:1px solid #ddd;padding:8px 10px;background:#f8fafc;text-align:center;font-size:14pt;width:15%">Saída Noite</th>'
-      + '<th style="border:1px solid #ddd;padding:8px 10px;background:#f8fafc;text-align:center;font-size:14pt;width:15%">Total</th>'
+      + '<div style="background:var(--azul);color:#fff;padding:10px 14px;font-weight:700;font-size:14px;text-align:center">Cardápio '+id+' – '+nome+'</div>'
+      + '<table style="width:100%;border-collapse:collapse"><thead><tr>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:left;font-size:11px;width:40%">Ingredientes</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Saída Manhã</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Saída Tarde</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Saída Noite</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Total</th>'
       + '</tr></thead><tbody>'+rows+'</tbody></table>'
-      + '<div style="display:flex;gap:20px;padding:10px 14px;border-top:1px solid #ddd;font-size:14pt;flex-wrap:wrap">'
+      + '<div style="display:flex;gap:20px;padding:10px 14px;border-top:1px solid #ddd;font-size:11px;flex-wrap:wrap">'
       + '<span style="font-weight:700">Manhã:</span> <span style="border-bottom:1px solid #888;min-width:100px;flex:1"></span>'
       + '<span style="font-weight:700">Tarde:</span> <span style="border-bottom:1px solid #888;min-width:100px;flex:1"></span>'
       + '<span style="font-weight:700">Noite:</span> <span style="border-bottom:1px solid #888;min-width:100px;flex:1"></span>'
@@ -7620,18 +7620,18 @@ function renderPreparo(filtro){
   let html = '';
   lista.forEach(c=>{
     const id=c[0], nome=c[1], tipo=c[2], ings=c[4], modo=c[5], sugest=c[6];
-      let hdr1 = '<tr><th style="border:2px solid #000;border-right:1px solid #000;padding:8px 12px;text-align:center;font-weight:700;font-size:15pt;background:#fff;color:#000">Cardápio '+id+'</th>'
-        + '<th colspan="4" style="border:2px solid #000;border-left:1px solid #000;padding:8px 12px;text-align:center;font-weight:700;font-size:15pt;background:#fff;color:#000">Quantidade Total por Categoria Escolar</th></tr>';
-      let hdr2 = '<tr><th style="border:1px solid #000;padding:8px 10px;text-align:center;font-weight:700;font-size:14pt;background:#fff;color:#000">Ingredientes</th>';
+      let hdr1 = '<tr><th style="border:2px solid #000;border-right:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:14px;background:#fff;color:#000">Cardápio '+id+'</th>'
+        + '<th colspan="4" style="border:2px solid #000;border-left:1px solid #000;padding:7px 10px;text-align:center;font-weight:700;font-size:14px;background:#fff;color:#000">Quantidade Total por Categoria Escolar</th></tr>';
+      let hdr2 = '<tr><th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:13px;background:#fff;color:#000">Ingredientes</th>';
       colMeta.forEach(m=>{
-        hdr2 += '<th style="border:1px solid #000;padding:8px 10px;text-align:center;font-weight:700;font-size:14pt;background:#fff;color:#000">'+m.nome+(m.sub?'<br>'+m.sub:'')+'</th>';
+        hdr2 += '<th style="border:1px solid #000;padding:6px 8px;text-align:center;font-weight:700;font-size:13px;background:#fff;color:#000">'+m.nome+(m.sub?'<br>'+m.sub:'')+'</th>';
     });
     hdr2 += '</tr>';
     let rows = '';
     for(let i=0;i<ings.length;i+=5){
       const inome=ings[i], vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
       const vals=[vF1,vF2,vMed,vEja];
-        rows += '<tr><td style="border:1px solid #000;padding:6px 10px;text-align:center;font-size:14pt;font-weight:400;background:#fff;color:#000">'+inome+'</td>';
+        rows += '<tr><td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:12px;font-weight:400;background:#fff;color:#000">'+inome+'</td>';
       colMeta.forEach((m,ci)=>{
         let raw = parseFloat(vals[ci])||0;
         let total = hasAlunos ? raw * (niveles.find(n=>n.id===m.id)?.alunos||0) : raw;
@@ -7642,7 +7642,7 @@ function renderPreparo(filtro){
         } else {
           val = total.toFixed(total%1===0?0:2).replace('.',',') + (isLiq?' ml':' g');
         }
-        rows += '<td style="border:1px solid #000;padding:6px 10px;text-align:center;font-size:14pt;font-weight:400;background:#fff;color:#000">'+val+'</td>';
+        rows += '<td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:12px;font-weight:400;background:#fff;color:#000">'+val+'</td>';
       });
       rows += '</tr>';
     }
@@ -7661,8 +7661,8 @@ function renderPreparo(filtro){
         + '</div>';
     }
     html += '<div class="card prep-card" style="margin-bottom:20px;border:1px solid #ddd;border-radius:0;box-shadow:none;font-family:Arial,Helvetica,sans-serif;page-break-inside:avoid;break-inside:avoid">'
-      + '<div style="padding:14px 16px 4px"><div style="font-weight:700;font-size:16pt;color:#000">Cardápio '+id+' – '+nome+'</div>'
-      + '<div style="font-size:14pt;color:#000;margin-top:2px">Tipo de preparação – '+tipo+'</div></div>'
+      + '<div style="padding:14px 16px 4px"><div style="font-weight:700;font-size:16px;color:#000">Cardápio '+id+' – '+nome+'</div>'
+      + '<div style="font-size:13px;color:#000;margin-top:2px">Tipo de preparação – '+tipo+'</div></div>'
       + '<div style="padding:4px 16px 14px"><table style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif">'
       + '<thead>'+hdr1+hdr2+'</thead><tbody>'+rows+'</tbody></table></div>'
       + '<div style="padding:0 16px 14px">'+modoHtml+sugHtml+'</div>'
