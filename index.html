@@ -348,9 +348,9 @@ tbody tr:hover td{background:#f0f5fc}
   .print-footer{position:fixed;bottom:8mm;left:0;right:0;font-size:7.5pt;color:#aaa;text-align:center;border-top:0.5px solid #ddd;padding-top:3px}
   /* ══ MERCADO — impressão formal ══ */
   .forn-grid{display:block!important;width:100%!important}
-  .forn-page{display:block!important;page-break-after:always;break-after:page;padding:0;margin:0}
-  .forn-page + .forn-page{page-break-before:always;break-before:page}
-  .forn-page:last-child{page-break-after:auto;break-after:auto}
+  .forn-page{display:block!important;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid;padding:0;margin:0}
+  .forn-page + .forn-page{break-before:page;page-break-before:always}
+  .forn-page:last-child{break-after:auto;page-break-after:auto}
   .forn-page .no-print{display:none!important}
   .forn-print-doc{page-break-inside:avoid}
 
