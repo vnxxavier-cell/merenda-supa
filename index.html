@@ -39,6 +39,10 @@ nav{background:var(--nav-bg);width:220px;min-width:220px;display:flex;flex-direc
 .nav-tab svg{flex-shrink:0;opacity:.7;transition:.2s;width:18px;height:18px}
 .nav-tab:hover svg,.nav-tab.ativo svg{opacity:1}
 
+/* Sub-tabs (usadas em Quantidades por Turno) */
+.sub-tab.ativo{color:var(--azul);border-bottom-color:var(--azul)}
+.sub-tab:hover{color:var(--azul)}
+
 /* ── PÁGINAS ── */
 .main-content{flex:1;min-width:0;overflow-y:auto;margin-left:220px;height:100vh}
 .pagina{display:none;padding:32px 40px;margin:0 auto;max-width:1500px;animation:fadeIn .3s}
@@ -1450,22 +1454,45 @@ function restaurarBackup(){
 ══════════════════════════════════════════════════════ -->
 <div id="pg-preparo" class="pagina">
   <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Quantidades por Turno</h2>
-  <div class="seletor-bar">
-    <div class="campo">
-      <label>Filtrar</label>
-      <input class="filtro-input" placeholder="Digite o nome do cardápio..." oninput="filtrarPreparo(this.value)" style="width:200px">
-    </div>
-    <div class="campo">
-      <label>Cardápio</label>
-      <select id="sel-cardapio-print" onchange="renderPreparo()" style="font-family:'Inter',sans-serif;font-size:13px;padding:5px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:200px;background:#fff">
-        <option value="">— Todos —</option>
-        <option value="ciclo">— Todos do Ciclo —</option>
-      </select>
-    </div>
-    <button class="btn btn-sm" onclick="imprimirPrepAtual()" style="display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Selecionado</button>
-    <button class="btn btn-sm" onclick="imprimirRegistroSaidas()" style="display:flex;align-items:center;gap:5px;background:#fff;color:#92400e;border:1.5px solid #f59e0b"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reg. Saídas</button>
+
+  <div class="sub-tab-bar" style="display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--borda)">
+    <button class="sub-tab ativo" onclick="trocarSubTabPreparo('qt',this)" style="padding:10px 20px;border:none;background:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s">📊 Quantidades por Turno</button>
+    <button class="sub-tab" onclick="trocarSubTabPreparo('rs',this)" style="padding:10px 20px;border:none;background:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s">📋 Registro de Saídas</button>
   </div>
-  <div id="prep-conteudo"></div>
+
+  <!-- Sub-aba: Quantidades por Turno -->
+  <div id="prep-sub-qt">
+    <div class="seletor-bar">
+      <div class="campo">
+        <label>Filtrar</label>
+        <input class="filtro-input" placeholder="Digite o nome do cardápio..." oninput="filtrarPreparo(this.value)" style="width:200px">
+      </div>
+      <div class="campo">
+        <label>Cardápio</label>
+        <select id="sel-cardapio-print" onchange="renderPreparo()" style="font-family:'Inter',sans-serif;font-size:13px;padding:5px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:200px;background:#fff">
+          <option value="">— Todos —</option>
+          <option value="ciclo">— Todos do Ciclo —</option>
+        </select>
+      </div>
+      <button class="btn btn-sm" onclick="imprimirPrepAtual()" style="display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir Selecionado</button>
+    </div>
+    <div id="prep-conteudo"></div>
+  </div>
+
+  <!-- Sub-aba: Registro de Saídas -->
+  <div id="prep-sub-rs" style="display:none">
+    <div class="seletor-bar">
+      <div class="campo">
+        <label>Cardápio</label>
+        <select id="sel-cardapio-rs" onchange="renderRegistroSaidas()" style="font-family:'Inter',sans-serif;font-size:13px;padding:5px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:200px;background:#fff">
+          <option value="">— Todos —</option>
+          <option value="ciclo">— Todos do Ciclo —</option>
+        </select>
+      </div>
+      <button class="btn btn-sm" onclick="imprimirRegistroSaidas()" style="display:flex;align-items:center;gap:5px;background:#fff;color:#92400e;border:1.5px solid #f59e0b"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Imprimir Reg. Saídas</button>
+    </div>
+    <div id="prep-rs-conteudo"></div>
+  </div>
 </div>
 
 </div><!-- /main-content -->
@@ -4727,6 +4754,11 @@ function init(){
       sel.innerHTML = '<option value="">— Todos —</option><option value="ciclo">— Todos do Ciclo —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
       sel.dataset.populated = '1';
     }
+    const selRs = document.getElementById('sel-cardapio-rs');
+    if(selRs && !selRs.dataset.populated){
+      selRs.innerHTML = '<option value="">— Todos —</option><option value="ciclo">— Todos do Ciclo —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
+      selRs.dataset.populated = '1';
+    }
   }
   carregarConfig();
   aplicarConsumoSemanas();
@@ -7495,6 +7527,62 @@ function renderGastos(){
   document.getElementById('total-gastos-mes').textContent = 'R$ ' + custoMes.toLocaleString('pt-BR', {minimumFractionDigits:2});
 }
 
+function trocarSubTabPreparo(sub, btn){
+  document.querySelectorAll('#pg-preparo .sub-tab').forEach(t=>t.classList.remove('ativo'));
+  if(btn) btn.classList.add('ativo');
+  document.getElementById('prep-sub-qt').style.display = sub==='qt' ? '' : 'none';
+  document.getElementById('prep-sub-rs').style.display = sub==='rs' ? '' : 'none';
+  if(sub==='rs') renderRegistroSaidas();
+}
+
+function renderRegistroSaidas(){
+  const el = document.getElementById('prep-rs-conteudo');
+  if(!el) return;
+  const sel = document.getElementById('sel-cardapio-rs');
+  if(sel&&!sel.dataset.populated){
+    sel.innerHTML = '<option value="">— Todos —</option><option value="ciclo">— Todos do Ciclo —</option>'+CD.map(c=>'<option value="'+c[0]+'">Cardápio '+c[0]+' – '+c[1]+'</option>').join('');
+    sel.dataset.populated = '1';
+  }
+  const filtroId = sel?sel.value:'';
+  let lista = CD;
+  if(filtroId === 'ciclo'){
+    const cicloIds = getCicloCardapios();
+    if(!cicloIds.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.</div>'; return; }
+    lista = lista.filter(c=>cicloIds.includes(c[0]));
+  } else if(filtroId) {
+    lista = lista.filter(c=>c[0]==parseInt(filtroId));
+  }
+  if(!lista.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio encontrado.</div>'; return; }
+  const BLANK_ROWS = 6;
+  let html = '';
+  lista.forEach(c => {
+    const id=c[0], nome=c[1], ings=c[4];
+    let rows = '';
+    for(let i=0;i<ings.length;i+=5){
+      const inome=ings[i];
+      rows += '<tr><td>'+inome+'</td><td></td><td></td><td></td><td></td></tr>';
+    }
+    for(let e=0;e<BLANK_ROWS;e++){
+      rows += '<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>';
+    }
+    rows += '<tr><td><b>Quant. de prep. serv.</b></td><td></td><td></td><td></td><td></td></tr>';
+    html += '<div style="border:1px solid var(--borda);border-radius:8px;margin-bottom:16px;font-family:Arial,Helvetica,sans-serif;background:#fff;overflow:hidden">'
+      + '<div style="background:var(--azul);color:#fff;padding:10px 14px;font-weight:700;font-size:14px;text-align:center">Cardápio '+id+' – '+nome+'</div>'
+      + '<table style="width:100%;border-collapse:collapse"><thead><tr>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:left;font-size:11px;width:40%">Ingredientes</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Saída Manhã</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Saída Tarde</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Saída Noite</th>'
+      + '<th style="border:1px solid #ddd;padding:6px 8px;background:#f8fafc;text-align:center;font-size:11px;width:15%">Total</th>'
+      + '</tr></thead><tbody>'+rows+'</tbody></table>'
+      + '<div style="display:flex;gap:20px;padding:10px 14px;border-top:1px solid #ddd;font-size:11px;flex-wrap:wrap">'
+      + '<span style="font-weight:700">Manhã:</span> <span style="border-bottom:1px solid #888;min-width:100px;flex:1"></span>'
+      + '<span style="font-weight:700">Tarde:</span> <span style="border-bottom:1px solid #888;min-width:100px;flex:1"></span>'
+      + '<span style="font-weight:700">Noite:</span> <span style="border-bottom:1px solid #888;min-width:100px;flex:1"></span>'
+      + '</div></div>';
+  });
+  el.innerHTML = html;
+}
 
 function renderPreparo(filtro){
   const el = document.getElementById('prep-conteudo');
@@ -7607,7 +7695,7 @@ function imprimirPrepAtual(){
 }
 
 function imprimirRegistroSaidas(){
-  const sel = document.getElementById('sel-cardapio-print');
+  const sel = document.getElementById('sel-cardapio-rs') || document.getElementById('sel-cardapio-print');
   const filtroTexto = (document.querySelector('.filtro-input')?.value||'').toLowerCase();
   let lista = CD;
   if(sel&&sel.value === 'ciclo'){
