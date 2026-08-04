@@ -6109,7 +6109,7 @@ function renderMercado(){
         <div class="card-header" style="background:${hdrBg};color:${hdrTxt};display:block;${hdrBorder}">
           <div style="font-size:14px;font-weight:700">${titulo}</div>
         </div>
-        <table><thead><tr><th style="width:32px;font-size:10px;text-align:center">Nº</th><th>Ingrediente</th><th style="width:36px;font-size:10px;text-align:center">Cont.</th><th style="width:45%">Observação</th><th style="width:44px;font-size:10px;text-align:center">Tipo</th><th class="num" style="width:72px;font-size:10px">Necessidade</th><th class="num" style="width:140px">A Comprar</th></tr></thead>
+        <table><thead><tr><th style="width:32px;font-size:10px;text-align:center">Nº</th><th>Ingrediente</th><th style="width:36px;font-size:10px;text-align:center">Cont.</th><th style="width:45%">Observação</th><th style="width:44px;font-size:10px;text-align:center">Tipo</th><th class="num" style="width:72px;font-size:10px">Necess.</th><th class="num" style="width:140px">A Comprar</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
         <div style="padding:8px 12px;border-top:1px solid var(--borda);text-align:center">
           <button class="btn btn-outline btn-sm" onclick="adicionarItemMercCard('${esc(titulo)}')" style="display:inline-flex;align-items:center;gap:4px;font-size:11px">+ Adicionar ingrediente</button>
