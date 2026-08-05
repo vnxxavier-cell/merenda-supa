@@ -1378,7 +1378,10 @@ function restaurarBackup(){
         </div>
         <div class="campo">
           <label>Senha <span id="senha-hint" style="font-size:11px;color:#aaa">(obrigatória)</span></label>
-          <input type="password" id="usuario-senha" placeholder="••••••••" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+          <div style="position:relative;display:flex;align-items:center">
+            <input type="password" id="usuario-senha" placeholder="••••••••" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 40px 8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+            <button type="button" class="btn-ver-senha" id="btn-ver-senha-usuario" onclick="toggleVerSenhaUsuario()" title="Mostrar/ocultar senha" style="position:absolute;right:3px;background:none;border:none;cursor:pointer;display:flex;align-items:center;padding:6px 8px;color:var(--txt2)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
@@ -2529,6 +2532,15 @@ document.addEventListener('DOMContentLoaded', function(){
 function toggleVerSenha(){
   const inp = document.getElementById('senha-input');
   const btn = document.getElementById('btn-ver-senha');
+  if(!inp) return;
+  const oculto = inp.type === 'password';
+  inp.type = oculto ? 'text' : 'password';
+  if(btn) btn.innerHTML = oculto ? ico('eyeOff') : ico('eye');
+}
+
+function toggleVerSenhaUsuario(){
+  const inp = document.getElementById('usuario-senha');
+  const btn = document.getElementById('btn-ver-senha-usuario');
   if(!inp) return;
   const oculto = inp.type === 'password';
   inp.type = oculto ? 'text' : 'password';
