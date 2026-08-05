@@ -1899,12 +1899,27 @@ const _supaSync = {
   // Salva lista de usuários no Supabase
   async saveUsuarios(usuarios) {
     if(!_supabase) return;
-    try {
-      // Limpa tabela e reinsere (simples para poucos registros)
-      for(const u of usuarios) {
-        await _supabase.from('usuarios').upsert(u, { onConflict: 'id' });
+    // Apenas colunas que existem na tabela 'usuarios' (nova_conta/updated_at não existem)
+    const COLS = ['id','nome','login','senha_hash','role','data_expiracao','data_criacao','ativo','renovacao_solicitada'];
+    for(const u of usuarios) {
+      const payload = {};
+      COLS.forEach(c => { if(u[c] !== undefined) payload[c] = u[c]; });
+      try {
+        // Tenta upsert; se falhar (ex: trigger de updated_at quebrado), usa delete+insert
+        const { error } = await _supabase.from('usuarios').upsert(payload, { onConflict: 'id' });
+        if(error){
+          console.warn('upsert usuario falhou, tentando delete+insert:', error.message);
+          await _supabase.from('usuarios').delete().eq('id', u.id);
+          await _supabase.from('usuarios').insert(payload);
+        }
+      } catch(e) {
+        console.warn('saveUsuarios error para ' + u.id + ':', e.message);
+        try {
+          await _supabase.from('usuarios').delete().eq('id', u.id);
+          await _supabase.from('usuarios').insert(payload);
+        } catch(e2) { console.warn('delete+insert falhou para ' + u.id + ':', e2.message); }
       }
-    } catch(e) { console.warn('Supabase saveUsuarios error:', e.message); }
+    }
   },
 
   // Carrega lista de usuários do Supabase
@@ -2323,7 +2338,6 @@ async function fazerLogin(){
       res.user.nova_conta = false;
       const _ls = window._origLS || localStorage;
       _ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS.map(u => u.id === res.user.id ? {...u, nova_conta: false} : u)));
-      if(_supabase){ try { await _supabase.from('usuarios').update({ nova_conta: false }).eq('id', res.user.id); } catch(e){} }
     } else if(!temDadosLocais){
       // Sem dados locais: para perfis fixos só carrega do Supabase (sem apagar); para outros limpa resíduos antes
       if(!_isPerfilFixo && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
@@ -2706,19 +2720,9 @@ async function salvarSenhaAdmin(){
   const ls = window._origLS || localStorage;
   ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
 
-  // Salva diretamente no Supabase com update explícito
+  // Salva diretamente no Supabase (usa saveUsuarios que trata delete+insert)
   if(_supabase){
-    try {
-      const { error } = await _supabase
-        .from('usuarios')
-        .update({ senha_hash: admin.senha_hash })
-        .eq('id', admin.id);
-      if(error) throw error;
-    } catch(e){
-      console.warn('Supabase senha update error:', e.message);
-      erro.textContent = 'Atenção: senha salva localmente mas falhou no servidor. Tente novamente.';
-      erro.style.display = '';
-    }
+    await _supaSync.saveUsuarios(USUARIOS);
   }
 
   document.getElementById('overlay-senha-admin').classList.remove('aberto');
