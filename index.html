@@ -992,8 +992,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;border-top:1px solid #f1f5f9;padding-top:16px">
       <button onclick="document.getElementById('modal-sem-forn').style.display='none'"
         style="background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700">Cancelar</button>
-      <button onclick="salvarAssocModalEImprimir()"
-        style="background:var(--azul);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700">Salvar e Imprimir</button>
+      <button onclick="imprimirModalForn()"
+        style="background:var(--azul);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700">Imprimir</button>
     </div>
   </div>
 </div>
@@ -1053,7 +1053,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </table>
       <div style="display:flex;gap:8px">
         <button class="btn btn-outline btn-sm" onclick="adicionarPeriodicidade()">+ Adicionar</button>
-        <button class="btn btn-primary btn-sm" onclick="salvarPeriodicidadesForm()">💾 Salvar</button>
       </div>
     </div>
   </div>
@@ -1077,7 +1076,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">📋 Filtrar usados no ciclo</button>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="adicionarIngrediente()">+ Adicionar Ingrediente</button>
-        <button class="btn btn-azul no-print admin-only" style="font-size:11px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px" onclick="salvarEmbalagensPadrao()" title="Salva as embalagens configuradas como padrão para todos os perfis"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar embalagens como padrão</button>
       </div>
     </div>
     <table>
@@ -1368,17 +1366,17 @@ function restaurarBackup(){
       <input type="hidden" id="usuario-id">
       <div class="campo" style="margin-bottom:12px">
         <label>Nome da Escola</label>
-        <input type="text" id="usuario-nome" placeholder="Ex: E.E. Centro" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+        <input type="text" id="usuario-nome" oninput="_autoSalvarUsuario()" placeholder="Ex: E.E. Centro" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="campo">
           <label>Login</label>
-          <input type="text" id="usuario-login" placeholder="escola_centro" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+          <input type="text" id="usuario-login" oninput="_autoSalvarUsuario()" placeholder="escola_centro" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
         </div>
         <div class="campo">
           <label>Senha <span id="senha-hint" style="font-size:11px;color:#aaa">(obrigatória)</span></label>
           <div style="position:relative;display:flex;align-items:center">
-            <input type="password" id="usuario-senha" placeholder="••••••••" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 40px 8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+            <input type="password" id="usuario-senha" oninput="_autoSalvarUsuario()" placeholder="••••••••" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 40px 8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
             <button type="button" class="btn-ver-senha" id="btn-ver-senha-usuario" onclick="toggleVerSenhaUsuario()" title="Mostrar/ocultar senha" style="position:absolute;right:3px;background:none;border:none;cursor:pointer;display:flex;align-items:center;padding:6px 8px;color:var(--txt2)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
         </div>
@@ -1386,7 +1384,7 @@ function restaurarBackup(){
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="campo">
           <label>Expiração</label>
-          <input type="date" id="usuario-expiracao" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
+          <input type="date" id="usuario-expiracao" onchange="_autoSalvarUsuario()" style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;width:100%;outline:none">
         </div>
         <div class="campo" style="display:flex;flex-direction:column;justify-content:flex-end">
           <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1398,13 +1396,12 @@ function restaurarBackup(){
       </div>
       <div class="campo" style="margin-bottom:16px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-          <input type="checkbox" id="usuario-ativo" checked style="width:16px;height:16px">
+          <input type="checkbox" id="usuario-ativo" onchange="_autoSalvarUsuario()" checked style="width:16px;height:16px">
           Conta ativa
         </label>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn btn-outline" onclick="fecharOverlayUsuario()">Cancelar</button>
-        <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="salvarUsuarioForm()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       </div>
     </div>
   </div>
@@ -1597,17 +1594,17 @@ function restaurarBackup(){
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="campo">
           <label>Nome / Número</label>
-          <input type="text" id="lic-nome" placeholder="Ex: Contrato 001/2026"
+          <input type="text" id="lic-nome" placeholder="Ex: Contrato 001/2026" oninput="_autoSalvarLicitacao()"
             style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
         </div>
         <div class="campo">
           <label>Data de Início</label>
-          <input type="date" id="lic-data-inicio"
+          <input type="date" id="lic-data-inicio" oninput="_autoSalvarLicitacao()"
             style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
         </div>
         <div class="campo">
           <label>Fornecedor</label>
-          <select id="lic-fornecedor"
+          <select id="lic-fornecedor" onchange="_autoSalvarLicitacao()"
             style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%;background:#fff">
             <option value="">— Selecione —</option>
             ${FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join('')}
@@ -1629,8 +1626,7 @@ function restaurarBackup(){
         Total: <span id="lic-total-contrato">R$ 0,00</span>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn btn-outline" onclick="fecharOverlayLic()">Cancelar</button>
-        <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="salvarLicitacaoForm()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar Contrato</button>
+        <button class="btn btn-outline" onclick="fecharOverlayLic()">Fechar</button>
       </div>
     </div>
   </div>
@@ -1681,11 +1677,11 @@ function restaurarBackup(){
       <div style="display:grid;grid-template-columns:80px 1fr;gap:12px;margin-bottom:20px">
         <div class="campo">
           <label>Número</label>
-          <input type="text" id="novo-prato-num" placeholder="Ex: 99" style="min-width:auto">
+          <input type="text" id="novo-prato-num" placeholder="Ex: 99" style="min-width:auto" oninput="_autoSalvarNovoPrato()">
         </div>
         <div class="campo">
           <label>Nome do Prato</label>
-          <input type="text" id="novo-prato-nome" placeholder="Ex: Arroz com Legumes" style="min-width:auto">
+          <input type="text" id="novo-prato-nome" placeholder="Ex: Arroz com Legumes" style="min-width:auto" oninput="_autoSalvarNovoPrato()">
         </div>
       </div>
       
@@ -1707,8 +1703,7 @@ function restaurarBackup(){
       </div>
       
       <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:12px">
-        <button class="btn btn-outline" onclick="fecharModalNovoPrato()">Cancelar</button>
-        <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="salvarNovoPrato()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar Prato</button>
+        <button class="btn btn-outline" onclick="fecharModalNovoPrato()">Fechar</button>
       </div>
     </div>
   </div>
@@ -2616,15 +2611,29 @@ function renderAdmin(){
 let _usuarioEditandoId = null;
 
 function abrirNovoUsuario(){
-  _usuarioEditandoId = null;
+  const novoId = gerarId('usr');
+  _usuarioEditandoId = novoId;
   document.getElementById('usuario-modal-titulo').textContent = 'Novo Usuário';
-  document.getElementById('usuario-id').value = '';
+  document.getElementById('usuario-id').value = novoId;
   document.getElementById('usuario-nome').value = '';
   document.getElementById('usuario-login').value = '';
   document.getElementById('usuario-senha').value = '';
   document.getElementById('usuario-expiracao').value = '';
   document.getElementById('usuario-ativo').checked = true;
   document.getElementById('senha-hint').textContent = '(obrigatória)';
+  USUARIOS.push({
+    id: novoId,
+    nome: '',
+    login: '',
+    senha_hash: '',
+    role: 'escola',
+    data_expiracao: null,
+    data_criacao: new Date().toISOString().split('T')[0],
+    ativo: true,
+    renovacao_solicitada: false,
+    nova_conta: true
+  });
+  salvarUsuarios();
   document.getElementById('overlay-usuario').classList.add('aberto');
 }
 
@@ -2653,6 +2662,34 @@ function adicionarMeses(n){
   const base = inp.value ? new Date(inp.value + 'T00:00:00') : new Date();
   base.setMonth(base.getMonth() + n);
   inp.value = base.toISOString().split('T')[0];
+  _autoSalvarUsuario();
+}
+
+let _salvarUsuarioTimer = null;
+
+async function _autoSalvarUsuario(){
+  clearTimeout(_salvarUsuarioTimer);
+  _salvarUsuarioTimer = setTimeout(() => _salvarUsuarioSilenciosamente(), 800);
+}
+
+async function _salvarUsuarioSilenciosamente(){
+  if(!_usuarioEditandoId) return;
+  const nome  = document.getElementById('usuario-nome').value.trim();
+  const login = document.getElementById('usuario-login').value.trim();
+  const senha = document.getElementById('usuario-senha').value;
+  const exp   = document.getElementById('usuario-expiracao').value;
+  const ativo = document.getElementById('usuario-ativo').checked;
+  if(!nome && !login) return;
+  const duplicado = USUARIOS.find(u => u.login === login && u.id !== _usuarioEditandoId);
+  if(duplicado) return;
+  const user = USUARIOS.find(u => u.id === _usuarioEditandoId);
+  if(!user) return;
+  user.nome  = nome;
+  user.login = login;
+  user.data_expiracao = exp || null;
+  user.ativo = ativo;
+  if(senha) user.senha_hash = await hashSenha(senha);
+  salvarUsuarios();
 }
 
 async function salvarUsuarioForm(){
@@ -3360,10 +3397,12 @@ function renderPeriodicidades(){
 
 function atualizarPeriodicidade(idx, campo, valor){
   PERIODICIDADES[idx][campo] = campo === 'semanas' ? (parseInt(valor) || 1) : valor;
+  salvarPeriodicidades();
 }
 
 function adicionarPeriodicidade(){
   PERIODICIDADES.push({ id: 'per_' + Date.now(), nome: 'Nova', semanas: 1 });
+  salvarPeriodicidades();
   renderPeriodicidades();
 }
 
@@ -3984,7 +4023,9 @@ function calcAdicionarItem(){
 }
 
 function abrirNovaLicitacao(){
-  _licEditandoId = null;
+  _licEditandoId = gerarId('lic');
+  // Cria esqueleto imediatamente
+  LICITACOES.push({ id: _licEditandoId, nome: '', data_inicio: '', fornecedor_id: null, status: 'ativa', itens: [] });
   _licItens = [];
   document.getElementById('lic-modal-titulo').textContent = 'Novo Contrato';
   document.getElementById('lic-nome').value = '';
@@ -4017,22 +4058,31 @@ function fecharOverlayLic(event){
 function adicionarItemLic(){
   _licItens.push({ ingrediente: '', qtd_contratada: 0, preco_unitario: 0 });
   renderTbodyLicItens();
+  _autoSalvarLicitacao();
 }
 
 function removerItemLic(idx){
   _licItens.splice(idx, 1);
   renderTbodyLicItens();
+  _autoSalvarLicitacao();
 }
 
 function atualizarItemLic(idx, campo, valor){
   _licItens[idx][campo] = campo === 'ingrediente' ? valor : (parseFloat(valor) || 0);
   atualizarTotalContratoLic();
+  _autoSalvarLicitacao();
 }
 
 function atualizarTotalContratoLic(){
   const total = _licItens.reduce((a,it) => a + (it.qtd_contratada * it.preco_unitario), 0);
   const el = document.getElementById('lic-total-contrato');
   if(el) el.textContent = 'R$ ' + total.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+let _salvarLicitacaoTimer = null;
+function _autoSalvarLicitacao(){
+  clearTimeout(_salvarLicitacaoTimer);
+  _salvarLicitacaoTimer = setTimeout(() => _salvarLicitacaoSilenciosa(), 800);
 }
 
 function renderTbodyLicItens(){
@@ -4088,26 +4138,23 @@ function sugerirItensLicitacao(){
 }
 
 function salvarLicitacaoForm(){
+  _salvarLicitacaoSilenciosa();
+  fecharOverlayLic();
+  renderLicitacoes();
+}
+
+function _salvarLicitacaoSilenciosa(){
   const nome = document.getElementById('lic-nome').value.trim();
   const dataInicio = document.getElementById('lic-data-inicio').value;
   const fornecedorId = document.getElementById('lic-fornecedor').value;
-  if(!nome){ alert('Informe o nome do contrato.'); return; }
-  if(!dataInicio){ alert('Informe a data de início.'); return; }
   const itensValidos = _licItens.filter(it => it.ingrediente && it.qtd_contratada > 0);
-  if(!itensValidos.length){ alert('Adicione pelo menos um item com quantidade maior que zero.'); return; }
-
-  if(_licEditandoId){
-    const lic = LICITACOES.find(l => l.id === _licEditandoId);
-    lic.nome = nome;
-    lic.data_inicio = dataInicio;
-    lic.fornecedor_id = fornecedorId || null;
-    lic.itens = itensValidos;
-  } else {
-    LICITACOES.push({ id: gerarId('lic'), nome, data_inicio: dataInicio, fornecedor_id: fornecedorId || null, status: 'ativa', itens: itensValidos });
-  }
+  const lic = LICITACOES.find(l => l.id === _licEditandoId);
+  if(!lic) return;
+  lic.nome = nome;
+  lic.data_inicio = dataInicio;
+  lic.fornecedor_id = fornecedorId || null;
+  lic.itens = itensValidos;
   salvarLicitacoes();
-  fecharOverlayLic();
-  renderLicitacoes();
 }
 
 let _recOrdemId = null;
@@ -4130,6 +4177,7 @@ function abrirConfirmarRecebimento(ordem_id){
 function fecharOverlayRec(event){
   if(event && event.target !== document.getElementById('overlay-recebimento')) return;
   document.getElementById('overlay-recebimento').classList.remove('aberto');
+  renderLicitacoes();
 }
 
 function renderModalRecebimento(ordem){
@@ -4157,7 +4205,7 @@ function renderModalRecebimento(ordem){
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn btn-outline" onclick="fecharOverlayRec()">Cancelar</button>
       <button class="btn btn-verde" style="display:inline-flex;align-items:center;gap:5px" onclick="confirmarTodosRecebidos()">${ico('checkCircle',13)}Confirmar todos</button>
-      <button class="btn btn-primary" style="display:inline-flex;align-items:center;gap:5px" onclick="confirmarRecebimentoForm()">${ico('save',13)}Salvar</button>
+
     </div>`;
 }
 
@@ -4165,10 +4213,12 @@ function setRecStatus(ingrediente, status, qtd){
   _recStatus[ingrediente] = { status, qtd: qtd !== null ? qtd : (_recStatus[ingrediente]?.qtd || 0) };
   const ordem = ORDENS_EXPEDIDAS.find(o => o.id === _recOrdemId);
   if(ordem) document.getElementById('modal-body-recebimento').innerHTML = renderModalRecebimento(ordem);
+  _autoSalvarRecebimento();
 }
 
 function setRecQtd(ingrediente, valor){
   if(_recStatus[ingrediente]) _recStatus[ingrediente].qtd = parseFloat(valor) || 0;
+  _autoSalvarRecebimento();
 }
 
 function confirmarTodosRecebidos(){
@@ -4178,11 +4228,13 @@ function confirmarTodosRecebidos(){
     _recStatus[it.ingrediente] = { status: 'recebido', qtd: it.qtd_solicitada };
   });
   document.getElementById('modal-body-recebimento').innerHTML = renderModalRecebimento(ordem);
+  _autoSalvarRecebimento();
 }
 
-function confirmarRecebimentoForm(){
+let _salvarRecebimentoTimer = null;
+
+function _salvarRecebimentoSilenciosa(){
   if(!_recOrdemId) return;
-  // Remove recebimentos antigos desta ordem
   RECEBIMENTOS = RECEBIMENTOS.filter(r => r.ordem_id !== _recOrdemId);
   const hoje = new Date().toISOString().split('T')[0];
   Object.entries(_recStatus).forEach(([ingrediente, s]) => {
@@ -4195,13 +4247,22 @@ function confirmarRecebimentoForm(){
       data: hoje
     });
   });
-  // Atualizar estoque com quantidades recebidas
   Object.entries(_recStatus).forEach(([ingrediente, s]) => {
     if(!s.status || s.status === 'nao_recebido') return;
     ESTOQUE[ingrediente] = (ESTOQUE[ingrediente] || 0) + (s.qtd || 0);
   });
   salvarEstoque();
   salvarRecebimentos();
+}
+
+function _autoSalvarRecebimento(){
+  clearTimeout(_salvarRecebimentoTimer);
+  _salvarRecebimentoTimer = setTimeout(() => _salvarRecebimentoSilenciosa(), 800);
+}
+
+function confirmarRecebimentoForm(){
+  if(!_recOrdemId) return;
+  _salvarRecebimentoSilenciosa();
   fecharOverlayRec();
   renderLicitacoes();
 }
@@ -6499,14 +6560,23 @@ function adicionarItemMercForn(nomeBase, btn){
   tr.innerHTML = `<td colspan="7" style="padding:6px 8px">
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <span style="font-size:12px;font-weight:700;color:var(--azul);min-width:80px">${nomeBase}</span>
-      <select class="forn-add-sel" style="flex:1;min-width:140px;padding:4px 6px;font-size:12px;border:1.5px solid #93c5fd;border-radius:6px">
+      <select class="forn-add-sel" onchange="autoSalvarAddItemForn('${enc}',this)"
+        style="flex:1;min-width:140px;padding:4px 6px;font-size:12px;border:1.5px solid #93c5fd;border-radius:6px">
         ${options}
       </select>
-      <button class="btn btn-sm" style="background:#1A3A6B;color:#fff;font-size:11px"
-        onclick="confirmarAddItemForn('${enc}',this)">Salvar</button>
       <button class="btn btn-outline btn-sm" style="font-size:11px" onclick="renderMercado()">✕</button>
     </div>
   </td>`;
+}
+
+let _salvarAddItemFornTimer = null;
+
+function autoSalvarAddItemForn(nomeBase, sel){
+  clearTimeout(_salvarAddItemFornTimer);
+  _salvarAddItemFornTimer = setTimeout(() => {
+    const fornId = sel?.value || null;
+    setIngFornecedor(nomeBase, fornId);
+  }, 800);
 }
 
 function confirmarAddItemForn(nomeBase, btn){
@@ -6632,7 +6702,7 @@ function validarEImprimir(){
     const tipoTag = isAF(it.nomeBase) ? 'AF' : 'MC';
     return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9">
       <span style="flex:1;font-size:13px;font-weight:600">${it.displayNome} <span style="font-size:11px;color:#94a3b8">${tipoTag}</span></span>
-      <select data-modal-ing="${enc}"
+      <select data-modal-ing="${enc}" onchange="autoSalvarAssocFornModal(this)"
         style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:150px">
         <option value="">— Selecione —</option>
         ${FORNECEDORES_CADASTRO.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}
@@ -6663,16 +6733,20 @@ function imprimirFornecedorSelecionado(){
   }, 400);
 }
 
-function salvarAssocModalEImprimir(){
+function autoSalvarAssocFornModal(sel){
+  if(!sel.value) return;
+  sel.style.borderColor = '';
+  ING_FORNECEDORES[sel.getAttribute('data-modal-ing')] = sel.value;
+  salvarIngFornecedores();
+}
+
+function imprimirModalForn(){
   const sels = document.querySelectorAll('#modal-sem-forn-lista [data-modal-ing]');
   let ok = true;
   sels.forEach(sel => {
     if(!sel.value){ ok = false; sel.style.borderColor='#ef4444'; return; }
-    sel.style.borderColor = '';
-    ING_FORNECEDORES[sel.getAttribute('data-modal-ing')] = sel.value;
   });
   if(!ok){ alert('Selecione um fornecedor para todos os ingredientes.'); return; }
-  salvarIngFornecedores();
   document.getElementById('modal-sem-forn').style.display = 'none';
   renderMercado();
   renderIngredientes();
@@ -7179,20 +7253,18 @@ function fecharModalNovoPrato(e){
 function adicionarIngredienteAoPrato(){
   const nome = document.getElementById('sel-ing-novo').value;
   const qtd = parseFloat(document.getElementById('qtd-ing-novo').value);
-  if(!nome){ alert('Selecione um ingrediente.'); return; }
-  if(!qtd || qtd <= 0){ alert('Informe a quantidade em gramas.'); return; }
-  if(novoPratoIngs.find(x => x.i === nome)){
-    alert('Este ingrediente já foi adicionado. Remova-o primeiro para alterar a quantidade.');
-    return;
-  }
+  if(!nome || !qtd || qtd <= 0) return;
+  if(novoPratoIngs.find(x => x.i === nome)) return;
   novoPratoIngs.push({ i: nome, g: qtd });
   document.getElementById('qtd-ing-novo').value = '';
   renderNovoPratoIngs();
+  _autoSalvarNovoPrato();
 }
 
 function removerIngredienteDoPrato(idx){
   novoPratoIngs.splice(idx, 1);
   renderNovoPratoIngs();
+  _autoSalvarNovoPrato();
 }
 
 function renderNovoPratoIngs(){
@@ -7212,47 +7284,42 @@ function renderNovoPratoIngs(){
   ).join('');
 }
 
-function salvarNovoPrato(){
+function _salvarNovoPratoSilencioso(){
   const num = document.getElementById('novo-prato-num').value.trim();
   const nome = document.getElementById('novo-prato-nome').value.trim();
-  if(!num){ alert('Informe o número do prato.'); return; }
-  if(!nome){ alert('Informe o nome do prato.'); return; }
-  if(novoPratoIngs.length === 0){ alert('Adicione pelo menos um ingrediente.'); return; }
-
+  if(!num || !nome || novoPratoIngs.length === 0) return;
   const chave = `${num} - ${nome}`;
-  
+
   if(editandoPratoKey && editandoPratoKey !== chave){
-    // Removendo a chave antiga se mudou o nome/numero
     delete DADOS.ficha[editandoPratoKey];
     const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom') || '{}');
     delete custom[editandoPratoKey];
     localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
-    
-    // Remover da lista de pratos
     const idx = PRATOS_LISTA.indexOf(editandoPratoKey);
     if(idx !== -1) PRATOS_LISTA.splice(idx, 1);
-  } else if(!editandoPratoKey && DADOS.ficha[chave]){
-    if(!confirm(`O prato "${chave}" já existe. Deseja substituí-lo?`)) return;
   }
 
-  // Salvar no DADOS em memória
   DADOS.ficha[chave] = [...novoPratoIngs];
-
-  // Persistir pratos customizados no localStorage
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom') || '{}');
   custom[chave] = [...novoPratoIngs];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
 
-  // Atualizar lista de pratos para os selectors do cardápio
   if(!PRATOS_LISTA.includes(chave)){
     PRATOS_LISTA.push(chave);
   }
   PRATOS_LISTA.sort();
+}
 
-  // Fechar modal e atualizar
+let _salvarNovoPratoTimer = null;
+function _autoSalvarNovoPrato(){
+  clearTimeout(_salvarNovoPratoTimer);
+  _salvarNovoPratoTimer = setTimeout(() => _salvarNovoPratoSilencioso(), 800);
+}
+
+function salvarNovoPrato(){
+  _salvarNovoPratoSilencioso();
   document.getElementById('overlay-novo-prato').classList.remove('aberto');
   renderFichas();
-  alert(`Prato "${chave}" salvo com sucesso!`);
 }
 
 function editarPrato(key){
@@ -7439,6 +7506,9 @@ function salvarEmbalagem(nome, valor){
   if(v > 0) EMBALAGENS[nome] = v;
   else delete EMBALAGENS[nome];
   localStorage.setItem('merenda_embalagens', JSON.stringify(EMBALAGENS));
+  // Salva também como padrão global (fora do proxy)
+  const ls = window._origLS || localStorage;
+  ls.setItem('merenda_embalagens_padrao', JSON.stringify(EMBALAGENS));
   // Atualiza só a célula desta linha
   const cell = document.querySelector(`[data-emb-nome="${nome.replace(/"/g,'\\"')}"]`);
   if(cell) cell.innerHTML = renderEmbBotoes(nome, DADOS.ingredientes[nome]?.unidade || 'kg');
