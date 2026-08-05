@@ -2063,6 +2063,20 @@ window.addEventListener('error', function(e){
 setInterval(() => { try{ _supaSync._flushSync(); }catch(_){} }, 30000);
 
 async function autenticar(login, senha){
+  // Tenta carregar do Supabase se disponível e ainda não carregado
+  if(_supabase && !window._supaUsersLoaded){
+    try {
+      const su = await _supaSync.loadUsuarios();
+      if(su && su.length){
+        const lu = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
+        const mg = su.map(s => { const l = lu.find(u => u.id === s.id); return l ? { ...s, ...l } : s; });
+        lu.forEach(l => { if(!mg.some(u => u.id === l.id)) mg.push(l); });
+        localStorage.setItem('merenda_usuarios', JSON.stringify(mg));
+        USUARIOS = mg;
+      }
+      window._supaUsersLoaded = true;
+    } catch(e){}
+  }
   // Garante que USUARIOS está atualizado (usa localStorage original)
   USUARIOS = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
   const user = USUARIOS.find(u => u.login === login.trim());
