@@ -1727,8 +1727,11 @@ try {
   // Tenta novamente após o script defer carregar
   setTimeout(() => {
     try { if(!_supabase && typeof supabase !== 'undefined'){ _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); console.info('✅ Supabase inicializado (defer)'); } } catch(e2){}
-    // Recarregar usuários do Supabase para outros dispositivos terem acesso
-    if(_supabase){ _supaSync.loadUsuarios().then(supaUsers => {
+    if(!_supabase) return;
+    // Se houver usuários pendentes de sync, salva agora
+    if(_usuariosPendentes){ _supaSync.saveUsuarios(USUARIOS).catch(()=>{}); _usuariosPendentes = false; }
+    // Recarregar usuários do Supabase para sincronizar com outros dispositivos
+    _supaSync.loadUsuarios().then(supaUsers => {
       if(supaUsers && supaUsers.length){
         const localUsers = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
         const merged = supaUsers.map(su => { const l = localUsers.find(u => u.id === su.id); return l ? { ...su, ...l } : su; });
@@ -1736,8 +1739,8 @@ try {
         localStorage.setItem('merenda_usuarios', JSON.stringify(merged));
         USUARIOS = merged;
       }
-    }).catch(()=>{}); }
-  }, 2000);
+    }).catch(()=>{});
+  }, 2500);
 }
 
 // ══════════════════════════════════════════════════════
@@ -1961,10 +1964,12 @@ window._SESSAO = null;
 
 // Variáveis globais de auth (lidas/escritas por todas as funções de auth)
 let USUARIOS = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
+var _usuariosPendentes = false;
 function salvarUsuarios(){
   localStorage.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
-  // Sync com Supabase
-  _supaSync.saveUsuarios(USUARIOS);
+  // Sync com Supabase — se não disponível ainda, agenda para quando estiver
+  if(_supabase) _supaSync.saveUsuarios(USUARIOS);
+  else _usuariosPendentes = true;
 }
 
 // Garante acesso imediato dos perfis fixos usando hashes pré-computados (sem await)
