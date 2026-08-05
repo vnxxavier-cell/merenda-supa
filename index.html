@@ -1727,6 +1727,16 @@ try {
   // Tenta novamente após o script defer carregar
   setTimeout(() => {
     try { if(!_supabase && typeof supabase !== 'undefined'){ _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); console.info('✅ Supabase inicializado (defer)'); } } catch(e2){}
+    // Recarregar usuários do Supabase para outros dispositivos terem acesso
+    if(_supabase){ _supaSync.loadUsuarios().then(supaUsers => {
+      if(supaUsers && supaUsers.length){
+        const localUsers = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
+        const merged = supaUsers.map(su => { const l = localUsers.find(u => u.id === su.id); return l ? { ...su, ...l } : su; });
+        localUsers.forEach(lu => { if(!merged.some(u => u.id === lu.id)) merged.push(lu); });
+        localStorage.setItem('merenda_usuarios', JSON.stringify(merged));
+        USUARIOS = merged;
+      }
+    }).catch(()=>{}); }
   }, 2000);
 }
 
