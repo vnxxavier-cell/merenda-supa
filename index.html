@@ -680,7 +680,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
     <div class="login-erro" id="login-erro"></div>
     <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
-    <div id="supa-status" style="margin-top:12px;font-size:11px;text-align:center;color:var(--txt2);display:none"></div>
   </div>
 </div>
 
@@ -1723,22 +1722,15 @@ function restaurarBackup(){
 const SUPABASE_URL  = 'https://gphckdoikdfsezqpqglz.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_2MQ5gj-285uYbuyuhgNfZw_g8tLmuc3';
 let _supabase = null;
-function _statusSupa(msg, cor){
-  const el = document.getElementById('supa-status');
-  if(!el) return;
-  el.style.display = ''; el.style.color = cor || 'var(--txt2)'; el.textContent = msg;
-}
 try {
   _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   console.info('✅ Supabase client inicializado');
-  _statusSupa('☁️ Supabase conectado', '#27ae60');
 } catch(e) {
   console.warn('⚠️ Supabase não disponível, modo offline:', e.message);
-  _statusSupa('Supabase offline — login via conta Admin', '#e67e22');
   // Tenta novamente após o script defer carregar
   setTimeout(() => {
-    try { if(!_supabase && typeof supabase !== 'undefined'){ _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); console.info('✅ Supabase inicializado (defer)'); _statusSupa('☁️ Supabase conectado', '#27ae60'); } } catch(e2){}
-    if(!_supabase) { _statusSupa('Supabase offline — login via conta Admin', '#e67e22'); return; }
+    try { if(!_supabase && typeof supabase !== 'undefined'){ _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); console.info('✅ Supabase inicializado (defer)'); } } catch(e2){}
+    if(!_supabase) return;
     // Se houver usuários pendentes de sync, salva agora
     if(_usuariosPendentes){ _supaSync.saveUsuarios(USUARIOS).catch(()=>{}); _usuariosPendentes = false; }
     // Sempre faz sync bidirecional ao inicializar: envia local→servidor e depois carrega servidor→local
@@ -1940,7 +1932,6 @@ const _supaSync = {
       }
     }
     console.log('saveUsuarios finalizado: ' + ok + ' ok, ' + falhas + ' falhas');
-    _statusSupa('☁️ ' + usuarios.length + ' usuários sincronizados', '#27ae60');
   },
 
   // Carrega lista de usuários do Supabase
