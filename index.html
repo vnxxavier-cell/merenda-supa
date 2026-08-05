@@ -680,6 +680,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
     <div class="login-erro" id="login-erro"></div>
     <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
+    <div id="supa-status" style="margin-top:12px;font-size:11px;text-align:center;color:var(--txt2);display:none"></div>
   </div>
 </div>
 
@@ -1719,17 +1720,28 @@ function restaurarBackup(){
 const SUPABASE_URL  = 'https://gphckdoikdfsezqpqglz.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_2MQ5gj-285uYbuyuhgNfZw_g8tLmuc3';
 let _supabase = null;
+function _statusSupa(msg, cor){
+  const el = document.getElementById('supa-status');
+  if(!el) return;
+  el.style.display = ''; el.style.color = cor || 'var(--txt2)'; el.textContent = msg;
+}
 try {
   _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   console.info('✅ Supabase client inicializado');
+  _statusSupa('☁️ Supabase conectado', '#27ae60');
 } catch(e) {
   console.warn('⚠️ Supabase não disponível, modo offline:', e.message);
+  _statusSupa('Supabase offline — login via conta Admin', '#e67e22');
   // Tenta novamente após o script defer carregar
   setTimeout(() => {
-    try { if(!_supabase && typeof supabase !== 'undefined'){ _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); console.info('✅ Supabase inicializado (defer)'); } } catch(e2){}
-    if(!_supabase) return;
+    try { if(!_supabase && typeof supabase !== 'undefined'){ _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); console.info('✅ Supabase inicializado (defer)'); _statusSupa('☁️ Supabase conectado', '#27ae60'); } } catch(e2){}
+    if(!_supabase) { _statusSupa('Supabase offline — login via conta Admin', '#e67e22'); return; }
     // Se houver usuários pendentes de sync, salva agora
     if(_usuariosPendentes){ _supaSync.saveUsuarios(USUARIOS).catch(()=>{}); _usuariosPendentes = false; }
+    // Sempre faz sync bidirecional ao inicializar: envia local→servidor e depois carrega servidor→local
+    _supaSync.saveUsuarios(USUARIOS).then(() => {
+      console.log('✅ Sync inicial de usuarios concluido');
+    }).catch(e => { console.warn('Sync inicial falhou:', e.message); });
     // Recarregar usuários do Supabase para sincronizar com outros dispositivos
     _supaSync.loadUsuarios().then(supaUsers => {
       if(supaUsers && supaUsers.length){
@@ -1898,9 +1910,10 @@ const _supaSync = {
 
   // Salva lista de usuários no Supabase
   async saveUsuarios(usuarios) {
-    if(!_supabase) return;
+    if(!_supabase){ console.warn('saveUsuarios: _supabase é null, abortando'); return; }
     // Apenas colunas que existem na tabela 'usuarios' (nova_conta/updated_at não existem)
     const COLS = ['id','nome','login','senha_hash','role','data_expiracao','data_criacao','ativo','renovacao_solicitada'];
+    let ok = 0, falhas = 0;
     for(const u of usuarios) {
       const payload = {};
       COLS.forEach(c => { if(u[c] !== undefined) payload[c] = u[c]; });
@@ -1908,18 +1921,23 @@ const _supaSync = {
         // Tenta upsert; se falhar (ex: trigger de updated_at quebrado), usa delete+insert
         const { error } = await _supabase.from('usuarios').upsert(payload, { onConflict: 'id' });
         if(error){
-          console.warn('upsert usuario falhou, tentando delete+insert:', error.message);
+          console.warn('upsert usuario ' + u.id + ' falhou (' + error.message + '), tentando delete+insert...');
           await _supabase.from('usuarios').delete().eq('id', u.id);
-          await _supabase.from('usuarios').insert(payload);
-        }
+          const { error: e2 } = await _supabase.from('usuarios').insert(payload);
+          if(e2){ console.error('insert fallback falhou para ' + u.id + ':', e2.message); falhas++; }
+          else { console.log('  ✅ delete+insert ok para ' + u.id); ok++; }
+        } else { ok++; }
       } catch(e) {
-        console.warn('saveUsuarios error para ' + u.id + ':', e.message);
+        console.warn('saveUsuarios erro para ' + u.id + ':', e.message);
         try {
           await _supabase.from('usuarios').delete().eq('id', u.id);
           await _supabase.from('usuarios').insert(payload);
-        } catch(e2) { console.warn('delete+insert falhou para ' + u.id + ':', e2.message); }
+          console.log('  ✅ delete+insert (catch) ok para ' + u.id); ok++;
+        } catch(e2) { console.error('  ❌ delete+insert falhou para ' + u.id + ':', e2.message); falhas++; }
       }
     }
+    console.log('saveUsuarios finalizado: ' + ok + ' ok, ' + falhas + ' falhas');
+    _statusSupa('☁️ ' + usuarios.length + ' usuários sincronizados', '#27ae60');
   },
 
   // Carrega lista de usuários do Supabase
@@ -1982,9 +2000,17 @@ let USUARIOS = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
 var _usuariosPendentes = false;
 function salvarUsuarios(){
   localStorage.setItem('merenda_usuarios', JSON.stringify(USUARIOS));
-  // Sync com Supabase — se não disponível ainda, agenda para quando estiver
-  if(_supabase) _supaSync.saveUsuarios(USUARIOS);
-  else _usuariosPendentes = true;
+  if(_supabase) {
+    console.log('salvarUsuarios: enviando ' + USUARIOS.length + ' usuarios para Supabase...');
+    _supaSync.saveUsuarios(USUARIOS).then(() => {
+      console.log('salvarUsuarios: sync concluido com sucesso');
+    }).catch(e => {
+      console.error('salvarUsuarios: FALHA no sync:', e.message || e);
+    });
+  } else {
+    console.warn('salvarUsuarios: _supabase ainda null, agendando sync pendente');
+    _usuariosPendentes = true;
+  }
 }
 
 // Garante acesso imediato dos perfis fixos usando hashes pré-computados (sem await)
@@ -2012,17 +2038,18 @@ function salvarUsuarios(){
   localStorage.setItem('merenda_usuarios', JSON.stringify(usuarios));
   USUARIOS = usuarios;
 })();
-// Sincroniza com Supabase sem sobrescrever a senha local
+// Sincroniza com Supabase: bidirecional (local ↔ servidor)
 (async function(){
   try {
     const supaUsuarios = await _supaSync.loadUsuarios();
+    const localUsuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
+    // Sempre envia usuários locais para o Supabase (garante que criados offline cheguem ao servidor)
+    _supaSync.saveUsuarios(localUsuarios).catch(()=>{});
     if(supaUsuarios && supaUsuarios.length > 0){
-      const localUsuarios = JSON.parse(localStorage.getItem('merenda_usuarios') || '[]');
       const merged = supaUsuarios.map(su => {
         const local = localUsuarios.find(l => l.id === su.id);
         return local ? { ...su, ...local } : su;
       });
-      // Garante que usuários locais não estejam no Supabase ainda (sync pendente) não sejam perdidos
       localUsuarios.forEach(lu => {
         if(!merged.some(u => u.id === lu.id)) merged.push(lu);
       });
