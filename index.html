@@ -2250,7 +2250,7 @@ async function verificarCallbackGoogle(){
 }
 
 function recarregarDados(){
-  // Re-lê todas as variáveis globais do localStorage (agora com proxy ativo)
+  try{
   NIVEIS_CONFIG = JSON.parse(localStorage.getItem('merenda_niveis') || 'null') || [
     { id:'f1', alunos:0, ativo:false, margem:0 },
     { id:'f2', alunos:0, ativo:false, margem:0 },
@@ -2317,6 +2317,7 @@ function recarregarDados(){
   if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
   if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
   if(SERVIDORES_CONFIG.acucar_g_por_serv === undefined) SERVIDORES_CONFIG.acucar_g_por_serv = 45;
+  }catch(e){console.error('recarregarDados',e)}
 }
 // ── LOGIN UI ──────────────────────────────────────────
 function mostrarTelaLogin(opts){
@@ -8452,14 +8453,14 @@ function ir(id, btn){
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
   if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
-  if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
+  if(id==='gastos'){ popularMesesGastos(); try{renderGastos()}catch(e){console.error('renderGastos',e)} }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
-  if(id==='licitacoes') renderLicitacoes();
+  if(id==='estoque'){ _estCorrigindo = false; try{renderEstoque()}catch(e){console.error('renderEstoque',e)}; try{renderDetalhamentoMercado()}catch(e){console.error('renderDetalhamento',e)}; }
+  if(id==='licitacoes'){ try{renderLicitacoes()}catch(e){console.error('renderLicitacoes',e)} }
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
-  if(id==='preparo') renderPreparo();
+  if(id==='preparo'){ try{renderPreparo()}catch(e){console.error('renderPreparo',e)} }
   const _tnEl = document.getElementById('mobile-tab-nome');
   if(_tnEl){ const _at = document.querySelector('.nav-tab.ativo'); if(_at){ const _tn = [..._at.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(_tn) _tnEl.textContent = _tn.textContent.trim(); } }
   _abaAtual = id;
