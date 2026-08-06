@@ -7711,6 +7711,7 @@ function popularMesesGastos(){
     s.appendChild(o);
   });
   if(cur && MESES_NOMES.includes(cur)) s.value = cur;
+  else if(s.options.length) s.selectedIndex = 0;
   popularSemanasGastos();
 }
 
