@@ -888,7 +888,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
           <button id="merc-modo-btn-reposicao" onclick="setMercModo('reposicao')"
             style="flex:1;border:none;border-left:2px solid var(--borda);padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;color:var(--txt2);transition:.15s">Reposição de estoque</button>
         </div>
-        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;var b=document.getElementById('merc-estoque-badge');if(b){b.textContent=_mercDescontarEstoque?'c/ desconto':'s/ desconto';b.style.background=_mercDescontarEstoque?'#dcfce7':'#fee2e2';b.style.color=_mercDescontarEstoque?'#166534':'#991b1b'};renderMercado()"> Descontar estoque <span id="merc-estoque-badge" style="font-size:10px;font-weight:700;background:#dcfce7;color:#166534;border-radius:4px;padding:1px 6px">c/ desconto</span></label>
+        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;renderMercado()"> Descontar estoque</label>
       </div>
       <button id="merc-view-toggle" class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="toggleMercadoViewMode()">Ver cobertura</button>
     </div>
@@ -6272,7 +6272,7 @@ function renderMercado(){
               <span class="print-only" style="font-size:10.5px;color:#555;font-style:italic">${esc(_obsMap[it.nomeBase] || '')}</span>
             </td>
             <td class="no-print" style="text-align:center">${tipoTag}</td>
-            <td class="num no-print" style="color:var(--txt2);overflow:hidden;font-size:11px">${fmtEsp(it.nomeBase,it.nec)}</td>
+            <td class="num no-print" style="color:var(--txt2);overflow:hidden;font-size:11px">${fmtEsp(it.nomeBase,it.nec)}${_mercDescontarEstoque && it.est > 0 ? `<div style="font-size:9px;color:#166534;margin-top:1px">− estoque ${fmtEsp(it.nomeBase,it.est)}</div>` : ''}</td>
             <td class="num no-print" style="overflow:hidden">
               <span style="color:#16a34a;font-size:12px;font-weight:700;white-space:nowrap">✓ Coberto</span>
             </td>
