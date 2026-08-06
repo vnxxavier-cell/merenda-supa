@@ -6748,6 +6748,16 @@ function renderDetalhamentoMercado(){
   const { todosItens, weekData } = _MERC_DATA;
   if(!todosItens.length) return;
 
+  // Só renderiza análise detalhada se houver refeições nos dados de semana
+  let temRefeicoes = false;
+  for(const w of weekData){
+    for(let i = 0; i < w.dias.length; i++){
+      if(w.dias[i] && w.datas[i]){ temRefeicoes = true; break; }
+    }
+    if(temRefeicoes) break;
+  }
+  if(!temRefeicoes) return;
+
   // Collect all day-meal pairs with their totals
   const dayMeals = [];
   const uniqDates = new Set();
@@ -7689,26 +7699,6 @@ function fecharNovoIng(){document.getElementById('overlay-novo-ing').style.displ
 function filtrarIngredientes(v){renderIngredientes(v)}
 function filtrarIngredientesForn(v){filtroIngForn=v;renderIngredientes()}
 
-// ── Navegação ──
-function ir(id, btn){
-  document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
-  document.getElementById('pg-'+id).classList.add('ativa');
-  if(btn) btn.classList.add('ativo');
-  if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); }
-  if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
-  if(id==='gastos') renderGastos();
-  if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
-  if(id==='licitacoes') renderLicitacoes();
-  if(id==='preparo') renderPreparo();
-  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
-  const _tnEl = document.getElementById('mobile-tab-nome');
-  if(_tnEl){ const _at = document.querySelector('.nav-tab.ativo'); if(_at){ const _tn = [..._at.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(_tn) _tnEl.textContent = _tn.textContent.trim(); } }
-  // Esconder header/assinatura global quando mercado ativo (tem os próprios)
-  atualizarPrintGlobal();
-}
-
 function popularMesesGastos(){
   const s = document.getElementById('sel-mes-gastos');
   if(!s || !MESES_NOMES?.length) return;
@@ -8455,11 +8445,13 @@ function carregarConfig(){
 function ir(id, btn){
   document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
-  document.getElementById('pg-'+id).classList.add('ativa');
+  var pg = document.getElementById('pg-'+id);
+  if(!pg) return;
+  pg.classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
   if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
-  if(id==='gastos') renderGastos();
+  if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
   if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
@@ -8469,7 +8461,6 @@ function ir(id, btn){
   if(id==='preparo') renderPreparo();
   const _tnEl = document.getElementById('mobile-tab-nome');
   if(_tnEl){ const _at = document.querySelector('.nav-tab.ativo'); if(_at){ const _tn = [..._at.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(_tn) _tnEl.textContent = _tn.textContent.trim(); } }
-  atualizarPrintGlobal();
   _abaAtual = id;
   fecharAjudaTab();
 }
