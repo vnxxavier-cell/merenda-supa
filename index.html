@@ -5850,7 +5850,7 @@ function getItensMercado(ciclo, mondayIso){
     const nec = totaisAcum[chave] || 0;
 
     const est = ESTOQUE[nomeBase] || 0;
-    const coberto = nec > 0 && est >= nec;
+    const coberto = _mercDescontarEstoque && nec > 0 && est >= nec;
     const comprarBase = _mercDescontarEstoque ? Math.max(0, nec - est) : nec;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
@@ -5923,7 +5923,7 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
-    const coberto = nec > 0 && est >= nec;
+    const coberto = _mercDescontarEstoque && nec > 0 && est >= nec;
     const comprarBase = _mercDescontarEstoque ? Math.max(0, nec - est) : nec;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
