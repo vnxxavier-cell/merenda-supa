@@ -6156,9 +6156,15 @@ function renderMercado(){
       mon = _d.toISOString().substring(0, 10);
     }
     const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(mon);
-    // Para cobertura: sempre mostra dias completos (sem filtrar por período)
-    const _wdF = _wd.map((dd, i) => _wda[i] ? dd : '');
-    const _wdaF = _wda.map(d => d);
+    // No modo reposição: mostra todas as semanas (respeita periodicidade do ingrediente)
+    // No modo período: filtra apenas os dias dentro do intervalo selecionado
+    const _usarFiltro = _MERC_MODO === 'periodo';
+    const _wdF = _usarFiltro
+      ? _wd.map((dd, i) => _inPer2(_wda[i]) ? dd : '')
+      : _wd.map((dd, i) => _wda[i] ? dd : '');
+    const _wdaF = _usarFiltro
+      ? _wda.map(d => _inPer2(d) ? d : null)
+      : _wda.map(d => d);
     weekData.push({
       dias: _wdF, datas: _wdaF,
       dailyTotais: _wdF.map((dd, i) => (!dd || !_wdaF[i]) ? {} : calcularTotaisNiveis([dd]).totais)
