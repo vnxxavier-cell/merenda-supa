@@ -40,8 +40,10 @@ nav{background:var(--nav-bg);width:220px;min-width:220px;display:flex;flex-direc
 .nav-tab:hover svg,.nav-tab.ativo svg{opacity:1}
 
 /* Sub-tabs (usadas em Quantidades por Turno) */
-.sub-tab.ativo{color:var(--azul);border-bottom-color:var(--azul)}
-.sub-tab:hover{color:var(--azul)}
+.sub-tab{transition:.15s}
+.sub-tab.ativo{color:var(--azul);border-bottom-color:var(--azul);background:#eff6ff}
+.sub-tab:hover{color:var(--azul);background:#f8fafc}
+.sub-tab-bar{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--borda)}
 
 /* ── PÁGINAS ── */
 .main-content{flex:1;min-width:0;overflow-y:auto;margin-left:220px;height:100vh}
@@ -1468,9 +1470,9 @@ function restaurarBackup(){
 <div id="pg-preparo" class="pagina">
   <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Quantidades por Turno</h2>
 
-  <div class="sub-tab-bar" style="display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--borda)">
-    <button class="sub-tab ativo" onclick="trocarSubTabPreparo('qt',this)" style="padding:10px 20px;border:none;background:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s">📊 Quantidades por Turno</button>
-    <button class="sub-tab" onclick="trocarSubTabPreparo('rs',this)" style="padding:10px 20px;border:none;background:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s">📋 Registro de Saídas</button>
+  <div class="sub-tab-bar">
+    <button class="sub-tab ativo" onclick="trocarSubTabPreparo('qt',this)" style="padding:8px 18px;border:none;background:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s;border-radius:8px 8px 0 0">📊 Quantidades por Turno</button>
+    <button class="sub-tab" onclick="trocarSubTabPreparo('rs',this)" style="padding:8px 18px;border:none;background:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s;border-radius:8px 8px 0 0">📋 Registro de Saídas</button>
   </div>
 
   <!-- Sub-aba: Quantidades por Turno -->
