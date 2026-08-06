@@ -1169,7 +1169,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <h1 id="preview-escola"></h1>
                 <p id="preview-subtitulo"></p>
         </div>
-        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;renderMercado()"> Descontar estoque</label>
+        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;var b=document.getElementById('merc-estoque-badge');if(b){b.textContent=_mercDescontarEstoque?'c/ desconto':'s/ desconto';b.style.background=_mercDescontarEstoque?'#dcfce7':'#fee2e2';b.style.color=_mercDescontarEstoque?'#166534':'#991b1b'};renderMercado()"> Descontar estoque <span id="merc-estoque-badge" style="font-size:10px;font-weight:700;background:#dcfce7;color:#166534;border-radius:4px;padding:1px 6px">c/ desconto</span></label>
       </div>
             <div class="mock-body"></div>
             <div class="mock-sig" id="preview-sig">Diretor(a) Escolar</div>
