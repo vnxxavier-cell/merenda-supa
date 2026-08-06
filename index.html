@@ -888,6 +888,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
           <button id="merc-modo-btn-reposicao" onclick="setMercModo('reposicao')"
             style="flex:1;border:none;border-left:2px solid var(--borda);padding:0 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:#fff;color:var(--txt2);transition:.15s">Reposição de estoque</button>
         </div>
+        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;renderMercado()"> Descontar estoque</label>
       </div>
       <button id="merc-view-toggle" class="btn no-print" style="display:flex;align-items:center;gap:5px;background:#f0f7ff;color:#1e40af;border:1.5px solid #bfdbfe;font-weight:700" onclick="toggleMercadoViewMode()">Ver cobertura</button>
     </div>
@@ -1169,8 +1170,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <h1 id="preview-escola"></h1>
                 <p id="preview-subtitulo"></p>
         </div>
-        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;renderMercado()"> Descontar estoque</label>
-      </div>
             <div class="mock-body"></div>
             <div class="mock-sig" id="preview-sig">Diretor(a) Escolar</div>
           </div>
