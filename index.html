@@ -6159,7 +6159,6 @@ function renderMercado(){
     // Para cobertura: sempre mostra dias completos (sem filtrar por período)
     const _wdF = _wd.map((dd, i) => _wda[i] ? dd : '');
     const _wdaF = _wda.map(d => d);
-    const _wdaF = _wda.map(d => _inPer2(d) ? d : null);
     weekData.push({
       dias: _wdF, datas: _wdaF,
       dailyTotais: _wdF.map((dd, i) => (!dd || !_wdaF[i]) ? {} : calcularTotaisNiveis([dd]).totais)
