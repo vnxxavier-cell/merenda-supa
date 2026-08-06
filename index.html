@@ -1168,8 +1168,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
               <div class="mock-header-text">
                 <h1 id="preview-escola"></h1>
                 <p id="preview-subtitulo"></p>
-              </div>
-            </div>
+        </div>
+        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;renderMercado()"> Descontar estoque</label>
+      </div>
             <div class="mock-body"></div>
             <div class="mock-sig" id="preview-sig">Diretor(a) Escolar</div>
           </div>
@@ -3301,6 +3302,7 @@ let _MERC_SEMANAS_SEL = []; // semanas selecionadas no seletor multi-semanas
 var _mercMesAtual = 0; // 0=Fev ... 10=Dez
 var _mercInicializado = false;
 var _mercMostrarPreco = true;
+var _mercDescontarEstoque = true;
 function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
 function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
@@ -5848,7 +5850,7 @@ function getItensMercado(ciclo, mondayIso){
 
     const est = ESTOQUE[nomeBase] || 0;
     const coberto = nec > 0 && est >= nec;
-    const comprarBase = Math.max(0, nec - est);
+    const comprarBase = _mercDescontarEstoque ? Math.max(0, nec - est) : nec;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
 
@@ -5919,7 +5921,7 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
     const coberto = nec > 0 && est >= nec;
-    const comprarBase = Math.max(0, nec - est);
+    const comprarBase = _mercDescontarEstoque ? Math.max(0, nec - est) : nec;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
     if(comprar <= 0 && ajuste.overrides[nomeBase] == null && !coberto) return;
