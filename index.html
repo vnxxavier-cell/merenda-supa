@@ -6148,7 +6148,7 @@ function renderMercado(){
   const weekData = [];
   const semanasWD = isMulti ? _MERC_SEMANAS_SEL : [mondayIso, null, null, null].slice(0,4);
   const _ini2 = getMercDataInicio(), _fim2 = getMercDataFim();
-  const _inPer2 = d => !d || !_ini2 || !_fim2 || (d >= _ini2 && d <= _fim2);
+    const _inPer2 = d => !d || !_ini2 || !_fim2 || (d >= _ini2 && d <= _fim2);
   semanasWD.forEach((mon, wi) => {
     if(!mon) {
       const _d = new Date(mondayIso + 'T00:00:00');
@@ -6156,7 +6156,9 @@ function renderMercado(){
       mon = _d.toISOString().substring(0, 10);
     }
     const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(mon);
-    const _wdF = _wd.map((dd, i) => _inPer2(_wda[i]) ? dd : '');
+    // Para cobertura: sempre mostra dias completos (sem filtrar por período)
+    const _wdF = _wd.map((dd, i) => _wda[i] ? dd : '');
+    const _wdaF = _wda.map(d => d);
     const _wdaF = _wda.map(d => _inPer2(d) ? d : null);
     weekData.push({
       dias: _wdF, datas: _wdaF,
