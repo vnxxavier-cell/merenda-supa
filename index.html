@@ -6151,12 +6151,14 @@ function renderMercado(){
 
   // ── Dados semanais (usado na análise de cobertura) ──
   const weekData = [];
-  const semanasWD = isMulti ? _MERC_SEMANAS_SEL : [mondayIso, null, null, null].slice(0,4);
+  // Sempre gera 4 semanas a partir da primeira selecionada para a análise de cobertura
+  const _firstMon = isMulti ? _MERC_SEMANAS_SEL[0] : mondayIso;
+  const semanasWD = _firstMon ? [_firstMon, null, null, null] : [];
   const _ini2 = getMercDataInicio(), _fim2 = getMercDataFim();
     const _inPer2 = d => !d || !_ini2 || !_fim2 || (d >= _ini2 && d <= _fim2);
   semanasWD.forEach((mon, wi) => {
     if(!mon) {
-      const _d = new Date(mondayIso + 'T00:00:00');
+      const _d = new Date(_firstMon + 'T00:00:00');
       _d.setDate(_d.getDate() + 7 * wi);
       mon = _d.toISOString().substring(0, 10);
     }
