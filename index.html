@@ -5843,9 +5843,9 @@ function getItensMercado(ciclo, mondayIso){
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
 
     const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
-    // Suporta formato antigo (per_1, per_2) e novo (semanal, mensal)
-    const perObj = PERIODICIDADES.find(p => p.id === per);
-    const numSemanas = per === 'mensal' ? 4 : per === 'trissemanais' ? 3 : per === 'quinzenal' ? 2 : per === 'semanal' ? 1 : (perObj ? perObj.semanas : 1);
+    // Suporta formato antigo (id: per_1), novo (semanal), ou nome (Semanal, Mensal)
+    const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
+    const numSemanas = per === 'mensal' || per.toLowerCase()==='mensal' ? 4 : per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 : per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 : per === 'semanal' || per.toLowerCase()==='semanal' ? 1 : (perObj ? perObj.semanas : 1);
     const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
 
@@ -5917,9 +5917,9 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     const detalheText = temDetalhe ? chave.split(' ___ ')[1] : '';
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
     const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
-    // Suporta formato antigo (per_1, per_2) e novo (semanal, mensal)
-    const perObj = PERIODICIDADES.find(p => p.id === per);
-    const numSemanas = per === 'mensal' ? 4 : per === 'trissemanais' ? 3 : per === 'quinzenal' ? 2 : per === 'semanal' ? 1 : (perObj ? perObj.semanas : 1);
+    // Suporta formato antigo (id: per_1), novo (semanal), ou nome (Semanal, Mensal)
+    const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
+    const numSemanas = per === 'mensal' || per.toLowerCase()==='mensal' ? 4 : per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 : per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 : per === 'semanal' || per.toLowerCase()==='semanal' ? 1 : (perObj ? perObj.semanas : 1);
     const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
