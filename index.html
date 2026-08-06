@@ -2260,6 +2260,12 @@ function recarregarDados(){
     { id:'medio', alunos:0, ativo:false, margem:0 },
     { id:'eja', alunos:0, ativo:false, margem:0 }
   ];
+  if(!Array.isArray(NIVEIS_CONFIG)) NIVEIS_CONFIG = [
+    { id:'f1', alunos:0, ativo:false, margem:0 },
+    { id:'f2', alunos:0, ativo:false, margem:0 },
+    { id:'medio', alunos:0, ativo:false, margem:0 },
+    { id:'eja', alunos:0, ativo:false, margem:0 }
+  ];
   PERCAPTA_CUSTOM = JSON.parse(localStorage.getItem('merenda_percapta') || '{}');
   { const salvos = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
     const padrao = carregarEmbalagensPadrao ? carregarEmbalagensPadrao() : {};
@@ -2267,10 +2273,17 @@ function recarregarDados(){
   LICITACOES      = JSON.parse(localStorage.getItem('merenda_licitacoes') || '[]');
   ORDENS_EXPEDIDAS= JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
   RECEBIMENTOS    = JSON.parse(localStorage.getItem('merenda_recebimentos') || '[]');
+  // Garantir arrays — Supabase pode retornar objetos
+  if(!Array.isArray(LICITACOES)) LICITACOES = [];
+  if(!Array.isArray(ORDENS_EXPEDIDAS)) ORDENS_EXPEDIDAS = [];
+  if(!Array.isArray(RECEBIMENTOS)) RECEBIMENTOS = [];
   ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque') || '{}');
+  if(typeof ESTOQUE !== 'object' || Array.isArray(ESTOQUE)) ESTOQUE = {};
   SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas') || '[]');
+  if(!Array.isArray(SEMANAS_CONSUMIDAS)) SEMANAS_CONSUMIDAS = [];
   MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
   PERIODICIDADES          = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || PERIODICIDADES;
+  if(!Array.isArray(PERIODICIDADES)) PERIODICIDADES = [];
   // Migração: garante que as periodicidades padrão novas existam para quem já tinha dados salvos
   const _perPadrao = [
     { id:'per_3', nome:'Tricosseminal', semanas:3 },
@@ -2288,6 +2301,11 @@ function recarregarDados(){
   FORNECEDORES_CADASTRO   = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
   ING_FORNECEDORES        = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
   ING_PERIODICIDADE       = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
+  // Garantir tipos corretos
+  if(!Array.isArray(FORNECEDORES_CADASTRO)) FORNECEDORES_CADASTRO = [];
+  if(typeof ING_FORNECEDORES !== 'object' || Array.isArray(ING_FORNECEDORES)) ING_FORNECEDORES = {};
+  if(typeof ING_PERIODICIDADE !== 'object' || Array.isArray(ING_PERIODICIDADE)) ING_PERIODICIDADE = {};
+  if(typeof MERC_AJUSTES !== 'object' || Array.isArray(MERC_AJUSTES)) MERC_AJUSTES = {};
   Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
   // Aplicar unidades customizadas
   const u = JSON.parse(localStorage.getItem('merenda_unidades') || '{}');
