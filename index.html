@@ -2204,7 +2204,7 @@ async function verificarCallbackGoogle(){
         window._origLS.getItem(prefix + 'merenda_niveis') !== null ||
         window._origLS.getItem(prefix + 'merenda_precos') !== null
       ));
-  if(user.nova_conta && !_isPerfilFixo){
+  if(user.nova_conta && !_isPerfilFixo && !temDadosLocais){
     if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
     if(_supabase){ try { await _supabase.from('escola_dados').delete().eq('user_id', user.id); } catch(e){} }
     const _defNiveis = [{id:'f1',alunos:0,ativo:false},{id:'f2',alunos:0,ativo:false},{id:'medio',alunos:0,ativo:false},{id:'eja',alunos:0,ativo:false}];
@@ -2440,7 +2440,7 @@ async function fazerLogin(){
           window._origLS.getItem(prefix + 'merenda_niveis') !== null ||
           window._origLS.getItem(prefix + 'merenda_precos') !== null
         ));
-    if(res.user.nova_conta && !_isPerfilFixo){
+    if(res.user.nova_conta && !_isPerfilFixo && !temDadosLocais){
       // Primeiro login de conta nova: apaga tudo local + Supabase para garantir estado limpo
       if(window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
       if(_supabase){ try { await _supabase.from('escola_dados').delete().eq('user_id', res.user.id); } catch(e){} }
