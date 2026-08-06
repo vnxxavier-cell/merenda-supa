@@ -318,7 +318,7 @@ tbody tr:hover td{background:#f0f5fc}
   .screen-hidden{display:block!important}
   @page{margin:20mm 24mm;size:A4}
   /* ── ocultar UI ── */
-  nav,#nav-principal,.mobile-topbar,#mobile-topbar,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay,#merc-calendario,#btn-ajuda-tab,[onclick*="baixarBackup"]{display:none!important}
+  nav,#nav-principal,.mobile-topbar,#mobile-topbar,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay,#merc-calendario,#btn-ajuda-tab{display:none!important}
   h2.titulo{display:none!important}
   /* ── layout base ── */
   body{background:#fff;font-size:10.5pt;color:#000;padding:0;margin:0;display:block!important}
@@ -1184,42 +1184,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   </div>
 </div>
 
-<!-- Botão de backup -->
-<button onclick="baixarBackup()" title="Baixar backup" style="position:fixed;bottom:70px;right:24px;z-index:999;width:36px;height:36px;border-radius:50%;background:#fff;border:1.5px solid #CBD5E1;color:#475569;font-size:15px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.10);display:flex;align-items:center;justify-content:center;transition:.15s;line-height:1" onmouseover="this.style.background='#1A3A6B';this.style.color='#fff';this.style.borderColor='#1A3A6B'" onmouseout="this.style.background='#fff';this.style.color='#475569';this.style.borderColor='#CBD5E1'">💾</button>
-
-<script>
-function baixarBackup(){
-  const chaves = ['merenda_niveis','merenda_precos','merenda_cal_config','merenda_cardapio','merenda_ciclos_planos','merenda_ing_periodicidade','merenda_ing_fornecedores','merenda_fornecedores','merenda_embalagens','merenda_unidades','merenda_af_custom','merenda_estoque','merenda_ordens_expedidas','merenda_recebimentos','merenda_licitacoes','merenda_fichas_custom','merenda_percapta','merenda_merc_ajustes','merenda_ing_custom'];
-  const dados = {};
-  chaves.forEach(function(k){ var v = localStorage.getItem(k); if(v !== null) dados[k] = JSON.parse(v); });
-  var blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'merenda-backup-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  alert('✅ Backup baixado! Guarde o arquivo .json em local seguro.');
-}
-function restaurarBackup(){
-  var inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = '.json';
-  inp.onchange = function(e){
-    var file = e.target.files[0]; if(!file) return;
-    var reader = new FileReader();
-    reader.onload = function(ev){
-      try {
-        var dados = JSON.parse(ev.target.result);
-        var n = 0;
-        Object.entries(dados).forEach(function(par){ localStorage.setItem(par[0], JSON.stringify(par[1])); n++; });
-        alert('✅ '+n+' configurações restauradas! A página será recarregada.');
-        location.reload();
-      } catch(err) { alert('Erro ao ler o arquivo: '+err.message); }
-    };
-    reader.readAsText(file);
-  };
-  inp.click();
-}
-</script>
 
 <!-- ══════════════════════════════════════════════════════
      PÁGINA: PREVISÃO DE GASTOS
