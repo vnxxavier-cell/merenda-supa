@@ -9072,82 +9072,116 @@ var _abaAtual = 'mercado';
 var AJUDA_ABAS = {
   mercado: {
     titulo: 'Lista de Compras',
-    desc: 'Gera automaticamente o que precisa ser comprado ou retirado do estoque para cada semana letiva, com base no cardápio planejado e nas fichas técnicas.',
+    desc: 'Sua central de compras da semana. O sistema calcula automaticamente tudo que precisa ser comprado ou retirado do estoque com base no cardápio planejado e nos dados já cadastrados.',
     itens: [
-      'Selecione a semana desejada para ver os ingredientes necessários agrupados por fornecedor.',
-      'Os totais já consideram o per capita de cada nível de ensino e o número de alunos configurado.',
-      'O tamanho de embalagem (pacote) de cada ingrediente é usado para arredondar as quantidades.',
-      'Use o botão de impressão para gerar o documento de requisição.'
+      'Selecione a semana usando os botões ‹ › no topo — os totais são recalculados na hora.',
+      'Os ingredientes aparecem agrupados por fornecedor. Clique no nome do fornecedor para ver os itens.',
+      'O campo "Qtd por Receita" mostra quanto vai de cada ingrediente por dia — baseado no per capita de cada nível e na quantidade de alunos.',
+      'Use o botão <b>Imprimir</b> para gerar o documento de requisição para a cozinha.',
+      'Tudo é <b>salvo automaticamente</b> — não se preocupe em clicar em "Salvar".'
     ]
   },
   cardapio: {
     titulo: 'Cardápio Anual',
-    desc: 'Monte o calendário letivo e distribua os pratos por todo o ano em poucos passos.',
+    desc: 'Monte o calendário de refeições do ano letivo inteiro. Distribua os pratos e o sistema faz o resto.',
     itens: [
-      'Marque o início e o fim do ano letivo no campo de período.',
-      'Cadastre todos os feriados e dias de recesso do ano.',
-      'Se houver sábados letivos, marque-os individualmente no calendário.',
-      'Defina quantos pratos diferentes compõem um ciclo semanal e cadastre cada prato do ciclo.',
-      'Clique em "Distribuir em todo o ano" para o sistema preencher automaticamente o calendário inteiro, pulando os dias sem aula.'
+      'Configure primeiro o <b>período letivo</b> na aba Configurações (data de início e fim do ano).',
+      'Na aba Configurações, cadastre <b>feriados e recessos</b> — o sistema pula esses dias automaticamente.',
+      'Defina quantos pratos diferentes compõem seu ciclo semanal e cadastre cada um.',
+      'Clique em <b>"Distribuir em todo o ano"</b> — o calendário inteiro é preenchido automaticamente.',
+      'Para trocar um prato em um dia específico, é só clicar no dia e selecionar outro prato.',
+      'Tudo é salvo automaticamente enquanto você trabalha.'
     ]
   },
   ficha: {
     titulo: 'Fichas Técnicas',
-    desc: 'Receitas com ingredientes e quantidades (per capita) por nível de ensino, baseadas no padrão PNAE. Personalize conforme a realidade da sua escola.',
+    desc: 'Receitas com ingredientes e quantidades por aluno (per capita). Já vêm pré-configuradas com o padrão PNAE — ajuste conforme a realidade da sua escola.',
     itens: [
-      'Cada prato tem uma ficha com per capita para Fundamental I, Fundamental II e Ensino Médio.',
-      'As fichas já vêm pré-configuradas com o padrão PNAE — modifique se necessário.',
-      'Fichas alteradas em relação ao padrão recebem a marcação "Modificado" no card.',
-      'Para desfazer alterações, use o botão "Restaurar padrão PNAE" dentro da ficha.'
+      'Cada prato tem uma ficha com quantidades para Fundamental I, Fundamental II e Ensino Médio.',
+      'Para alterar uma quantidade, clique no número e digite o novo valor — <b>salva automaticamente</b>.',
+      'Fichas alteradas recebem o selo <b>"Modificado"</b> no card para fácil identificação.',
+      'Use <b>"Restaurar"</b> para voltar ao padrão PNAE original daquele prato.',
+      'Para criar um prato novo, clique em <b>"Novo Prato"</b> — preencha número, nome e ingredientes.',
+      'Use o campo de busca para encontrar rapidamente qualquer prato pelo nome.'
     ]
   },
   ingredientes: {
     titulo: 'Ingredientes',
-    desc: 'Cadastro completo dos ingredientes: preços, unidades, periodicidade de compra, tamanho do pacote comercial e fornecedor responsável.',
+    desc: 'Cadastro completo: preços, embalagens, periodicidade de compra e fornecedor de cada ingrediente.',
     itens: [
-      'Informe o preço de compra de cada ingrediente para que os orçamentos sejam calculados.',
-      'O campo "Pacote" define o múltiplo de arredondamento nas listas de compras (ex: 5 kg).',
-      'Associe cada ingrediente a um fornecedor cadastrado para organizar as ordens por fornecedor.',
-      'A periodicidade indica se o ingrediente é comprado semanal, quinzenal ou mensalmente.'
+      'Na tabela principal, preencha o <b>preço</b> de cada ingrediente — os orçamentos dependem disso.',
+      'Os botões de <b>embalagem</b> (1kg, 5kg, Livre etc.) definem o tamanho do pacote comercial. A lista de compras arredonda as quantidades para esses múltiplos.',
+      'A <b>periodicidade</b> indica se o ingrediente é comprado toda semana, a cada 2 semanas, etc.',
+      'Associe cada ingrediente a um <b>fornecedor</b> — isso organiza as ordens de compra automaticamente.',
+      'Todas as alterações são <b>salvas automaticamente</b> — sem botão Salvar.'
     ]
   },
   gastos: {
     titulo: 'Orçamento',
-    desc: 'Visão consolidada do custo da merenda por período — total gasto, custo por aluno/dia e comparativo por ingrediente ou fornecedor.',
+    desc: 'Visão financeira completa: gasto total, gasto por aluno/dia e comparativo entre ingredientes. Tudo calculado automaticamente com base nos cardápios e preços cadastrados.',
     itens: [
-      'Selecione o período para ver o total calculado com base nos cardápios e preços cadastrados.',
-      'Os valores refletem os preços informados na aba Ingredientes.',
-      'Compare o custo real com o teto de per capita do PNAE para identificar distorções.'
+      'Selecione o <b>período</b> (mês, bimestre ou ciclo) para ver o custo total calculado.',
+      'O card <b>"Gasto Estimado no Ciclo"</b> mostra o custo total projetado para o período selecionado.',
+      'Os valores usam os preços informados na aba Ingredientes — mantenha-os atualizados.',
+      'Use o gráfico para comparar o custo de cada ingrediente e identificar os mais impactantes.'
+    ]
+  },
+  estoque: {
+    titulo: 'Estoque',
+    desc: 'Controle de entrada e saída de mercadorias: recebimentos, ajustes manuais e ordens de compra expedidas.',
+    itens: [
+      'A aba mostra o <b>saldo atual</b> de cada ingrediente — o sistema atualiza automaticamente conforme as compras e os cardápios consomem.',
+      'Em <b>"Ordens Expedidas"</b>, veja os pedidos já gerados e confirme o recebimento de cada item.',
+      'Use <b>"Ajuste Manual"</b> para corrigir o saldo quando necessário (quebras, perdas, sobras).',
+      'Os recebimentos são <b>salvos automaticamente</b> conforme você marca cada item.'
     ]
   },
   licitacoes: {
     titulo: 'Contratos',
-    desc: 'Controle dos contratos de licitação ativos: valor autorizado, saldo utilizado e geração de pedidos de compra vinculados ao contrato.',
+    desc: 'Gerencie contratos de licitação: cadastre, veja o saldo disponível e gere ordens de compra vinculadas.',
     itens: [
-      'Cadastre cada contrato com o valor total autorizado e vigência.',
-      'Cada pedido de compra gerado desconta do saldo contratual disponível.',
-      'Acompanhe o percentual utilizado e receba alerta ao se aproximar do limite.',
-      'Exporte o histórico de pedidos por contrato para prestação de contas.'
+      'Clique em <b>"Novo Contrato"</b> e preencha nome, data de início e fornecedor.',
+      'Adicione os <b>itens contratados</b> (ingrediente, quantidade e preço unitário).',
+      'Use <b>"Sugerir quantidades"</b> para o sistema calcular automaticamente o que precisa ser contratado.',
+      'Gere <b>ordens de compra</b> a partir dos contratos — cada ordem desconta do saldo disponível.',
+      'O percentual de uso do contrato fica visível na lista principal.',
+      '<b>Tudo salva automaticamente</b> enquanto você preenche.'
     ]
   },
   preparo: {
     titulo: 'Quantidades por Turno',
-    desc: 'Quantidades prontas para a cozinha: ingredientes do dia de hoje, separados por turno e nível de ensino, com base no cardápio e no número real de alunos.',
+    desc: 'Guia prático da cozinha: veja as quantidades exatas de cada ingrediente para o dia, separadas por turno (manhã/tarde/noite) e nível de ensino.',
     itens: [
-      'Selecione o dia para ver o cardápio do dia e as quantidades de cada ingrediente.',
-      'As quantidades já aplicam o per capita e consideram os alunos ativos em cada nível.',
-      'Imprima ou exiba na tela da cozinha como guia de trabalho do cozinheiro.',
-      'Fichas técnicas detalhadas podem ser abertas diretamente deste guia.'
+      'Use as sub-abas <b>"Quantidades por Turno"</b> e <b>"Registro de Saídas"</b> para alternar entre as visões.',
+      'Na aba <b>Quantidades</b>: selecione a data e o cardápio — o sistema calcula os totais por turno.',
+      'Os valores já aplicam o per capita de cada nível de ensino e o número de alunos.',
+      'Na aba <b>Registro de Saídas</b>: preencha as quantidades que realmente saíram da despensa.',
+      'Imprima para usar como guia na cozinha ou como registro de controle.'
     ]
   },
   config: {
     titulo: 'Configurações',
-    desc: 'Dados gerais da escola, níveis de ensino ativos, número de alunos e calendário letivo com feriados, recessos e sábados letivos.',
+    desc: 'Dados da escola: nome, níveis de ensino ativos, número de alunos e calendário letivo.',
     itens: [
-      'Informe o nome da escola e subtítulo que aparecem no cabeçalho dos documentos impressos.',
-      'Ative os níveis de ensino (F I, F II, Médio, EJA) e informe o número de alunos de cada um.',
-      'Configure o período letivo (início e fim do ano) para que o calendário seja gerado corretamente.',
-      'Adicione feriados, recessos e sábados letivos — o sistema exclui esses dias automaticamente.'
+      'Preencha o <b>nome da escola</b> e subtítulo — eles aparecem no cabeçalho dos documentos.',
+      '<b>Ative os níveis</b> de ensino (F I, F II, Médio, EJA) e informe a quantidade de alunos de cada um.',
+      'Configure o <b>período letivo</b> (início e fim do ano) para o calendário ser gerado corretamente.',
+      'Adicione <b>feriados, recessos e sábados letivos</b> — o sistema exclui dias sem aula automaticamente.',
+      'Em <b>Periodicidades</b>, cadastre as frequências de entrega (semanal, quinzenal, etc.).',
+      'Em <b>Fornecedores</b>, cadastre os nomes e cores de cada fornecedor.',
+      'Todas as alterações são <b>salvas automaticamente</b>.'
+    ]
+  },
+  admin: {
+    titulo: 'Administração',
+    desc: 'Gerenciamento de usuários (escolas) que acessam o sistema. Disponível apenas para o perfil Administrador.',
+    itens: [
+      'A tabela mostra todas as escolas cadastradas com status: <b>Ativo</b>, <b>Expirado</b> ou <b>Inativo</b>.',
+      'Clique em <b>"Novo Usuário"</b> e preencha nome, login e senha inicial — a escola poderá acessar imediatamente.',
+      'Para editar, clique no ícone de lápis — os campos são <b>salvos automaticamente</b>.',
+      'Use os botões <b>+3m, +6m, +1a</b> para definir a data de expiração do acesso.',
+      'Escolas com acesso expirado não conseguem fazer login até o admin renovar.',
+      'Usuários também podem fazer login com <b>Google</b> — o vínculo é feito pelo e-mail da conta Google.'
     ]
   }
 };
