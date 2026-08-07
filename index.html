@@ -3148,6 +3148,12 @@ let NIVEIS_CONFIG = JSON.parse(localStorage.getItem('merenda_niveis') || 'null')
   { id:'medio', alunos:0, ativo:false, margem:0 },
   { id:'eja',   alunos:0, ativo:false, margem:0 },
 ];
+if(!Array.isArray(NIVEIS_CONFIG)) NIVEIS_CONFIG = [
+  { id:'f1',    alunos:0, ativo:false, margem:0 },
+  { id:'f2',    alunos:0, ativo:false, margem:0 },
+  { id:'medio', alunos:0, ativo:false, margem:0 },
+  { id:'eja',   alunos:0, ativo:false, margem:0 },
+];
 
 // Per capita customizado pelo usuário (sobrepõe valores PNAE por nível)
 let PERCAPTA_CUSTOM = JSON.parse(localStorage.getItem('merenda_percapta') || '{}');
@@ -3185,9 +3191,13 @@ let EMBALAGENS = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
 
 // Licitações e Estoque — declarados aqui para evitar TDZ (acessados em IIFEs abaixo)
 let LICITACOES       = JSON.parse(localStorage.getItem('merenda_licitacoes')      || '[]');
+if(!Array.isArray(LICITACOES)) LICITACOES = [];
 let ORDENS_EXPEDIDAS = JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
+if(!Array.isArray(ORDENS_EXPEDIDAS)) ORDENS_EXPEDIDAS = [];
 let RECEBIMENTOS     = JSON.parse(localStorage.getItem('merenda_recebimentos')     || '[]');
+if(!Array.isArray(RECEBIMENTOS)) RECEBIMENTOS = [];
 let ESTOQUE          = JSON.parse(localStorage.getItem('merenda_estoque')         || '{}');
+if(typeof ESTOQUE !== 'object' || Array.isArray(ESTOQUE)) ESTOQUE = {};
 
 // Mesclar ingredientes customizados adicionados pelo usuário
 (function(){
@@ -3202,6 +3212,7 @@ let ESTOQUE          = JSON.parse(localStorage.getItem('merenda_estoque')       
 
 // Ajustes manuais da ordem de mercado: { [ciclo_sem]: { overrides:{ing:qtd|null}, extras:[{nome,qtd,af}] } }
 let MERC_AJUSTES = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
+if(typeof MERC_AJUSTES !== 'object' || Array.isArray(MERC_AJUSTES)) MERC_AJUSTES = {};
 function salvarMercAjustes(){ localStorage.setItem('merenda_merc_ajustes', JSON.stringify(MERC_AJUSTES)); }
 function getMondayOf(dateIso){
   const d = new Date(dateIso + 'T00:00:00');
@@ -3288,6 +3299,7 @@ function salvarRecebimentos(){ localStorage.setItem('merenda_recebimentos',  JSO
 function gerarId(prefix){ return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 
 let SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas')  || '[]');
+if(!Array.isArray(SEMANAS_CONSUMIDAS)) SEMANAS_CONSUMIDAS = [];
 let SERVIDORES_CONFIG  = JSON.parse(localStorage.getItem('merenda_servidores_config')   || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45, func_nivel: {}, func_total: 0 };
 if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
 if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
@@ -3296,6 +3308,7 @@ if(!SERVIDORES_CONFIG.func_nivel || typeof SERVIDORES_CONFIG.func_nivel !== 'obj
 
 // ── Fornecedores cadastrados ───────────────────────────
 let FORNECEDORES_CADASTRO = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
+if(!Array.isArray(FORNECEDORES_CADASTRO)) FORNECEDORES_CADASTRO = [];
 (function migrarIngForn(){
   // Migra formato antigo { nome: [ids] } → { nome: id }
   const raw = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
@@ -3312,6 +3325,10 @@ let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades
   { id: 'per_3', nome: 'Tricosseminal',   semanas: 3 },
   { id: 'per_4', nome: 'Mensal',          semanas: 4 },
   { id: 'per_5', nome: 'Por ciclo',       semanas: 5 },
+];
+if(!Array.isArray(PERIODICIDADES)) PERIODICIDADES = [
+  { id: 'per_1', nome: 'Semanal',         semanas: 1 },
+  { id: 'per_2', nome: 'Quinzenal',       semanas: 2 },
 ];
 let ING_PERIODICIDADE = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
 let _MERC_DATA = null; // cache para renderMercadoTabela()
@@ -5006,7 +5023,11 @@ function init(){
         {i:'MAÇÃ / FRUTA DA ESTAÇÃO',g:90,f1:65,f2:90,medio:120,eja:90},
         {i:'MARGARINA',g:5,f1:3,f2:5,medio:5,eja:5},
         {i:'PÃO FRANCÊS',g:75,f1:50,f2:75,medio:75,eja:75}
-      ];
+];
+if(!Array.isArray(PERIODICIDADES)) PERIODICIDADES = [
+  { id: 'per_1', nome: 'Semanal',         semanas: 1 },
+  { id: 'per_2', nome: 'Quinzenal',       semanas: 2 },
+];
     }
   }
 
