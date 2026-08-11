@@ -2028,7 +2028,7 @@ function salvarUsuarios(){
 })();
 
 function setupStorageProxy(userId){
-  const prefix = 'u_' + userId + '_';
+  var prefix = 'u_' + userId + '_';
   // Se já configurado para este mesmo usuário, não refaz
   if(window._origLS && window._USER_PREFIX === prefix) return;
   // Se configurado para outro usuário, restaura localStorage original antes de reconfigurar
@@ -2040,7 +2040,6 @@ function setupStorageProxy(userId){
     delete window._USER_PREFIX;
   }
   const SHARED = new Set(['merenda_usuarios','merenda_fichas_custom']);
-  const prefix = 'u_' + userId + '_';
   window._origLS = {
     getItem:    localStorage.getItem.bind(localStorage),
     setItem:    localStorage.setItem.bind(localStorage),
