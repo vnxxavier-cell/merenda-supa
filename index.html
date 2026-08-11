@@ -2246,7 +2246,10 @@ async function verificarCallbackGoogle(){
   if(app2) app2.style.display = '';
   const nav2 = document.getElementById('nav');
   if(nav2) nav2.style.display = '';
-  ir('compras', null);
+  init();
+  gerarSeletoresPratos();
+  carregarConfig();
+  initTabAtiva();
 }
 
 function recarregarDados(){
