@@ -2241,10 +2241,12 @@ async function verificarCallbackGoogle(){
     user.nova_conta = false;
     const _ls = window._origLS || localStorage;
     _ls.setItem('merenda_usuarios', JSON.stringify(USUARIOS.map(u => u.id === user.id ? {...u, nova_conta: false} : u)));
-  } else if(!temDadosLocais){
-    if(!_isPerfilFixo && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
-    try { await _supaSync.loadFromSupabase(user.id); } catch(e) { console.warn('Sync load error:', e); }
-  } else {
+    } else if(!temDadosLocais){
+      if(!_isPerfilFixo && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
+      var _supaOk = false;
+      try { _supaOk = await _supaSync.loadFromSupabase(res.user.id); } catch(e) {}
+      if(!_supaOk){ setTimeout(function(){ _supaSync.loadFromSupabase(res.user.id).then(function(ok){ if(ok){ recarregarDados(); init(); initTabAtiva(); } }).catch(function(){}); }, 3000); }
+    } else {
     setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
   }
   recarregarDados();
@@ -2510,7 +2512,9 @@ async function fazerLogin(){
     } else if(!temDadosLocais){
       // Sem dados locais: para perfis fixos só carrega do Supabase (sem apagar); para outros limpa resíduos antes
       if(!_isPerfilFixo && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
-      try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
+      var _supaOkG = false;
+      try { _supaOkG = await _supaSync.loadFromSupabase(res.user.id); } catch(e) {}
+      if(!_supaOkG){ setTimeout(function(){ _supaSync.loadFromSupabase(res.user.id).then(function(ok){ if(ok){ recarregarDados(); init(); initTabAtiva(); } }).catch(function(){}); }, 3000); }
     } else {
       setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
     }
