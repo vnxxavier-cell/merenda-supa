@@ -2253,24 +2253,41 @@ async function verificarCallbackGoogle(){
 }
 
 function recarregarDados(){
-  // Re-lê todas as variáveis globais do localStorage (agora com proxy ativo)
-  NIVEIS_CONFIG = JSON.parse(localStorage.getItem('merenda_niveis') || 'null') || [
+  // Re-lê todas as variáveis globais do localStorage
+  var _pfx = (window._USER_PREFIX || '');
+  var _ls  = (window._origLS || localStorage);
+  var _get = function(k){ return _pfx ? _ls.getItem(_pfx + k) : _ls.getItem(k); };
+
+  NIVEIS_CONFIG = JSON.parse(_get('merenda_niveis') || 'null') || [
     { id:'f1', alunos:0, ativo:false, margem:0 },
     { id:'f2', alunos:0, ativo:false, margem:0 },
     { id:'medio', alunos:0, ativo:false, margem:0 },
     { id:'eja', alunos:0, ativo:false, margem:0 }
   ];
-  PERCAPTA_CUSTOM = JSON.parse(localStorage.getItem('merenda_percapta') || '{}');
-  { const salvos = JSON.parse(localStorage.getItem('merenda_embalagens') || '{}');
+  if(!Array.isArray(NIVEIS_CONFIG)) NIVEIS_CONFIG = [
+    { id:'f1', alunos:0, ativo:false, margem:0 },
+    { id:'f2', alunos:0, ativo:false, margem:0 },
+    { id:'medio', alunos:0, ativo:false, margem:0 },
+    { id:'eja', alunos:0, ativo:false, margem:0 }
+  ];
+  PERCAPTA_CUSTOM = JSON.parse(_get('merenda_percapta') || '{}');
+  { const salvos = JSON.parse(_get('merenda_embalagens') || '{}');
     const padrao = carregarEmbalagensPadrao ? carregarEmbalagensPadrao() : {};
     EMBALAGENS = Object.assign({}, padrao, salvos); }
-  LICITACOES      = JSON.parse(localStorage.getItem('merenda_licitacoes') || '[]');
-  ORDENS_EXPEDIDAS= JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
-  RECEBIMENTOS    = JSON.parse(localStorage.getItem('merenda_recebimentos') || '[]');
-  ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque') || '{}');
-  SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas') || '[]');
-  MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
-  PERIODICIDADES          = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || PERIODICIDADES;
+  LICITACOES      = JSON.parse(_get('merenda_licitacoes') || '[]');
+  if(!Array.isArray(LICITACOES)) LICITACOES = [];
+  ORDENS_EXPEDIDAS= JSON.parse(_get('merenda_ordens_expedidas') || '[]');
+  if(!Array.isArray(ORDENS_EXPEDIDAS)) ORDENS_EXPEDIDAS = [];
+  RECEBIMENTOS    = JSON.parse(_get('merenda_recebimentos') || '[]');
+  if(!Array.isArray(RECEBIMENTOS)) RECEBIMENTOS = [];
+  ESTOQUE            = JSON.parse(_get('merenda_estoque') || '{}');
+  if(typeof ESTOQUE !== 'object' || Array.isArray(ESTOQUE)) ESTOQUE = {};
+  SEMANAS_CONSUMIDAS = JSON.parse(_get('merenda_semanas_consumidas') || '[]');
+  if(!Array.isArray(SEMANAS_CONSUMIDAS)) SEMANAS_CONSUMIDAS = [];
+  MERC_AJUSTES       = JSON.parse(_get('merenda_merc_ajustes') || '{}');
+  if(typeof MERC_AJUSTES !== 'object' || Array.isArray(MERC_AJUSTES)) MERC_AJUSTES = {};
+  PERIODICIDADES          = JSON.parse(_get('merenda_periodicidades') || 'null') || PERIODICIDADES;
+  if(!Array.isArray(PERIODICIDADES)) PERIODICIDADES = [];
   // Migração: garante que as periodicidades padrão novas existam para quem já tinha dados salvos
   const _perPadrao = [
     { id:'per_3', nome:'Tricosseminal', semanas:3 },
@@ -2285,17 +2302,17 @@ function recarregarDados(){
     }
   });
   if(_perMigrou) localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES));
-  FORNECEDORES_CADASTRO   = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
-  ING_FORNECEDORES        = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
-  ING_PERIODICIDADE       = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
+  FORNECEDORES_CADASTRO   = JSON.parse(_get('merenda_fornecedores') || '[]');
+  ING_FORNECEDORES        = JSON.parse(_get('merenda_ing_fornecedores') || '{}');
+  ING_PERIODICIDADE       = JSON.parse(_get('merenda_ing_periodicidade') || '{}');
   Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
   // Aplicar unidades customizadas
-  const u = JSON.parse(localStorage.getItem('merenda_unidades') || '{}');
+  const u = JSON.parse(_get('merenda_unidades') || '{}');
   Object.entries(u).forEach(([nome, unidade]) => {
     if(DADOS.ingredientes[nome]) DADOS.ingredientes[nome].unidade = unidade;
   });
   // Re-ler CAL_CONFIG e recalcular dias letivos (sempre com proxy ativo)
-  const calSaved = localStorage.getItem('merenda_cal_config');
+  const calSaved = _get('merenda_cal_config');
   if(calSaved){
     const cal = JSON.parse(calSaved);
     Object.assign(CAL_CONFIG, cal);
@@ -2313,10 +2330,10 @@ function recarregarDados(){
   novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
   atualizarCiclos();
   // Variáveis lidas no init do script que também precisam ser recarregadas com prefixo
-  AF_LIST = JSON.parse(localStorage.getItem('merenda_af_custom')) || AF_LIST;
-  CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}');
-  { const card = localStorage.getItem('merenda_cardapio'); if(card) DADOS.cardapio = JSON.parse(card); }
-  SERVIDORES_CONFIG = JSON.parse(localStorage.getItem('merenda_servidores_config') || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45 };
+  AF_LIST = JSON.parse(_get('merenda_af_custom')) || AF_LIST;
+  CICLOS_PLANOS = JSON.parse(_get('merenda_ciclos_planos') || '{}');
+  { const card = _get('merenda_cardapio'); if(card) DADOS.cardapio = JSON.parse(card); }
+  SERVIDORES_CONFIG = JSON.parse(_get('merenda_servidores_config') || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45 };
   if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
   if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
   if(SERVIDORES_CONFIG.acucar_g_por_serv === undefined) SERVIDORES_CONFIG.acucar_g_por_serv = 45;
