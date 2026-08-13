@@ -938,10 +938,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             <h3>Cobertura por item</h3>
             <select id="merc-tipo-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Inter',sans-serif">
               <option value="todos">Todos os itens</option>
-              <option value="semanal">Semanais (1 sem.)</option>
-              <option value="quinzenal">Quinzenais (2 sem.)</option>
-              <option value="trissemanais">Trissemanais (3 sem.)</option>
-              <option value="mensal">Mensais (4 sem.)</option>
+              <option value="1">Máx. 1 semana</option>
+              <option value="2">Máx. 2 semanas</option>
+              <option value="3">Máx. 3 semanas</option>
+              <option value="4">Máx. 4 semanas</option>
               <option value="comprar">Somente com compra</option>
             </select>
             <select id="merc-forn-filter" onchange="renderMercadoTabela()" style="font-size:12px;padding:5px 9px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-family:'Inter',sans-serif">
@@ -1054,18 +1054,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
   </div>
 
-  <!-- Periodicidades de entrega -->
+  <!-- Periodicidade máxima -->
   <div class="card" style="margin-bottom:24px">
-    <div class="card-header" style="background:var(--azul)">⏱ Periodicidades de Entrega</div>
+    <div class="card-header" style="background:var(--azul)">⏱ Periodicidade Máxima</div>
     <div style="padding:16px">
-      <p style="font-size:12px;color:var(--txt2);margin-bottom:14px">Defina as frequências de entrega disponíveis. O lote por entrega de cada ingrediente será calculado automaticamente com base no consumo semanal × semanas da periodicidade.</p>
-      <table style="margin-bottom:12px">
-        <thead><tr><th>Nome</th><th class="num">A cada (semanas)</th><th></th></tr></thead>
-        <tbody id="tbody-periodicidades"></tbody>
-      </table>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-outline btn-sm" onclick="adicionarPeriodicidade()">+ Adicionar</button>
-      </div>
+      <p style="font-size:12px;color:var(--txt2);margin-bottom:6px">Cada ingrediente tem uma <b>periodicidade máxima</b> em semanas. O sistema limita o cálculo da demanda à quantidade de semanas marcada — por exemplo, se o tomate está com máx. 1 semana, mesmo que a lista peça 4 semanas, só entra 1 semana no cálculo.</p>
+      <p style="font-size:12px;color:var(--txt2)">Para definir, vá na aba <b>Ingredientes</b> e use o campo <b>"máx. sem."</b> de cada ingrediente.</p>
     </div>
   </div>
 
@@ -5852,10 +5846,17 @@ function getItensMercado(ciclo, mondayIso){
     const detalheText = temDetalhe ? chave.split(' ___ ')[1] : '';
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
 
-    const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
-    // Suporta formato antigo (id: per_1), novo (semanal), ou nome (Semanal, Mensal)
+    const per = ING_PERIODICIDADE[nomeBase] || '';
+    // Periodicidade máxima: número de semanas (1-4) ou formato antigo (semanal, per_1, etc.)
     const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
-    const numSemanas = per === 'mensal' || per.toLowerCase()==='mensal' ? 4 : per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 : per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 : per === 'semanal' || per.toLowerCase()==='semanal' ? 1 : (perObj ? perObj.semanas : 1);
+    const perNum = parseInt(per, 10);
+    const numSemanas = Math.min(4, Math.max(1,
+      perNum > 0 ? perNum :
+      per === 'mensal' || per.toLowerCase()==='mensal' ? 4 :
+      per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 :
+      per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 :
+      per === 'semanal' || per.toLowerCase()==='semanal' ? 1 :
+      (perObj ? perObj.semanas : 1)));
     const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
 
@@ -5926,10 +5927,17 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     if(ajuste.overrides[nomeBase] === null) return;
     const detalheText = temDetalhe ? chave.split(' ___ ')[1] : '';
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
-    const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
-    // Suporta formato antigo (id: per_1), novo (semanal), ou nome (Semanal, Mensal)
+    const per = ING_PERIODICIDADE[nomeBase] || '';
+    // Periodicidade máxima: número de semanas (1-4) ou formato antigo (semanal, per_1, etc.)
     const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
-    const numSemanas = per === 'mensal' || per.toLowerCase()==='mensal' ? 4 : per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 : per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 : per === 'semanal' || per.toLowerCase()==='semanal' ? 1 : (perObj ? perObj.semanas : 1);
+    const perNum = parseInt(per, 10);
+    const numSemanas = Math.min(4, Math.max(1,
+      perNum > 0 ? perNum :
+      per === 'mensal' || per.toLowerCase()==='mensal' ? 4 :
+      per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 :
+      per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 :
+      per === 'semanal' || per.toLowerCase()==='semanal' ? 1 :
+      (perObj ? perObj.semanas : 1)));
     const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
@@ -6209,8 +6217,8 @@ function renderMercado(){
 
   const _obsMap = getMercAjuste().obs || {};
   const _perBadge = (it) => {
-    if(it.periodicidade === 'semanal') return '';
-    const label = it.numSemanas === 4 ? '4 sem.' : it.numSemanas === 3 ? '3 sem.' : '2 sem.';
+    if(it.numSemanas <= 1) return '';
+    const label = 'máx. ' + it.numSemanas + ' sem.';
     const bg  = it.coberto ? '#bbf7d0' : '#bfdbfe';
     const cor = it.coberto ? '#14532d' : '#1e40af';
     return `<span style="font-size:9px;font-weight:700;background:${bg};color:${cor};border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${label}</span>`;
@@ -6429,7 +6437,7 @@ function renderMercadoTabela(){
 
   let items = [...todosItens];
   if(tipoFilter === 'comprar')      items = items.filter(it => it.comprar > 0);
-  else if(tipoFilter !== 'todos')   items = items.filter(it => it.periodicidade === tipoFilter);
+  else if(tipoFilter !== 'todos')   items = items.filter(it => (it.numSemanas || 1) === parseInt(tipoFilter, 10));
   if(fornFilter !== 'todos')        items = items.filter(it => (ING_FORNECEDORES[it.nomeBase]||'') === fornFilter);
 
   const _obsMap = getMercAjuste().obs || {};
@@ -6611,10 +6619,7 @@ function abrirDrillDown(nomeBase){
 
   const forn = (() => { const fid = ING_FORNECEDORES[nomeBase]; return fid ? FORNECEDORES_CADASTRO.find(f=>f.id===fid) : null; })();
   const fornNome = forn ? forn.nome : 'Sem fornecedor definido';
-  const periLabel = itemData ? (
-    itemData.periodicidade === 'mensal' ? 'Mensal (4 sem.)' :
-    itemData.periodicidade === 'trissemanais' ? 'Trissemanais (3 sem.)' :
-    itemData.periodicidade === 'quinzenal' ? 'Quinzenal (2 sem.)' : 'Semanal') : '—';
+  const periLabel = itemData ? `Máx. ${itemData.numSemanas || 1} sem.` : '—';
   const comprar = itemData ? itemData.comprar : 0;
   const nec     = itemData ? itemData.nec : 0;
 
@@ -7580,14 +7585,11 @@ function renderIngredientes(filtro=''){
         <button class="btn-swap no-print" style="margin-left:6px;display:inline-flex;align-items:center;justify-content:center" title="Alterar fornecedor">${ico('refresh',11)}</button>
       </td>
       <td>
-        <select onchange="setIngPeriodicidade('${nome.replace(/'/g,"\\'")}',this.value)"
-          style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:var(--azul);font-weight:700;outline:none;cursor:pointer;min-width:100px">
-          <option value="">— Período —</option>
-          <option value="semanal"       ${ING_PERIODICIDADE[nome]==='semanal'      ?'selected':''}>Semanal (1 sem.)</option>
-          <option value="quinzenal"     ${ING_PERIODICIDADE[nome]==='quinzenal'    ?'selected':''}>Quinzenal (2 sem.)</option>
-          <option value="trissemanais"  ${ING_PERIODICIDADE[nome]==='trissemanais' ?'selected':''}>Trissemanais (3 sem.)</option>
-          <option value="mensal"        ${ING_PERIODICIDADE[nome]==='mensal'       ?'selected':''}>Mensal (4 sem.)</option>
-        </select>
+        <input type="number" min="1" max="4" step="1" value="${ING_PERIODICIDADE[nome]||''}" placeholder="1"
+          title="Periodicidade máxima em semanas (1 a 4). Limita o cálculo da demanda."
+          onchange="setIngPeriodicidade('${nome.replace(/'/g,"\\'")}',this.value)"
+          style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:var(--azul);font-weight:700;outline:none;width:64px;text-align:center">
+        <span style="font-size:11px;color:var(--txt2)">máx. sem.</span>
       </td>
       <td>
         <select onchange="setIngFornecedor('${nome.replace(/'/g,"\\'")}',this.value)"
@@ -9128,7 +9130,7 @@ var AJUDA_ABAS = {
     itens: [
       'Na tabela principal, preencha o <b>preço</b> de cada ingrediente — os orçamentos dependem disso.',
       'Os botões de <b>embalagem</b> (1kg, 5kg, Livre etc.) definem o tamanho do pacote comercial. A lista de compras arredonda as quantidades para esses múltiplos.',
-      'A <b>periodicidade</b> indica se o ingrediente é comprado toda semana, a cada 2 semanas, etc.',
+      'A <b>periodicidade máxima</b> (campo "máx. sem.") limita quantas semanas entram no cálculo da demanda do ingrediente — útil para perecíveis (1 semana) e estocáveis (4 semanas).',
       'Associe cada ingrediente a um <b>fornecedor</b> — isso organiza as ordens de compra automaticamente.',
       'Todas as alterações são <b>salvas automaticamente</b> — sem botão Salvar.'
     ]
