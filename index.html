@@ -1169,7 +1169,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <h1 id="preview-escola"></h1>
                 <p id="preview-subtitulo"></p>
         </div>
-        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;renderMercado()"> Descontar estoque</label>
+        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--txt2);white-space:nowrap;margin-top:4px"><input type="checkbox" id="merc-descontar-estoque" checked onchange="_mercDescontarEstoque=this.checked;var b=document.getElementById('merc-estoque-badge');if(b){b.textContent=_mercDescontarEstoque?'c/ desconto':'s/ desconto';b.style.background=_mercDescontarEstoque?'#dcfce7':'#fee2e2';b.style.color=_mercDescontarEstoque?'#166534':'#991b1b'};renderMercado()"> Descontar estoque <span id="merc-estoque-badge" style="font-size:10px;font-weight:700;background:#dcfce7;color:#166534;border-radius:4px;padding:1px 6px">c/ desconto</span></label>
       </div>
             <div class="mock-body"></div>
             <div class="mock-sig" id="preview-sig">Diretor(a) Escolar</div>
@@ -5844,7 +5844,9 @@ function getItensMercado(ciclo, mondayIso){
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
 
     const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
-    const numSemanas = per === 'mensal' ? 4 : per === 'trissemanais' ? 3 : per === 'quinzenal' ? 2 : 1;
+    // Suporta formato antigo (id: per_1), novo (semanal), ou nome (Semanal, Mensal)
+    const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
+    const numSemanas = per === 'mensal' || per.toLowerCase()==='mensal' ? 4 : per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 : per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 : per === 'semanal' || per.toLowerCase()==='semanal' ? 1 : (perObj ? perObj.semanas : 1);
     const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
 
@@ -5916,7 +5918,9 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     const detalheText = temDetalhe ? chave.split(' ___ ')[1] : '';
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
     const per = ING_PERIODICIDADE[nomeBase] || 'semanal';
-    const numSemanas = per === 'mensal' ? 4 : per === 'trissemanais' ? 3 : per === 'quinzenal' ? 2 : 1;
+    // Suporta formato antigo (id: per_1), novo (semanal), ou nome (Semanal, Mensal)
+    const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
+    const numSemanas = per === 'mensal' || per.toLowerCase()==='mensal' ? 4 : per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 : per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 : per === 'semanal' || per.toLowerCase()==='semanal' ? 1 : (perObj ? perObj.semanas : 1);
     const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
@@ -6148,12 +6152,14 @@ function renderMercado(){
 
   // ── Dados semanais (usado na análise de cobertura) ──
   const weekData = [];
-  const semanasWD = isMulti ? _MERC_SEMANAS_SEL : [mondayIso, null, null, null].slice(0,4);
+  // Sempre gera 4 semanas a partir da primeira selecionada para a análise de cobertura
+  const _firstMon = isMulti ? _MERC_SEMANAS_SEL[0] : mondayIso;
+  const semanasWD = _firstMon ? [_firstMon, null, null, null] : [];
   const _ini2 = getMercDataInicio(), _fim2 = getMercDataFim();
     const _inPer2 = d => !d || !_ini2 || !_fim2 || (d >= _ini2 && d <= _fim2);
   semanasWD.forEach((mon, wi) => {
     if(!mon) {
-      const _d = new Date(mondayIso + 'T00:00:00');
+      const _d = new Date(_firstMon + 'T00:00:00');
       _d.setDate(_d.getDate() + 7 * wi);
       mon = _d.toISOString().substring(0, 10);
     }
@@ -6455,7 +6461,7 @@ function renderMercadoTabela(){
       <div style="display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px">` +
       segs.map(s => `<div class="merc-seg ${s.cls}" data-tip="${s.tip.replace(/"/g,'&quot;')}"></div>`).join('') +
       `</div>
-      <div style="font-size:10px;color:#9ca3af;margin-top:3px;text-align:right">${segs.length} dias${perLabel}</div>
+      <div style="font-size:10px;color:#9ca3af;margin-top:3px;text-align:right">${segs.length} dias · ${it.numSemanas} sem.</div>
     </div>`;
   };
 
@@ -6495,10 +6501,10 @@ function renderMercadoTabela(){
     const tipoTag = isAF(it.nomeBase)
       ? `<span class="badge badge-verde" style="font-size:10px;padding:2px 6px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/><path d="M17 13a3 3 0 0 1-5 2.3"/></svg>AF</span>`
       : `<span class="badge badge-azul" style="font-size:10px;padding:2px 6px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>MC</span>`;
-    const _perLabel = { 2:'2 sem.', 3:'3 sem.', 4:'4 sem.' };
-    const perTag = it.numSemanas > 1
-      ? `<span class="badge badge-roxo" style="font-size:10px;padding:2px 6px">${_perLabel[it.numSemanas]||it.numSemanas+'×sem.'}</span>`
-      : '';
+    const _perLabel = { 1:'1 sem.', 2:'2 sem.', 3:'3 sem.', 4:'4 sem.' };
+    const corPer = it.numSemanas > 1 ? '#7C3AED' : '#9CA3AF';
+    const bgPer  = it.numSemanas > 1 ? '#EDE9FE' : '#F3F4F6';
+    const perTag = `<span class="badge" style="font-size:10px;padding:2px 6px;background:${bgPer};color:${corPer}">${_perLabel[it.numSemanas]||it.numSemanas+' sem.'}</span>`;
     const isSel = _MERC_SEL === it.nomeBase;
     return `<tr class="${isSel?'merc-sel':''}" data-item="${encD}" onclick="selecionarItemMerc('${enc}')">
       <td><div style="font-weight:700;margin-bottom:3px;color:var(--txt)">${it.nomeBase}</div><div style="display:flex;gap:4px;flex-wrap:wrap">${tipoTag}${perTag}</div></td>
@@ -6742,6 +6748,16 @@ function renderDetalhamentoMercado(){
 
   const { todosItens, weekData } = _MERC_DATA;
   if(!todosItens.length) return;
+
+  // Só renderiza análise detalhada se houver refeições nos dados de semana
+  let temRefeicoes = false;
+  for(const w of weekData){
+    for(let i = 0; i < w.dias.length; i++){
+      if(w.dias[i] && w.datas[i]){ temRefeicoes = true; break; }
+    }
+    if(temRefeicoes) break;
+  }
+  if(!temRefeicoes) return;
 
   // Collect all day-meal pairs with their totals
   const dayMeals = [];
@@ -7684,26 +7700,6 @@ function fecharNovoIng(){document.getElementById('overlay-novo-ing').style.displ
 function filtrarIngredientes(v){renderIngredientes(v)}
 function filtrarIngredientesForn(v){filtroIngForn=v;renderIngredientes()}
 
-// ── Navegação ──
-function ir(pagina, btn) {
-  document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
-  document.getElementById('pg-'+id).classList.add('ativa');
-  if(btn) btn.classList.add('ativo');
-  if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); }
-  if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
-  if(id==='gastos') renderGastos();
-  if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
-  if(id==='licitacoes') renderLicitacoes();
-  if(id==='preparo') renderPreparo();
-  if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
-  const _tnEl = document.getElementById('mobile-tab-nome');
-  if(_tnEl){ const _at = document.querySelector('.nav-tab.ativo'); if(_at){ const _tn = [..._at.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(_tn) _tnEl.textContent = _tn.textContent.trim(); } }
-  // Esconder header/assinatura global quando mercado ativo (tem os próprios)
-  atualizarPrintGlobal();
-}
-
 function popularMesesGastos(){
   const s = document.getElementById('sel-mes-gastos');
   if(!s || !MESES_NOMES?.length) return;
@@ -7715,6 +7711,7 @@ function popularMesesGastos(){
     s.appendChild(o);
   });
   if(cur && MESES_NOMES.includes(cur)) s.value = cur;
+  else if(s.options.length) s.selectedIndex = 0;
   popularSemanasGastos();
 }
 
@@ -8450,11 +8447,13 @@ function carregarConfig(){
 function ir(id, btn){
   document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
-  document.getElementById('pg-'+id).classList.add('ativa');
+  var pg = document.getElementById('pg-'+id);
+  if(!pg) return;
+  pg.classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
   if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
-  if(id==='gastos') renderGastos();
+  if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
   if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
@@ -8464,7 +8463,6 @@ function ir(id, btn){
   if(id==='preparo') renderPreparo();
   const _tnEl = document.getElementById('mobile-tab-nome');
   if(_tnEl){ const _at = document.querySelector('.nav-tab.ativo'); if(_at){ const _tn = [..._at.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(_tn) _tnEl.textContent = _tn.textContent.trim(); } }
-  atualizarPrintGlobal();
   _abaAtual = id;
   fecharAjudaTab();
 }
