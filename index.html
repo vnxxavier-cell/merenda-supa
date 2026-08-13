@@ -7685,7 +7685,7 @@ function filtrarIngredientes(v){renderIngredientes(v)}
 function filtrarIngredientesForn(v){filtroIngForn=v;renderIngredientes()}
 
 // ── Navegação ──
-function ir(id, btn){
+function ir(pagina, btn) {
   document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
   document.getElementById('pg-'+id).classList.add('ativa');
