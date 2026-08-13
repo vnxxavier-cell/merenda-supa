@@ -2321,6 +2321,8 @@ function recarregarDados(){
   if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
   if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
   if(SERVIDORES_CONFIG.acucar_g_por_serv === undefined) SERVIDORES_CONFIG.acucar_g_por_serv = 45;
+  // Fornecedor único: associa todos os ingredientes automaticamente
+  autoAssociarFornecedorUnico();
 }
 // ── LOGIN UI ──────────────────────────────────────────
 function mostrarTelaLogin(opts){
@@ -3306,8 +3308,19 @@ var _mercMesAtual = 0; // 0=Fev ... 10=Dez
 var _mercInicializado = false;
 var _mercMostrarPreco = true;
 var _mercDescontarEstoque = true;
-function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); }
+function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); autoAssociarFornecedorUnico(); }
 function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
+
+// Se houver apenas UM fornecedor cadastrado, associa todos os ingredientes a ele automaticamente
+function autoAssociarFornecedorUnico(){
+  if(FORNECEDORES_CADASTRO.length !== 1) return;
+  const fid = FORNECEDORES_CADASTRO[0].id;
+  let mudou = false;
+  Object.keys(DADOS.ingredientes).forEach(nome => {
+    if(ING_FORNECEDORES[nome] !== fid){ ING_FORNECEDORES[nome] = fid; mudou = true; }
+  });
+  if(mudou) salvarIngFornecedores();
+}
 function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
 function salvarIngPeriodicidade(){ localStorage.setItem('merenda_ing_periodicidade', JSON.stringify(ING_PERIODICIDADE)); }
 function setMercModo(modo){
