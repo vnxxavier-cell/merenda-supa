@@ -2029,9 +2029,18 @@ function salvarUsuarios(){
 })();
 
 function setupStorageProxy(userId){
-  if(window._origLS) return; // já configurado
+  var prefix = 'u_' + userId + '_';
+  // Se já configurado para este mesmo usuário, não refaz
+  if(window._origLS && window._USER_PREFIX === prefix) return;
+  // Se configurado para outro usuário, restaura localStorage original antes de reconfigurar
+  if(window._origLS && window._USER_PREFIX !== prefix){
+    localStorage.getItem    = window._origLS.getItem;
+    localStorage.setItem    = window._origLS.setItem;
+    localStorage.removeItem = window._origLS.removeItem;
+    delete window._origLS;
+    delete window._USER_PREFIX;
+  }
   const SHARED = new Set(['merenda_usuarios','merenda_fichas_custom']);
-  const prefix = 'u_' + userId + '_';
   window._origLS = {
     getItem:    localStorage.getItem.bind(localStorage),
     setItem:    localStorage.setItem.bind(localStorage),
