@@ -4910,21 +4910,6 @@ function sincronizarSeletores(ciclo, sem, skipRender = false){
     const el = document.getElementById(id);
     if(el) el.value = ciclo;
   });
-  // Mercado: seleciona mês e semana a partir do ciclo+semana
-  if(DIAS_LETIVOS_ARRAY.length) {
-    const cIdx = parseInt(ciclo.split(' ')[1]) - 1;
-    const globalWeekIdx = cIdx * 5 + (sem - 1);
-    const firstMon = getMonday(DIAS_LETIVOS_ARRAY[0]);
-    const weekStart = new Date(firstMon + 'T00:00:00');
-    weekStart.setDate(weekStart.getDate() + globalWeekIdx * 7);
-    const mondayIso = weekStart.toISOString().split('T')[0];
-    const mesIdx = weekStart.getMonth() - 1;
-    const mesNome = (mesIdx >= 0 && mesIdx < MESES_NOMES.length) ? MESES_NOMES[mesIdx] : (MESES_NOMES[0] || '');
-    const iniciEl = document.getElementById('merc-data-inicio');
-    const fimEl   = document.getElementById('merc-data-fim');
-    if(iniciEl) iniciEl.value = mondayIso;
-    if(fimEl && !fimEl.value){ const _d=new Date(mondayIso+'T00:00:00'); _d.setDate(_d.getDate()+4); fimEl.value=_d.toISOString().substring(0,10); }
-  }
 
   if(!skipRender) renderCardapio();
   renderMercado();
