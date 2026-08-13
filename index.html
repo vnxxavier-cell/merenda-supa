@@ -5812,9 +5812,6 @@ function getItensMercado(ciclo, mondayIso){
     totais1['CAFÉ']   = (totais1['CAFÉ']   || 0) + SERVIDORES_CONFIG.cafe_kg;
     totais1['AÇÚCAR'] = (totais1['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg;
   }
-  const totais2 = _somaTotaisSemanas(mondayIso, 2);
-  const totais3 = _somaTotaisSemanas(mondayIso, 3);
-  const totais4 = _somaTotaisSemanas(mondayIso, 4);
 
   const ajuste = getMercAjuste();
   const af_items=[], mc_items=[];
@@ -5828,17 +5825,17 @@ function getItensMercado(ciclo, mondayIso){
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
 
     const per = ING_PERIODICIDADE[nomeBase] || '';
-    // Periodicidade máxima: número de semanas (1-4) ou formato antigo (semanal, per_1, etc.)
+    // Periodicidade máxima: número de semanas (livre) ou formato antigo (semanal, per_1, etc.)
     const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
     const perNum = parseInt(per, 10);
-    const numSemanas = Math.min(4, Math.max(1,
+    const numSemanas = Math.max(1,
       perNum > 0 ? perNum :
       per === 'mensal' || per.toLowerCase()==='mensal' ? 4 :
       per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 :
       per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 :
       per === 'semanal' || per.toLowerCase()==='semanal' ? 1 :
-      (perObj ? perObj.semanas : 1)));
-    const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
+      (perObj ? perObj.semanas : 1));
+    const totaisAcum = numSemanas === 1 ? totais1 : _somaTotaisSemanas(mondayIso, numSemanas);
     const nec = totaisAcum[chave] || 0;
 
     const est = ESTOQUE[nomeBase] || 0;
@@ -5896,9 +5893,6 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     return sum;
   };
   const totais1 = _acum(1);
-  const totais2 = _acum(2);
-  const totais3 = _acum(3);
-  const totais4 = _acum(4);
   const ajuste = getMercAjuste();
   const af_items=[], mc_items=[];
   let totalKg = 0;
@@ -5909,17 +5903,17 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     const detalheText = temDetalhe ? chave.split(' ___ ')[1] : '';
     const displayNome = detalheText ? `${nomeBase} <small style="color:var(--txt2)">(${detalheText})</small>` : nomeBase;
     const per = ING_PERIODICIDADE[nomeBase] || '';
-    // Periodicidade máxima: número de semanas (1-4) ou formato antigo (semanal, per_1, etc.)
+    // Periodicidade máxima: número de semanas (livre) ou formato antigo (semanal, per_1, etc.)
     const perObj = PERIODICIDADES.find(p => p.id === per || p.nome.toLowerCase() === per.toLowerCase());
     const perNum = parseInt(per, 10);
-    const numSemanas = Math.min(4, Math.max(1,
+    const numSemanas = Math.max(1,
       perNum > 0 ? perNum :
       per === 'mensal' || per.toLowerCase()==='mensal' ? 4 :
       per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 :
       per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 :
       per === 'semanal' || per.toLowerCase()==='semanal' ? 1 :
-      (perObj ? perObj.semanas : 1)));
-    const totaisAcum = numSemanas === 4 ? totais4 : numSemanas === 3 ? totais3 : numSemanas === 2 ? totais2 : totais1;
+      (perObj ? perObj.semanas : 1));
+    const totaisAcum = numSemanas === 1 ? totais1 : _acum(numSemanas);
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
     const coberto = _mercDescontarEstoque && nec > 0 && est >= nec;
@@ -6150,9 +6144,10 @@ function renderMercado(){
 
   // ── Dados semanais (usado na análise de cobertura) ──
   const weekData = [];
-  // Sempre gera 4 semanas a partir da primeira selecionada para a análise de cobertura
+  // Gera semanas suficientes a partir da primeira selecionada (máximo marcado pelos itens)
   const _firstMon = isMulti ? _MERC_SEMANAS_SEL[0] : mondayIso;
-  const semanasWD = _firstMon ? [_firstMon, null, null, null] : [];
+  const _maxSem = Math.max(1, ...todosItens.map(it => it.numSemanas || 1));
+  const semanasWD = _firstMon ? Array.from({length: _maxSem}, (_, i) => i === 0 ? _firstMon : null) : [];
   const _ini2 = getMercDataInicio(), _fim2 = getMercDataFim();
     const _inPer2 = d => !d || !_ini2 || !_fim2 || (d >= _ini2 && d <= _fim2);
   semanasWD.forEach((mon, wi) => {
@@ -7566,8 +7561,8 @@ function renderIngredientes(filtro=''){
         <button class="btn-swap no-print" style="margin-left:6px;display:inline-flex;align-items:center;justify-content:center" title="Alterar fornecedor">${ico('refresh',11)}</button>
       </td>
       <td>
-        <input type="number" min="1" max="4" step="1" value="${ING_PERIODICIDADE[nome]||''}" placeholder="1"
-          title="Periodicidade máxima em semanas (1 a 4). Limita o cálculo da demanda."
+        <input type="number" min="1" step="1" value="${ING_PERIODICIDADE[nome]||''}" placeholder="1"
+          title="Periodicidade máxima em semanas. Limita o cálculo da demanda."
           onchange="setIngPeriodicidade('${nome.replace(/'/g,"\\'")}',this.value)"
           style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 6px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:var(--azul);font-weight:700;outline:none;width:64px;text-align:center">
         <span style="font-size:11px;color:var(--txt2)">máx. sem.</span>
