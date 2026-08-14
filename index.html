@@ -4789,6 +4789,32 @@ function getCalWeekDiasAndDatas(mondayIso) {
   return { dias, datas };
 }
 
+// Datas Seg–Sex da semana de calendário wi (base 0 a partir da segunda-feira do primeiro dia letivo)
+function getDiasSemanaCal(wi){
+  if(!DIAS_LETIVOS_ARRAY.length) return [];
+  const firstMon = getMonday(DIAS_LETIVOS_ARRAY[0]);
+  const base = new Date(firstMon + 'T00:00:00');
+  base.setDate(base.getDate() + wi * 7);
+  const out = [];
+  for(let i = 0; i < 5; i++){
+    const d = new Date(base);
+    d.setDate(d.getDate() + i);
+    out.push(d.toISOString().split('T')[0]);
+  }
+  return out;
+}
+
+// Checkbox por semana: se a semana 100% feriado deve consumir preparações na distribuição
+function getSemanasConsumir(){
+  try { return JSON.parse(localStorage.getItem('merenda_semanas_consumir') || '{}'); }
+  catch(e){ return {}; }
+}
+function setSemanaConsumir(wi, checked){
+  const s = getSemanasConsumir();
+  if(checked) s[wi] = 1; else delete s[wi];
+  localStorage.setItem('merenda_semanas_consumir', JSON.stringify(s));
+}
+
 function populateMesesMerc(){
   const sel = document.getElementById('sel-mes-merc');
   if(!sel) return;
@@ -5639,12 +5665,33 @@ function renderCardapio(){
     } else if(dow===0){
       const nextDate = new Date(2026, m, day + 1);
       const mondayIso = nextDate.toISOString().split('T')[0];
-      const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
-      const semana = semanaIdx >= 0 ? SEMANAS_CAL[semanaIdx] : null;
-      const botoesWeek = semana ? `
-        <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
-          <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
-        </div>` : '';
+      const wi = getCalWeekIdx(mondayIso);
+      const totalCalWeeks = DIAS_LETIVOS_ARRAY.length ? getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1 : 0;
+      let botoesWeek = '';
+      if(wi < totalCalWeeks){
+        const datasSem = getDiasSemanaCal(wi);
+        const letSet = new Set(DIAS_LETIVOS_ARRAY);
+        const todaFeriado = datasSem.length > 0 && !datasSem.some(dt => letSet.has(dt));
+        if(todaFeriado){
+          const sCons = getSemanasConsumir();
+          const checked = sCons[wi] ? 'checked' : '';
+          botoesWeek = `
+            <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+              <span style="font-size:10px;font-weight:800;color:#dc2626;letter-spacing:.03em">Semana feriado</span>
+              <label style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:#64748b;cursor:pointer" title="Se marcado, a distribuição consome as 5 preparações desta semana">
+                <input type="checkbox" ${checked} onclick="event.stopPropagation();setSemanaConsumir(${wi},this.checked)" style="margin:0"> consumir
+              </label>
+            </div>`;
+        } else {
+          const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
+          if(semanaIdx >= 0){
+            botoesWeek = `
+              <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+                <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
+              </div>`;
+          }
+        }
+      }
       days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
     } else {
       days += `<div class="cal-day day-nletivo" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}</div>`;
@@ -8998,13 +9045,23 @@ function distribuirAPartirDoCiclo(){
   if(!DIAS_LETIVOS_ARRAY.length) return;
   const totalCalWeeks = getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1;
   const startWeek = cIdx * 5;
+  const letSet = new Set(DIAS_LETIVOS_ARRAY);
+  const sCons = getSemanasConsumir();
   let pratoIdx = 0;
+  let semanasPreservadas = 0;
   for(let wi = startWeek; wi < totalCalWeeks; wi++){
     const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
     const sIdx   = wi % 4;
     const mesNome = MESES_NOMES[mesIdx];
     if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
     if(!DADOS.cardapio[mesNome][sIdx]) DADOS.cardapio[mesNome][sIdx] = { dias: ['','','','',''] };
+    // Semana 100% feriado: só consome preparações se o checkbox "consumir" estiver marcado
+    const datasSem = getDiasSemanaCal(wi);
+    const todaFeriado = datasSem.length > 0 && !datasSem.some(dt => letSet.has(dt));
+    if(todaFeriado && !sCons[wi]){
+      semanasPreservadas++;
+      continue;
+    }
     for(let dow = 0; dow < 5; dow++){
       DADOS.cardapio[mesNome][sIdx].dias[dow] = pratos[pratoIdx % pratos.length];
       pratoIdx++;
@@ -9014,8 +9071,7 @@ function distribuirAPartirDoCiclo(){
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   renderCardapio();
   sincronizarSeletores(ciclo, 1, true);
-  const semanas = totalCalWeeks - startWeek;
-  alert(`✅ ${semanas * 5} posições preenchidas a partir do ${ciclo} com ${pratos.length} prato(s) em rotação!`);
+  alert(`✅ ${pratoIdx} posições preenchidas a partir do ${ciclo} com ${pratos.length} prato(s) em rotação!${semanasPreservadas ? `\n${semanasPreservadas} semana(s) de feriado preservada(s) — sem consumir preparações.` : ''}`);
 }
 
 function getCorDia(iso, letIdx){
