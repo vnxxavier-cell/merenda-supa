@@ -1383,7 +1383,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
       <span>Previsão de Reposição</span>
-      <button id="btn-corrigir-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="toggleCorrecaoEstoque()">✏️ Corrigir Estoque</button>
+      <div style="display:flex;gap:6px">
+        <button id="btn-recalcular-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="recalcularEstoque()">🔄 Recalcular Saldo</button>
+        <button id="btn-corrigir-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="toggleCorrecaoEstoque()">✏️ Corrigir Estoque</button>
+      </div>
     </div>
     <div style="overflow-x:auto;padding:0">
       <table id="tabela-previsao">
@@ -1724,6 +1727,7 @@ const _supaSync = {
     'merenda_ordens_expedidas': 'ordens_expedidas',
     'merenda_recebimentos': 'recebimentos',
     'merenda_estoque': 'estoque',
+    'merenda_semanas_consumidas': 'semanas_consumidas',
     'merenda_merc_ajustes': 'merc_ajustes',
     'merenda_servidores_config': 'servidores_config',
     'merenda_af_custom': 'af_custom',
@@ -3505,6 +3509,39 @@ function renderEstoque(){
 
 }
 
+// Recalcula o saldo de estoque do zero: (soma dos recebimentos confirmados) − (consumo das semanas já encerradas)
+function recalcularEstoque(){
+  if(!confirm('Recalcular o saldo de estoque de todos os ingredientes?\n\nSaldo = (soma dos recebimentos confirmados) − (consumo das semanas já encerradas).\n\nEsta ação substitui o estoque atual.')) return;
+  const hoje = new Date().toISOString().split('T')[0];
+  const totalSemanas = Math.ceil(DIAS_LETIVOS_ARRAY.length / 5);
+  const consumoPorIng = {};
+  for(let wi = 0; wi < totalSemanas; wi++){
+    const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
+    const lastDay = DIAS_LETIVOS_ARRAY[lastDayIdx];
+    if(!lastDay || lastDay >= hoje) break;
+    const weekData = getWeekData(wi);
+    if(!weekData) continue;
+    const { totais } = calcularTotaisNiveis(weekData.dias);
+    Object.entries(totais).forEach(([chave, qtd]) => {
+      const nome = chave.includes(' ___ ') ? chave.split(' ___ ')[0] : chave;
+      consumoPorIng[nome] = (consumoPorIng[nome] || 0) + qtd;
+    });
+    if(!SEMANAS_CONSUMIDAS.includes(wi)) SEMANAS_CONSUMIDAS.push(wi);
+  }
+  Object.keys(ESTOQUE).forEach(k => ESTOQUE[k] = 0);
+  RECEBIMENTOS.forEach(r => {
+    if(!r.status || r.status === 'nao_recebido') return;
+    ESTOQUE[r.ingrediente] = (ESTOQUE[r.ingrediente] || 0) + (r.qtd_recebida || 0);
+  });
+  Object.entries(consumoPorIng).forEach(([nome, qtd]) => {
+    ESTOQUE[nome] = Math.max(0, (ESTOQUE[nome] || 0) - qtd);
+  });
+  salvarEstoque();
+  salvarSemanasConsumidas();
+  renderEstoque();
+  alert('✅ Estoque recalculado com sucesso!');
+}
+
 // ── Periodicidades ────────────────────────────────────
 function renderPeriodicidades(){
   const tbody = document.getElementById('tbody-periodicidades');
@@ -4360,6 +4397,11 @@ let _salvarRecebimentoTimer = null;
 
 function _salvarRecebimentoSilenciosa(){
   if(!_recOrdemId) return;
+  // Reverter estoque adicionado anteriormente para esta ordem
+  RECEBIMENTOS.filter(r => r.ordem_id === _recOrdemId).forEach(r => {
+    if(!r.status || r.status === 'nao_recebido') return;
+    ESTOQUE[r.ingrediente] = Math.max(0, (ESTOQUE[r.ingrediente] || 0) - (r.qtd_recebida || 0));
+  });
   RECEBIMENTOS = RECEBIMENTOS.filter(r => r.ordem_id !== _recOrdemId);
   const hoje = new Date().toISOString().split('T')[0];
   Object.entries(_recStatus).forEach(([ingrediente, s]) => {
