@@ -7883,9 +7883,8 @@ function renderRegistroSaidas(){
   const filtroId = sel?sel.value:'';
   let lista = CD;
   if(filtroId === 'ciclo'){
-    const cicloIds = getCicloCardapios();
-    if(!cicloIds.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.</div>'; return; }
-    lista = lista.filter(c=>cicloIds.includes(c[0]));
+    lista = getCicloListaCardapios();
+    if(!lista.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.</div>'; return; }
   } else if(filtroId) {
     lista = lista.filter(c=>c[0]==parseInt(filtroId));
   }
@@ -7950,9 +7949,8 @@ function renderPreparo(filtro){
   
   let lista = CD;
   if(filtroId === 'ciclo'){
-    const cicloIds = getCicloCardapios();
-    if(!cicloIds.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.</div>'; return; }
-    lista = lista.filter(c=>cicloIds.includes(c[0]));
+    lista = getCicloListaCardapios();
+    if(!lista.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.</div>'; return; }
   }
   if(filtroTexto) lista = lista.filter(c=>c[1].toLowerCase().includes(filtroTexto));
   if(filtroId && filtroId !== 'ciclo') lista = lista.filter(c=>c[0]==parseInt(filtroId));
@@ -8042,11 +8040,11 @@ function imprimirPrepAtual(){
 function imprimirRegistroSaidas(){
   const sel = document.getElementById('sel-cardapio-rs') || document.getElementById('sel-cardapio-print');
   const filtroTexto = (document.querySelector('.filtro-input')?.value||'').toLowerCase();
+  const isCiclo = sel && sel.value === 'ciclo';
   let lista = CD;
-  if(sel&&sel.value === 'ciclo'){
-    const cicloIds = getCicloCardapios();
-    if(!cicloIds.length){ alert('Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.'); return; }
-    lista = lista.filter(c=>cicloIds.includes(c[0]));
+  if(isCiclo){
+    lista = getCicloListaCardapios();
+    if(!lista.length){ alert('Nenhum cardápio no ciclo atual. Configure o ciclo na aba Cardápio Anual.'); return; }
   } else if(sel&&sel.value) {
     lista = lista.filter(c=>c[0]==parseInt(sel.value));
   }
@@ -8080,7 +8078,7 @@ function imprimirRegistroSaidas(){
       + '<div class="rs-assinatura"><span>Tarde:</span> <span class="rs-linha"></span></div>'
       + '<div class="rs-assinatura"><span>Noite:</span> <span class="rs-linha"></span></div>'
       + '</div></div>';
-    formsHtml += form + '<div class="rs-gap"></div>' + form;
+    formsHtml += isCiclo ? (form + '<div class="rs-gap"></div>') : (form + '<div class="rs-gap"></div>' + form);
   });
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
@@ -8180,6 +8178,21 @@ function getCicloCardapios(){
     if(c) ids.add(c[0]);
   });
   return [...ids];
+}
+
+// Retorna os cardápios do ciclo na ordem configurada no Cardápio Anual, sem duplicatas
+function getCicloListaCardapios(){
+  const sel = document.getElementById('plan-ciclo');
+  const cicloNome = sel ? sel.value : '';
+  if(!cicloNome || !CICLOS_PLANOS[cicloNome] || !CICLOS_PLANOS[cicloNome].length) return [];
+  const lista = [];
+  const visto = new Set();
+  CICLOS_PLANOS[cicloNome].forEach(pratoStr => {
+    const {num} = nomeNum(pratoStr);
+    const c = CD.find(x => x[0] == parseInt(num));
+    if(c && !visto.has(c[0])){ visto.add(c[0]); lista.push(c); }
+  });
+  return lista;
 }
 
 function atualizarPrintGlobal(){
