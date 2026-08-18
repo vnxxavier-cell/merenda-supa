@@ -8078,7 +8078,7 @@ function imprimirRegistroSaidas(){
       + '<div class="rs-assinatura"><span>Tarde:</span> <span class="rs-linha"></span></div>'
       + '<div class="rs-assinatura"><span>Noite:</span> <span class="rs-linha"></span></div>'
       + '</div></div>';
-    formsHtml += isCiclo ? (form + '<div class="rs-gap"></div>') : (form + '<div class="rs-gap"></div>' + form);
+    formsHtml += form + '<div class="rs-gap"></div>';
   });
   const w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
