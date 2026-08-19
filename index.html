@@ -1378,10 +1378,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
       <span>Estoque</span>
-      <div style="display:flex;gap:6px">
-        <button id="btn-recalcular-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="recalcularEstoque()">🔄 Recalcular Saldo</button>
-        <button id="btn-corrigir-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="toggleCorrecaoEstoque()">✏️ Corrigir Estoque</button>
-      </div>
     </div>
     <div style="overflow-x:auto;padding:0">
       <table id="tabela-previsao">
@@ -3348,13 +3344,6 @@ Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTO
 function salvarEstoque(){          localStorage.setItem('merenda_estoque',             JSON.stringify(ESTOQUE)); }
 function salvarSemanasConsumidas(){ localStorage.setItem('merenda_semanas_consumidas', JSON.stringify(SEMANAS_CONSUMIDAS)); }
 
-function corrigirEstoque(nome, valor){
-  const v = parseFloat(String(valor).replace(',','.'));
-  ESTOQUE[nome] = isNaN(v) ? 0 : Math.max(0, v);
-  salvarEstoque();
-  renderEstoque();
-}
-
 // Desconta do estoque o consumo de todas as semanas já encerradas (roda no init)
 function aplicarConsumoSemanas(){
   const hoje = new Date().toISOString().split('T')[0];
@@ -3384,15 +3373,6 @@ function aplicarConsumoSemanas(){
 // ══════════════════════════════════════════════════════
 // ESTOQUE — UI
 // ══════════════════════════════════════════════════════
-let _estCorrigindo = false;
-
-function toggleCorrecaoEstoque(){
-  _estCorrigindo = !_estCorrigindo;
-  const btn = document.getElementById('btn-corrigir-estoque');
-  if(btn) btn.textContent = _estCorrigindo ? '✅ Concluir' : '✏️ Corrigir Estoque';
-  renderEstoque();
-}
-
 function renderEstoque(){
   const ings = Object.keys(DADOS.ingredientes).sort();
   const tbody = document.getElementById('tbody-previsao');
@@ -3407,10 +3387,8 @@ function renderEstoque(){
           <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px">
             <input type="number" min="0" step="0.01"
               value="${ESTOQUE[nome]||0}"
-              data-est-ing="${nome.replace(/"/g,'&quot;')}"
-              onchange="corrigirEstoque('${nome.replace(/'/g,"\\'")}',this.value)"
-              ${_estCorrigindo ? '' : 'readonly'}
-              style="width:80px;text-align:right;padding:4px 6px;border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;${_estCorrigindo ? 'border:1.5px solid var(--azul2);color:var(--azul2);background:#fff;cursor:text' : 'border:1.5px solid transparent;color:var(--txt);background:transparent;cursor:default'}">
+              readonly
+              style="width:80px;text-align:right;padding:4px 6px;border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;border:1.5px solid transparent;color:var(--txt);background:transparent;cursor:default">
             <span style="font-size:11px;color:var(--txt2)">${unid}</span>
           </div>
         </td>
@@ -3419,39 +3397,6 @@ function renderEstoque(){
       '<tr><td colspan="2" style="text-align:center;color:#aaa;padding:16px">Nenhum ingrediente para este filtro.</td></tr>';
   }
 
-}
-
-// Recalcula o saldo de estoque do zero: (soma dos recebimentos confirmados) − (consumo das semanas já encerradas)
-function recalcularEstoque(){
-  if(!confirm('Recalcular o saldo de estoque de todos os ingredientes?\n\nSaldo = (soma dos recebimentos confirmados) − (consumo das semanas já encerradas).\n\nEsta ação substitui o estoque atual.')) return;
-  const hoje = new Date().toISOString().split('T')[0];
-  const totalSemanas = Math.ceil(DIAS_LETIVOS_ARRAY.length / 5);
-  const consumoPorIng = {};
-  for(let wi = 0; wi < totalSemanas; wi++){
-    const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
-    const lastDay = DIAS_LETIVOS_ARRAY[lastDayIdx];
-    if(!lastDay || lastDay >= hoje) break;
-    const weekData = getWeekData(wi);
-    if(!weekData) continue;
-    const { totais } = calcularTotaisNiveis(weekData.dias);
-    Object.entries(totais).forEach(([chave, qtd]) => {
-      const nome = chave.includes(' ___ ') ? chave.split(' ___ ')[0] : chave;
-      consumoPorIng[nome] = (consumoPorIng[nome] || 0) + qtd;
-    });
-    if(!SEMANAS_CONSUMIDAS.includes(wi)) SEMANAS_CONSUMIDAS.push(wi);
-  }
-  Object.keys(ESTOQUE).forEach(k => ESTOQUE[k] = 0);
-  RECEBIMENTOS.forEach(r => {
-    if(!r.status || r.status === 'nao_recebido') return;
-    ESTOQUE[r.ingrediente] = (ESTOQUE[r.ingrediente] || 0) + (r.qtd_recebida || 0);
-  });
-  Object.entries(consumoPorIng).forEach(([nome, qtd]) => {
-    ESTOQUE[nome] = Math.max(0, (ESTOQUE[nome] || 0) - qtd);
-  });
-  salvarEstoque();
-  salvarSemanasConsumidas();
-  renderEstoque();
-  alert('✅ Estoque recalculado com sucesso!');
 }
 
 // ── Periodicidades ────────────────────────────────────
@@ -8475,7 +8420,7 @@ function ir(id, btn){
   if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ _estCorrigindo = false; renderEstoque(); renderDetalhamentoMercado(); }
+  if(id==='estoque'){ renderEstoque(); renderDetalhamentoMercado(); }
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
