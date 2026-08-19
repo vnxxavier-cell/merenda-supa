@@ -1392,6 +1392,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
   </div>
 
+  <!-- Bloco: Quantidades por Dia -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
+      <span>Quantidades por Dia</span>
+    </div>
+    <div style="overflow-x:auto;padding:0">
+      <table id="tabela-detalhamento">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th class="num">—</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-detalhamento">
+          <tr><td colspan="2" class="empty-state-td">Selecione o período no Mercado para ver as quantidades por dia.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -3199,15 +3219,22 @@ function getMercSemLabel(){
   if(!fim){ const d=new Date(mon+'T00:00:00'); d.setDate(d.getDate()+4); fim=d.toISOString().substring(0,10); }
   return fmtDataCurta(mon)+' – '+fmtDataCurta(fim);
 }
+function _salvarPeriodoMerc(){
+  localStorage.setItem('merc_data_inicio', getMercDataInicio());
+  localStorage.setItem('merc_data_fim', getMercDataFim());
+  localStorage.setItem('merc_semanas_sel', JSON.stringify(_MERC_SEMANAS_SEL));
+}
 function onMercDataInicioChange(){
   const inicio=getMercDataInicio(); if(!inicio){ renderMercado(); return; }
   const fimEl=document.getElementById('merc-data-fim');
   if(!fimEl.value){ const d=new Date(getMercMondayIso()+'T00:00:00'); d.setDate(d.getDate()+4); fimEl.value=d.toISOString().substring(0,10); }
   _MERC_SEMANAS_SEL = [];
+  _salvarPeriodoMerc();
   renderMercado();
 }
 function onMercDataFimChange(){
   _MERC_SEMANAS_SEL = [];
+  _salvarPeriodoMerc();
   renderMercado();
 }
 function toggleMercWeek(mon){
@@ -3225,6 +3252,7 @@ function toggleMercWeek(mon){
     document.getElementById('merc-data-inicio').value = '';
     document.getElementById('merc-data-fim').value = '';
   }
+  _salvarPeriodoMerc();
   renderMercado();
 }
 function selTodasSemanas(){
@@ -3241,9 +3269,21 @@ function selTodasSemanas(){
     document.getElementById('merc-data-inicio').value = firstMon;
     if(lastDay) document.getElementById('merc-data-fim').value = lastDay;
   }
+  _salvarPeriodoMerc();
   renderMercado();
 }
 function getMercKey(){ const c=getMercCiclo(),m=getMercMondayIso(); return (c||'x')+'_'+(m||'x'); }
+function restaurarPeriodoMercado(){
+  const iniEl = document.getElementById('merc-data-inicio');
+  const fimEl = document.getElementById('merc-data-fim');
+  if(!iniEl || !fimEl) return;
+  const _ini = localStorage.getItem('merc_data_inicio');
+  const _fim = localStorage.getItem('merc_data_fim');
+  const _sem = localStorage.getItem('merc_semanas_sel');
+  if(_ini) iniEl.value = _ini;
+  if(_fim) fimEl.value = _fim;
+  _MERC_SEMANAS_SEL = _sem ? (JSON.parse(_sem) || []) : [];
+}
 function getMercAjuste(){ const k=getMercKey(); if(!MERC_AJUSTES[k]) MERC_AJUSTES[k]={overrides:{},extras:[],obs:{}}; if(!MERC_AJUSTES[k].obs) MERC_AJUSTES[k].obs={}; return MERC_AJUSTES[k]; }
 function salvarObsItemMerc(nome, texto){
   const aj = getMercAjuste();
@@ -4289,6 +4329,8 @@ function confirmarRecebimentoForm(){
   _salvarRecebimentoSilenciosa();
   fecharOverlayRec();
   renderLicitacoes();
+  renderEstoque();
+  renderDetalhamentoMercado();
 }
 
 function cancelarOrdem(ordemId){
@@ -4311,6 +4353,8 @@ function cancelarOrdem(ordemId){
   salvarRecebimentos();
   salvarOrdens();
   renderLicitacoes();
+  renderEstoque();
+  renderDetalhamentoMercado();
 }
 
 function fecharOverlaySelContrato(ev){
@@ -4926,6 +4970,7 @@ function init(){
   }
   carregarConfig();
   aplicarConsumoSemanas();
+  restaurarPeriodoMercado();
 }
 
 // ══════════════════════════════════════════════════════
@@ -6663,24 +6708,80 @@ function confirmarAddItemForn(nomeBase, btn){
   renderMercado();
 }
 
-function renderDetalhamentoMercado(){
-  const tabela = document.getElementById('tabela-previsao');
-  const tbody  = document.getElementById('tbody-previsao');
-  if(!tabela || !tbody) return;
+function construirMercDataEstoque(){
+  const mondayIso = getMercMondayIso();
+  if(!mondayIso && !_MERC_SEMANAS_SEL.length) return null;
+  const ciclo = getMercCiclo() || '';
+  const _ini = getMercDataInicio(), _fim = getMercDataFim();
+  const _inPeriodo = d => !d || !_ini || !_fim || (d >= _ini && d <= _fim);
+  const semanas = _MERC_SEMANAS_SEL.length > 0 ? _MERC_SEMANAS_SEL : [mondayIso];
+  const dias = [], datas = [];
+  semanas.forEach(mon => {
+    const { dias: wd, datas: wda } = getCalWeekDiasAndDatas(mon);
+    wd.forEach((d, i) => {
+      const data = wda[i];
+      dias.push(_inPeriodo(data) ? d : '');
+      datas.push(_inPeriodo(data) ? data : null);
+    });
+  });
+  const dailyTotais = dias.map((d, i) => {
+    if(!d || !datas[i]) return {};
+    return calcularTotaisNiveis([d]).totais;
+  });
+  const isMulti = _MERC_SEMANAS_SEL.length > 0;
+  const { af_items, mc_items } = isMulti
+    ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
+    : getItensMercado(ciclo, mondayIso);
+  const todosItens = [...af_items, ...mc_items];
+  const weekData = [];
+  const _firstMon = isMulti ? _MERC_SEMANAS_SEL[0] : mondayIso;
+  const _maxSem = Math.max(1, ...todosItens.map(it => it.numSemanas || 1));
+  const semanasWD = _firstMon ? Array.from({length: _maxSem}, (_, i) => i === 0 ? _firstMon : null) : [];
+  const _ini2 = getMercDataInicio(), _fim2 = getMercDataFim();
+  const _inPer2 = d => !d || !_ini2 || !_fim2 || (d >= _ini2 && d <= _fim2);
+  semanasWD.forEach((mon, wi) => {
+    if(!mon) {
+      const _d = new Date(_firstMon + 'T00:00:00');
+      _d.setDate(_d.getDate() + 7 * wi);
+      mon = _d.toISOString().substring(0, 10);
+    }
+    const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(mon);
+    const _usarFiltro = _MERC_MODO === 'periodo';
+    const _wdF = _usarFiltro
+      ? _wd.map((dd, i) => _inPer2(_wda[i]) ? dd : '')
+      : _wd.map((dd, i) => _wda[i] ? dd : '');
+    const _wdaF = _usarFiltro
+      ? _wda.map(d => _inPer2(d) ? d : null)
+      : _wda.map(d => d);
+    weekData.push({
+      dias: _wdF, datas: _wdaF,
+      dailyTotais: _wdF.map((dd, i) => (!dd || !_wdaF[i]) ? {} : calcularTotaisNiveis([dd]).totais)
+    });
+  });
+  return { todosItens, mondayIso, weekData };
+}
 
-  // Se não há dados do mercado, a tabela original (renderEstoque) já está na tabela
-  if(!_MERC_DATA || !_MERC_DATA.todosItens || !_MERC_DATA.weekData){
-    // Garante cabeçalho original para a Tabela de Estoque
+function renderDetalhamentoMercado(){
+  const tabela = document.getElementById('tabela-detalhamento');
+  const tbody  = document.getElementById('tbody-detalhamento');
+  if(!tabela || !tbody) return;
+  const _semDados = () => {
     const thead = tabela.querySelector('thead');
-    thead.innerHTML = `<tr>
-      <th>Ingrediente</th>
-      <th class="num">Estoque Atual</th>
+    if(thead) thead.innerHTML = `<tr>
+      <th>Item</th>
+      <th class="num">—</th>
     </tr>`;
+    tbody.innerHTML = `<tr><td colspan="2" class="empty-state-td">Selecione o período no Mercado para ver as quantidades por dia.</td></tr>`;
+  };
+
+  // Se não há dados do mercado, mostra a mensagem na tabela de detalhamento
+  if(!_MERC_DATA || !_MERC_DATA.todosItens || !_MERC_DATA.weekData){
+    _semDados();
     return;
   }
 
   const { todosItens, weekData } = _MERC_DATA;
-  if(!todosItens.length) return;
+  if(!todosItens.length){ _semDados(); return; }
 
   // Só renderiza análise detalhada se houver refeições nos dados de semana
   let temRefeicoes = false;
@@ -6690,7 +6791,7 @@ function renderDetalhamentoMercado(){
     }
     if(temRefeicoes) break;
   }
-  if(!temRefeicoes) return;
+  if(!temRefeicoes){ _semDados(); return; }
 
   // Collect all day-meal pairs with their totals
   const dayMeals = [];
@@ -6707,7 +6808,7 @@ function renderDetalhamentoMercado(){
     });
   });
 
-  if(!dayMeals.length) return;
+  if(!dayMeals.length){ _semDados(); return; }
 
   const hoje = new Date().toISOString().split('T')[0];
   const dayClasses = dayMeals.map(dm => {
@@ -8416,11 +8517,11 @@ function ir(id, btn){
   pg.classList.add('ativa');
   if(btn) btn.classList.add('ativo');
   if(id==='cardapio'){ _calMesAtual = _getMesAtualDefault(); renderCardapio(); aplicarEstadoPaineisCardapio(); }
-  if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); _MERC_SEMANAS_SEL=[]; document.getElementById('merc-data-inicio').value=''; document.getElementById('merc-data-fim').value=''; _mercInicializado=true; } renderMercado(); }
+  if(id==='mercado'){ if(!_mercInicializado){ _mercMesAtual=_getMesAtualDefault(); restaurarPeriodoMercado(); _mercInicializado=true; } renderMercado(); }
   if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ renderEstoque(); renderDetalhamentoMercado(); }
+  if(id==='estoque'){ renderEstoque(); if(!_MERC_DATA) _MERC_DATA = construirMercDataEstoque(); renderDetalhamentoMercado(); }
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
