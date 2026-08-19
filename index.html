@@ -462,11 +462,6 @@ tr:hover .hover-info{display:block}
 .tag-mc{background:#cce5ff;color:#1A3A6B;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}
 
 /* ── Estoque ── */
-.est-progress{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-top:4px}
-.est-progress-bar{height:100%;border-radius:3px;transition:.3s}
-.est-progress-bar.ok{background:var(--verde2)}
-.est-progress-bar.atencao{background:var(--amarelo)}
-.est-progress-bar.critico{background:var(--vermelho)}
 .est-alert-card{border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
 .est-alert-card.critico{background:#fee2e2;border:1.5px solid var(--vermelho)}
 .est-alert-card.atencao{background:#fef3c7;border:1.5px solid var(--amarelo)}
@@ -1382,7 +1377,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <!-- Bloco 2: Tabela de previsão -->
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
-      <span>Previsão de Reposição</span>
+      <span>Estoque</span>
       <div style="display:flex;gap:6px">
         <button id="btn-recalcular-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="recalcularEstoque()">🔄 Recalcular Saldo</button>
         <button id="btn-corrigir-estoque" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="toggleCorrecaoEstoque()">✏️ Corrigir Estoque</button>
@@ -1394,9 +1389,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
           <tr>
             <th>Ingrediente</th>
             <th class="num">Estoque Atual</th>
-            <th class="num">Semanas Cobertas</th>
-            <th class="num">Próximo Pedido</th>
-            <th>Status</th>
           </tr>
         </thead>
         <tbody id="tbody-previsao"></tbody>
@@ -3389,74 +3381,6 @@ function aplicarConsumoSemanas(){
   }
 }
 
-// Retorna previsão de esgotamento para um ingrediente
-// { semanasCoberta, dataEsgotamento, dataPedido, status, consumoSemanalMedio }
-function calcularPrevisaoIngrediente(nome){
-  const estoqueAtual = ESTOQUE[nome] || 0;
-  const hoje = new Date().toISOString().split('T')[0];
-  const totalSemanas = Math.ceil(DIAS_LETIVOS_ARRAY.length / 5);
-
-  let semanaAtual = 0;
-  for(let wi = 0; wi < totalSemanas; wi++){
-    const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
-    if(DIAS_LETIVOS_ARRAY[lastDayIdx] >= hoje){ semanaAtual = wi; break; }
-    semanaAtual = wi + 1;
-  }
-
-  let somaConsumo = 0;
-  let contagemSemanas = 0;
-  for(let wi = semanaAtual; wi < Math.min(semanaAtual + 4, totalSemanas); wi++){
-    const wd = getWeekData(wi);
-    if(!wd) continue;
-    const { totais } = calcularTotaisNiveis(wd.dias);
-    let consumoSemana = 0;
-    Object.entries(totais).forEach(([chave, qtd]) => {
-      const n = chave.includes(' ___ ') ? chave.split(' ___ ')[0] : chave;
-      if(n === nome) consumoSemana += qtd;
-    });
-    somaConsumo += consumoSemana;
-    contagemSemanas++;
-  }
-  const consumoSemanalMedio = contagemSemanas > 0 ? somaConsumo / contagemSemanas : 0;
-
-  let saldoProjetado = estoqueAtual;
-  let semanasCoberta = 0;
-  let dataEsgotamento = null;
-
-  for(let wi = semanaAtual; wi < totalSemanas; wi++){
-    const wd = getWeekData(wi);
-    if(!wd) break;
-    const { totais } = calcularTotaisNiveis(wd.dias);
-    let consumoSemana = 0;
-    Object.entries(totais).forEach(([chave, qtd]) => {
-      const n = chave.includes(' ___ ') ? chave.split(' ___ ')[0] : chave;
-      if(n === nome) consumoSemana += qtd;
-    });
-    saldoProjetado -= consumoSemana;
-    if(saldoProjetado <= 0){
-      const lastDayIdx = Math.min(wi * 5 + 4, DIAS_LETIVOS_ARRAY.length - 1);
-      dataEsgotamento = DIAS_LETIVOS_ARRAY[lastDayIdx] || null;
-      break;
-    }
-    semanasCoberta++;
-  }
-
-  let dataPedido = null;
-  if(dataEsgotamento){
-    const d = new Date(dataEsgotamento + 'T00:00:00');
-    d.setDate(d.getDate() - 7);
-    dataPedido = d.toISOString().split('T')[0];
-  }
-
-  let status;
-  if(!dataEsgotamento) status = 'ok';
-  else if(semanasCoberta < 1) status = 'critico';
-  else if(semanasCoberta <= 3) status = 'atencao';
-  else status = 'ok';
-
-  return { semanasCoberta, dataEsgotamento, dataPedido, status, consumoSemanalMedio };
-}
-
 // ══════════════════════════════════════════════════════
 // ESTOQUE — UI
 // ══════════════════════════════════════════════════════
@@ -3470,22 +3394,13 @@ function toggleCorrecaoEstoque(){
 }
 
 function renderEstoque(){
-  const ings = Object.keys(DADOS.ingredientes).sort();  // Bloco 2: tabela de previsão
+  const ings = Object.keys(DADOS.ingredientes).sort();
   const tbody = document.getElementById('tbody-previsao');
   if(tbody){
-    const rows = ings
+    tbody.innerHTML = ings
       .map(nome => {
-        const p = calcularPrevisaoIngrediente(nome);
         const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
-        const corBar = p.status === 'critico' ? 'critico' : p.status === 'atencao' ? 'atencao' : 'ok';
-        const statusBadge =
-          p.status === 'critico'  ? '<span style="color:var(--vermelho);font-weight:700">🔴 Crítico</span>' :
-          p.status === 'atencao'  ? '<span style="color:#92400e;font-weight:700">🟡 Atenção</span>' :
-                                    '<span style="color:var(--verde);font-weight:700">✅ OK</span>';
-        return { nome, p, unid, corBar, statusBadge, status: p.status };
-      });
-
-    tbody.innerHTML = rows.map(({nome, p, unid, corBar, statusBadge}) => `
+        return `
       <tr>
         <td><b>${nome}</b></td>
         <td class="num">
@@ -3499,15 +3414,9 @@ function renderEstoque(){
             <span style="font-size:11px;color:var(--txt2)">${unid}</span>
           </div>
         </td>
-        <td class="num">
-          ${p.semanasCoberta != null ? `
-            <div style="font-weight:700">${p.semanasCoberta} sem.</div>
-            <div class="est-progress"><div class="est-progress-bar ${corBar}" style="width:${Math.min(100, (p.semanasCoberta / 8) * 100)}%"></div></div>` : '—'}
-        </td>
-        <td class="num" style="font-size:12px">${p.dataPedido ? fmtDataBR(p.dataPedido) : p.dataEsgotamento ? '<span style="color:var(--vermelho);font-weight:700">Agora</span>' : '—'}</td>
-        <td>${statusBadge}</td>
-      </tr>`).join('') ||
-      '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px">Nenhum ingrediente para este filtro.</td></tr>';
+      </tr>`;
+      }).join('') ||
+      '<tr><td colspan="2" style="text-align:center;color:#aaa;padding:16px">Nenhum ingrediente para este filtro.</td></tr>';
   }
 
 }
@@ -6814,16 +6723,13 @@ function renderDetalhamentoMercado(){
   const tbody  = document.getElementById('tbody-previsao');
   if(!tabela || !tbody) return;
 
-  // Se não há dados do mercado, a Previsão original (renderEstoque) já está na tabela
+  // Se não há dados do mercado, a tabela original (renderEstoque) já está na tabela
   if(!_MERC_DATA || !_MERC_DATA.todosItens || !_MERC_DATA.weekData){
-    // Garante cabeçalho original para a Previsão de Estoque
+    // Garante cabeçalho original para a Tabela de Estoque
     const thead = tabela.querySelector('thead');
     thead.innerHTML = `<tr>
       <th>Ingrediente</th>
       <th class="num">Estoque Atual</th>
-      <th class="num">Semanas Cobertas</th>
-      <th class="num">Próximo Pedido</th>
-      <th>Status</th>
     </tr>`;
     return;
   }
