@@ -335,6 +335,7 @@ tbody tr:hover td{background:#f0f5fc}
   .print-header img{width:100%;height:auto;display:block}
   .print-header.sem-timbre{border-bottom:2.5px solid #1A3A6B;padding-bottom:10px}
   .print-title{font-size:13pt;font-weight:800;text-align:center;margin:12px 0 10px;color:#000;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #c8d4e8;padding-bottom:8px}
+  #print-title-global:empty{display:none!important}
   /* ── cards e tabelas gerais ── */
   .card{box-shadow:none;border:1px solid #c8d4e8!important;margin-bottom:14px;break-inside:avoid}
   .card-header{background:#1A3A6B!important;color:#fff!important;padding:8px 12px!important;font-size:11.5pt!important;font-weight:700;text-transform:uppercase;text-align:left;border:none!important}
@@ -8165,13 +8166,16 @@ function atualizarPrintGlobal(){
   const isMercado = document.getElementById('pg-mercado')?.classList.contains('ativa');
   const gh = document.getElementById('print-header');
   const ga = document.getElementById('print-assinatura');
+  const gpt = document.getElementById('print-title-global');
   if(!gh) return;
   if(isMercado){
     gh.classList.add('print-hide');
     if(ga) ga.classList.add('print-hide');
+    if(gpt) gpt.classList.add('print-hide');
   } else {
     gh.classList.remove('print-hide');
     if(ga) ga.classList.remove('print-hide');
+    if(gpt) gpt.classList.remove('print-hide');
   }
 }
 
