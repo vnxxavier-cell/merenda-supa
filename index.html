@@ -316,7 +316,7 @@ tbody tr:hover td{background:#f0f5fc}
 .print-hide{display:none!important}
 @media print{
   .screen-hidden{display:block!important}
-  @page{margin:20mm 24mm;size:A4}
+  @page{margin:12mm 20mm;size:A4}
   /* ── ocultar UI ── */
   nav,#nav-principal,.mobile-topbar,#mobile-topbar,.seletor-bar,.btn,.stats-grid,.no-print,#pg-config,.overlay,#merc-calendario,#btn-ajuda-tab{display:none!important}
   h2.titulo{display:none!important}
@@ -6858,12 +6858,50 @@ function imprimirFornecedorSelecionado(){
   if(!fornId){ alert('Selecione um fornecedor antes de imprimir.'); return; }
   const fornNome = (FORNECEDORES_CADASTRO.find(f=>f.id===fornId)||{}).nome || '';
   if(!fornNome){ alert('Fornecedor não encontrado.'); return; }
-  document.querySelectorAll('.forn-page').forEach(card => {
-    card.style.cssText = '';
-    card.classList.toggle('print-excluida', card.getAttribute('data-forn-id') !== fornId);
-  });
-  atualizarPrintGlobal();
-  window.print();
+  const card = document.querySelector('.forn-page[data-forn-id="' + fornId + '"]');
+  const doc = card ? card.querySelector('.forn-print-doc') : null;
+  if(!doc){ alert('Documento de impressão não encontrado para este fornecedor.'); return; }
+  const css = [
+    '@page{margin:12mm 20mm;size:A4}',
+    'body{margin:0;font-family:"Inter",Arial,sans-serif;color:#000;font-size:10.5pt}',
+    '.print-only{display:block}',
+    '.forn-print-doc{page-break-inside:avoid}',
+    'img{max-width:100%;height:auto;display:block;margin:0 auto 8px}',
+    '.forn-titulo{text-align:center;font-size:13pt;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#1A3A6B;border-bottom:2px solid #1A3A6B;padding-bottom:8px;margin-bottom:12px}',
+    '.forn-info{display:flex;gap:40px;font-size:10pt;margin-bottom:12px;flex-wrap:wrap}',
+    '.forn-info span strong{color:#1A3A6B}',
+    '.forn-tabela{width:100%;font-size:10pt;margin-bottom:0;border-collapse:collapse}',
+    '.forn-tabela thead tr{background:linear-gradient(135deg,#1A3A6B 0%,#2E75B6 100%);color:#fff}',
+    '.forn-tabela thead th{padding:7px 10px;font-weight:700;text-transform:uppercase;font-size:9pt;letter-spacing:.04em}',
+    '.forn-tabela thead th:first-child{width:42px;text-align:center}',
+    '.forn-tabela thead th:nth-child(3){width:80px;text-align:right}',
+    '.forn-tabela thead th:nth-child(4){width:50px;text-align:center}',
+    '.forn-tabela tbody td{padding:6px 10px;vertical-align:middle}',
+    '.forn-tabela tbody tr:nth-child(even) td{background:#F5F8FD}',
+    '.forn-tabela td:first-child{text-align:center;color:#888;font-size:9pt}',
+    '.forn-tabela td:nth-child(3){text-align:right;font-family:"DM Mono",monospace;font-weight:700}',
+    '.forn-tabela td:nth-child(4){text-align:center}',
+    '.forn-assinatura{margin-top:8mm;text-align:center;break-inside:avoid;page-break-inside:avoid}',
+    '.forn-assinatura-linha{display:inline-block;width:280px;border-top:1.5px solid #000;padding-top:6px;margin-top:0;font-size:10pt;font-weight:700;color:#000}',
+    '.forn-assinatura-cargo{font-size:9pt;color:#555;margin-top:4px}'
+  ].join('\n');
+  const frame = document.createElement('iframe');
+  frame.style.position = 'fixed';
+  frame.style.right = '0';
+  frame.style.bottom = '0';
+  frame.style.width = '0';
+  frame.style.height = '0';
+  frame.style.border = '0';
+  document.body.appendChild(frame);
+  const fdoc = frame.contentDocument;
+  fdoc.open();
+  fdoc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + esc(fornNome) + ' - Ordem de Fornecimento</title><style>' + css + '</style></head><body>' + doc.outerHTML + '</body></html>');
+  fdoc.close();
+  setTimeout(() => {
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+    setTimeout(() => { if(frame.parentNode) frame.parentNode.removeChild(frame); }, 1000);
+  }, 150);
 }
 
 function autoSalvarAssocFornModal(sel){
