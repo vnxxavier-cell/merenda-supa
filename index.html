@@ -351,6 +351,7 @@ tbody tr:hover td{background:#f0f5fc}
   /* ══ MERCADO — impressão formal ══ */
   .forn-grid{display:block!important;width:100%!important}
   .forn-page{display:block!important;break-after:page!important;page-break-after:always!important;padding:0;margin:0}
+  .forn-page.print-excluida{display:none!important}
   .forn-page:last-child{break-after:auto!important;page-break-after:auto!important}
   .forn-page .no-print{display:none!important}
   .forn-print-doc{page-break-inside:avoid}
@@ -6820,9 +6821,9 @@ function validarEImprimir(){
     const fid = ING_FORNECEDORES[it.nomeBase];
     return !fid || !FORNECEDORES_CADASTRO.find(f => f.id === fid);
   });
-  if(semForn.length === 0){ atualizarPrintGlobal(); window.print(); return; }
+  if(semForn.length === 0){ limparEstadosPrintMerc(); atualizarPrintGlobal(); window.print(); return; }
   if(FORNECEDORES_CADASTRO.length === 0){
-    if(confirm('Nenhum fornecedor cadastrado. Deseja imprimir mesmo assim?')){ atualizarPrintGlobal(); window.print(); }
+    if(confirm('Nenhum fornecedor cadastrado. Deseja imprimir mesmo assim?')){ limparEstadosPrintMerc(); atualizarPrintGlobal(); window.print(); }
     return;
   }
   const lista = document.getElementById('modal-sem-forn-lista');
@@ -6841,23 +6842,25 @@ function validarEImprimir(){
   document.getElementById('modal-sem-forn').style.display = 'flex';
 }
 
+function limparEstadosPrintMerc(){
+  document.querySelectorAll('.forn-page').forEach(card => {
+    card.style.cssText = '';
+    card.classList.remove('print-excluida');
+  });
+}
+
 function imprimirFornecedorSelecionado(){
   const sel = document.getElementById('merc-sel-forn-print');
   const fornId = sel ? sel.value : '';
   if(!fornId){ alert('Selecione um fornecedor antes de imprimir.'); return; }
   const fornNome = (FORNECEDORES_CADASTRO.find(f=>f.id===fornId)||{}).nome || '';
   if(!fornNome){ alert('Fornecedor não encontrado.'); return; }
-  const cards = document.querySelectorAll('.forn-page');
-  const origDisplays = [];
-  cards.forEach(card => {
-    origDisplays.push(card.style.cssText);
-    if(card.getAttribute('data-forn-id') !== fornId) card.style.cssText = 'display:none!important';
+  document.querySelectorAll('.forn-page').forEach(card => {
+    card.style.cssText = '';
+    card.classList.toggle('print-excluida', card.getAttribute('data-forn-id') !== fornId);
   });
   atualizarPrintGlobal();
-  setTimeout(() => {
-    try { window.print(); }
-    finally { cards.forEach((card, i) => card.style.cssText = origDisplays[i]); }
-  }, 400);
+  window.print();
 }
 
 function autoSalvarAssocFornModal(sel){
@@ -6877,6 +6880,7 @@ function imprimirModalForn(){
   document.getElementById('modal-sem-forn').style.display = 'none';
   renderMercado();
   renderIngredientes();
+  limparEstadosPrintMerc();
   atualizarPrintGlobal();
   window.print();
 }
