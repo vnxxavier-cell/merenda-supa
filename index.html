@@ -6455,7 +6455,7 @@ function renderMercado(){
           <tbody>${printRows}</tbody>
         </table></div>
         <div class="forn-assinatura">
-          <div class="forn-assinatura-linha">${_diretor || '________________________'}</div>
+          <div class="forn-assinatura-linha">${_diretor ? (_cargo ? _diretor + ' (' + _cargo + ')' : _diretor) : '________________________'}</div>
         </div>
       </div>
       <!-- tela interativa -->
