@@ -6497,6 +6497,7 @@ function renderMercado(){
         .map(f => `<option value="${f.id}"${f.id===curVal?' selected':''}>${esc(f.nome)}</option>`).join('');
   }
   updateMercadoViewMode();
+  atualizarPrintGlobal();
 }
 
 function renderMercadoTabela(){
