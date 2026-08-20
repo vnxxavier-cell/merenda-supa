@@ -394,7 +394,6 @@ tbody tr:hover td{background:#f0f5fc}
     border-top:1.5px solid #000;padding-top:6px;margin-top:0;
     font-size:10pt;font-weight:700;color:#000
   }
-  .forn-assinatura-cargo{font-size:9pt;color:#555;margin-top:4px}
 }
 
 .select-prato {
@@ -6457,7 +6456,6 @@ function renderMercado(){
         </table></div>
         <div class="forn-assinatura">
           <div class="forn-assinatura-linha">${_diretor || '________________________'}</div>
-          <div class="forn-assinatura-cargo">${_cargo}</div>
         </div>
       </div>
       <!-- tela interativa -->
@@ -6882,8 +6880,7 @@ function imprimirFornecedorSelecionado(){
     '.forn-tabela td:nth-child(3){text-align:right;font-family:"DM Mono",monospace;font-weight:700}',
     '.forn-tabela td:nth-child(4){text-align:center}',
     '.forn-assinatura{margin-top:8mm;text-align:center;break-inside:avoid;page-break-inside:avoid}',
-    '.forn-assinatura-linha{display:inline-block;width:280px;border-top:1.5px solid #000;padding-top:6px;margin-top:0;font-size:10pt;font-weight:700;color:#000}',
-    '.forn-assinatura-cargo{font-size:9pt;color:#555;margin-top:4px}'
+    '.forn-assinatura-linha{display:inline-block;width:280px;border-top:1.5px solid #000;padding-top:6px;margin-top:0;font-size:10pt;font-weight:700;color:#000}'
   ].join('\n');
   const frame = document.createElement('iframe');
   frame.style.position = 'fixed';
