@@ -3586,7 +3586,7 @@ function renderFornecedoresCadastro(){
     <td style="display:flex;align-items:center;gap:8px;border:none">
       <span onclick="abrirPaletaForn(${i},this)" title="Alterar cor"
         style="width:22px;height:22px;border-radius:50%;background:${cor};border:1.5px solid #94a3b8;cursor:pointer;display:inline-block;flex-shrink:0"></span>
-      <input type="text" value="${f.nome.replace(/"/g,'&quot;')}" onchange="FORNECEDORES_CADASTRO[${i}].nome=this.value;salvarFornecedoresCadastro()"
+      <input type="text" value="${f.nome.replace(/"/g,'&quot;')}" onchange="FORNECEDORES_CADASTRO[${i}].nome=this.value.trim();salvarFornecedoresCadastro()"
         style="font-family:'Inter',sans-serif;font-size:13px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;width:200px">
     </td>
     <td><button onclick="removerFornecedorCadastro(${i})"
@@ -6435,7 +6435,7 @@ function renderMercado(){
       </tr>`;
     }).join('');
 
-    return `<div class="forn-page">
+    return `<div class="forn-page" data-forn-id="${fornId || 'sem'}">
       <!-- impressão formal -->
       <div class="print-only forn-print-doc" style="page-break-inside:avoid">
         <div style="border-bottom:2.5px solid #000;padding-bottom:10px;margin-bottom:14px;text-align:center">
@@ -6466,7 +6466,7 @@ function renderMercado(){
         <table><thead><tr><th style="width:32px;font-size:10px;text-align:center">Nº</th><th>Ingrediente</th><th style="width:36px;font-size:10px;text-align:center">Cont.</th><th style="width:45%">Observação</th><th style="width:44px;font-size:10px;text-align:center">Tipo</th><th class="num" style="width:72px;font-size:10px">Necess.</th><th class="num" style="width:66px;font-size:10px">Estoque</th><th class="num" style="width:130px">A Comprar</th></tr></thead>
         <tbody>${buildRows(items, fornId)}</tbody></table>
         <div style="padding:8px 12px;border-top:1px solid var(--borda);text-align:center">
-          <button class="btn btn-outline btn-sm" onclick="adicionarItemMercCard('${esc(titulo)}')" style="display:inline-flex;align-items:center;gap:4px;font-size:11px">+ Adicionar ingrediente</button>
+          <button class="btn btn-outline btn-sm" onclick="adicionarItemMercCard('${esc(fornId)}')" style="display:inline-flex;align-items:center;gap:4px;font-size:11px">+ Adicionar ingrediente</button>
         </div>
     </div>`;
   };
@@ -6851,14 +6851,12 @@ function imprimirFornecedorSelecionado(){
   const origDisplays = [];
   cards.forEach(card => {
     origDisplays.push(card.style.cssText);
-    const hdr = card.querySelector('.card-header');
-    const match = hdr && hdr.textContent.trim() === fornNome;
-    if(!match) card.style.cssText = 'display:none!important';
+    if(card.getAttribute('data-forn-id') !== fornId) card.style.cssText = 'display:none!important';
   });
   atualizarPrintGlobal();
   setTimeout(() => {
-    window.print();
-    setTimeout(() => cards.forEach((card, i) => card.style.cssText = origDisplays[i]), 500);
+    try { window.print(); }
+    finally { cards.forEach((card, i) => card.style.cssText = origDisplays[i]); }
   }, 400);
 }
 
@@ -6958,8 +6956,8 @@ function cancelarAdicionarItemMerc(af){
   if(el) el.remove();
 }
 
-function adicionarItemMercCard(fornNome){
-  const forn = FORNECEDORES_CADASTRO.find(f => f.nome === fornNome);
+function adicionarItemMercCard(fornId){
+  const forn = FORNECEDORES_CADASTRO.find(f => f.id === fornId);
   if(!forn){ alert('Fornecedor não encontrado.'); return; }
   const opts = Object.keys(DADOS.ingredientes).sort().map(n => `<option value="${n}">${n}</option>`).join('');
   const formId = 'form-add-card';
@@ -6975,7 +6973,7 @@ function adicionarItemMercCard(fornNome){
   </div>`;
   const cards = document.querySelectorAll('.forn-page .card.no-print');
   for(const card of cards){
-    if(card.querySelector('.card-header')?.textContent.trim() === fornNome){
+    if(card.closest('.forn-page')?.getAttribute('data-forn-id') === fornId){
       card.insertAdjacentHTML('beforeend', html);
       break;
     }
