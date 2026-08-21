@@ -4567,16 +4567,29 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
   // Recupera o mondayIso armazenado ao abrir o modal
   const mondayIso = _ordemPendente ? _ordemPendente.mondayIso : '';
 
+  const semanas = (_MERC_SEMANAS_SEL && _MERC_SEMANAS_SEL.length) ? _MERC_SEMANAS_SEL.slice().sort() : [mondayIso];
+  const _ini = getMercDataInicio(), _fim = getMercDataFim();
+  const _inPeriodo = d => !d || !_ini || !_fim || (d >= _ini && d <= _fim);
+  const dias = [], datas = [];
+  semanas.forEach(mon => {
+    const { dias: wd, datas: wda } = getCalWeekDiasAndDatas(mon);
+    wd.forEach((d, i) => {
+      const data = wda[i];
+      dias.push(_inPeriodo(data) ? d : '');
+      datas.push(_inPeriodo(data) ? data : null);
+    });
+  });
   const contratosSelecionados = [];
   checks.forEach(cb => {
     const licId = cb.getAttribute('data-lic-id');
     const lic = LICITACOES.find(l => l.id === licId);
     if(!lic) return;
-    // Coleta itens que este contrato cobre
-    const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
+    // Itens da lista (igual à tela) para o período selecionado
+    const { af_items, mc_items } = _MERC_SEMANAS_SEL.length > 0
+      ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
+      : getItensMercado(ciclo, mondayIso);
     const todosItens = [...af_items, ...mc_items];
-    // Snapshot das quantidades por dia letivo da semana da ordem (lote congelado)
-    const { dias: _wd, datas: _wda } = getCalWeekDiasAndDatas(mondayIso);
+    // Snapshot das quantidades por dia letivo de CADA semana selecionada (lote congelado)
     const _qtdDia = (nomeBase, data, dia) => {
       if(!dia || !data) return 0;
       const totais = calcularTotaisNiveis([dia]).totais;
@@ -4586,14 +4599,20 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
     };
     const itensOrdem = todosItens
       .filter(it => it.comprar > 0 && lic.itens.some(li => li.ingrediente === it.nomeBase))
-      .map(it => ({
-        ingrediente: it.nomeBase,
-        qtd_solicitada: parseFloat(it.comprar.toFixed(3)),
-        dias: _wd.map((d, i) => {
-          const qtd = _qtdDia(it.nomeBase, _wda[i], d);
-          return qtd > 0 ? { data: _wda[i], qtd: parseFloat(qtd.toFixed(3)) } : null;
-        }).filter(Boolean)
-      }));
+      .map(it => {
+        const _dias = [];
+        dias.forEach((d, i) => {
+          if(!d || !datas[i]) return;
+          const qtd = _qtdDia(it.nomeBase, datas[i], d);
+          if(qtd > 0) _dias.push({ data: datas[i], qtd: parseFloat(qtd.toFixed(3)) });
+        });
+        return {
+          ingrediente: it.nomeBase,
+          qtd_solicitada: parseFloat(it.comprar.toFixed(3)),
+          dias: _dias
+        };
+      })
+      .filter(it => it.dias.length > 0);
     if(itensOrdem.length)
       contratosSelecionados.push({ licId, itens: itensOrdem, nome: lic.nome });
   });
@@ -4603,14 +4622,19 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
     return;
   }
 
+  const _semLabel = semanas.length > 1
+    ? semanas.length + ' semanas: ' + fmtDataBR(semanas[0]) + ' a ' + fmtDataBR(semanas[semanas.length - 1])
+    : semLabel;
   contratosSelecionados.forEach(({ licId, itens }) => {
     ORDENS_EXPEDIDAS.push({
       id: gerarId('ord'),
       licitacao_id: licId,
       ciclo,
-      semana: semLabel,
+      semana: _semLabel,
       data_expedicao: hoje,
       mondayIso,
+      semanas: semanas.slice(),
+      numSemanas: semanas.length,
       itens
     });
   });
