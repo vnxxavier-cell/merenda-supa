@@ -987,12 +987,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div id="modal-sem-forn" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:14px;padding:28px 28px 20px;max-width:520px;width:94%;box-shadow:0 8px 40px rgba(0,0,0,.22);max-height:85vh;overflow-y:auto">
     <div style="font-size:16px;font-weight:800;color:#1A3A6B;margin-bottom:6px">Ingredientes sem fornecedor</div>
-    <div style="font-size:13px;color:#64748b;margin-bottom:18px">Associe cada ingrediente a um fornecedor antes de imprimir.</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:18px" id="modal-sem-forn-sub">Associe cada ingrediente a um fornecedor antes de imprimir.</div>
     <div id="modal-sem-forn-lista"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;border-top:1px solid #f1f5f9;padding-top:16px">
       <button onclick="document.getElementById('modal-sem-forn').style.display='none'"
         style="background:#f1f5f9;color:#475569;border:1.5px solid #cbd5e1;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700">Cancelar</button>
-      <button onclick="imprimirModalForn()"
+      <button onclick="confirmarModalSemForn()" id="btn-modal-sem-forn-confirm"
         style="background:var(--azul);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700">Imprimir</button>
     </div>
   </div>
@@ -3418,6 +3418,8 @@ let _lotesPeriodoIni = '', _lotesPeriodoFim = '';
 let _matrizFiltroStatus = { coberto:true, parcial:true, planejado:true, sem:true, manual:true, removido:true };
 let _removidosPendentes = {}; // licId → { ingrediente: {motivo, usuario} } (modal de registro)
 let _precosSemLicTemp = {}; // ingrediente → preço unit. manual (itens sem contrato)
+let _licEscolhidaPorForn = {}; // fid → licitacao_id escolhida (ou null = sem contrato)
+let _modalSemFornModo = 'print'; // 'print' | 'registro'
 
 const MATRIZ_STATUS = {
   coberto:  { cor:'#dcfce7', bd:'#4ade80', txt:'#166534', css:'#dcfce7' },
@@ -3587,7 +3589,7 @@ function _matrizCobertura(demandaMap){
             const cq = Math.min(dem, disp); disp -= cq;
             const cell = c[d] = c[d] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
             cell.cov += cq;
-            cell.fontes.push({tipo:'coberto', lote:o.id, ciclo:o.ciclo, semana:o.semana, qtd:cq});
+            cell.fontes.push({tipo:'coberto', lote:o.id, ciclo:o.ciclo, semana:o.semana, qtd:cq, semC: !!(item && item.sem_contrato)});
           }
         });
       }
@@ -3597,7 +3599,7 @@ function _matrizCobertura(demandaMap){
           if(!e.data || !dias.includes(e.data)) return;
           const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
           cell.pend += (e.qtd||0) > 0 ? e.qtd : ((demandaMap.get(e.data)||{})[ing]||0);
-          cell.fontes.push({tipo:'planejado', lote:o.id, ciclo:o.ciclo, semana:o.semana});
+          cell.fontes.push({tipo:'planejado', lote:o.id, ciclo:o.ciclo, semana:o.semana, semC: !!(item && item.sem_contrato)});
         });
       }
       if(item && rec && rec.status === 'nao_recebido'){
@@ -3651,8 +3653,8 @@ function _matrizTooltip(ing, iso, cell, dem){
   if(cell.man > 0) L.push(`Adicionado manualmente: ${_matrizFmtNum(cell.man)} ${un}`);
   cell.fontes.forEach(f => {
     const loteTxt = `Ordem ${f.ciclo} — ${f.semana}`;
-    if(f.tipo === 'coberto') L.push(`• ${loteTxt}: +${_matrizFmtNum(f.qtd)} ${un} (recebido)`);
-    else if(f.tipo === 'planejado') L.push(`• ${loteTxt}: pedido aguardando recebimento`);
+    if(f.tipo === 'coberto') L.push(`• ${loteTxt}: +${_matrizFmtNum(f.qtd)} ${un} (recebido${f.semC ? ', sem contrato' : ''})`);
+    else if(f.tipo === 'planejado') L.push(`• ${loteTxt}: pedido aguardando recebimento${f.semC ? ' (sem contrato)' : ''}`);
     else if(f.tipo === 'negado') L.push(`• ${loteTxt}: recebimento não confirmado (não recebido)`);
     else if(f.tipo === 'manual') L.push(`• Adicionado manualmente à ${loteTxt}${f.usuario ? ' por ' + f.usuario : ''}`);
     else if(f.tipo === 'removido') L.push(`• Retirado da ${loteTxt}${f.motivo ? ' — motivo: ' + f.motivo : ''}${f.usuario ? ' (por ' + f.usuario + ')' : ''}`);
@@ -3734,9 +3736,9 @@ function toggleRemoverItemModal(licId, ingrediente){
 }
 
 // Preço manual dos itens sem contrato no modal de registro
-function atualizarPrecoSemLic(nome, idx, val, qtd){
+function atualizarPrecoSemLic(fid, nome, idx, val, qtd){
   _precosSemLicTemp[nome] = parseFloat(String(val).replace(',', '.')) || 0;
-  const el = document.getElementById('sub-sem-' + idx);
+  const el = document.getElementById('sub-sem-' + fid + '-' + idx);
   if(el) el.textContent = 'R$ ' + ((parseFloat(qtd) || 0) * (_precosSemLicTemp[nome] || 0)).toFixed(2).replace('.', ',');
 }
 
@@ -3903,9 +3905,10 @@ function renderEstoqueLotes(){
   if(legend){
     legend.innerHTML = ordens.map(o => {
       const lic = LICITACOES.find(x => x.id === o.licitacao_id);
+      const fornNome = o.fornecedor_id ? ((FORNECEDORES_CADASTRO.find(f => f.id === o.fornecedor_id)||{}).nome || '') : '';
       return `<span style="display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;font-size:11px;color:#475569">
         <span style="width:12px;height:12px;border-radius:3px;background:${loteCor[o.id]};flex-shrink:0"></span>
-        <b>Ciclo ${esc(o.ciclo)}</b> — ${esc(o.semana)} — ${lic ? esc(lic.nome) : 'Sem contrato'} <span style="color:#94a3b8">(exp ${fmtDataBR(o.data_expedicao)})</span>
+        <b>Ciclo ${esc(o.ciclo)}</b> — ${esc(o.semana)} — ${lic ? esc(lic.nome) : (fornNome ? esc(fornNome) : 'Sem contrato')} <span style="color:#94a3b8">(exp ${fmtDataBR(o.data_expedicao)})</span>
       </span>`;
     }).join('') || '<span style="font-size:11px;color:#94a3b8;padding:4px 0">Nenhuma ordem registrada ainda.</span>';
   }
@@ -4152,9 +4155,10 @@ function _ordemCardHtml(o, precoOf){
   const confirmados = recebidos.length;
   const pendentes = totalItens - confirmados;
   const total = (o.itens||[]).reduce((t, it) => t + (it.qtd_solicitada||0) * (precoOf ? (precoOf(it)||0) : 0), 0);
+  const fornNome = o.fornecedor_id ? ((FORNECEDORES_CADASTRO.find(f => f.id === o.fornecedor_id)||{}).nome || '') : '';
   return `<div style="border:1px solid var(--borda);border-radius:8px;margin-bottom:8px;overflow:hidden">
     <div style="background:#f8fafc;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleOrdem('${o.id}')">
-      <span style="font-weight:700;font-size:13px">${esc(o.ciclo)} — ${esc(o.semana)}</span>
+      <span style="font-weight:700;font-size:13px">${esc(o.ciclo)} — ${esc(o.semana)}${fornNome ? ' · ' + esc(fornNome) : ''}</span>
       <span style="font-size:12px;color:var(--txt2)">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})} · ${fmtDataBR(o.data_expedicao)} · ${confirmados}/${totalItens} confirmados</span>
       <div style="display:flex;gap:6px;align-items:center" onclick="event.stopPropagation()">
         ${pendentes > 0 ? `<button class="btn btn-sm" style="background:var(--laranja);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="abrirConfirmarRecebimento('${o.id}')">${ico('check',11)}Confirmar recebimento</button>` : `<span style="color:var(--verde);font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:4px">${ico('checkCircle',12)}Completo</span>`}
@@ -4171,8 +4175,8 @@ function _ordemCardHtml(o, precoOf){
             rec.status === 'parcial'  ? `<span style="color:var(--amarelo);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('alert',12)}Parcial</span>` :
             `<span style="color:var(--vermelho);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('xCircle',12)}Não recebido</span>`;
           const unid = DADOS.ingredientes[it.ingrediente]?.unidade || 'kg';
-          return `<tr>
-            <td>${esc(it.ingrediente)}${it.manual ? ' <span style="font-size:10px;color:var(--azul2);font-weight:700" title="Adicionado manualmente">(manual)</span>' : ''}</td>
+          return `<tr style="${it.sem_contrato ? 'background:#FFFBEB;' : ''}">
+            <td>${esc(it.ingrediente)}${it.manual ? ' <span style="font-size:10px;color:var(--azul2);font-weight:700" title="Adicionado manualmente">(manual)</span>' : ''}${it.sem_contrato ? ' <span style="font-size:10px;color:#B45309;font-weight:700" title="Expedido para o fornecedor sem contrato para este item">(sem contrato)</span>' : ''}</td>
             <td class="num">${fmt(it.qtd_solicitada)} ${unid}</td>
             <td class="num">${rec ? fmt(rec.qtd_recebida)+' '+unid : '—'}</td>
             <td>${statusLabel}</td>
@@ -4878,125 +4882,37 @@ function registrarOrdemExpedida(){
     return;
   }
 
-  // Para cada contrato ativo, lista quais itens da ordem ele cobre
-  const licMap = {}; // licId → { nome, itens: [{ ingrediente, qtd }] }
-  const itensSemLic = [];
-  const itensComLicSet = new Set();
-
+  // Agrupa por fornecedor (prioridade máxima: a lista onde o usuário colocou o item)
+  const fornMap = {}; // fid → { nome, itens: [{nomeBase, comprar, displayNome}] }
+  const semFornItens = [];
   todosItens.forEach(it => {
     if(it.comprar <= 0) return;
-    const lics = licitacoesAtivasParaIngrediente(it.nomeBase, hoje);
-    if(!lics.length){ itensSemLic.push({ nomeBase: it.nomeBase, comprar: parseFloat(it.comprar.toFixed(3)) }); return; }
-    itensComLicSet.add(it.nomeBase);
-    lics.forEach(lic => {
-      if(!licMap[lic.id]) licMap[lic.id] = { nome: lic.nome, itens: [] };
-      // Evita duplicar o mesmo ingrediente no mesmo contrato
-      if(!licMap[lic.id].itens.some(x => x.ingrediente === it.nomeBase))
-        licMap[lic.id].itens.push({ ingrediente: it.nomeBase, qtd: parseFloat(it.comprar.toFixed(3)) });
-    });
+    const fid = ING_FORNECEDORES[it.nomeBase];
+    const forn = fid ? FORNECEDORES_CADASTRO.find(f => f.id === fid) : null;
+    if(!fid || !forn){ semFornItens.push(it); return; }
+    if(!fornMap[fid]) fornMap[fid] = { nome: forn.nome, itens: [] };
+    fornMap[fid].itens.push({ nomeBase: it.nomeBase, comprar: parseFloat(it.comprar.toFixed(3)), displayNome: it.displayNome });
   });
-
-  if(!Object.keys(licMap).length){
-    console.warn('Ordem sem vínculo com contrato. Itens da ordem:', todosItens.map(i=>i.nomeBase+'('+i.comprar+'kg)'));
-    console.warn('Contratos ativos:', LICITACOES.filter(l=>l.status==='ativa').map(l=>l.nome+' itens:'+l.itens.map(x=>x.ingrediente).join(',')));
-    console.warn('itensSemLic:', itensSemLic.map(x=>x.nomeBase));
+  const fornIds = Object.keys(fornMap).sort((a,b) => fornMap[a].nome.localeCompare(fornMap[b].nome, 'pt-BR'));
+  if(!fornIds.length && !semFornItens.length){
+    alert('Nenhum item para registrar ordem.');
+    return;
   }
 
   // Monta modal de seleção
   const body = document.getElementById('modal-body-sel-contrato');
-  const licIds = Object.keys(licMap);
   body.innerHTML = `
     <p style="margin:0 0 12px;font-size:13px;color:#475569">
       Ciclo: <b>${esc(ciclo)}</b> — Semana: <b>${esc(semLabel)}</b>
     </p>
     <p style="margin:0 0 12px;font-size:13px;color:#475569">
-      Selecione o(s) contrato(s) para os quais deseja registrar a ordem:
+      Selecione o(s) fornecedor(es) para os quais deseja registrar a ordem:
     </p>
     <div style="display:flex;flex-direction:column;gap:10px">
-      ${licIds.map(licId => {
-        const lic = licMap[licId];
-        const licFull = LICITACOES.find(l => l.id === licId);
-        const precoMap = {};
-        if(licFull) licFull.itens.forEach(it => { precoMap[it.ingrediente] = it.preco_unitario || 0; });
-        const totalLic = lic.itens.reduce((s, it) => s + it.qtd * (precoMap[it.ingrediente]||0), 0);
-        return `<div style="border:1.5px solid #CBD5E1;border-radius:8px;overflow:hidden">
-          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:#fff">
-            <input type="checkbox" checked data-lic-id="${esc(licId)}" style="width:16px;height:16px;accent-color:var(--verde)">
-            <div style="flex:1">
-              <span style="font-weight:700;font-size:14px;color:var(--verde)">${esc(lic.nome)}</span>
-              ${licFull ? `<span style="font-size:11px;color:#94A3B8;margin-left:8px">Início: ${fmtDataBR(licFull.data_inicio)}</span>` : ''}
-            </div>
-            <span style="font-weight:700;font-size:13px;color:#1e293b">R$ ${totalLic.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
-          </label>
-          <div style="overflow-x:auto;border-top:1px solid #E2E8F0">
-            <table style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead><tr>
-                <th style="padding:4px 8px;text-align:left;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Ingrediente</th>
-                <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Qtd (kg)</th>
-                <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Preço unit.</th>
-                <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Subtotal</th>
-                <th style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0"></th>
-              </tr></thead>
-              <tbody>
-                ${lic.itens.map(it => {
-                  const pu = precoMap[it.ingrediente]||0;
-                  const sub = it.qtd * pu;
-                  const removido = _removidosPendentes[licId] && _removidosPendentes[licId][it.ingrediente];
-                  return `<tr style="${removido ? 'opacity:.45' : ''}">
-                    <td style="padding:3px 8px;border-bottom:1px solid #F1F5F9">${esc(it.ingrediente)} ${removido ? '<span style="color:#9a3412;font-weight:700;font-size:10px">(removido' + (removido.motivo ? ': ' + esc(removido.motivo) : '') + ')</span>' : ''}</td>
-                    <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-family:'DM Mono',monospace">${it.qtd.toFixed(3)}</td>
-                    <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9">R$ ${pu.toFixed(2).replace('.',',')}</td>
-                    <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-weight:600">R$ ${sub.toFixed(2).replace('.',',')}</td>
-                    <td style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;white-space:nowrap">
-                      <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:${removido ? '#dcfce7' : '#fff7ed'};color:${removido ? '#166534' : '#9a3412'};border:1px solid ${removido ? '#86efac' : '#fed7aa'};border-radius:5px;cursor:pointer;font-family:inherit" onclick="toggleRemoverItemModal('${esc(licId)}','${esc(it.ingrediente)}')">${removido ? '↩ Restaurar' : '✕ Remover'}</button>
-                    </td>
-                  </tr>`;
-                }).join('')}
-              </tbody>
-              <tfoot><tr>
-                <td colspan="3" style="padding:5px 8px;text-align:right;font-weight:700;font-size:12px">Total</td>
-                <td class="num" style="padding:5px 8px;text-align:right;font-weight:700;font-size:12px;color:var(--verde)">R$ ${totalLic.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
-              </tr></tfoot>
-            </table>
-          </div>
-        </div>`;
-      }).join('')}
+      ${fornIds.map(fid => _blocoFornModal(fid, fornMap[fid], LICITACOES.filter(l => l.status === 'ativa' && l.data_inicio <= hoje && l.fornecedor_id === fid))).join('')}
     </div>
-    ${itensSemLic.length ? `<div style="border:1.5px solid #FBBF24;border-radius:8px;overflow:hidden">
-      <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:#FFFBEB">
-        <input type="checkbox" checked data-lic-id="__sem_contrato" style="width:16px;height:16px;accent-color:#D97706">
-        <div style="flex:1">
-          <span style="font-weight:700;font-size:14px;color:#B45309">Sem contrato</span>
-          <span style="font-size:11px;color:#92400E;margin-left:8px">itens sem contrato ativo — informe o preço manualmente</span>
-        </div>
-      </label>
-      <div style="overflow-x:auto;border-top:1px solid #FDE68A">
-        <table style="width:100%;border-collapse:collapse;font-size:11px">
-          <thead><tr>
-            <th style="padding:4px 8px;text-align:left;background:#FFFBEB;border-bottom:1px solid #FDE68A">Ingrediente</th>
-            <th class="num" style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A">Qtd (kg)</th>
-            <th class="num" style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A">Preço unit.</th>
-            <th class="num" style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A">Subtotal</th>
-            <th style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A"></th>
-          </tr></thead>
-          <tbody>
-            ${itensSemLic.map((it, si) => {
-              const removido = _removidosPendentes['__sem_contrato'] && _removidosPendentes['__sem_contrato'][it.nomeBase];
-              const pu = _precosSemLicTemp[it.nomeBase] || 0;
-              const sub = it.comprar * pu;
-              return `<tr style="background:#FFFBEB;${removido ? 'opacity:.45' : ''}">
-                <td style="padding:3px 8px;border-bottom:1px solid #FEF3C7">${esc(it.nomeBase)} ${removido ? '<span style="color:#9a3412;font-weight:700;font-size:10px">(removido' + (removido.motivo ? ': ' + esc(removido.motivo) : '') + ')</span>' : ''}</td>
-                <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7;font-family:'DM Mono',monospace">${it.comprar.toFixed(3)}</td>
-                <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7"><input type="number" step="0.01" min="0" value="${pu || ''}" placeholder="0,00" oninput="atualizarPrecoSemLic('${esc(it.nomeBase)}',${si},this.value,${it.comprar})" style="width:86px;text-align:right;padding:2px 6px;border:1.5px solid #FCD34D;border-radius:5px;font-family:'DM Mono',monospace;font-size:11px;background:#fff"></td>
-                <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7;font-family:'DM Mono',monospace;font-weight:600" id="sub-sem-${si}">R$ ${sub.toFixed(2).replace('.',',')}</td>
-                <td style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7;white-space:nowrap">
-                  <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:${removido ? '#dcfce7' : '#fff7ed'};color:${removido ? '#166534' : '#9a3412'};border:1px solid ${removido ? '#86efac' : '#fed7aa'};border-radius:5px;cursor:pointer;font-family:inherit" onclick="toggleRemoverItemModal('__sem_contrato','${esc(it.nomeBase)}')">${removido ? '↩ Restaurar' : '✕ Remover'}</button>
-                </td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
+    ${semFornItens.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
+      ⚠️ ${semFornItens.length} item(ns) sem fornecedor associado — ao registrar, você precisará associá-los: ${semFornItens.map(it => esc(it.nomeBase)).join(', ')}
     </div>` : ''}
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #E2E8F0">
       <button class="btn btn-outline" onclick="fecharOverlaySelContrato()">Cancelar</button>
@@ -5005,15 +4921,84 @@ function registrarOrdemExpedida(){
   `;
 
   // Pausa o registro da ordem para mostrar o modal (sem usar async)
-  _ordemPendente = { ciclo, semLabel, hoje, mondayIso, itensSemLic };
+  _ordemPendente = { ciclo, semLabel, hoje, mondayIso, semFornItens, fornIds };
   document.getElementById('overlay-sel-contrato').classList.add('aberto');
+}
+
+// Bloco do fornecedor no modal de registro (itens do contrato normais; sem contrato em âmbar com preço manual)
+function _blocoFornModal(fid, forn, lics){
+  const _def = lics.reduce((best, l) => {
+    const n = l.itens.filter(x => forn.itens.some(i => i.nomeBase === x.ingrediente)).length;
+    if(!best || n > best.n) return { id: l.id, n };
+    return best;
+  }, null);
+  if(_licEscolhidaPorForn[fid] === undefined) _licEscolhidaPorForn[fid] = _def ? _def.id : null;
+  const licId = _licEscolhidaPorForn[fid] || null;
+  const lic = licId ? LICITACOES.find(l => l.id === licId) : null;
+  const precoMap = {};
+  if(lic) lic.itens.forEach(x => { precoMap[x.ingrediente] = x.preco_unitario || 0; });
+
+  const selContrato = lics.length > 1 ? `
+    <select onchange="_licEscolhidaPorForn['${fid}']=this.value||null;registrarOrdemExpedida()" style="font-size:11px;padding:3px 8px;border-radius:5px;border:1.5px solid #CBD5E1;background:#fff;font-family:inherit">
+      <option value="" ${!licId ? 'selected' : ''}>Sem contrato</option>
+      ${lics.map(l => `<option value="${l.id}" ${licId === l.id ? 'selected' : ''}>${esc(l.nome)}</option>`).join('')}
+    </select>` : '';
+  const badge = !lics.length
+    ? '<span style="font-size:11px;color:#B45309;margin-left:8px">sem contrato ativo</span>'
+    : (lic ? `<span style="font-size:11px;color:#94A3B8;margin-left:8px">Contrato: ${esc(lic.nome)}</span>` : '<span style="font-size:11px;color:#B45309;margin-left:8px">sem contrato</span>');
+
+  return `<div style="border:1.5px solid #CBD5E1;border-radius:8px;overflow:hidden">
+    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:#fff">
+      <input type="checkbox" checked data-forn-id="${fid}" style="width:16px;height:16px;accent-color:var(--verde)">
+      <div style="flex:1">
+        <span style="font-weight:700;font-size:14px;color:var(--verde)">${esc(forn.nome)}</span>
+        ${badge}
+      </div>
+      ${selContrato}
+    </label>
+    <div style="overflow-x:auto;border-top:1px solid #E2E8F0">
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr>
+          <th style="padding:4px 8px;text-align:left;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Ingrediente</th>
+          <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Qtd (kg)</th>
+          <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Preço unit.</th>
+          <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Subtotal</th>
+          <th style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0"></th>
+        </tr></thead>
+        <tbody>
+          ${forn.itens.map((it, si) => {
+            const noContrato = !(precoMap[it.nomeBase] != null);
+            const pu = noContrato ? (_precosSemLicTemp[it.nomeBase] || 0) : (precoMap[it.nomeBase] || 0);
+            const sub = it.comprar * pu;
+            const removido = _removidosPendentes[fid] && _removidosPendentes[fid][it.nomeBase];
+            return `<tr style="${noContrato ? 'background:#FFFBEB;' : ''}${removido ? 'opacity:.45' : ''}">
+              <td style="padding:3px 8px;border-bottom:1px solid #F1F5F9">${esc(it.nomeBase)} ${noContrato ? '<span style="color:#B45309;font-weight:700;font-size:10px">(sem contrato)</span>' : ''} ${removido ? '<span style="color:#9a3412;font-weight:700;font-size:10px">(removido' + (removido.motivo ? ': ' + esc(removido.motivo) : '') + ')</span>' : ''}</td>
+              <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-family:'DM Mono',monospace">${it.comprar.toFixed(3)}</td>
+              <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9">${noContrato ? `<input type="number" step="0.01" min="0" value="${pu || ''}" placeholder="0,00" oninput="atualizarPrecoSemLic('${fid}','${esc(it.nomeBase)}',${si},this.value,${it.comprar})" style="width:86px;text-align:right;padding:2px 6px;border:1.5px solid #FCD34D;border-radius:5px;font-family:'DM Mono',monospace;font-size:11px;background:#fff">` : 'R$ ' + pu.toFixed(2).replace('.', ',')}</td>
+              <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-family:'DM Mono',monospace;font-weight:600" id="sub-sem-${fid}-${si}">R$ ${sub.toFixed(2).replace('.', ',')}</td>
+              <td style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;white-space:nowrap">
+                <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:${removido ? '#dcfce7' : '#fff7ed'};color:${removido ? '#166534' : '#9a3412'};border:1px solid ${removido ? '#86efac' : '#fed7aa'};border-radius:5px;cursor:pointer;font-family:inherit" onclick="toggleRemoverItemModal('${fid}','${esc(it.nomeBase)}')">${removido ? '↩ Restaurar' : '✕ Remover'}</button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
 }
 
 let _ordemPendente = null;
 
 function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
-  const checks = document.querySelectorAll('#modal-body-sel-contrato input[type=checkbox]:checked');
-  if(!checks.length){ alert('Selecione ao menos um contrato.'); return; }
+  // Itens sem fornecedor: exige associação antes de registrar
+  const _semForn = ((_ordemPendente && _ordemPendente.semFornItens) || []);
+  if(_semForn.length){
+    montarModalSemForn(_semForn, 'registro');
+    return;
+  }
+
+  const checks = document.querySelectorAll('#modal-body-sel-contrato input[type=checkbox][data-forn-id]:checked');
+  if(!checks.length){ alert('Selecione ao menos um fornecedor.'); return; }
 
   // Recupera o mondayIso armazenado ao abrir o modal
   const mondayIso = _ordemPendente ? _ordemPendente.mondayIso : '';
@@ -5037,18 +5022,22 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       .filter(([k]) => k === nomeBase || k.startsWith(nomeBase + ' ___ '))
       .reduce((s, [,v]) => s + v, 0);
   };
-  const contratosSelecionados = [];
+
+  const { af_items, mc_items } = _MERC_SEMANAS_SEL.length > 0
+    ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
+    : getItensMercado(ciclo, mondayIso);
+  const _todos = [...af_items, ...mc_items];
+
+  const _ordens = [];
   checks.forEach(cb => {
-    const licId = cb.getAttribute('data-lic-id');
-    const lic = LICITACOES.find(l => l.id === licId);
-    if(!lic) return;
-    // Itens da lista (igual à tela) para o período selecionado
-    const { af_items, mc_items } = _MERC_SEMANAS_SEL.length > 0
-      ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
-      : getItensMercado(ciclo, mondayIso);
-    const todosItens = [...af_items, ...mc_items];
-    const itensOrdem = todosItens
-      .filter(it => it.comprar > 0 && lic.itens.some(li => li.ingrediente === it.nomeBase))
+    const fid = cb.getAttribute('data-forn-id');
+    const licId = _licEscolhidaPorForn[fid] || null;
+    const lic = licId ? LICITACOES.find(l => l.id === licId) : null;
+    const precoMap = {};
+    if(lic) lic.itens.forEach(x => { precoMap[x.ingrediente] = x.preco_unitario || 0; });
+    const _remPend = (_removidosPendentes && _removidosPendentes[fid]) || {};
+    const itensOrdem = _todos
+      .filter(it => it.comprar > 0 && (ING_FORNECEDORES[it.nomeBase] || '') === fid)
       .map(it => {
         const _dias = [];
         dias.forEach((d, i) => {
@@ -5056,16 +5045,18 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
           const qtd = _qtdDia(it.nomeBase, datas[i], d);
           if(qtd > 0) _dias.push({ data: datas[i], qtd: parseFloat(qtd.toFixed(3)) });
         });
+        const semContrato = !(precoMap[it.nomeBase] != null);
         return {
           ingrediente: it.nomeBase,
           qtd_solicitada: parseFloat(it.comprar.toFixed(3)),
           dias: _dias,
           manual: !!it.extra,
-          usuario: _matrizUsuarioAtual()
+          usuario: _matrizUsuarioAtual(),
+          sem_contrato: semContrato,
+          preco_unitario: semContrato ? (_precosSemLicTemp[it.nomeBase] || 0) : (precoMap[it.nomeBase] || 0)
         };
       })
       .filter(it => it.dias.length > 0);
-    const _remPend = (_removidosPendentes && _removidosPendentes[licId]) || {};
     const itensFinal = itensOrdem.filter(it => !_remPend[it.ingrediente]);
     const removidosFinal = itensOrdem.filter(it => _remPend[it.ingrediente]).map(it => ({
       ingrediente: it.ingrediente,
@@ -5076,51 +5067,10 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       data: hoje
     }));
     if(itensFinal.length || removidosFinal.length)
-      contratosSelecionados.push({ licId, itens: itensFinal, removidos: removidosFinal, nome: lic.nome });
+      _ordens.push({ fid, licitacao_id: licId, itens: itensFinal, removidos: removidosFinal });
   });
 
-  // Ordem "Sem contrato": itens da lista sem contrato ativo
-  let semOrdemItens = null;
-  const _semLicNomes = new Set(((_ordemPendente && _ordemPendente.itensSemLic) || []).map(x => x.nomeBase));
-  if(_semLicNomes.size && document.querySelector('#modal-body-sel-contrato input[data-lic-id="__sem_contrato"]:checked')){
-    const { af_items: _af2, mc_items: _mc2 } = _MERC_SEMANAS_SEL.length > 0
-      ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
-      : getItensMercado(ciclo, mondayIso);
-    const _todos2 = [..._af2, ..._mc2];
-    const _remPend2 = (_removidosPendentes && _removidosPendentes['__sem_contrato']) || {};
-    const _semItens = _todos2
-      .filter(it => it.comprar > 0 && _semLicNomes.has(it.nomeBase))
-      .map(it => {
-        const _dias = [];
-        dias.forEach((d, i) => {
-          if(!d || !datas[i]) return;
-          const qtd = _qtdDia(it.nomeBase, datas[i], d);
-          if(qtd > 0) _dias.push({ data: datas[i], qtd: parseFloat(qtd.toFixed(3)) });
-        });
-        return {
-          ingrediente: it.nomeBase,
-          qtd_solicitada: parseFloat(it.comprar.toFixed(3)),
-          dias: _dias,
-          manual: !!it.extra,
-          usuario: _matrizUsuarioAtual(),
-          preco_unitario: _precosSemLicTemp[it.nomeBase] || 0
-        };
-      })
-      .filter(it => it.dias.length > 0);
-    const _semItensFinal = _semItens.filter(it => !_remPend2[it.ingrediente]);
-    const _semRemovidos = _semItens.filter(it => _remPend2[it.ingrediente]).map(it => ({
-      ingrediente: it.ingrediente,
-      qtd_solicitada: it.qtd_solicitada,
-      dias: it.dias,
-      motivo: _remPend2[it.ingrediente].motivo || '',
-      usuario: _remPend2[it.ingrediente].usuario || '',
-      data: hoje
-    }));
-    if(_semItensFinal.length || _semRemovidos.length)
-      semOrdemItens = { itens: _semItensFinal, removidos: _semRemovidos };
-  }
-
-  if(!contratosSelecionados.length && !semOrdemItens){
+  if(!_ordens.length){
     alert('Nenhum item disponível para registrar a ordem.');
     return;
   }
@@ -5128,40 +5078,26 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
   const _semLabel = semanas.length > 1
     ? semanas.length + ' semanas: ' + fmtDataBR(semanas[0]) + ' a ' + fmtDataBR(semanas[semanas.length - 1])
     : semLabel;
-  contratosSelecionados.forEach(({ licId, itens, removidos }) => {
+  _ordens.forEach(o => {
     ORDENS_EXPEDIDAS.push({
       id: gerarId('ord'),
-      licitacao_id: licId,
+      fornecedor_id: o.fid,
+      licitacao_id: o.licitacao_id,
       ciclo,
       semana: _semLabel,
       data_expedicao: hoje,
       mondayIso,
       semanas: semanas.slice(),
       numSemanas: semanas.length,
-      itens,
-      removidos: removidos || []
+      itens: o.itens,
+      removidos: o.removidos
     });
   });
-  if(semOrdemItens){
-    ORDENS_EXPEDIDAS.push({
-      id: gerarId('ord'),
-      licitacao_id: null,
-      ciclo,
-      semana: _semLabel,
-      data_expedicao: hoje,
-      mondayIso,
-      semanas: semanas.slice(),
-      numSemanas: semanas.length,
-      itens: semOrdemItens.itens,
-      removidos: semOrdemItens.removidos
-    });
-  }
   _removidosPendentes = {};
   salvarOrdens();
   fecharOverlaySelContrato();
   renderEstoqueLotes();
-  const _nOrdens = contratosSelecionados.length + (semOrdemItens ? 1 : 0);
-  alert(`✅ ${_nOrdens} ordem(ns) registrada(s) com sucesso!`);
+  alert(`✅ ${_ordens.length} ordem(ns) registrada(s) com sucesso!`);
 }
 
 // Arredonda para cima ao múltiplo da embalagem; retorna {arred, nPacotes}
@@ -7371,12 +7307,24 @@ function validarEImprimir(){
     if(confirm('Nenhum fornecedor cadastrado. Deseja imprimir mesmo assim?')){ limparEstadosPrintMerc(); atualizarPrintGlobal(); window.print(); }
     return;
   }
+  montarModalSemForn(semForn, 'print');
+}
+
+// Monta o modal de associação de fornecedores (impressão ou registro)
+function montarModalSemForn(items, modo){
+  _modalSemFornModo = modo || 'print';
+  const sub = document.getElementById('modal-sem-forn-sub');
+  const btn = document.getElementById('btn-modal-sem-forn-confirm');
+  if(sub) sub.textContent = modo === 'registro'
+    ? 'Associe cada ingrediente a um fornecedor antes de registrar a ordem.'
+    : 'Associe cada ingrediente a um fornecedor antes de imprimir.';
+  if(btn) btn.textContent = modo === 'registro' ? 'Continuar registro' : 'Imprimir';
   const lista = document.getElementById('modal-sem-forn-lista');
-  lista.innerHTML = semForn.map(it => {
+  lista.innerHTML = items.map(it => {
     const enc = it.nomeBase.replace(/"/g,'&quot;');
     const tipoTag = isAF(it.nomeBase) ? 'AF' : 'MC';
     return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9">
-      <span style="flex:1;font-size:13px;font-weight:600">${it.displayNome} <span style="font-size:11px;color:#94a3b8">${tipoTag}</span></span>
+      <span style="flex:1;font-size:13px;font-weight:600">${it.displayNome || esc(it.nomeBase)} <span style="font-size:11px;color:#94a3b8">${tipoTag}</span></span>
       <select data-modal-ing="${enc}" onchange="autoSalvarAssocFornModal(this)"
         style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;min-width:150px">
         <option value="">— Selecione —</option>
@@ -7385,6 +7333,20 @@ function validarEImprimir(){
     </div>`;
   }).join('');
   document.getElementById('modal-sem-forn').style.display = 'flex';
+}
+
+// Botão único do modal: imprime ou continua o registro, conforme o modo
+function confirmarModalSemForn(){
+  if(_modalSemFornModo === 'registro'){
+    const sels = document.querySelectorAll('#modal-sem-forn-lista [data-modal-ing]');
+    let ok = true;
+    sels.forEach(sel => { if(!sel.value){ ok = false; sel.style.borderColor = '#ef4444'; } });
+    if(!ok){ alert('Selecione um fornecedor para todos os ingredientes.'); return; }
+    document.getElementById('modal-sem-forn').style.display = 'none';
+    registrarOrdemExpedida();
+    return;
+  }
+  imprimirModalForn();
 }
 
 function limparEstadosPrintMerc(){
