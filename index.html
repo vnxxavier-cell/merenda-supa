@@ -3417,6 +3417,7 @@ let _lotesBusca = '';
 let _lotesPeriodoIni = '', _lotesPeriodoFim = '';
 let _matrizFiltroStatus = { coberto:true, parcial:true, planejado:true, sem:true, manual:true, removido:true };
 let _removidosPendentes = {}; // licId → { ingrediente: {motivo, usuario} } (modal de registro)
+let _precosSemLicTemp = {}; // ingrediente → preço unit. manual (itens sem contrato)
 
 const MATRIZ_STATUS = {
   coberto:  { cor:'#dcfce7', bd:'#4ade80', txt:'#166534', css:'#dcfce7' },
@@ -3730,6 +3731,13 @@ function toggleRemoverItemModal(licId, ingrediente){
   if(motivo === null) return;
   _removidosPendentes[licId][ingrediente] = { motivo, usuario: _matrizUsuarioAtual() };
   registrarOrdemExpedida();
+}
+
+// Preço manual dos itens sem contrato no modal de registro
+function atualizarPrecoSemLic(nome, idx, val, qtd){
+  _precosSemLicTemp[nome] = parseFloat(String(val).replace(',', '.')) || 0;
+  const el = document.getElementById('sub-sem-' + idx);
+  if(el) el.textContent = 'R$ ' + ((parseFloat(qtd) || 0) * (_precosSemLicTemp[nome] || 0)).toFixed(2).replace('.', ',');
 }
 
 const LOTES_CORES = ['#93C5FD','#86EFAC','#FCD34D','#FCA5A5','#C4B5FD','#5EEAD4','#F9A8D4','#BEF264','#A5B4FC','#FDBA74'];
@@ -4137,14 +4145,75 @@ function sugerirQuantidades(lic_id){
 // ══════════════════════════════════════════════════════
 // LICITAÇÕES
 // ══════════════════════════════════════════════════════
+// Cartão de ordem expedida (usado nos contratos e nas ordens sem contrato)
+function _ordemCardHtml(o, precoOf){
+  const recebidos = RECEBIMENTOS.filter(r => r.ordem_id === o.id);
+  const totalItens = (o.itens||[]).length;
+  const confirmados = recebidos.length;
+  const pendentes = totalItens - confirmados;
+  const total = (o.itens||[]).reduce((t, it) => t + (it.qtd_solicitada||0) * (precoOf ? (precoOf(it)||0) : 0), 0);
+  return `<div style="border:1px solid var(--borda);border-radius:8px;margin-bottom:8px;overflow:hidden">
+    <div style="background:#f8fafc;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleOrdem('${o.id}')">
+      <span style="font-weight:700;font-size:13px">${esc(o.ciclo)} — ${esc(o.semana)}</span>
+      <span style="font-size:12px;color:var(--txt2)">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})} · ${fmtDataBR(o.data_expedicao)} · ${confirmados}/${totalItens} confirmados</span>
+      <div style="display:flex;gap:6px;align-items:center" onclick="event.stopPropagation()">
+        ${pendentes > 0 ? `<button class="btn btn-sm" style="background:var(--laranja);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="abrirConfirmarRecebimento('${o.id}')">${ico('check',11)}Confirmar recebimento</button>` : `<span style="color:var(--verde);font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:4px">${ico('checkCircle',12)}Completo</span>`}
+        <button class="btn btn-sm" style="background:#fee2e2;color:var(--vermelho);border:1px solid #fca5a5;display:inline-flex;align-items:center;gap:4px" onclick="cancelarOrdem('${o.id}')">${ico('trash',11)}Cancelar</button>
+      </div>
+    </div>
+    <div id="body-ordem-${o.id}" style="display:none;padding:12px 14px">
+      <table><thead><tr><th>Ingrediente</th><th class="num">Solicitado</th><th class="num">Recebido</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${(o.itens||[]).map(it => {
+          const rec = recebidos.find(r => r.ingrediente === it.ingrediente);
+          const statusLabel = !rec ? '<span style="color:#aaa">Pendente</span>' :
+            rec.status === 'recebido' ? `<span style="color:var(--verde);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('checkCircle',12)}Total</span>` :
+            rec.status === 'parcial'  ? `<span style="color:var(--amarelo);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('alert',12)}Parcial</span>` :
+            `<span style="color:var(--vermelho);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('xCircle',12)}Não recebido</span>`;
+          const unid = DADOS.ingredientes[it.ingrediente]?.unidade || 'kg';
+          return `<tr>
+            <td>${esc(it.ingrediente)}${it.manual ? ' <span style="font-size:10px;color:var(--azul2);font-weight:700" title="Adicionado manualmente">(manual)</span>' : ''}</td>
+            <td class="num">${fmt(it.qtd_solicitada)} ${unid}</td>
+            <td class="num">${rec ? fmt(rec.qtd_recebida)+' '+unid : '—'}</td>
+            <td>${statusLabel}</td>
+            <td style="text-align:right;white-space:nowrap">
+              <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:5px;cursor:pointer;font-family:inherit" onclick="removerItemOrdem('${o.id}','${esc(it.ingrediente)}')">✕ Remover</button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody></table>
+      ${(o.removidos && o.removidos.length) ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px">
+        <div style="font-size:12px;font-weight:700;color:#9a3412;margin-bottom:4px">Itens retirados da ordem (demanda original preservada):</div>
+        ${o.removidos.map(r => `<div style="display:flex;gap:10px;align-items:center;padding:3px 0;font-size:12px;color:#7c2d12">
+          <span>• ${esc(r.ingrediente)} — ${fmt(r.qtd_solicitada)} ${esc(DADOS.ingredientes[r.ingrediente]?.unidade||'kg')}</span>
+          ${r.motivo ? `<span style="color:#9a3412;font-style:italic">motivo: ${esc(r.motivo)}</span>` : ''}
+          ${r.usuario ? `<span style="color:#c2410c">(por ${esc(r.usuario)})</span>` : ''}
+          <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:5px;cursor:pointer;font-family:inherit" onclick="restaurarItemOrdem('${o.id}','${esc(r.ingrediente)}')">↩ Restaurar</button>
+        </div>`).join('')}
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
 function renderLicitacoes(){
   const el = document.getElementById('lista-licitacoes');
   if(!el) return;
+  const semLicOrdens = ORDENS_EXPEDIDAS.filter(o => !o.licitacao_id);
+  const semLicHtml = semLicOrdens.length ? `<div class="card" style="margin-bottom:16px">
+    <div class="card-header" style="background:#B45309;cursor:pointer" onclick="toggleLicitacao('__sem_contrato')">
+      <span>Ordens sem contrato</span>
+      <span style="font-weight:400;font-size:12px;opacity:.8">${semLicOrdens.length} ordem(ns)</span>
+    </div>
+    <div id="body-lic-__sem_contrato" style="display:none;padding:20px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);margin-bottom:10px">Ordens Expedidas</div>
+      ${semLicOrdens.map(o => _ordemCardHtml(o, it => it.preco_unitario || 0)).join('')}
+    </div>
+  </div>` : '';
   if(!LICITACOES.length){
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">Nenhum contrato cadastrado. Clique em "Novo Contrato" para começar.</div>';
+    el.innerHTML = semLicHtml || '<div style="text-align:center;padding:40px;color:#aaa">Nenhum contrato cadastrado. Clique em "Novo Contrato" para começar.</div>';
     return;
   }
-  el.innerHTML = LICITACOES.map(lic => {
+  el.innerHTML = semLicHtml + LICITACOES.map(lic => {
     const saldo = calcularSaldoLicitacao(lic.id);
     const totalContratado = lic.itens.reduce((a,it) => a + it.qtd_contratada * it.preco_unitario, 0);
     const totalExpedItems = Object.values(saldo).reduce((a,s) => a + s.expedido, 0);
@@ -4192,53 +4261,7 @@ function renderLicitacoes(){
 
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);margin-bottom:10px">Ordens Expedidas</div>
         ${!ordens.length ? '<div style="color:#aaa;font-size:13px;padding:8px 0">Nenhuma ordem expedida ainda.</div>' :
-          ordens.map(o => {
-            const recebidos = RECEBIMENTOS.filter(r => r.ordem_id === o.id);
-            const totalItens = o.itens.length;
-            const confirmados = recebidos.length;
-            const pendentes = totalItens - confirmados;
-            return `<div style="border:1px solid var(--borda);border-radius:8px;margin-bottom:8px;overflow:hidden">
-              <div style="background:#f8fafc;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleOrdem('${o.id}')">
-                <span style="font-weight:700;font-size:13px">${o.ciclo} — Semana ${o.semana}</span>
-                <span style="font-size:12px;color:var(--txt2)">${(()=>{let t=0;o.itens.forEach(it=>{const li=lic.itens.find(x=>x.ingrediente===it.ingrediente);if(li)t+=it.qtd_solicitada*li.preco_unitario;});return'R$ '+t.toLocaleString('pt-BR',{minimumFractionDigits:2});})()} · ${fmtDataBR(o.data_expedicao)} · ${confirmados}/${totalItens} confirmados</span>
-                <div style="display:flex;gap:6px;align-items:center" onclick="event.stopPropagation()">
-                  ${pendentes > 0 ? `<button class="btn btn-sm" style="background:var(--laranja);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="abrirConfirmarRecebimento('${o.id}')">${ico('check',11)}Confirmar recebimento</button>` : `<span style="color:var(--verde);font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:4px">${ico('checkCircle',12)}Completo</span>`}
-                  <button class="btn btn-sm" style="background:#fee2e2;color:var(--vermelho);border:1px solid #fca5a5;display:inline-flex;align-items:center;gap:4px" onclick="cancelarOrdem('${o.id}')">${ico('trash',11)}Cancelar</button>
-                </div>
-              </div>
-              <div id="body-ordem-${o.id}" style="display:none;padding:12px 14px">
-                <table><thead><tr><th>Ingrediente</th><th class="num">Solicitado</th><th class="num">Recebido</th><th>Status</th><th></th></tr></thead>
-                <tbody>
-                  ${o.itens.map(it => {
-                    const rec = recebidos.find(r => r.ingrediente === it.ingrediente);
-                    const statusLabel = !rec ? '<span style="color:#aaa">Pendente</span>' :
-                      rec.status === 'recebido' ? `<span style="color:var(--verde);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('checkCircle',12)}Total</span>` :
-                      rec.status === 'parcial'  ? `<span style="color:var(--amarelo);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('alert',12)}Parcial</span>` :
-                      `<span style="color:var(--vermelho);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('xCircle',12)}Não recebido</span>`;
-                    const unid = DADOS.ingredientes[it.ingrediente]?.unidade || 'kg';
-                    return `<tr>
-                      <td>${it.ingrediente}${it.manual ? ' <span style="font-size:10px;color:var(--azul2);font-weight:700" title="Adicionado manualmente">(manual)</span>' : ''}</td>
-                      <td class="num">${fmt(it.qtd_solicitada)} ${unid}</td>
-                      <td class="num">${rec ? fmt(rec.qtd_recebida)+' '+unid : '—'}</td>
-                      <td>${statusLabel}</td>
-                      <td style="text-align:right;white-space:nowrap">
-                        <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:5px;cursor:pointer;font-family:inherit" onclick="removerItemOrdem('${o.id}','${esc(it.ingrediente)}')">✕ Remover</button>
-                      </td>
-                    </tr>`;
-                  }).join('')}
-                </tbody></table>
-                ${(o.removidos && o.removidos.length) ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px">
-                  <div style="font-size:12px;font-weight:700;color:#9a3412;margin-bottom:4px">Itens retirados da ordem (demanda original preservada):</div>
-                  ${o.removidos.map(r => `<div style="display:flex;gap:10px;align-items:center;padding:3px 0;font-size:12px;color:#7c2d12">
-                    <span>• ${esc(r.ingrediente)} — ${fmt(r.qtd_solicitada)} ${esc(DADOS.ingredientes[r.ingrediente]?.unidade||'kg')}</span>
-                    ${r.motivo ? `<span style="color:#9a3412;font-style:italic">motivo: ${esc(r.motivo)}</span>` : ''}
-                    ${r.usuario ? `<span style="color:#c2410c">(por ${esc(r.usuario)})</span>` : ''}
-                    <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:5px;cursor:pointer;font-family:inherit" onclick="restaurarItemOrdem('${o.id}','${esc(r.ingrediente)}')">↩ Restaurar</button>
-                  </div>`).join('')}
-                </div>` : ''}
-              </div>
-            </div>`;
-          }).join('')}
+          ordens.map(o => _ordemCardHtml(o, it => { const li = lic.itens.find(x=>x.ingrediente===it.ingrediente); return li ? li.preco_unitario : 0; })).join('')}
       </div>
     </div>`;
   }).join('');
@@ -4863,7 +4886,7 @@ function registrarOrdemExpedida(){
   todosItens.forEach(it => {
     if(it.comprar <= 0) return;
     const lics = licitacoesAtivasParaIngrediente(it.nomeBase, hoje);
-    if(!lics.length){ itensSemLic.push(it.nomeBase); return; }
+    if(!lics.length){ itensSemLic.push({ nomeBase: it.nomeBase, comprar: parseFloat(it.comprar.toFixed(3)) }); return; }
     itensComLicSet.add(it.nomeBase);
     lics.forEach(lic => {
       if(!licMap[lic.id]) licMap[lic.id] = { nome: lic.nome, itens: [] };
@@ -4876,9 +4899,7 @@ function registrarOrdemExpedida(){
   if(!Object.keys(licMap).length){
     console.warn('Ordem sem vínculo com contrato. Itens da ordem:', todosItens.map(i=>i.nomeBase+'('+i.comprar+'kg)'));
     console.warn('Contratos ativos:', LICITACOES.filter(l=>l.status==='ativa').map(l=>l.nome+' itens:'+l.itens.map(x=>x.ingrediente).join(',')));
-    console.warn('itensSemLic:', itensSemLic);
-    alert('Nenhum item desta ordem está vinculado a um contrato ativo.\n\nMotivos comuns:\n• A data de início do contrato é posterior a hoje?\n• O nome do ingrediente no contrato está escrito igual ao da receita?\n• Nenhuma semana selecionada no calendário da Lista de Compras?\n\nVeja o console (F12) para mais detalhes.');
-    return;
+    console.warn('itensSemLic:', itensSemLic.map(x=>x.nomeBase));
   }
 
   // Monta modal de seleção
@@ -4941,8 +4962,41 @@ function registrarOrdemExpedida(){
         </div>`;
       }).join('')}
     </div>
-    ${itensSemLic.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
-      ⚠️ ${itensSemLic.length} item(ns) sem contrato ativo: ${itensSemLic.map(esc).join(', ')}
+    ${itensSemLic.length ? `<div style="border:1.5px solid #FBBF24;border-radius:8px;overflow:hidden">
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:#FFFBEB">
+        <input type="checkbox" checked data-lic-id="__sem_contrato" style="width:16px;height:16px;accent-color:#D97706">
+        <div style="flex:1">
+          <span style="font-weight:700;font-size:14px;color:#B45309">Sem contrato</span>
+          <span style="font-size:11px;color:#92400E;margin-left:8px">itens sem contrato ativo — informe o preço manualmente</span>
+        </div>
+      </label>
+      <div style="overflow-x:auto;border-top:1px solid #FDE68A">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr>
+            <th style="padding:4px 8px;text-align:left;background:#FFFBEB;border-bottom:1px solid #FDE68A">Ingrediente</th>
+            <th class="num" style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A">Qtd (kg)</th>
+            <th class="num" style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A">Preço unit.</th>
+            <th class="num" style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A">Subtotal</th>
+            <th style="padding:4px 8px;text-align:right;background:#FFFBEB;border-bottom:1px solid #FDE68A"></th>
+          </tr></thead>
+          <tbody>
+            ${itensSemLic.map((it, si) => {
+              const removido = _removidosPendentes['__sem_contrato'] && _removidosPendentes['__sem_contrato'][it.nomeBase];
+              const pu = _precosSemLicTemp[it.nomeBase] || 0;
+              const sub = it.comprar * pu;
+              return `<tr style="background:#FFFBEB;${removido ? 'opacity:.45' : ''}">
+                <td style="padding:3px 8px;border-bottom:1px solid #FEF3C7">${esc(it.nomeBase)} ${removido ? '<span style="color:#9a3412;font-weight:700;font-size:10px">(removido' + (removido.motivo ? ': ' + esc(removido.motivo) : '') + ')</span>' : ''}</td>
+                <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7;font-family:'DM Mono',monospace">${it.comprar.toFixed(3)}</td>
+                <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7"><input type="number" step="0.01" min="0" value="${pu || ''}" placeholder="0,00" oninput="atualizarPrecoSemLic('${esc(it.nomeBase)}',${si},this.value,${it.comprar})" style="width:86px;text-align:right;padding:2px 6px;border:1.5px solid #FCD34D;border-radius:5px;font-family:'DM Mono',monospace;font-size:11px;background:#fff"></td>
+                <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7;font-family:'DM Mono',monospace;font-weight:600" id="sub-sem-${si}">R$ ${sub.toFixed(2).replace('.',',')}</td>
+                <td style="padding:3px 8px;text-align:right;border-bottom:1px solid #FEF3C7;white-space:nowrap">
+                  <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:${removido ? '#dcfce7' : '#fff7ed'};color:${removido ? '#166534' : '#9a3412'};border:1px solid ${removido ? '#86efac' : '#fed7aa'};border-radius:5px;cursor:pointer;font-family:inherit" onclick="toggleRemoverItemModal('__sem_contrato','${esc(it.nomeBase)}')">${removido ? '↩ Restaurar' : '✕ Remover'}</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
     </div>` : ''}
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #E2E8F0">
       <button class="btn btn-outline" onclick="fecharOverlaySelContrato()">Cancelar</button>
@@ -4976,6 +5030,13 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       datas.push(_inPeriodo(data) ? data : null);
     });
   });
+  const _qtdDia = (nomeBase, data, dia) => {
+    if(!dia || !data) return 0;
+    const totais = calcularTotaisNiveis([dia]).totais;
+    return Object.entries(totais)
+      .filter(([k]) => k === nomeBase || k.startsWith(nomeBase + ' ___ '))
+      .reduce((s, [,v]) => s + v, 0);
+  };
   const contratosSelecionados = [];
   checks.forEach(cb => {
     const licId = cb.getAttribute('data-lic-id');
@@ -4986,14 +5047,6 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
       : getItensMercado(ciclo, mondayIso);
     const todosItens = [...af_items, ...mc_items];
-    // Snapshot das quantidades por dia letivo de CADA semana selecionada (lote congelado)
-    const _qtdDia = (nomeBase, data, dia) => {
-      if(!dia || !data) return 0;
-      const totais = calcularTotaisNiveis([dia]).totais;
-      return Object.entries(totais)
-        .filter(([k]) => k === nomeBase || k.startsWith(nomeBase + ' ___ '))
-        .reduce((s, [,v]) => s + v, 0);
-    };
     const itensOrdem = todosItens
       .filter(it => it.comprar > 0 && lic.itens.some(li => li.ingrediente === it.nomeBase))
       .map(it => {
@@ -5026,8 +5079,49 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       contratosSelecionados.push({ licId, itens: itensFinal, removidos: removidosFinal, nome: lic.nome });
   });
 
-  if(!contratosSelecionados.length){
-    alert('Nenhum contrato selecionado possui itens disponíveis.');
+  // Ordem "Sem contrato": itens da lista sem contrato ativo
+  let semOrdemItens = null;
+  const _semLicNomes = new Set(((_ordemPendente && _ordemPendente.itensSemLic) || []).map(x => x.nomeBase));
+  if(_semLicNomes.size && document.querySelector('#modal-body-sel-contrato input[data-lic-id="__sem_contrato"]:checked')){
+    const { af_items: _af2, mc_items: _mc2 } = _MERC_SEMANAS_SEL.length > 0
+      ? getItensMercadoMulti(ciclo, dias, datas, mondayIso)
+      : getItensMercado(ciclo, mondayIso);
+    const _todos2 = [..._af2, ..._mc2];
+    const _remPend2 = (_removidosPendentes && _removidosPendentes['__sem_contrato']) || {};
+    const _semItens = _todos2
+      .filter(it => it.comprar > 0 && _semLicNomes.has(it.nomeBase))
+      .map(it => {
+        const _dias = [];
+        dias.forEach((d, i) => {
+          if(!d || !datas[i]) return;
+          const qtd = _qtdDia(it.nomeBase, datas[i], d);
+          if(qtd > 0) _dias.push({ data: datas[i], qtd: parseFloat(qtd.toFixed(3)) });
+        });
+        return {
+          ingrediente: it.nomeBase,
+          qtd_solicitada: parseFloat(it.comprar.toFixed(3)),
+          dias: _dias,
+          manual: !!it.extra,
+          usuario: _matrizUsuarioAtual(),
+          preco_unitario: _precosSemLicTemp[it.nomeBase] || 0
+        };
+      })
+      .filter(it => it.dias.length > 0);
+    const _semItensFinal = _semItens.filter(it => !_remPend2[it.ingrediente]);
+    const _semRemovidos = _semItens.filter(it => _remPend2[it.ingrediente]).map(it => ({
+      ingrediente: it.ingrediente,
+      qtd_solicitada: it.qtd_solicitada,
+      dias: it.dias,
+      motivo: _remPend2[it.ingrediente].motivo || '',
+      usuario: _remPend2[it.ingrediente].usuario || '',
+      data: hoje
+    }));
+    if(_semItensFinal.length || _semRemovidos.length)
+      semOrdemItens = { itens: _semItensFinal, removidos: _semRemovidos };
+  }
+
+  if(!contratosSelecionados.length && !semOrdemItens){
+    alert('Nenhum item disponível para registrar a ordem.');
     return;
   }
 
@@ -5048,11 +5142,26 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       removidos: removidos || []
     });
   });
+  if(semOrdemItens){
+    ORDENS_EXPEDIDAS.push({
+      id: gerarId('ord'),
+      licitacao_id: null,
+      ciclo,
+      semana: _semLabel,
+      data_expedicao: hoje,
+      mondayIso,
+      semanas: semanas.slice(),
+      numSemanas: semanas.length,
+      itens: semOrdemItens.itens,
+      removidos: semOrdemItens.removidos
+    });
+  }
   _removidosPendentes = {};
   salvarOrdens();
   fecharOverlaySelContrato();
   renderEstoqueLotes();
-  alert(`✅ ${contratosSelecionados.length} ordem(ns) registrada(s) com sucesso!`);
+  const _nOrdens = contratosSelecionados.length + (semOrdemItens ? 1 : 0);
+  alert(`✅ ${_nOrdens} ordem(ns) registrada(s) com sucesso!`);
 }
 
 // Arredonda para cima ao múltiplo da embalagem; retorna {arred, nPacotes}
