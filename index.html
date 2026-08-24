@@ -1375,6 +1375,37 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div id="pg-estoque" class="pagina">
   <h2 class="titulo">📦 Gestão de Estoque</h2>
 
+  <!-- Bloco: Matriz de Cobertura da Demanda -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <span>Cobertura da Demanda — Dias Letivos</span>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Mês anterior" onclick="matrizNav(-1)">‹</button>
+        <select id="matriz-janela" onchange="_matrizJanelaMeses=parseInt(this.value)||1;_matrizOffsetMeses=0;renderMatrizEstoque()" style="font-size:12px;padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;font-family:inherit">
+          <option value="1" style="color:#333">1 mês</option>
+          <option value="3" style="color:#333">3 meses</option>
+          <option value="12" style="color:#333">Ano inteiro</option>
+        </select>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Próximo mês" onclick="matrizNav(1)">›</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#F8FAFC">
+      <input id="matriz-busca" placeholder="Buscar ingrediente..." oninput="_matrizBusca=this.value;renderMatrizEstoque()" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;border:1.5px solid var(--borda);border-radius:6px;width:180px;background:#fff">
+      <input type="date" id="matriz-periodo-ini" title="Período — início" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
+      <input type="date" id="matriz-periodo-fim" title="Período — fim" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
+      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="aplicarPeriodoMatriz()">Aplicar período</button>
+      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="limparPeriodoMatriz()">Limpar</button>
+      <span style="font-size:12px;color:var(--txt2);font-weight:600" id="matriz-range-label"></span>
+    </div>
+    <div id="matriz-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#fff"></div>
+    <div style="overflow:auto;max-height:72vh" id="matriz-scroll">
+      <table id="tabela-matriz-estoque" style="border-collapse:separate;border-spacing:0;width:100%">
+        <thead></thead>
+        <tbody id="tbody-matriz-estoque"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Bloco: Estoque por Lotes -->
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
@@ -3397,6 +3428,364 @@ function aplicarConsumoSemanas(){
 // ══════════════════════════════════════════════════════
 // ESTOQUE — UI
 // ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// MATRIZ DE COBERTURA DA DEMANDA (aba Estoque)
+// ══════════════════════════════════════════════════════
+let _matrizJanelaMeses = 1;
+let _matrizOffsetMeses = 0;
+let _matrizBusca = '';
+let _matrizPeriodoIni = '', _matrizPeriodoFim = '';
+let _matrizFiltroStatus = { coberto:true, planejado:true, sem:true, manual:true, removido:true };
+let _removidosPendentes = {}; // licId → { ingrediente: {motivo, usuario} } (modal de registro)
+
+const MATRIZ_STATUS = {
+  coberto:  { cor:'#dcfce7', bd:'#4ade80', txt:'#166534' },
+  planejado:{ cor:'#fef9c3', bd:'#facc15', txt:'#854d0e' },
+  sem:      { cor:'#fee2e2', bd:'#f87171', txt:'#991b1b' },
+  manual:   { cor:'#dbeafe', bd:'#60a5fa', txt:'#1e40af' },
+  removido: { cor:'#ffedd5', bd:'#fb923c', txt:'#9a3412' }
+};
+
+function _matrizUsuarioAtual(){
+  const s = window._SESSAO;
+  const u = s ? USUARIOS.find(x => x.id === s.user_id) : null;
+  return u ? (u.nome || u.login || '') : '';
+}
+
+function _perSemanasIng(ing){
+  const per = ING_PERIODICIDADE[ing] || '';
+  const perObj = PERIODICIDADES.find(p => p.id === per || (p.nome||'').toLowerCase() === per.toLowerCase());
+  const perNum = parseInt(per, 10);
+  return Math.max(1,
+    perNum > 0 ? perNum :
+    per === 'mensal' || per.toLowerCase()==='mensal' ? 4 :
+    per === 'trissemanais' || per.toLowerCase()==='trissemanal' ? 3 :
+    per === 'quinzenal' || per.toLowerCase()==='quinzenal' ? 2 :
+    per === 'semanal' || per.toLowerCase()==='semanal' ? 1 :
+    (perObj ? perObj.semanas : 1));
+}
+
+function _matrizMesesEscolares(){
+  if(!DIAS_LETIVOS_ARRAY.length) return [];
+  const first = DIAS_LETIVOS_ARRAY[0], last = DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1];
+  const fy = +first.slice(0,4), fm = +first.slice(5,7) - 1;
+  const ly = +last.slice(0,4),  lm = +last.slice(5,7) - 1;
+  const out = [];
+  const d = new Date(fy, fm, 1);
+  while(d.getFullYear() < ly || (d.getFullYear() === ly && d.getMonth() <= lm)){
+    out.push({ ano: d.getFullYear(), mes: d.getMonth() });
+    d.setMonth(d.getMonth() + 1);
+  }
+  return out;
+}
+
+function _matrizDiasDaJanela(){
+  const meses = _matrizMesesEscolares();
+  if(!meses.length) return [];
+  if(_matrizPeriodoIni || _matrizPeriodoFim){
+    return DIAS_LETIVOS_ARRAY.filter(iso => (!_matrizPeriodoIni || iso >= _matrizPeriodoIni) && (!_matrizPeriodoFim || iso <= _matrizPeriodoFim));
+  }
+  const janela = Math.min(_matrizJanelaMeses, meses.length);
+  const maxOff = Math.max(0, meses.length - janela);
+  _matrizOffsetMeses = Math.max(0, Math.min(_matrizOffsetMeses, maxOff));
+  const sel = meses.slice(_matrizOffsetMeses, _matrizOffsetMeses + janela).map(m => m.ano + '-' + String(m.mes + 1).padStart(2,'0'));
+  return DIAS_LETIVOS_ARRAY.filter(iso => sel.includes(iso.slice(0,7)));
+}
+
+function _matrizJanelaLabel(dias){
+  if(!dias.length) return 'Nenhum dia letivo no período';
+  const MESES_NOME = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  if(_matrizPeriodoIni || _matrizPeriodoFim){
+    return `Período: ${fmtDataBR(dias[0])} – ${fmtDataBR(dias[dias.length - 1])} · ${dias.length} dias letivos`;
+  }
+  const m1 = +dias[0].slice(5,7) - 1, m2 = +dias[dias.length - 1].slice(5,7) - 1;
+  const ano = dias[0].slice(0,4);
+  const txt = m1 === m2 ? MESES_NOME[m1] : MESES_NOME[m1] + ' – ' + MESES_NOME[m2];
+  return `${txt} ${ano} · ${dias.length} dias letivos`;
+}
+
+// Demanda por dia: iso → { ingrediente → kg } (agregando variantes " ___ detalhe")
+function _matrizDemandas(dias){
+  const map = new Map();
+  dias.forEach(iso => {
+    const meal = getMealByDate(iso);
+    const tot = meal ? calcularTotaisNiveis([meal]).totais : {};
+    const agg = {};
+    Object.entries(tot).forEach(([k, v]) => {
+      const base = k.includes(' ___ ') ? k.split(' ___ ')[0] : k;
+      agg[base] = (agg[base] || 0) + v;
+    });
+    map.set(iso, agg);
+  });
+  return map;
+}
+
+// Motor de cobertura: células por ingrediente e dia {cov, pend, man, rem, fontes[]}
+function _matrizCobertura(demandaMap){
+  const dias = DIAS_LETIVOS_ARRAY;
+  const ings = new Set();
+  demandaMap.forEach(agg => Object.keys(agg).forEach(k => ings.add(k)));
+  ORDENS_EXPEDIDAS.forEach(o => {
+    (o.itens||[]).forEach(it => ings.add(it.ingrediente));
+    (o.removidos||[]).forEach(r => ings.add(r.ingrediente));
+  });
+  const cells = {};
+  ings.forEach(ing => { cells[ing] = {}; });
+  const ordensSorted = ORDENS_EXPEDIDAS.slice().sort((a,b) =>
+    (a.data_expedicao||'').localeCompare(b.data_expedicao||'') || (a.id||'').localeCompare(b.id||''));
+  ordensSorted.forEach(o => {
+    const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
+    if(!mons.length) return;
+    const ingSet = new Set();
+    (o.itens||[]).forEach(it => ingSet.add(it.ingrediente));
+    (o.removidos||[]).forEach(r => ingSet.add(r.ingrediente));
+    RECEBIMENTOS.filter(r => r.ordem_id === o.id).forEach(r => ingSet.add(r.ingrediente));
+    ingSet.forEach(ing => {
+      const c = cells[ing];
+      if(!c) return;
+      const perSem = _perSemanasIng(ing);
+      const covMons = mons.slice(0, Math.min(perSem, mons.length));
+      const winDays = [];
+      covMons.forEach(mon => {
+        const { datas } = getCalWeekDiasAndDatas(mon);
+        datas.forEach(d => { if(d && dias.includes(d)) winDays.push(d); });
+      });
+      winDays.sort();
+      const rec = RECEBIMENTOS.find(r => r.ordem_id === o.id && r.ingrediente === ing);
+      const recQtd = rec && rec.status !== 'nao_recebido' ? (rec.qtd_recebida || 0) : 0;
+      const item = (o.itens||[]).find(it => it.ingrediente === ing);
+      const removidosIng = (o.removidos||[]).filter(r => r.ingrediente === ing);
+      if(recQtd > 0){
+        let disp = recQtd;
+        winDays.forEach(d => {
+          if(disp <= 0) return;
+          const dem = (demandaMap.get(d)||{})[ing] || 0;
+          if(dem > 0){
+            const cq = Math.min(dem, disp); disp -= cq;
+            const cell = c[d] = c[d] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
+            cell.cov += cq;
+            cell.fontes.push({tipo:'coberto', lote:o.id, ciclo:o.ciclo, semana:o.semana, qtd:cq});
+          }
+        });
+      }
+      if(item && recQtd <= 0 && !(rec && rec.status === 'nao_recebido')){
+        const ds = (item.dias && item.dias.length) ? item.dias : winDays.map(d => ({data:d, qtd:0}));
+        ds.forEach(e => {
+          if(!e.data || !dias.includes(e.data)) return;
+          const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
+          cell.pend += (e.qtd||0) > 0 ? e.qtd : ((demandaMap.get(e.data)||{})[ing]||0);
+          cell.fontes.push({tipo:'planejado', lote:o.id, ciclo:o.ciclo, semana:o.semana});
+        });
+      }
+      if(item && rec && rec.status === 'nao_recebido'){
+        const ds = (item.dias && item.dias.length) ? item.dias : winDays.map(d => ({data:d, qtd:0}));
+        ds.forEach(e => {
+          if(!e.data || !dias.includes(e.data)) return;
+          const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
+          cell.fontes.push({tipo:'negado', lote:o.id, ciclo:o.ciclo, semana:o.semana});
+        });
+      }
+      if(item && item.manual){
+        const ds = (item.dias && item.dias.length) ? item.dias : [];
+        ds.forEach(e => {
+          if(!e.data || !dias.includes(e.data)) return;
+          const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
+          cell.man += (e.qtd||0) > 0 ? e.qtd : ((demandaMap.get(e.data)||{})[ing]||0);
+          cell.fontes.push({tipo:'manual', lote:o.id, ciclo:o.ciclo, semana:o.semana, usuario:item.usuario||''});
+        });
+      }
+      removidosIng.forEach(r => {
+        const ds = (r.dias && r.dias.length) ? r.dias : winDays.map(d => ({data:d, qtd:0}));
+        ds.forEach(e => {
+          if(!e.data || !dias.includes(e.data)) return;
+          const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
+          cell.rem += (e.qtd||0) > 0 ? e.qtd : ((demandaMap.get(e.data)||{})[ing]||0);
+          cell.fontes.push({tipo:'removido', lote:o.id, ciclo:o.ciclo, semana:o.semana, motivo:r.motivo||'', usuario:r.usuario||''});
+        });
+      });
+    });
+  });
+  return cells;
+}
+
+function _matrizStatusCell(cell, dem){
+  if(cell.man > 0) return 'manual';
+  if(!dem || dem <= 0) return null;
+  if(cell.cov >= dem - 1e-9) return 'coberto';
+  if(cell.pend > 0) return 'planejado';
+  if(cell.rem > 0) return 'removido';
+  return 'sem';
+}
+
+function _matrizTooltip(ing, iso, cell, dem){
+  const un = DADOS.ingredientes[ing]?.unidade || 'kg';
+  const L = [];
+  L.push(`${ing} — ${fmtDataBR(iso)}`);
+  L.push(`Demanda: ${fmt(dem)} ${un}`);
+  if(cell.cov > 0) L.push(`Recebido/coberto: ${fmt(cell.cov)} ${un}`);
+  if(cell.pend > 0) L.push(`Planejado (aguardando): ${fmt(cell.pend)} ${un}`);
+  if(cell.man > 0) L.push(`Adicionado manualmente: ${fmt(cell.man)} ${un}`);
+  cell.fontes.forEach(f => {
+    const loteTxt = `Ordem ${f.ciclo} — ${f.semana}`;
+    if(f.tipo === 'coberto') L.push(`• ${loteTxt}: +${fmt(f.qtd)} ${un} (recebido)`);
+    else if(f.tipo === 'planejado') L.push(`• ${loteTxt}: pedido aguardando recebimento`);
+    else if(f.tipo === 'negado') L.push(`• ${loteTxt}: recebimento não confirmado (não recebido)`);
+    else if(f.tipo === 'manual') L.push(`• Adicionado manualmente à ${loteTxt}${f.usuario ? ' por ' + f.usuario : ''}`);
+    else if(f.tipo === 'removido') L.push(`• Retirado da ${loteTxt}${f.motivo ? ' — motivo: ' + f.motivo : ''}${f.usuario ? ' (por ' + f.usuario + ')' : ''}`);
+  });
+  return L.join('\n');
+}
+
+function matrizNav(delta){ _matrizOffsetMeses += delta; renderMatrizEstoque(); }
+function aplicarPeriodoMatriz(){
+  _matrizPeriodoIni = document.getElementById('matriz-periodo-ini')?.value || '';
+  _matrizPeriodoFim = document.getElementById('matriz-periodo-fim')?.value || '';
+  renderMatrizEstoque();
+}
+function limparPeriodoMatriz(){
+  _matrizPeriodoIni = ''; _matrizPeriodoFim = '';
+  const i = document.getElementById('matriz-periodo-ini'), f = document.getElementById('matriz-periodo-fim');
+  if(i) i.value = ''; if(f) f.value = '';
+  renderMatrizEstoque();
+}
+
+function renderMatrizEstoque(){
+  const tbody  = document.getElementById('tbody-matriz-estoque');
+  const thead  = document.getElementById('tabela-matriz-estoque')?.querySelector('thead');
+  const legend = document.getElementById('matriz-legenda');
+  const rangeEl = document.getElementById('matriz-range-label');
+  if(!tbody || !thead) return;
+  const dias = _matrizDiasDaJanela();
+
+  if(legend){
+    const sts = [
+      ['coberto','🟢 Recebido / coberto'],
+      ['planejado','🟡 Pedido aguardando'],
+      ['sem','🔴 Demanda sem cobertura'],
+      ['manual','🔵 Adicionado manualmente'],
+      ['removido','🟠 Retirado da ordem']
+    ];
+    legend.innerHTML = sts.map(([k, label]) => `
+      <label style="display:flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:20px;background:#fff;font-size:11px;color:#475569;cursor:pointer;user-select:none">
+        <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderMatrizEstoque()" style="accent-color:var(--azul2)">${label}
+      </label>`).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Sem demanda = célula vazia</span>`;
+  }
+  if(rangeEl) rangeEl.textContent = _matrizJanelaLabel(dias);
+
+  if(!dias.length){
+    thead.innerHTML = '';
+    tbody.innerHTML = '<tr><td colspan="3" class="empty-state-td">Nenhum dia letivo no período selecionado.</td></tr>';
+    return;
+  }
+
+  const demanda = _matrizDemandas(DIAS_LETIVOS_ARRAY);
+  const cells = _matrizCobertura(demanda);
+  const DIAS_ABREV = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const thBase = 'border:1px solid #C8D0DC;padding:5px 8px;background:#1A3A6B;color:#fff;white-space:nowrap';
+  thead.innerHTML = `<tr>
+    <th style="${thBase};position:sticky;left:0;top:0;z-index:3;text-align:left">Ingrediente</th>
+    ${dias.map(iso => {
+      const dow = new Date(iso + 'T00:00:00').getDay();
+      return `<th style="${thBase};position:sticky;top:0;z-index:2;text-align:center;font-size:10px;min-width:56px" title="${fmtDataBR(iso)}">${DIAS_ABREV[dow]}<br><span style="font-weight:400;font-size:9px;color:#9fb3d1">${fmtDataCurta(iso)}</span></th>`;
+    }).join('')}
+    <th style="${thBase};position:sticky;right:0;top:0;z-index:3;text-align:right;font-size:10px">Saldo físico</th>
+  </tr>`;
+
+  const ingsSet = new Set();
+  dias.forEach(iso => { Object.keys(demanda.get(iso)||{}).forEach(k => ingsSet.add(k)); });
+  Object.keys(cells).forEach(ing => { dias.forEach(iso => { if(cells[ing][iso]) ingsSet.add(ing); }); });
+  const busca = _matrizBusca.trim();
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const ings = [...ingsSet].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+
+  const rows = ings.map(ing => {
+    if(busca && !norm(ing).includes(norm(busca))) return null;
+    let any = false;
+    const cellsHtml = dias.map(iso => {
+      const dem = (demanda.get(iso)||{})[ing] || 0;
+      const cell = cells[ing][iso];
+      const st = _matrizStatusCell(cell||{}, dem);
+      if(!st) return `<td style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
+      if(_matrizFiltroStatus[st]) any = true;
+      const S = MATRIZ_STATUS[st];
+      const val = (st === 'manual' && dem <= 0) ? (cell.man || 0) : dem;
+      return `<td title="${esc(_matrizTooltip(ing, iso, cell||{}, dem))}" style="border:1px solid ${S.bd};background:${S.cor};color:${S.txt};text-align:right;padding:3px 6px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${fmt(val)}</td>`;
+    }).join('');
+    if(!any) return null;
+    const un = DADOS.ingredientes[ing]?.unidade || 'kg';
+    const saldo = ESTOQUE[ing] || 0;
+    return `<tr>
+      <td style="border:1px solid #C8D0DC;padding:5px 8px;font-weight:700;font-size:12px;position:sticky;left:0;background:#fff;white-space:nowrap">${esc(ing)}</td>
+      ${cellsHtml}
+      <td style="border:1px solid #C8D0DC;padding:5px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:#64748b;position:sticky;right:0;background:#fff;white-space:nowrap">${fmt(saldo)} <span style="font-size:9px">${esc(un)}</span></td>
+    </tr>`;
+  }).filter(Boolean).join('');
+
+  tbody.innerHTML = rows || `<tr><td colspan="${dias.length + 2}" class="empty-state-td">Nenhum item encontrado com os filtros atuais.</td></tr>`;
+}
+
+// Remove/restaura item de ordem já registrada (aba Licitações)
+function removerItemOrdem(ordemId, ingrediente){
+  const ordem = ORDENS_EXPEDIDAS.find(o => o.id === ordemId);
+  if(!ordem) return;
+  const it = (ordem.itens||[]).find(x => x.ingrediente === ingrediente);
+  if(!it) return;
+  const rec = RECEBIMENTOS.find(r => r.ordem_id === ordemId && r.ingrediente === ingrediente);
+  const temRec = rec && rec.status && rec.status !== 'nao_recebido' && (rec.qtd_recebida||0) > 0;
+  const aviso = temRec ? '\n\n⚠️ Há recebimento confirmado que será revertido do estoque.' : '';
+  if(!confirm(`Remover "${ingrediente}" da ordem ${ordem.ciclo} — ${ordem.semana}?${aviso}\n\nA demanda original ficará registrada como retirada da ordem.`)) return;
+  const motivo = prompt('Motivo da remoção (opcional):');
+  if(motivo === null) return;
+  if(temRec){
+    ESTOQUE[ingrediente] = Math.max(0, (ESTOQUE[ingrediente]||0) - (rec.qtd_recebida||0));
+  }
+  RECEBIMENTOS = RECEBIMENTOS.filter(r => !(r.ordem_id === ordemId && r.ingrediente === ingrediente));
+  ordem.itens = (ordem.itens||[]).filter(x => x.ingrediente !== ingrediente);
+  ordem.removidos = ordem.removidos || [];
+  ordem.removidos.push({
+    ingrediente,
+    qtd_solicitada: it.qtd_solicitada,
+    dias: it.dias || [],
+    motivo,
+    usuario: _matrizUsuarioAtual(),
+    data: new Date().toISOString().split('T')[0]
+  });
+  salvarEstoque();
+  salvarRecebimentos();
+  salvarOrdens();
+  renderLicitacoes();
+  renderEstoqueLotes();
+  renderMatrizEstoque();
+}
+
+function restaurarItemOrdem(ordemId, ingrediente){
+  const ordem = ORDENS_EXPEDIDAS.find(o => o.id === ordemId);
+  if(!ordem) return;
+  const idx = (ordem.removidos||[]).findIndex(r => r.ingrediente === ingrediente);
+  if(idx < 0) return;
+  const r = ordem.removidos[idx];
+  ordem.removidos.splice(idx, 1);
+  ordem.itens.push({ ingrediente, qtd_solicitada: r.qtd_solicitada, dias: r.dias || [], manual:false, usuario:_matrizUsuarioAtual() });
+  salvarOrdens();
+  renderLicitacoes();
+  renderEstoqueLotes();
+  renderMatrizEstoque();
+}
+
+// Remove/restaura item no modal de registro da ordem (antes de registrar)
+function toggleRemoverItemModal(licId, ingrediente){
+  if(!_removidosPendentes[licId]) _removidosPendentes[licId] = {};
+  if(_removidosPendentes[licId][ingrediente]){
+    delete _removidosPendentes[licId][ingrediente];
+    registrarOrdemExpedida();
+    return;
+  }
+  const motivo = prompt('Motivo da remoção do item (opcional):');
+  if(motivo === null) return;
+  _removidosPendentes[licId][ingrediente] = { motivo, usuario: _matrizUsuarioAtual() };
+  registrarOrdemExpedida();
+}
+
 const LOTES_CORES = ['#2563EB','#16A34A','#D97706','#DC2626','#7C3AED','#0D9488','#DB2777','#65A30D','#4F46E5','#B45309'];
 
 function renderEstoqueLotes(){
@@ -3827,7 +4216,7 @@ function renderLicitacoes(){
                 </div>
               </div>
               <div id="body-ordem-${o.id}" style="display:none;padding:12px 14px">
-                <table><thead><tr><th>Ingrediente</th><th class="num">Solicitado</th><th class="num">Recebido</th><th>Status</th></tr></thead>
+                <table><thead><tr><th>Ingrediente</th><th class="num">Solicitado</th><th class="num">Recebido</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                   ${o.itens.map(it => {
                     const rec = recebidos.find(r => r.ingrediente === it.ingrediente);
@@ -3837,13 +4226,25 @@ function renderLicitacoes(){
                       `<span style="color:var(--vermelho);font-weight:700;display:inline-flex;align-items:center;gap:3px">${ico('xCircle',12)}Não recebido</span>`;
                     const unid = DADOS.ingredientes[it.ingrediente]?.unidade || 'kg';
                     return `<tr>
-                      <td>${it.ingrediente}</td>
+                      <td>${it.ingrediente}${it.manual ? ' <span style="font-size:10px;color:var(--azul2);font-weight:700" title="Adicionado manualmente">(manual)</span>' : ''}</td>
                       <td class="num">${fmt(it.qtd_solicitada)} ${unid}</td>
                       <td class="num">${rec ? fmt(rec.qtd_recebida)+' '+unid : '—'}</td>
                       <td>${statusLabel}</td>
+                      <td style="text-align:right;white-space:nowrap">
+                        <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:5px;cursor:pointer;font-family:inherit" onclick="removerItemOrdem('${o.id}','${esc(it.ingrediente)}')">✕ Remover</button>
+                      </td>
                     </tr>`;
                   }).join('')}
                 </tbody></table>
+                ${(o.removidos && o.removidos.length) ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px">
+                  <div style="font-size:12px;font-weight:700;color:#9a3412;margin-bottom:4px">Itens retirados da ordem (demanda original preservada):</div>
+                  ${o.removidos.map(r => `<div style="display:flex;gap:10px;align-items:center;padding:3px 0;font-size:12px;color:#7c2d12">
+                    <span>• ${esc(r.ingrediente)} — ${fmt(r.qtd_solicitada)} ${esc(DADOS.ingredientes[r.ingrediente]?.unidade||'kg')}</span>
+                    ${r.motivo ? `<span style="color:#9a3412;font-style:italic">motivo: ${esc(r.motivo)}</span>` : ''}
+                    ${r.usuario ? `<span style="color:#c2410c">(por ${esc(r.usuario)})</span>` : ''}
+                    <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:5px;cursor:pointer;font-family:inherit" onclick="restaurarItemOrdem('${o.id}','${esc(r.ingrediente)}')">↩ Restaurar</button>
+                  </div>`).join('')}
+                </div>` : ''}
               </div>
             </div>`;
           }).join('')}
@@ -4522,16 +4923,21 @@ function registrarOrdemExpedida(){
                 <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Qtd (kg)</th>
                 <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Preço unit.</th>
                 <th class="num" style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0">Subtotal</th>
+                <th style="padding:4px 8px;text-align:right;background:#F8FAFC;border-bottom:1px solid #E2E8F0"></th>
               </tr></thead>
               <tbody>
                 ${lic.itens.map(it => {
                   const pu = precoMap[it.ingrediente]||0;
                   const sub = it.qtd * pu;
-                  return `<tr>
-                    <td style="padding:3px 8px;border-bottom:1px solid #F1F5F9">${esc(it.ingrediente)}</td>
+                  const removido = _removidosPendentes[licId] && _removidosPendentes[licId][it.ingrediente];
+                  return `<tr style="${removido ? 'opacity:.45' : ''}">
+                    <td style="padding:3px 8px;border-bottom:1px solid #F1F5F9">${esc(it.ingrediente)} ${removido ? '<span style="color:#9a3412;font-weight:700;font-size:10px">(removido' + (removido.motivo ? ': ' + esc(removido.motivo) : '') + ')</span>' : ''}</td>
                     <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-family:'DM Mono',monospace">${it.qtd.toFixed(3)}</td>
                     <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9">R$ ${pu.toFixed(2).replace('.',',')}</td>
                     <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-weight:600">R$ ${sub.toFixed(2).replace('.',',')}</td>
+                    <td style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;white-space:nowrap">
+                      <button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:${removido ? '#dcfce7' : '#fff7ed'};color:${removido ? '#166534' : '#9a3412'};border:1px solid ${removido ? '#86efac' : '#fed7aa'};border-radius:5px;cursor:pointer;font-family:inherit" onclick="toggleRemoverItemModal('${esc(licId)}','${esc(it.ingrediente)}')">${removido ? '↩ Restaurar' : '✕ Remover'}</button>
+                    </td>
                   </tr>`;
                 }).join('')}
               </tbody>
@@ -4609,12 +5015,24 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
         return {
           ingrediente: it.nomeBase,
           qtd_solicitada: parseFloat(it.comprar.toFixed(3)),
-          dias: _dias
+          dias: _dias,
+          manual: !!it.extra,
+          usuario: _matrizUsuarioAtual()
         };
       })
       .filter(it => it.dias.length > 0);
-    if(itensOrdem.length)
-      contratosSelecionados.push({ licId, itens: itensOrdem, nome: lic.nome });
+    const _remPend = (_removidosPendentes && _removidosPendentes[licId]) || {};
+    const itensFinal = itensOrdem.filter(it => !_remPend[it.ingrediente]);
+    const removidosFinal = itensOrdem.filter(it => _remPend[it.ingrediente]).map(it => ({
+      ingrediente: it.ingrediente,
+      qtd_solicitada: it.qtd_solicitada,
+      dias: it.dias,
+      motivo: _remPend[it.ingrediente].motivo || '',
+      usuario: _remPend[it.ingrediente].usuario || '',
+      data: hoje
+    }));
+    if(itensFinal.length || removidosFinal.length)
+      contratosSelecionados.push({ licId, itens: itensFinal, removidos: removidosFinal, nome: lic.nome });
   });
 
   if(!contratosSelecionados.length){
@@ -4625,7 +5043,7 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
   const _semLabel = semanas.length > 1
     ? semanas.length + ' semanas: ' + fmtDataBR(semanas[0]) + ' a ' + fmtDataBR(semanas[semanas.length - 1])
     : semLabel;
-  contratosSelecionados.forEach(({ licId, itens }) => {
+  contratosSelecionados.forEach(({ licId, itens, removidos }) => {
     ORDENS_EXPEDIDAS.push({
       id: gerarId('ord'),
       licitacao_id: licId,
@@ -4635,9 +5053,11 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       mondayIso,
       semanas: semanas.slice(),
       numSemanas: semanas.length,
-      itens
+      itens,
+      removidos: removidos || []
     });
   });
+  _removidosPendentes = {};
   salvarOrdens();
   fecharOverlaySelContrato();
   renderEstoqueLotes();
@@ -8532,7 +8952,7 @@ function ir(id, btn){
   if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ renderEstoqueLotes(); }
+  if(id==='estoque'){ renderEstoqueLotes(); renderMatrizEstoque(); }
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
