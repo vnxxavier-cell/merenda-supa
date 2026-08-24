@@ -1375,54 +1375,34 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div id="pg-estoque" class="pagina">
   <h2 class="titulo">📦 Gestão de Estoque</h2>
 
-  <!-- Bloco: Matriz de Cobertura da Demanda -->
+  <!-- Bloco: Estoque por Lotes (cobertura da demanda por dia letivo) -->
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-      <span>Cobertura da Demanda — Dias Letivos</span>
+      <span>Estoque por Lotes</span>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Mês anterior" onclick="matrizNav(-1)">‹</button>
-        <select id="matriz-janela" onchange="_matrizJanelaMeses=parseInt(this.value)||1;_matrizOffsetMeses=0;renderMatrizEstoque()" style="font-size:12px;padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;font-family:inherit">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Mês anterior" onclick="lotesNav(-1)">‹</button>
+        <select id="lotes-janela" onchange="_lotesJanelaMeses=parseInt(this.value)||1;_lotesOffsetMeses=0;renderEstoqueLotes()" style="font-size:12px;padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;font-family:inherit">
           <option value="1" style="color:#333">1 mês</option>
           <option value="3" style="color:#333">3 meses</option>
           <option value="12" style="color:#333">Ano inteiro</option>
         </select>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Próximo mês" onclick="matrizNav(1)">›</button>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Próximo mês" onclick="lotesNav(1)">›</button>
       </div>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#F8FAFC">
-      <input id="matriz-busca" placeholder="Buscar ingrediente..." oninput="_matrizBusca=this.value;renderMatrizEstoque()" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;border:1.5px solid var(--borda);border-radius:6px;width:180px;background:#fff">
-      <input type="date" id="matriz-periodo-ini" title="Período — início" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
-      <input type="date" id="matriz-periodo-fim" title="Período — fim" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
-      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="aplicarPeriodoMatriz()">Aplicar período</button>
-      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="limparPeriodoMatriz()">Limpar</button>
-      <span style="font-size:12px;color:var(--txt2);font-weight:600" id="matriz-range-label"></span>
+      <input id="lotes-busca" placeholder="Buscar ingrediente..." oninput="_lotesBusca=this.value;renderEstoqueLotes()" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;border:1.5px solid var(--borda);border-radius:6px;width:180px;background:#fff">
+      <input type="date" id="lotes-periodo-ini" title="Período — início" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
+      <input type="date" id="lotes-periodo-fim" title="Período — fim" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
+      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="aplicarPeriodoLotes()">Aplicar período</button>
+      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="limparPeriodoLotes()">Limpar</button>
+      <span style="font-size:12px;color:var(--txt2);font-weight:600" id="lotes-range-label"></span>
     </div>
-    <div id="matriz-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#fff"></div>
-    <div style="overflow:auto;max-height:72vh" id="matriz-scroll">
-      <table id="tabela-matriz-estoque" style="border-collapse:separate;border-spacing:0;width:100%">
-        <thead></thead>
-        <tbody id="tbody-matriz-estoque"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Bloco: Estoque por Lotes -->
-  <div class="card" style="margin-bottom:24px">
-    <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center">
-      <span>Estoque por Lotes</span>
-    </div>
+    <div id="lotes-status-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#fff"></div>
     <div id="lotes-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#F8FAFC"></div>
-    <div style="overflow-x:auto;padding:0">
-      <table id="tabela-lotes">
-        <thead>
-          <tr>
-            <th>Ingrediente</th>
-            <th class="num">Saldo Estoque</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-lotes">
-          <tr><td colspan="2" class="empty-state-td">Registre uma ordem na aba Licitações para visualizar o estoque por lotes.</td></tr>
-        </tbody>
+    <div style="overflow:auto;max-height:72vh">
+      <table id="tabela-lotes" style="border-collapse:separate;border-spacing:0;width:100%">
+        <thead></thead>
+        <tbody id="tbody-lotes"></tbody>
       </table>
     </div>
   </div>
@@ -3431,10 +3411,10 @@ function aplicarConsumoSemanas(){
 // ══════════════════════════════════════════════════════
 // MATRIZ DE COBERTURA DA DEMANDA (aba Estoque)
 // ══════════════════════════════════════════════════════
-let _matrizJanelaMeses = 1;
-let _matrizOffsetMeses = 0;
-let _matrizBusca = '';
-let _matrizPeriodoIni = '', _matrizPeriodoFim = '';
+let _lotesJanelaMeses = 1;
+let _lotesOffsetMeses = 0;
+let _lotesBusca = '';
+let _lotesPeriodoIni = '', _lotesPeriodoFim = '';
 let _matrizFiltroStatus = { coberto:true, parcial:true, planejado:true, sem:true, manual:true, removido:true };
 let _removidosPendentes = {}; // licId → { ingrediente: {motivo, usuario} } (modal de registro)
 
@@ -3472,7 +3452,7 @@ function _perSemanasIng(ing){
     (perObj ? perObj.semanas : 1));
 }
 
-function _matrizMesesEscolares(){
+function _lotesMesesEscolares(){
   if(!DIAS_LETIVOS_ARRAY.length) return [];
   const first = DIAS_LETIVOS_ARRAY[0], last = DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1];
   const fy = +first.slice(0,4), fm = +first.slice(5,7) - 1;
@@ -3486,23 +3466,23 @@ function _matrizMesesEscolares(){
   return out;
 }
 
-function _matrizDiasDaJanela(){
-  const meses = _matrizMesesEscolares();
+function _lotesDiasDaJanela(){
+  const meses = _lotesMesesEscolares();
   if(!meses.length) return [];
-  if(_matrizPeriodoIni || _matrizPeriodoFim){
-    return DIAS_LETIVOS_ARRAY.filter(iso => (!_matrizPeriodoIni || iso >= _matrizPeriodoIni) && (!_matrizPeriodoFim || iso <= _matrizPeriodoFim));
+  if(_lotesPeriodoIni || _lotesPeriodoFim){
+    return DIAS_LETIVOS_ARRAY.filter(iso => (!_lotesPeriodoIni || iso >= _lotesPeriodoIni) && (!_lotesPeriodoFim || iso <= _lotesPeriodoFim));
   }
-  const janela = Math.min(_matrizJanelaMeses, meses.length);
+  const janela = Math.min(_lotesJanelaMeses, meses.length);
   const maxOff = Math.max(0, meses.length - janela);
-  _matrizOffsetMeses = Math.max(0, Math.min(_matrizOffsetMeses, maxOff));
-  const sel = meses.slice(_matrizOffsetMeses, _matrizOffsetMeses + janela).map(m => m.ano + '-' + String(m.mes + 1).padStart(2,'0'));
+  _lotesOffsetMeses = Math.max(0, Math.min(_lotesOffsetMeses, maxOff));
+  const sel = meses.slice(_lotesOffsetMeses, _lotesOffsetMeses + janela).map(m => m.ano + '-' + String(m.mes + 1).padStart(2,'0'));
   return DIAS_LETIVOS_ARRAY.filter(iso => sel.includes(iso.slice(0,7)));
 }
 
-function _matrizJanelaLabel(dias){
+function _lotesJanelaLabel(dias){
   if(!dias.length) return 'Nenhum dia letivo no período';
   const MESES_NOME = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  if(_matrizPeriodoIni || _matrizPeriodoFim){
+  if(_lotesPeriodoIni || _lotesPeriodoFim){
     return `Período: ${fmtDataBR(dias[0])} – ${fmtDataBR(dias[dias.length - 1])} · ${dias.length} dias letivos`;
   }
   const m1 = +dias[0].slice(5,7) - 1, m2 = +dias[dias.length - 1].slice(5,7) - 1;
@@ -3679,103 +3659,17 @@ function _matrizTooltip(ing, iso, cell, dem){
   return L.join('\n');
 }
 
-function matrizNav(delta){ _matrizOffsetMeses += delta; renderMatrizEstoque(); }
-function aplicarPeriodoMatriz(){
-  _matrizPeriodoIni = document.getElementById('matriz-periodo-ini')?.value || '';
-  _matrizPeriodoFim = document.getElementById('matriz-periodo-fim')?.value || '';
-  renderMatrizEstoque();
+function lotesNav(delta){ _lotesOffsetMeses += delta; renderEstoqueLotes(); }
+function aplicarPeriodoLotes(){
+  _lotesPeriodoIni = document.getElementById('lotes-periodo-ini')?.value || '';
+  _lotesPeriodoFim = document.getElementById('lotes-periodo-fim')?.value || '';
+  renderEstoqueLotes();
 }
-function limparPeriodoMatriz(){
-  _matrizPeriodoIni = ''; _matrizPeriodoFim = '';
-  const i = document.getElementById('matriz-periodo-ini'), f = document.getElementById('matriz-periodo-fim');
+function limparPeriodoLotes(){
+  _lotesPeriodoIni = ''; _lotesPeriodoFim = '';
+  const i = document.getElementById('lotes-periodo-ini'), f = document.getElementById('lotes-periodo-fim');
   if(i) i.value = ''; if(f) f.value = '';
-  renderMatrizEstoque();
-}
-
-function renderMatrizEstoque(){
-  const tbody  = document.getElementById('tbody-matriz-estoque');
-  const thead  = document.getElementById('tabela-matriz-estoque')?.querySelector('thead');
-  const legend = document.getElementById('matriz-legenda');
-  const rangeEl = document.getElementById('matriz-range-label');
-  if(!tbody || !thead) return;
-  try{
-  const dias = _matrizDiasDaJanela();
-
-  if(legend){
-    const sts = [
-      ['coberto','Recebido / coberto'],
-      ['parcial','Parcialmente coberto'],
-      ['planejado','Pedido aguardando'],
-      ['sem','Demanda sem cobertura'],
-      ['manual','Adicionado manualmente'],
-      ['removido','Retirado da ordem']
-    ];
-    legend.innerHTML = sts.map(([k, label]) => {
-      const S = MATRIZ_STATUS[k];
-      return `
-      <label style="display:flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:20px;background:#fff;font-size:11px;color:#475569;cursor:pointer;user-select:none">
-        <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderMatrizEstoque()" style="accent-color:var(--azul2)">
-        <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${S.bd};background:${S.css};flex-shrink:0"></span>${label}
-      </label>`;
-    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Sem demanda = célula vazia</span>`;
-  }
-  if(rangeEl) rangeEl.textContent = _matrizJanelaLabel(dias);
-
-  if(!dias.length){
-    thead.innerHTML = '';
-    tbody.innerHTML = '<tr><td colspan="3" class="empty-state-td">Nenhum dia letivo no período selecionado.</td></tr>';
-    return;
-  }
-
-  const demanda = _matrizDemandas();
-  const cells = _matrizCobertura(demanda);
-  const DIAS_ABREV = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const thBase = 'border:1px solid #C8D0DC;padding:5px 8px;background:#1A3A6B;color:#fff;white-space:nowrap';
-  thead.innerHTML = `<tr>
-    <th style="${thBase};position:sticky;left:0;top:0;z-index:3;text-align:left">Ingrediente</th>
-    ${dias.map(iso => {
-      const dow = new Date(iso + 'T00:00:00').getDay();
-      return `<th style="${thBase};position:sticky;top:0;z-index:2;text-align:center;font-size:10px;min-width:56px" title="${fmtDataBR(iso)}">${DIAS_ABREV[dow]}<br><span style="font-weight:400;font-size:9px;color:#9fb3d1">${fmtDataCurta(iso)}</span></th>`;
-    }).join('')}
-    <th style="${thBase};position:sticky;right:0;top:0;z-index:3;text-align:right;font-size:10px">Saldo físico</th>
-  </tr>`;
-
-  const ingsSet = new Set();
-  dias.forEach(iso => { Object.keys(demanda.get(iso)||{}).forEach(k => ingsSet.add(k)); });
-  Object.keys(cells).forEach(ing => { dias.forEach(iso => { if(cells[ing][iso]) ingsSet.add(ing); }); });
-  const busca = _matrizBusca.trim();
-  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const ings = [...ingsSet].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-
-  const rows = ings.map(ing => {
-    if(busca && !norm(ing).includes(norm(busca))) return null;
-    let any = false;
-    const cellsHtml = dias.map(iso => {
-      const dem = (demanda.get(iso)||{})[ing] || 0;
-      const cell = cells[ing][iso];
-      const st = _matrizStatusCell(cell||{}, dem);
-      if(!st) return `<td style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
-      if(_matrizFiltroStatus[st]) any = true;
-      const S = MATRIZ_STATUS[st];
-      const val = (st === 'manual' && dem <= 0) ? (cell.man || 0) : dem;
-      return `<td title="${esc(_matrizTooltip(ing, iso, cell||{}, dem))}" style="border:1px solid ${S.bd};background:${S.css};color:${S.txt};text-align:right;padding:3px 6px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${_matrizFmtNum(val)}</td>`;
-    }).join('');
-    if(!any) return null;
-    const un = DADOS.ingredientes[ing]?.unidade || 'kg';
-    const saldo = ESTOQUE[ing] || 0;
-    return `<tr>
-      <td style="border:1px solid #C8D0DC;padding:5px 8px;font-weight:700;font-size:12px;position:sticky;left:0;background:#fff;white-space:nowrap">${esc(ing)}</td>
-      ${cellsHtml}
-      <td style="border:1px solid #C8D0DC;padding:5px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:#64748b;position:sticky;right:0;background:#fff;white-space:nowrap">${_matrizFmtNum(saldo)} <span style="font-size:9px">${esc(un)}</span></td>
-    </tr>`;
-  }).filter(Boolean).join('');
-
-  tbody.innerHTML = rows || `<tr><td colspan="${dias.length + 2}" class="empty-state-td">Nenhum item encontrado com os filtros atuais.</td></tr>`;
-  }catch(err){
-    console.error('Erro na matriz de cobertura:', err);
-    if(thead) thead.innerHTML = '';
-    if(tbody) tbody.innerHTML = `<tr><td colspan="3" style="padding:16px;color:#b91c1c;font-size:12px;font-family:monospace;white-space:pre-wrap;text-align:left">Erro ao montar a matriz: ${esc(String((err && err.message) || err))}&#10;${esc(String((err && err.stack) || ''))}</td></tr>`;
-  }
+  renderEstoqueLotes();
 }
 
 // Remove/restaura item de ordem já registrada (aba Licitações)
@@ -3809,7 +3703,6 @@ function removerItemOrdem(ordemId, ingrediente){
   salvarOrdens();
   renderLicitacoes();
   renderEstoqueLotes();
-  renderMatrizEstoque();
 }
 
 function restaurarItemOrdem(ordemId, ingrediente){
@@ -3823,7 +3716,6 @@ function restaurarItemOrdem(ordemId, ingrediente){
   salvarOrdens();
   renderLicitacoes();
   renderEstoqueLotes();
-  renderMatrizEstoque();
 }
 
 // Remove/restaura item no modal de registro da ordem (antes de registrar)
@@ -3846,128 +3738,132 @@ function renderEstoqueLotes(){
   const tbody  = document.getElementById('tbody-lotes');
   const thead  = document.getElementById('tabela-lotes')?.querySelector('thead');
   const legend = document.getElementById('lotes-legenda');
-  if(!tbody) return;
+  const stLegend = document.getElementById('lotes-status-legenda');
+  const rangeEl = document.getElementById('lotes-range-label');
+  if(!tbody || !thead) return;
+  try{
   const hoje = new Date().toISOString().split('T')[0];
   const ABREV = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const _resetVazio = () => {
-    if(thead) thead.innerHTML = `<tr><th>Ingrediente</th><th class="num">Saldo Estoque</th></tr>`;
-    tbody.innerHTML = `<tr><td colspan="2" class="empty-state-td">Registre uma ordem na aba Licitações para visualizar o estoque por lotes.</td></tr>`;
+  const dias = _lotesDiasDaJanela();
+
+  // Legenda de status com filtros
+  if(stLegend){
+    const sts = [
+      ['coberto','Recebido / coberto'],
+      ['parcial','Parcialmente coberto'],
+      ['planejado','Pedido aguardando'],
+      ['sem','Demanda sem cobertura'],
+      ['manual','Adicionado manualmente'],
+      ['removido','Retirado da ordem']
+    ];
+    stLegend.innerHTML = sts.map(([k, label]) => {
+      const S = MATRIZ_STATUS[k];
+      return `
+      <label style="display:flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:20px;background:#fff;font-size:11px;color:#475569;cursor:pointer;user-select:none">
+        <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderEstoqueLotes()" style="accent-color:var(--azul2)">
+        <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${S.bd};background:${S.css};flex-shrink:0"></span>${label}
+      </label>`;
+    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Sem demanda = célula vazia</span>`;
+  }
+  if(rangeEl) rangeEl.textContent = _lotesJanelaLabel(dias);
+
+  if(!dias.length){
+    thead.innerHTML = '';
+    tbody.innerHTML = '<tr><td colspan="3" class="empty-state-td">Nenhum dia letivo no período selecionado.</td></tr>';
     if(legend) legend.innerHTML = '';
-  };
+    return;
+  }
 
+  const demanda = _matrizDemandas();
+  const cells = _matrizCobertura(demanda);
   const ordens = ORDENS_EXPEDIDAS.slice().sort((a,b) => (a.data_expedicao||'').localeCompare(b.data_expedicao||''));
-  if(!ordens.length){ _resetVazio(); return; }
+  const loteCor = {};
+  ordens.forEach((o, idx) => { loteCor[o.id] = LOTES_CORES[idx % LOTES_CORES.length]; });
 
-  // mondayIso da ordem (fallback: match do rótulo "dd/mm – dd/mm" em SEMANAS_CAL)
-  const _mondayOf = o => {
-    if(o.mondayIso) return o.mondayIso;
-    const iniLabel = (o.semana || '').split(/[–-]/)[0].trim();
-    if(!iniLabel) return '';
-    const w = SEMANAS_CAL.find(x => fmtDataCurta(x.days[0]) === iniLabel);
-    return w ? w.monday : '';
-  };
-  // Quantidades por dia de um item: snapshot gravado no registro ou recálculo do cardápio
-  const _diasItem = (o, item) => {
-    if(Array.isArray(item.dias) && item.dias.length) return item.dias;
-    const mon = _mondayOf(o);
-    if(!mon) return [];
-    const { dias: wd, datas: wda } = getCalWeekDiasAndDatas(mon);
-    const out = [];
-    wd.forEach((d, i) => {
-      if(!d || !wda[i]) return;
-      const totais = calcularTotaisNiveis([d]).totais;
-      const qtd = Object.entries(totais)
-        .filter(([k]) => k === item.ingrediente || k.startsWith(item.ingrediente + ' ___ '))
-        .reduce((s, [,v]) => s + v, 0);
-      if(qtd > 0) out.push({ data: wda[i], qtd: parseFloat(qtd.toFixed(3)) });
-    });
-    return out;
-  };
-
-  const lotes = ordens.map((o, idx) => {
-    const cor = LOTES_CORES[idx % LOTES_CORES.length];
-    const itemDias = {};
-    const datas = new Set();
-    (o.itens || []).forEach(item => {
-      const ds = _diasItem(o, item);
-      itemDias[item.ingrediente] = ds;
-      ds.forEach(d => datas.add(d.data));
-    });
-    return { ordem: o, cor, itemDias, datas };
-  });
-
-  const datasAll = [...new Set(lotes.flatMap(l => [...l.datas]))].sort();
-  if(!datasAll.length){ _resetVazio(); return; }
-
+  // Cabeçalho: dias letivos da janela + barras de cor dos lotes com dias na data
   const thBgPassado = '#64748B', thBgHoje = '#D97706', thBgFuturo = '#1A3A6B';
   const _cellThBg = d => d < hoje ? thBgPassado : (d === hoje ? thBgHoje : thBgFuturo);
+  const thBase = 'border:1px solid #C8D0DC;padding:5px 8px;color:#fff;white-space:nowrap';
+  thead.innerHTML = `<tr>
+    <th style="${thBase};position:sticky;left:0;top:0;z-index:3;text-align:left;background:#1A3A6B">Ingrediente</th>
+    ${dias.map(iso => {
+      const dow = new Date(iso + 'T00:00:00').getDay();
+      const abrev = ABREV[dow === 0 ? 6 : dow - 1] || '';
+      const lotesDia = ordens.filter(o => (o.itens||[]).some(it => (it.dias||[]).some(e => e.data === iso)));
+      const bars = lotesDia.length
+        ? `<div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">${lotesDia.map(o => `<div style="height:3px;border-radius:2px;background:${loteCor[o.id] || '#94A3B8'}"></div>`).join('')}</div>`
+        : '';
+      return `<th style="${thBase};position:sticky;top:0;z-index:2;text-align:center;font-size:10px;min-width:56px;background:${_cellThBg(iso)}" title="${fmtDataBR(iso)} — ${abrev}">${fmtDataCurta(iso)}${bars}</th>`;
+    }).join('')}
+    <th style="${thBase};position:sticky;right:0;top:0;z-index:3;text-align:right;font-size:10px;background:#1A3A6B">Saldo Estoque</th>
+  </tr>`;
 
-  const ths = [
-    `<th style="border:1px solid #C8D0DC;padding:5px 8px;background:#1A3A6B;color:#fff;text-align:left;white-space:nowrap;font-size:11px;position:sticky;left:0;z-index:2">Ingrediente</th>`
-  ];
-  datasAll.forEach(dt => {
-    const dow = new Date(dt+'T00:00:00').getDay();
-    const abrev = ABREV[dow === 0 ? 6 : dow - 1] || '';
-    const dmes = fmtDataCurta(dt);
-    const corLotes = lotes.filter(l => l.datas.has(dt)).map(l => l.cor);
-    const bars = corLotes.length
-      ? `<div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">${corLotes.map(c => `<div style="height:3px;border-radius:2px;background:${c}"></div>`).join('')}</div>`
-      : '';
-    ths.push(`<th style="border:1px solid #C8D0DC;padding:4px 6px;background:${_cellThBg(dt)};color:#fff;text-align:center;white-space:nowrap;font-size:11px;min-width:52px" title="${dt} — ${abrev}">${dmes}${bars}</th>`);
-  });
-  ths.push(`<th style="border:1px solid #C8D0DC;padding:5px 8px;background:#1A3A6B;color:#fff;text-align:right;white-space:nowrap;font-size:11px;position:sticky;right:0;z-index:2">Saldo Estoque</th>`);
-  thead.innerHTML = `<tr>${ths.join('')}</tr>`;
-
-  // Ingredientes = união dos itens de todos os lotes
+  // Ingredientes: demanda na janela + fontes dos lotes
   const ingsSet = new Set();
-  lotes.forEach(l => Object.keys(l.itemDias).forEach(n => ingsSet.add(n)));
-  const ings = [...ingsSet].sort();
-
-  const _qtdNoDia = (lote, ing, data) => {
-    const ds = lote.itemDias[ing] || [];
-    const e = ds.find(d => d.data === data);
-    return e ? e.qtd : 0;
-  };
+  dias.forEach(iso => { Object.keys(demanda.get(iso)||{}).forEach(k => ingsSet.add(k)); });
+  Object.keys(cells).forEach(ing => { dias.forEach(iso => { if(cells[ing][iso]) ingsSet.add(ing); }); });
+  ordens.forEach(o => {
+    (o.itens||[]).forEach(it => ingsSet.add(it.ingrediente));
+    (o.removidos||[]).forEach(r => ingsSet.add(r.ingrediente));
+  });
+  const busca = _lotesBusca.trim();
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const ings = [...ingsSet].sort((a,b) => a.localeCompare(b, 'pt-BR'));
 
   const rows = ings.map(ing => {
+    if(busca && !norm(ing).includes(norm(busca))) return null;
+    let any = false;
+    const cellsHtml = dias.map(iso => {
+      const dem = (demanda.get(iso)||{})[ing] || 0;
+      const cell = cells[ing][iso];
+      const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[]};
+      const st = _matrizStatusCell(cc, dem);
+      if(!st) return `<td style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
+      if(_matrizFiltroStatus[st]) any = true;
+      const S = MATRIZ_STATUS[st];
+      const val = (st === 'manual' && dem <= 0) ? (cc.man || 0) : dem;
+      const cores = [...new Set((cc.fontes||[]).map(f => loteCor[f.lote] || '#94A3B8'))];
+      const dots = cores.length
+        ? `<div style="display:flex;gap:1px;margin-top:2px;justify-content:center">${cores.map(c => `<span style="width:5px;height:5px;border-radius:50%;background:${c}"></span>`).join('')}</div>`
+        : '';
+      return `<td title="${esc(_matrizTooltip(ing, iso, cc, dem))}" style="border:1px solid ${S.bd};background:${S.css};color:${S.txt};text-align:right;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${_matrizFmtNum(val)}${dots}</td>`;
+    }).join('');
+    if(!any) return null;
+    // Saldo Estoque: total dos lotes − consumo dos dias já passados (comportamento original)
     let total = 0, consumido = 0;
-    const cells = datasAll.map(dt => {
-      const ocorrencias = lotes.filter(l => _qtdNoDia(l, ing, dt) > 0);
-      if(!ocorrencias.length){
-        return `<td style="border:1px solid #E5EAF1;padding:4px 5px;text-align:right;background:#F8FAFC"></td>`;
-      }
-      const chips = ocorrencias.map(l => {
-        const q = _qtdNoDia(l, ing, dt);
-        return `<div style="background:${l.cor}1F;border:1.5px solid ${l.cor};color:${l.cor};border-radius:6px;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;text-align:center" title="${l.ordem.ciclo} — ${l.ordem.semana}">${q.toFixed(3)}</div>`;
-      }).join('');
-      return `<td style="border:1px solid #E5EAF1;padding:4px 5px;background:#fff">${ocorrencias.length === 1 ? chips : `<div style="display:flex;flex-direction:column;gap:2px">${chips}</div>`}</td>`;
-    });
-    lotes.forEach(l => {
-      (l.itemDias[ing] || []).forEach(d => {
-        total += d.qtd;
-        if(d.data < hoje) consumido += d.qtd;
+    ordens.forEach(o => {
+      (o.itens||[]).filter(it => it.ingrediente === ing).forEach(it => {
+        (it.dias||[]).forEach(d => {
+          total += d.qtd;
+          if(d.data < hoje) consumido += d.qtd;
+        });
       });
     });
     const saldo = total - consumido;
     const unid = DADOS.ingredientes[ing]?.unidade || 'kg';
-    cells.push(`<td style="border:1px solid #C8D0DC;padding:5px 8px;text-align:right;font-weight:800;font-family:'DM Mono',monospace;font-size:12px;color:${saldo < 0 ? '#dc2626' : '#16a34a'};position:sticky;right:0;background:#fff" title="Lotes: ${total.toFixed(3)} ${unid} · Consumido: ${consumido.toFixed(3)} ${unid}">${saldo.toFixed(3)} <span style="font-size:9px;color:#94a3b8;font-weight:600">${unid}</span></td>`);
     return `<tr>
-      <td style="border:1px solid #C8D0DC;padding:5px 8px;font-weight:700;font-size:12px;position:sticky;left:0;background:#fff;white-space:nowrap">${ing}</td>
-      ${cells.join('')}
+      <td style="border:1px solid #C8D0DC;padding:5px 8px;font-weight:700;font-size:12px;position:sticky;left:0;background:#fff;white-space:nowrap">${esc(ing)}</td>
+      ${cellsHtml}
+      <td style="border:1px solid #C8D0DC;padding:5px 8px;text-align:right;font-weight:800;font-family:'DM Mono',monospace;font-size:12px;color:${saldo < 0 ? '#dc2626' : '#16a34a'};position:sticky;right:0;background:#fff;white-space:nowrap" title="Lotes: ${_matrizFmtNum(total)} ${unid} · Consumido: ${_matrizFmtNum(consumido)} ${unid}">${_matrizFmtNum(saldo)} <span style="font-size:9px;color:#94a3b8;font-weight:600">${esc(unid)}</span></td>
     </tr>`;
-  }).join('');
+  }).filter(Boolean).join('');
 
-  tbody.innerHTML = rows;
+  tbody.innerHTML = rows || `<tr><td colspan="${dias.length + 2}" class="empty-state-td">Nenhum item encontrado com os filtros atuais.</td></tr>`;
 
+  // Legenda de lotes (cores)
   if(legend){
-    legend.innerHTML = lotes.map(l => {
-      const o = l.ordem;
+    legend.innerHTML = ordens.map(o => {
       const lic = LICITACOES.find(x => x.id === o.licitacao_id);
       return `<span style="display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;font-size:11px;color:#475569">
-        <span style="width:12px;height:12px;border-radius:3px;background:${l.cor};flex-shrink:0"></span>
+        <span style="width:12px;height:12px;border-radius:3px;background:${loteCor[o.id]};flex-shrink:0"></span>
         <b>Ciclo ${esc(o.ciclo)}</b> — ${esc(o.semana)} — ${lic ? esc(lic.nome) : 'Sem contrato'} <span style="color:#94a3b8">(exp ${fmtDataBR(o.data_expedicao)})</span>
       </span>`;
-    }).join('');
+    }).join('') || '<span style="font-size:11px;color:#94a3b8;padding:4px 0">Nenhuma ordem registrada ainda.</span>';
+  }
+  }catch(err){
+    console.error('Erro na tabela de estoque:', err);
+    if(thead) thead.innerHTML = '';
+    if(tbody) tbody.innerHTML = `<tr><td colspan="3" style="padding:16px;color:#b91c1c;font-size:12px;font-family:monospace;white-space:pre-wrap;text-align:left">Erro ao montar a tabela: ${esc(String((err && err.message) || err))}&#10;${esc(String((err && err.stack) || ''))}</td></tr>`;
   }
 }
 
@@ -9006,7 +8902,7 @@ function ir(id, btn){
   if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ renderEstoqueLotes(); renderMatrizEstoque(); }
+  if(id==='estoque'){ renderEstoqueLotes(); }
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
