@@ -3435,15 +3435,16 @@ let _matrizJanelaMeses = 1;
 let _matrizOffsetMeses = 0;
 let _matrizBusca = '';
 let _matrizPeriodoIni = '', _matrizPeriodoFim = '';
-let _matrizFiltroStatus = { coberto:true, planejado:true, sem:true, manual:true, removido:true };
+let _matrizFiltroStatus = { coberto:true, parcial:true, planejado:true, sem:true, manual:true, removido:true };
 let _removidosPendentes = {}; // licId → { ingrediente: {motivo, usuario} } (modal de registro)
 
 const MATRIZ_STATUS = {
-  coberto:  { cor:'#dcfce7', bd:'#4ade80', txt:'#166534' },
-  planejado:{ cor:'#fef9c3', bd:'#facc15', txt:'#854d0e' },
-  sem:      { cor:'#fee2e2', bd:'#f87171', txt:'#991b1b' },
-  manual:   { cor:'#dbeafe', bd:'#60a5fa', txt:'#1e40af' },
-  removido: { cor:'#ffedd5', bd:'#fb923c', txt:'#9a3412' }
+  coberto:  { cor:'#dcfce7', bd:'#4ade80', txt:'#166534', css:'#dcfce7' },
+  parcial:  { cor:'#dcfce7', bd:'#ca8a04', txt:'#166534', css:'repeating-linear-gradient(45deg,#dcfce7 0 7px,#fff 7px 14px)' },
+  planejado:{ cor:'#fef9c3', bd:'#facc15', txt:'#854d0e', css:'#fef9c3' },
+  sem:      { cor:'#fee2e2', bd:'#f87171', txt:'#991b1b', css:'#fee2e2' },
+  manual:   { cor:'#dbeafe', bd:'#60a5fa', txt:'#1e40af', css:'#dbeafe' },
+  removido: { cor:'#ffedd5', bd:'#fb923c', txt:'#9a3412', css:'#ffedd5' }
 };
 
 function _matrizUsuarioAtual(){
@@ -3504,10 +3505,43 @@ function _matrizJanelaLabel(dias){
   return `${txt} ${ano} · ${dias.length} dias letivos`;
 }
 
+// Cache de demanda por dia (invalidado quando cardápio/fichas/config mudam)
+let _matrizDemandaCache = null;
+let _matrizDemandaSig = null;
+
+function _hashStr(s){
+  let h = 5381;
+  for(let i = 0; i < s.length; i++){ h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; }
+  return h;
+}
+
+function _matrizAssinatura(){
+  const card = DADOS.cardapio || {};
+  let mealStr = '';
+  Object.keys(card).sort().forEach(m => {
+    (card[m]||[]).forEach(s => { mealStr += ((s && s.dias)||[]).map(d => d||'-').join('|') + ';'; });
+  });
+  let fichaStr = '';
+  Object.keys(DADOS.ficha||{}).sort().forEach(p => {
+    const arr = DADOS.ficha[p]||[];
+    fichaStr += p + ':' + arr.length;
+    arr.forEach(ing => { fichaStr += (ing.i||'') + ':' + (ing.d||'') + ';'; });
+  });
+  const niv = (NIVEIS_CONFIG||[]).map(n => (n.ativo?1:0)+':'+(n.alunos||0)+':'+(n.margem||0)).join('|');
+  const srv = [SERVIDORES_CONFIG.ativo, SERVIDORES_CONFIG.func_total, SERVIDORES_CONFIG.cafe_kg, SERVIDORES_CONFIG.acucar_kg].join(':');
+  return _hashStr(
+    mealStr + '#' + fichaStr + '#' + niv + '#' + srv +
+    '#' + JSON.stringify(DADOS.ingredientes||{}) + '#' + JSON.stringify(PERCAPTA_CUSTOM||{}) +
+    '#' + DIAS_LETIVOS_ARRAY.join(',')
+  );
+}
+
 // Demanda por dia: iso → { ingrediente → kg } (agregando variantes " ___ detalhe")
-function _matrizDemandas(dias){
+function _matrizDemandas(){
+  const sig = _matrizAssinatura();
+  if(_matrizDemandaCache && _matrizDemandaSig === sig) return _matrizDemandaCache;
   const map = new Map();
-  dias.forEach(iso => {
+  DIAS_LETIVOS_ARRAY.forEach(iso => {
     const meal = getMealByDate(iso);
     const tot = meal ? calcularTotaisNiveis([meal]).totais : {};
     const agg = {};
@@ -3517,6 +3551,8 @@ function _matrizDemandas(dias){
     });
     map.set(iso, agg);
   });
+  _matrizDemandaCache = map;
+  _matrizDemandaSig = sig;
   return map;
 }
 
@@ -3612,6 +3648,7 @@ function _matrizStatusCell(cell, dem){
   if(cell.man > 0) return 'manual';
   if(!dem || dem <= 0) return null;
   if(cell.cov >= dem - 1e-9) return 'coberto';
+  if(cell.cov > 0) return 'parcial';
   if(cell.pend > 0) return 'planejado';
   if(cell.rem > 0) return 'removido';
   return 'sem';
@@ -3659,16 +3696,21 @@ function renderMatrizEstoque(){
 
   if(legend){
     const sts = [
-      ['coberto','🟢 Recebido / coberto'],
-      ['planejado','🟡 Pedido aguardando'],
-      ['sem','🔴 Demanda sem cobertura'],
-      ['manual','🔵 Adicionado manualmente'],
-      ['removido','🟠 Retirado da ordem']
+      ['coberto','Recebido / coberto'],
+      ['parcial','Parcialmente coberto'],
+      ['planejado','Pedido aguardando'],
+      ['sem','Demanda sem cobertura'],
+      ['manual','Adicionado manualmente'],
+      ['removido','Retirado da ordem']
     ];
-    legend.innerHTML = sts.map(([k, label]) => `
+    legend.innerHTML = sts.map(([k, label]) => {
+      const S = MATRIZ_STATUS[k];
+      return `
       <label style="display:flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:20px;background:#fff;font-size:11px;color:#475569;cursor:pointer;user-select:none">
-        <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderMatrizEstoque()" style="accent-color:var(--azul2)">${label}
-      </label>`).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Sem demanda = célula vazia</span>`;
+        <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderMatrizEstoque()" style="accent-color:var(--azul2)">
+        <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${S.bd};background:${S.css};flex-shrink:0"></span>${label}
+      </label>`;
+    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Sem demanda = célula vazia</span>`;
   }
   if(rangeEl) rangeEl.textContent = _matrizJanelaLabel(dias);
 
@@ -3678,7 +3720,7 @@ function renderMatrizEstoque(){
     return;
   }
 
-  const demanda = _matrizDemandas(DIAS_LETIVOS_ARRAY);
+  const demanda = _matrizDemandas();
   const cells = _matrizCobertura(demanda);
   const DIAS_ABREV = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   const thBase = 'border:1px solid #C8D0DC;padding:5px 8px;background:#1A3A6B;color:#fff;white-space:nowrap';
@@ -3709,7 +3751,7 @@ function renderMatrizEstoque(){
       if(_matrizFiltroStatus[st]) any = true;
       const S = MATRIZ_STATUS[st];
       const val = (st === 'manual' && dem <= 0) ? (cell.man || 0) : dem;
-      return `<td title="${esc(_matrizTooltip(ing, iso, cell||{}, dem))}" style="border:1px solid ${S.bd};background:${S.cor};color:${S.txt};text-align:right;padding:3px 6px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${fmt(val)}</td>`;
+      return `<td title="${esc(_matrizTooltip(ing, iso, cell||{}, dem))}" style="border:1px solid ${S.bd};background:${S.css};color:${S.txt};text-align:right;padding:3px 6px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${fmt(val)}</td>`;
     }).join('');
     if(!any) return null;
     const un = DADOS.ingredientes[ing]?.unidade || 'kg';
