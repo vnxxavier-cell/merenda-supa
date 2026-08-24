@@ -3838,7 +3838,7 @@ function renderEstoqueLotes(){
         const b = diaBanda[iso];
         if(b){
           const cj = loteCor[b.id] || '#94A3B8';
-          return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #E5EAF1;background:${cj}14;min-width:56px"></td>`;
+          return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #E5EAF1;background:${cj}26;min-width:56px"></td>`;
         }
         return `<td style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
       }
@@ -3852,11 +3852,11 @@ function renderEstoqueLotes(){
       if(st === 'coberto' && domCob){
         const c = loteCor[domCob.lote] || '#86EFAC';
         const ct = loteTxtCor[domCob.lote] || '#15803D';
-        bg = `${c}33`; txt = ct; bd = `${c}99`;
+        bg = `${c}4D`; txt = ct; bd = `${c}99`;
       } else if(st === 'parcial' && domCob){
         const c = loteCor[domCob.lote] || '#86EFAC';
         const ct = loteTxtCor[domCob.lote] || '#15803D';
-        bg = `repeating-linear-gradient(45deg, ${c}33 0 7px, #fff 7px 14px)`;
+        bg = `repeating-linear-gradient(45deg, ${c}4D 0 7px, #fff 7px 14px)`;
         txt = ct; bd = `${c}99`;
       } else {
         const S = MATRIZ_STATUS[st];
