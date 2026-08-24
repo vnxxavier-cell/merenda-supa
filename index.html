@@ -3573,11 +3573,6 @@ function _matrizCobertura(demandaMap){
         datas.forEach(d => { if(d && dias.includes(d)) winDays.push(d); });
       });
       winDays.sort();
-      // Janela de cobertura do lote (usada para pintar dias sem demanda)
-      winDays.forEach(d => {
-        const cell = c[d] = c[d] || {cov:0,pend:0,man:0,rem:0,fontes:[],jan:[]};
-        if(!(cell.jan||[]).includes(o.id)) cell.jan.push(o.id);
-      });
       const rec = RECEBIMENTOS.find(r => r.ordem_id === o.id && r.ingrediente === ing);
       const recQtd = rec && rec.status !== 'nao_recebido' ? (rec.qtd_recebida || 0) : 0;
       const item = (o.itens||[]).find(it => it.ingrediente === ing);
@@ -3737,7 +3732,8 @@ function toggleRemoverItemModal(licId, ingrediente){
   registrarOrdemExpedida();
 }
 
-const LOTES_CORES = ['#2563EB','#16A34A','#D97706','#DC2626','#7C3AED','#0D9488','#DB2777','#65A30D','#4F46E5','#B45309'];
+const LOTES_CORES = ['#93C5FD','#86EFAC','#FCD34D','#FCA5A5','#C4B5FD','#5EEAD4','#F9A8D4','#BEF264','#A5B4FC','#FDBA74'];
+const LOTES_CORES_TXT = ['#1D4ED8','#15803D','#A16207','#B91C1C','#6D28D9','#0F766E','#BE185D','#4D7C0F','#4338CA','#C2410C'];
 
 function renderEstoqueLotes(){
   const tbody  = document.getElementById('tbody-lotes');
@@ -3763,7 +3759,7 @@ function renderEstoqueLotes(){
     ];
     stLegend.innerHTML = sts.map(([k, label]) => {
       let sw, swBd;
-      if(k === 'coberto'){ sw = 'linear-gradient(90deg,#2563EB,#16A34A,#D97706,#DC2626)'; swBd = '#94A3B8'; }
+      if(k === 'coberto'){ sw = 'linear-gradient(90deg,#93C5FD,#86EFAC,#FCD34D,#FCA5A5)'; swBd = '#94A3B8'; }
       else if(k === 'parcial'){ sw = 'repeating-linear-gradient(45deg,#94A3B8 0 6px,#fff 6px 12px)'; swBd = '#94A3B8'; }
       else if(k === 'sem'){ sw = '#fff'; swBd = '#dc2626'; }
       else { sw = MATRIZ_STATUS[k].css; swBd = MATRIZ_STATUS[k].bd; }
@@ -3772,7 +3768,7 @@ function renderEstoqueLotes(){
         <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderEstoqueLotes()" style="accent-color:var(--azul2)">
         <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${swBd};background:${sw};flex-shrink:0"></span>${label}
       </label>`;
-    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Vazia = sem demanda · tom claro = período do lote sem demanda</span>`;
+    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Vazia = sem demanda · tom claro = período do lote (banda)</span>`;
   }
   if(rangeEl) rangeEl.textContent = _lotesJanelaLabel(dias);
 
@@ -3788,6 +3784,17 @@ function renderEstoqueLotes(){
   const ordens = ORDENS_EXPEDIDAS.slice().sort((a,b) => (a.data_expedicao||'').localeCompare(b.data_expedicao||''));
   const loteCor = {};
   ordens.forEach((o, idx) => { loteCor[o.id] = LOTES_CORES[idx % LOTES_CORES.length]; });
+  const loteTxtCor = {};
+  ordens.forEach((o, idx) => { loteTxtCor[o.id] = LOTES_CORES_TXT[idx % LOTES_CORES_TXT.length]; });
+  // Banda vertical: lote mais antigo cujo período (semanas do lote) cobre cada dia
+  const diaBanda = {};
+  ordens.forEach(o => {
+    const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
+    mons.forEach(mon => {
+      const { datas } = getCalWeekDiasAndDatas(mon);
+      datas.forEach(d => { if(d && !(d in diaBanda)) diaBanda[d] = o; });
+    });
+  });
 
   // Cabeçalho: dias letivos da janela + barras de cor dos lotes com dias na data
   const thBgPassado = '#64748B', thBgHoje = '#D97706', thBgFuturo = '#1A3A6B';
@@ -3828,9 +3835,10 @@ function renderEstoqueLotes(){
       const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:[]};
       const st = _matrizStatusCell(cc, dem);
       if(!st){
-        if((cc.jan||[]).length){
-          const cj = loteCor[cc.jan[0]] || '#94A3B8';
-          return `<td title="${esc(ing + ' — ' + fmtDataBR(iso) + '\nSem demanda (dentro do período do lote)')}" style="border:1px solid #E5EAF1;background:${cj}1F;min-width:56px"></td>`;
+        const b = diaBanda[iso];
+        if(b){
+          const cj = loteCor[b.id] || '#94A3B8';
+          return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #E5EAF1;background:${cj}14;min-width:56px"></td>`;
         }
         return `<td style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
       }
@@ -3842,12 +3850,14 @@ function renderEstoqueLotes(){
         : null;
       let bg, txt, bd;
       if(st === 'coberto' && domCob){
-        const c = loteCor[domCob.lote] || '#16A34A';
-        bg = c; txt = '#fff'; bd = c;
+        const c = loteCor[domCob.lote] || '#86EFAC';
+        const ct = loteTxtCor[domCob.lote] || '#15803D';
+        bg = `${c}33`; txt = ct; bd = `${c}99`;
       } else if(st === 'parcial' && domCob){
-        const c = loteCor[domCob.lote] || '#16A34A';
-        bg = `repeating-linear-gradient(45deg, ${c} 0 7px, #fff 7px 14px)`;
-        txt = c; bd = '#ca8a04';
+        const c = loteCor[domCob.lote] || '#86EFAC';
+        const ct = loteTxtCor[domCob.lote] || '#15803D';
+        bg = `repeating-linear-gradient(45deg, ${c}33 0 7px, #fff 7px 14px)`;
+        txt = ct; bd = `${c}99`;
       } else {
         const S = MATRIZ_STATUS[st];
         bg = S.css; txt = S.txt; bd = S.bd;
