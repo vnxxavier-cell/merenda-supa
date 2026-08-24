@@ -3422,7 +3422,7 @@ const MATRIZ_STATUS = {
   coberto:  { cor:'#dcfce7', bd:'#4ade80', txt:'#166534', css:'#dcfce7' },
   parcial:  { cor:'#dcfce7', bd:'#ca8a04', txt:'#166534', css:'repeating-linear-gradient(45deg,#dcfce7 0 7px,#fff 7px 14px)' },
   planejado:{ cor:'#fef9c3', bd:'#facc15', txt:'#854d0e', css:'#fef9c3' },
-  sem:      { cor:'#fee2e2', bd:'#f87171', txt:'#991b1b', css:'#fee2e2' },
+  sem:      { cor:'#fff', bd:'#E5EAF1', txt:'#dc2626', css:'#fff' },
   manual:   { cor:'#dbeafe', bd:'#60a5fa', txt:'#1e40af', css:'#dbeafe' },
   removido: { cor:'#ffedd5', bd:'#fb923c', txt:'#9a3412', css:'#ffedd5' }
 };
@@ -3573,6 +3573,11 @@ function _matrizCobertura(demandaMap){
         datas.forEach(d => { if(d && dias.includes(d)) winDays.push(d); });
       });
       winDays.sort();
+      // Janela de cobertura do lote (usada para pintar dias sem demanda)
+      winDays.forEach(d => {
+        const cell = c[d] = c[d] || {cov:0,pend:0,man:0,rem:0,fontes:[],jan:[]};
+        if(!(cell.jan||[]).includes(o.id)) cell.jan.push(o.id);
+      });
       const rec = RECEBIMENTOS.find(r => r.ordem_id === o.id && r.ingrediente === ing);
       const recQtd = rec && rec.status !== 'nao_recebido' ? (rec.qtd_recebida || 0) : 0;
       const item = (o.itens||[]).find(it => it.ingrediente === ing);
@@ -3757,13 +3762,17 @@ function renderEstoqueLotes(){
       ['removido','Retirado da ordem']
     ];
     stLegend.innerHTML = sts.map(([k, label]) => {
-      const S = MATRIZ_STATUS[k];
+      let sw, swBd;
+      if(k === 'coberto'){ sw = 'linear-gradient(90deg,#2563EB,#16A34A,#D97706,#DC2626)'; swBd = '#94A3B8'; }
+      else if(k === 'parcial'){ sw = 'repeating-linear-gradient(45deg,#94A3B8 0 6px,#fff 6px 12px)'; swBd = '#94A3B8'; }
+      else if(k === 'sem'){ sw = '#fff'; swBd = '#dc2626'; }
+      else { sw = MATRIZ_STATUS[k].css; swBd = MATRIZ_STATUS[k].bd; }
       return `
       <label style="display:flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:20px;background:#fff;font-size:11px;color:#475569;cursor:pointer;user-select:none">
         <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderEstoqueLotes()" style="accent-color:var(--azul2)">
-        <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${S.bd};background:${S.css};flex-shrink:0"></span>${label}
+        <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${swBd};background:${sw};flex-shrink:0"></span>${label}
       </label>`;
-    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Sem demanda = célula vazia</span>`;
+    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Vazia = sem demanda · tom claro = período do lote sem demanda</span>`;
   }
   if(rangeEl) rangeEl.textContent = _lotesJanelaLabel(dias);
 
@@ -3816,17 +3825,39 @@ function renderEstoqueLotes(){
     const cellsHtml = dias.map(iso => {
       const dem = (demanda.get(iso)||{})[ing] || 0;
       const cell = cells[ing][iso];
-      const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[]};
+      const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:[]};
       const st = _matrizStatusCell(cc, dem);
-      if(!st) return `<td style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
+      if(!st){
+        if((cc.jan||[]).length){
+          const cj = loteCor[cc.jan[0]] || '#94A3B8';
+          return `<td title="${esc(ing + ' — ' + fmtDataBR(iso) + '\nSem demanda (dentro do período do lote)')}" style="border:1px solid #E5EAF1;background:${cj}1F;min-width:56px"></td>`;
+        }
+        return `<td style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
+      }
       if(_matrizFiltroStatus[st]) any = true;
-      const S = MATRIZ_STATUS[st];
       const val = (st === 'manual' && dem <= 0) ? (cc.man || 0) : dem;
-      const cores = [...new Set((cc.fontes||[]).map(f => loteCor[f.lote] || '#94A3B8'))];
+      const cobertas = (cc.fontes||[]).filter(f => f.tipo === 'coberto');
+      const domCob = cobertas.length
+        ? cobertas.reduce((a,b) => ((b.qtd||0) > (a.qtd||0) ? b : a), cobertas[0])
+        : null;
+      let bg, txt, bd;
+      if(st === 'coberto' && domCob){
+        const c = loteCor[domCob.lote] || '#16A34A';
+        bg = c; txt = '#fff'; bd = c;
+      } else if(st === 'parcial' && domCob){
+        const c = loteCor[domCob.lote] || '#16A34A';
+        bg = `repeating-linear-gradient(45deg, ${c} 0 7px, #fff 7px 14px)`;
+        txt = c; bd = '#ca8a04';
+      } else {
+        const S = MATRIZ_STATUS[st];
+        bg = S.css; txt = S.txt; bd = S.bd;
+      }
+      const domCor = domCob ? (loteCor[domCob.lote] || '') : '';
+      const cores = [...new Set((cc.fontes||[]).map(f => loteCor[f.lote] || '#94A3B8').filter(c => c !== domCor))];
       const dots = cores.length
         ? `<div style="display:flex;gap:1px;margin-top:2px;justify-content:center">${cores.map(c => `<span style="width:5px;height:5px;border-radius:50%;background:${c}"></span>`).join('')}</div>`
         : '';
-      return `<td title="${esc(_matrizTooltip(ing, iso, cc, dem))}" style="border:1px solid ${S.bd};background:${S.css};color:${S.txt};text-align:right;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${_matrizFmtNum(val)}${dots}</td>`;
+      return `<td title="${esc(_matrizTooltip(ing, iso, cc, dem))}" style="border:1px solid ${bd};background:${bg};color:${txt};text-align:right;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${_matrizFmtNum(val)}${dots}</td>`;
     }).join('');
     if(!any) return null;
     // Saldo Estoque: total dos lotes − consumo dos dias já passados (comportamento original)
