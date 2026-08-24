@@ -3584,13 +3584,22 @@ function _matrizCobertura(demandaMap){
       const item = (o.itens||[]).find(it => it.ingrediente === ing);
       const removidosIng = (o.removidos||[]).filter(r => r.ingrediente === ing);
       if(recQtd > 0){
+        // Base = snapshot da ordem (item.dias); fallback: demanda atual da janela
+        const ds = (item && item.dias && item.dias.length) ? item.dias
+          : winDays.map(d => ({ data: d, qtd: (demandaMap.get(d)||{})[ing] || 0 }));
+        const solicitado = item ? (item.qtd_solicitada || 0) : 0;
+        // Recebimento integral (>= solicitado): cobre todos os dias do item, mesmo com desconto de estoque no registro
+        const recTotal = recQtd >= solicitado - 0.001;
         let disp = recQtd;
-        winDays.forEach(d => {
-          if(disp <= 0) return;
-          const dem = (demandaMap.get(d)||{})[ing] || 0;
-          if(dem > 0){
-            const cq = Math.min(dem, disp); disp -= cq;
-            const cell = c[d] = c[d] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
+        ds.forEach(e => {
+          if(!e.data || !dias.includes(e.data)) return;
+          const demSnap = e.qtd || 0;
+          if(demSnap <= 0) return;
+          const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[],snap:0};
+          cell.snap = (cell.snap || 0) + demSnap;
+          const cq = recTotal ? demSnap : Math.min(demSnap, disp);
+          disp = Math.max(0, disp - cq);
+          if(cq > 0){
             cell.cov += cq;
             cell.fontes.push({tipo:'coberto', lote:o.id, ciclo:o.ciclo, semana:o.semana, qtd:cq, semC: !!(item && item.sem_contrato)});
           }
@@ -3600,8 +3609,10 @@ function _matrizCobertura(demandaMap){
         const ds = (item.dias && item.dias.length) ? item.dias : winDays.map(d => ({data:d, qtd:0}));
         ds.forEach(e => {
           if(!e.data || !dias.includes(e.data)) return;
-          const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[]};
-          cell.pend += (e.qtd||0) > 0 ? e.qtd : ((demandaMap.get(e.data)||{})[ing]||0);
+          const q = (e.qtd||0) > 0 ? e.qtd : ((demandaMap.get(e.data)||{})[ing]||0);
+          const cell = c[e.data] = c[e.data] || {cov:0,pend:0,man:0,rem:0,fontes:[],snap:0};
+          cell.pend += q;
+          cell.snap = (cell.snap || 0) + q;
           cell.fontes.push({tipo:'planejado', lote:o.id, ciclo:o.ciclo, semana:o.semana, semC: !!(item && item.sem_contrato)});
         });
       }
@@ -3639,8 +3650,11 @@ function _matrizCobertura(demandaMap){
 function _matrizStatusCell(cell, dem){
   if(cell.man > 0) return 'manual';
   if(!dem || dem <= 0) return null;
-  if(cell.cov >= dem - 1e-9) return 'coberto';
-  if(cell.cov > 0) return 'parcial';
+  const r3 = v => Math.round((v + Number.EPSILON) * 1000) / 1000;
+  // Base de comparação: demanda registrada nas ordens (snapshot); fallback: demanda atual
+  const demComp = (cell.snap && cell.snap > 0) ? cell.snap : dem;
+  if(r3(cell.cov) >= r3(demComp)) return 'coberto';
+  if(r3(cell.cov) > 0) return 'parcial';
   if(cell.pend > 0) return 'planejado';
   if(cell.rem > 0) return 'removido';
   return 'sem';
@@ -3845,7 +3859,7 @@ function renderEstoqueLotes(){
     const cellsHtml = dias.map(iso => {
       const dem = (demanda.get(iso)||{})[ing] || 0;
       const cell = cells[ing][iso];
-      const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:[]};
+      const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:[], snap:0};
       const st = _matrizStatusCell(cc, dem);
       if(!st){
         const b = diaBanda[iso];
