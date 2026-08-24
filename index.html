@@ -1067,7 +1067,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="overflow:visible">
     <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;border-radius:var(--r) var(--r) 0 0">
       <span>Lista de Ingredientes <span style="font-weight:400;font-size:12px;opacity:.8" id="cnt-ings"></span></span>
-      <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">📋 Filtrar usados no ciclo</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">📋 Filtrar usados no ciclo</button>
+        <button class="btn btn-sm" onclick="imprimirPesquisaPrecos()" title="Gerar e imprimir formulário de pesquisa de preços com os itens da lista (respeita os filtros atuais)" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">🖨️ Pesquisa de Preços</button>
+      </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="adicionarIngrediente()">+ Adicionar Ingrediente</button>
       </div>
@@ -8118,6 +8121,99 @@ function renderIngredientes(filtro=''){
         </div>
       </td>
     </tr>`}).join('');
+}
+
+// Formulário de pesquisa de preços (respeita os filtros atuais da lista, inclusive "usados no ciclo")
+function imprimirPesquisaPrecos(){
+  const usadosSet = new Set();
+  if(_filtroApenasUsados){
+    Object.values(CICLOS_PLANOS).forEach(arr => (arr||[]).forEach(p => {
+      if(p && DADOS.ficha[p]) DADOS.ficha[p].forEach(x => usadosSet.add(x.i));
+    }));
+  }
+  const filtro = (document.querySelector('#pg-ingredientes .filtro-input')?.value || '').trim();
+  const ings = Object.entries(DADOS.ingredientes)
+    .filter(([n]) => !filtro || n.toLowerCase().includes(filtro.toLowerCase()))
+    .filter(([n]) => !filtroIngForn || (filtroIngForn === 'AF' ? isAF(n) : !isAF(n)))
+    .filter(([n]) => !_filtroApenasUsados || usadosSet.has(n))
+    .sort((a,b) => a[0].localeCompare(b[0], 'pt-BR'));
+  if(!ings.length){ alert('Nenhum ingrediente com os filtros atuais.'); return; }
+
+  const escola = localStorage.getItem('merenda_escola') || '';
+  const hojeTxt = fmtDataBR(new Date().toISOString().split('T')[0]);
+  const cicloSel = document.getElementById('plan-ciclo')?.value || '';
+  const filtroTxt = _filtroApenasUsados
+    ? (cicloSel ? 'Itens usados no ciclo: ' + cicloSel : 'Itens usados no ciclo configurado')
+    : 'Lista geral de ingredientes';
+  const rowsHtml = ings.map(([nome, d], i) => `
+    <tr>
+      <td class="c">${i + 1}</td>
+      <td>${esc(nome)}</td>
+      <td class="c">${esc(d.unidade || 'kg')}</td>
+      <td class="preco"></td>
+      <td class="preco"></td>
+      <td class="preco"></td>
+      <td class="preco menor"></td>
+    </tr>`).join('');
+  const doc = `
+  <div class="pesq-doc">
+    <div class="pesq-cab">
+      ${escola ? `<div class="pesq-escola">${esc(escola)}</div>` : ''}
+      <div class="pesq-titulo">Pesquisa de Preços — Gêneros Alimentícios</div>
+      <div class="pesq-sub">${esc(filtroTxt)} &nbsp;·&nbsp; Data: ${hojeTxt} &nbsp;·&nbsp; ${ings.length} item(ns)</div>
+    </div>
+    <table class="pesq-tabela">
+      <thead><tr>
+        <th class="c" style="width:34px">Nº</th>
+        <th>Ingrediente</th>
+        <th class="c" style="width:64px">Unid.</th>
+        <th class="c">Preço 1 (R$)</th>
+        <th class="c">Preço 2 (R$)</th>
+        <th class="c">Preço 3 (R$)</th>
+        <th class="c" style="width:86px">Menor preço</th>
+      </tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="pesq-assinatura">
+      <div class="pesq-assinatura-linha">Responsável pela pesquisa</div>
+      <div class="pesq-assinatura-linha" style="margin-left:40px">Data: ____/____/______</div>
+    </div>
+  </div>`;
+  const css = [
+    '@page{margin:14mm 16mm;size:A4}',
+    'body{margin:0;font-family:"Inter",Arial,sans-serif;color:#000;font-size:10pt}',
+    '.pesq-cab{text-align:center;margin-bottom:12px}',
+    '.pesq-escola{font-size:11pt;font-weight:700;color:#1A3A6B;text-transform:uppercase;letter-spacing:.04em}',
+    '.pesq-titulo{font-size:13pt;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#1A3A6B;border-bottom:2px solid #1A3A6B;padding-bottom:8px;margin:6px 0}',
+    '.pesq-sub{font-size:9.5pt;color:#333}',
+    '.pesq-tabela{width:100%;border-collapse:collapse;font-size:9.5pt}',
+    '.pesq-tabela thead tr{background:linear-gradient(135deg,#1A3A6B 0%,#2E75B6 100%);color:#fff}',
+    '.pesq-tabela thead th{padding:6px 8px;font-weight:700;text-transform:uppercase;font-size:8.5pt;letter-spacing:.03em}',
+    '.pesq-tabela tbody td{padding:5px 8px;border-bottom:1px solid #DDE5F0;vertical-align:middle}',
+    '.pesq-tabela tbody tr:nth-child(even) td{background:#F5F8FD}',
+    '.pesq-tabela .c{text-align:center}',
+    '.pesq-tabela .preco{height:16px;min-width:72px}',
+    '.pesq-tabela .menor{background:#FFF9E6}',
+    '.pesq-assinatura{margin-top:10mm;text-align:center;break-inside:avoid;page-break-inside:avoid;display:flex;justify-content:center;gap:40px}',
+    '.pesq-assinatura-linha{display:inline-block;width:240px;border-top:1.5px solid #000;padding-top:6px;font-size:9.5pt;font-weight:700}'
+  ].join('\n');
+  const frame = document.createElement('iframe');
+  frame.style.position = 'fixed';
+  frame.style.right = '0';
+  frame.style.bottom = '0';
+  frame.style.width = '0';
+  frame.style.height = '0';
+  frame.style.border = '0';
+  document.body.appendChild(frame);
+  const fdoc = frame.contentDocument;
+  fdoc.open();
+  fdoc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pesquisa de Preços</title><style>' + css + '</style></head><body>' + doc + '</body></html>');
+  fdoc.close();
+  setTimeout(() => {
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+    setTimeout(() => { if(frame.parentNode) frame.parentNode.removeChild(frame); }, 1000);
+  }, 150);
 }
 
 const UNIDADES_COMUNS = ['kg','g','L','mL','un','dz','maço','caixa','pacote','lata','fardo','saco','pote','garrafa','bisnaga'];
