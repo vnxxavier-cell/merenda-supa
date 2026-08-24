@@ -4915,6 +4915,8 @@ function registrarOrdemExpedida(){
     alert('Nenhum item para registrar ordem.');
     return;
   }
+  const semPeriodicidade = todosItens.filter(it => it.comprar > 0 && !ING_PERIODICIDADE[it.nomeBase]);
+  const numSemanasLote = (_MERC_SEMANAS_SEL && _MERC_SEMANAS_SEL.length) ? _MERC_SEMANAS_SEL.length : 1;
 
   // Monta modal de seleção
   const body = document.getElementById('modal-body-sel-contrato');
@@ -4926,8 +4928,11 @@ function registrarOrdemExpedida(){
       Selecione o(s) fornecedor(es) para os quais deseja registrar a ordem:
     </p>
     <div style="display:flex;flex-direction:column;gap:10px">
-      ${fornIds.map(fid => _blocoFornModal(fid, fornMap[fid], LICITACOES.filter(l => l.status === 'ativa' && l.data_inicio <= hoje && l.fornecedor_id === fid))).join('')}
+      ${fornIds.map(fid => _blocoFornModal(fid, fornMap[fid], LICITACOES.filter(l => l.status === 'ativa' && l.data_inicio <= hoje && l.fornecedor_id === fid), numSemanasLote)).join('')}
     </div>
+    ${semPeriodicidade.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
+      ⚠️ ${semPeriodicidade.length} item(ns) sem periodicidade configurada — configure na aba Ingredientes antes de registrar: ${semPeriodicidade.map(it => esc(it.nomeBase)).join(', ')}
+    </div>` : ''}
     ${semFornItens.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
       ⚠️ ${semFornItens.length} item(ns) sem fornecedor associado — ao registrar, você precisará associá-los: ${semFornItens.map(it => esc(it.nomeBase)).join(', ')}
     </div>` : ''}
@@ -4938,12 +4943,12 @@ function registrarOrdemExpedida(){
   `;
 
   // Pausa o registro da ordem para mostrar o modal (sem usar async)
-  _ordemPendente = { ciclo, semLabel, hoje, mondayIso, semFornItens, fornIds };
+  _ordemPendente = { ciclo, semLabel, hoje, mondayIso, semFornItens, semPeriodicidade, numSemanasLote, fornIds };
   document.getElementById('overlay-sel-contrato').classList.add('aberto');
 }
 
 // Bloco do fornecedor no modal de registro (itens do contrato normais; sem contrato em âmbar com preço manual)
-function _blocoFornModal(fid, forn, lics){
+function _blocoFornModal(fid, forn, lics, numSemanasLote){
   const _def = lics.reduce((best, l) => {
     const n = l.itens.filter(x => forn.itens.some(i => i.nomeBase === x.ingrediente)).length;
     if(!best || n > best.n) return { id: l.id, n };
@@ -4988,8 +4993,13 @@ function _blocoFornModal(fid, forn, lics){
             const pu = noContrato ? (_precosSemLicTemp[it.nomeBase] || 0) : (precoMap[it.nomeBase] || 0);
             const sub = it.comprar * pu;
             const removido = _removidosPendentes[fid] && _removidosPendentes[fid][it.nomeBase];
+            const _nS = numSemanasLote || 1;
+            const perItem = Math.min(_perSemanasIng(it.nomeBase), _nS);
+            const janTag = _nS <= 1 ? '' : perItem >= _nS
+              ? '<span style="font-size:9px;color:#475569;font-weight:600;background:#F1F5F9;border-radius:4px;padding:1px 5px;margin-left:4px">todo o período</span>'
+              : `<span style="font-size:9px;color:#B45309;font-weight:700;background:#FFFBEB;border:1px solid #FCD34D;border-radius:4px;padding:1px 5px;margin-left:4px">${perItem === 1 ? '1ª semana' : perItem + ' semanas'}</span>`;
             return `<tr style="${noContrato ? 'background:#FFFBEB;' : ''}${removido ? 'opacity:.45' : ''}">
-              <td style="padding:3px 8px;border-bottom:1px solid #F1F5F9">${esc(it.nomeBase)} ${noContrato ? '<span style="color:#B45309;font-weight:700;font-size:10px">(sem contrato)</span>' : ''} ${removido ? '<span style="color:#9a3412;font-weight:700;font-size:10px">(removido' + (removido.motivo ? ': ' + esc(removido.motivo) : '') + ')</span>' : ''}</td>
+              <td style="padding:3px 8px;border-bottom:1px solid #F1F5F9">${esc(it.nomeBase)}${janTag} ${noContrato ? '<span style="color:#B45309;font-weight:700;font-size:10px">(sem contrato)</span>' : ''} ${removido ? '<span style="color:#9a3412;font-weight:700;font-size:10px">(removido' + (removido.motivo ? ': ' + esc(removido.motivo) : '') + ')</span>' : ''}</td>
               <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-family:'DM Mono',monospace">${it.comprar.toFixed(3)}</td>
               <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9">${noContrato ? `<input type="number" step="0.01" min="0" value="${pu || ''}" placeholder="0,00" oninput="atualizarPrecoSemLic('${fid}','${esc(it.nomeBase)}',${si},this.value,${it.comprar})" style="width:86px;text-align:right;padding:2px 6px;border:1.5px solid #FCD34D;border-radius:5px;font-family:'DM Mono',monospace;font-size:11px;background:#fff">` : 'R$ ' + pu.toFixed(2).replace('.', ',')}</td>
               <td class="num" style="padding:3px 8px;text-align:right;border-bottom:1px solid #F1F5F9;font-family:'DM Mono',monospace;font-weight:600" id="sub-sem-${fid}-${si}">R$ ${sub.toFixed(2).replace('.', ',')}</td>
@@ -5011,6 +5021,13 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
   const _semForn = ((_ordemPendente && _ordemPendente.semFornItens) || []);
   if(_semForn.length){
     montarModalSemForn(_semForn, 'registro');
+    return;
+  }
+
+  // Itens sem periodicidade configurada: bloqueia até configurar
+  const _semPer = ((_ordemPendente && _ordemPendente.semPeriodicidade) || []);
+  if(_semPer.length){
+    alert('Os seguintes itens estão sem periodicidade configurada:\n\n• ' + _semPer.map(x => x.nomeBase).join('\n• ') + '\n\nConfigure a periodicidade na aba Ingredientes e registre a ordem novamente.');
     return;
   }
 
@@ -5045,6 +5062,12 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
     : getItensMercado(ciclo, mondayIso);
   const _todos = [...af_items, ...mc_items];
 
+  // Datas de cada semana do período (para limitar itens à janela de periodicidade)
+  const _semanaDatas = semanas.map(mon => {
+    const { datas: _wd } = getCalWeekDiasAndDatas(mon);
+    return new Set((_wd || []).filter(Boolean));
+  });
+
   const _ordens = [];
   checks.forEach(cb => {
     const fid = cb.getAttribute('data-forn-id');
@@ -5057,8 +5080,12 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
       .filter(it => it.comprar > 0 && (ING_FORNECEDORES[it.nomeBase] || '') === fid)
       .map(it => {
         const _dias = [];
+        const _per = _perSemanasIng(it.nomeBase);
+        const _janela = _semanaDatas.slice(0, Math.min(_per, _semanaDatas.length));
+        const _ok = d => _janela.some(s => s.has(d));
         dias.forEach((d, i) => {
           if(!d || !datas[i]) return;
+          if(!_ok(datas[i])) return;
           const qtd = _qtdDia(it.nomeBase, datas[i], d);
           if(qtd > 0) _dias.push({ data: datas[i], qtd: parseFloat(qtd.toFixed(3)) });
         });
@@ -5137,6 +5164,39 @@ function arredondarEmb(nome, qtd){
     }
   });
   if(changed) localStorage.setItem('merenda_precos', JSON.stringify(saved));
+})();
+
+// Migração: trunca os dias dos itens das ordens antigas para a janela de periodicidade de cada ingrediente
+// (verdura de 1 semana em lote de 4 semanas só deve cobrir a 1ª semana)
+(function(){
+  let mudou = false;
+  ORDENS_EXPEDIDAS.forEach(o => {
+    const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
+    if(!mons.length) return;
+    const _janelaDatas = ing => {
+      const perSem = _perSemanasIng(ing);
+      const covMons = mons.slice(0, Math.min(perSem, mons.length));
+      const set = new Set();
+      covMons.forEach(mon => {
+        const { datas } = getCalWeekDiasAndDatas(mon);
+        datas.forEach(d => { if(d) set.add(d); });
+      });
+      return set;
+    };
+    (o.itens||[]).forEach(it => {
+      if(!Array.isArray(it.dias) || !it.dias.length) return;
+      const ok = _janelaDatas(it.ingrediente);
+      const novo = it.dias.filter(e => ok.has(e.data));
+      if(novo.length !== it.dias.length){ it.dias = novo; mudou = true; }
+    });
+    (o.removidos||[]).forEach(r => {
+      if(!Array.isArray(r.dias) || !r.dias.length) return;
+      const ok = _janelaDatas(r.ingrediente);
+      const novo = r.dias.filter(e => ok.has(e.data));
+      if(novo.length !== r.dias.length){ r.dias = novo; mudou = true; }
+    });
+  });
+  if(mudou) salvarOrdens();
 })();
 
 // CALENDÁRIO 2026 E CÁLCULO DE CICLOS
