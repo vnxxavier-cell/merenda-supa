@@ -3911,7 +3911,7 @@ function renderEstoqueLotes(){
         <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderEstoqueLotes()" style="accent-color:var(--azul2)">
         <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${swBd};background:${sw};flex-shrink:0"></span>${label}
       </label>`;
-    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Vazia = sem demanda ou fora do período do lote · tom claro = período do lote (banda)</span>`;
+    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Vazia = sem demanda · tom claro = período do lote (banda)</span>`;
   }
   if(rangeEl) rangeEl.textContent = _lotesJanelaLabel(dias);
 
@@ -3987,10 +3987,6 @@ function renderEstoqueLotes(){
       const cell = cells[ing][iso];
       const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:false, snap:0};
       const st = _matrizStatusCell(cc, dem);
-      // Demanda fora da janela de qualquer lote → célula em branco (semana a semana)
-      if(st === 'sem' && !cc.jan){
-        return `<td title="${esc('Demanda fora do período do lote — registre nova ordem para esta semana')}" style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
-      }
       if(!st){
         const b = diaBanda[iso];
         if(b){
