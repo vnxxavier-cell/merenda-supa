@@ -6613,18 +6613,26 @@ function getItensMercado(ciclo, mondayIso){
     const nec = totaisAcum[chave] || 0;
 
     const est = ESTOQUE[nomeBase] || 0;
-    // Item é "devido" na semana W se (W-1) % P === 0 (P = periodicidade em semanas)
-    const due = ((semanaOrdem - 1) % numSemanas) === 0;
+    // "Já pedido": alguma ordem existente contém o item e sua janela de cobertura
+    // (primeiras min(P, numSemanas) semanas a partir da 1ª semana da ordem) inclui a semana da ordem
+    const _cobPorOrdem = ORDENS_EXPEDIDAS.some(o => {
+      const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
+      if(!mons.length) return false;
+      if(!(o.itens||[]).some(it => it.ingrediente === nomeBase)) return false;
+      const covMons = mons.slice(0, Math.min(numSemanas, mons.length));
+      return covMons.includes(mondayIso);
+    });
+    const due = !_cobPorOrdem;
     // Não-due: fora da ordem (comprar 0, exibido como coberto/"já pedido")
     // Due e W>1: estoque NÃO considerado no cálculo (estoque físico permanece intacto)
     const estCalc = due ? (semanaOrdem > 1 ? 0 : est) : 0;
-    const coberto = !due || (_mercDescontarEstoque && nec > 0 && est >= nec);
+    const coberto = _cobPorOrdem || (_mercDescontarEstoque && nec > 0 && est >= nec);
     const comprarBase = due ? (_mercDescontarEstoque ? Math.max(0, nec - estCalc) : nec) : 0;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
 
     if(comprar <= 0 && ajuste.overrides[nomeBase] == null && !coberto) return;
-    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto, jaPedido: !due};
+    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto, jaPedido: _cobPorOrdem};
     (isAF(nomeBase) ? af_items : mc_items).push(obj);
   });
 
@@ -6699,17 +6707,25 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     const totaisAcum = numSemanas === 1 ? totais1 : _acum(numSemanas);
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
-    // Item é "devido" na semana W se (W-1) % P === 0 (P = periodicidade em semanas)
-    const due = ((semanaOrdem - 1) % numSemanas) === 0;
+    // "Já pedido": alguma ordem existente contém o item e sua janela de cobertura
+    // (primeiras min(P, numSemanas) semanas a partir da 1ª semana da ordem) inclui a semana da ordem
+    const _cobPorOrdem = ORDENS_EXPEDIDAS.some(o => {
+      const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
+      if(!mons.length) return false;
+      if(!(o.itens||[]).some(it => it.ingrediente === nomeBase)) return false;
+      const covMons = mons.slice(0, Math.min(numSemanas, mons.length));
+      return covMons.includes(_firstMon);
+    });
+    const due = !_cobPorOrdem;
     // Não-due: fora da ordem (comprar 0, exibido como coberto/"já pedido")
     // Due e W>1: estoque NÃO considerado no cálculo (estoque físico permanece intacto)
     const estCalc = due ? (semanaOrdem > 1 ? 0 : est) : 0;
-    const coberto = !due || (_mercDescontarEstoque && nec > 0 && est >= nec);
+    const coberto = _cobPorOrdem || (_mercDescontarEstoque && nec > 0 && est >= nec);
     const comprarBase = due ? (_mercDescontarEstoque ? Math.max(0, nec - estCalc) : nec) : 0;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
     if(comprar <= 0 && ajuste.overrides[nomeBase] == null && !coberto) return;
-    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto, jaPedido: !due};
+    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto, jaPedido: _cobPorOrdem};
     (isAF(nomeBase) ? af_items : mc_items).push(obj);
   });
   (ajuste.extras||[]).forEach(ex => {
