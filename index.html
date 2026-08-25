@@ -2293,6 +2293,13 @@ function recarregarDados(){
   FORNECEDORES_CADASTRO   = JSON.parse(localStorage.getItem('merenda_fornecedores') || '[]');
   ING_FORNECEDORES        = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
   ING_PERIODICIDADE       = JSON.parse(localStorage.getItem('merenda_ing_periodicidade') || '{}');
+  // Padrão: ingredientes sem periodicidade configurada começam com 1 semana
+  { let _perMudou = false;
+    Object.keys(DADOS.ingredientes).forEach(k => {
+      if(!ING_PERIODICIDADE[k]){ ING_PERIODICIDADE[k] = '1'; _perMudou = true; }
+    });
+    if(_perMudou) salvarIngPeriodicidade();
+  }
   Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
   // Aplicar unidades customizadas
   const u = JSON.parse(localStorage.getItem('merenda_unidades') || '{}');
@@ -4915,7 +4922,6 @@ function registrarOrdemExpedida(){
     alert('Nenhum item para registrar ordem.');
     return;
   }
-  const semPeriodicidade = todosItens.filter(it => it.comprar > 0 && !ING_PERIODICIDADE[it.nomeBase]);
   const numSemanasLote = (_MERC_SEMANAS_SEL && _MERC_SEMANAS_SEL.length) ? _MERC_SEMANAS_SEL.length : 1;
 
   // Monta modal de seleção
@@ -4930,9 +4936,6 @@ function registrarOrdemExpedida(){
     <div style="display:flex;flex-direction:column;gap:10px">
       ${fornIds.map(fid => _blocoFornModal(fid, fornMap[fid], LICITACOES.filter(l => l.status === 'ativa' && l.data_inicio <= hoje && l.fornecedor_id === fid), numSemanasLote)).join('')}
     </div>
-    ${semPeriodicidade.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
-      ⚠️ ${semPeriodicidade.length} item(ns) sem periodicidade configurada — configure na aba Ingredientes antes de registrar: ${semPeriodicidade.map(it => esc(it.nomeBase)).join(', ')}
-    </div>` : ''}
     ${semFornItens.length ? `<div style="margin-top:12px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#B91C1C">
       ⚠️ ${semFornItens.length} item(ns) sem fornecedor associado — ao registrar, você precisará associá-los: ${semFornItens.map(it => esc(it.nomeBase)).join(', ')}
     </div>` : ''}
@@ -4943,7 +4946,7 @@ function registrarOrdemExpedida(){
   `;
 
   // Pausa o registro da ordem para mostrar o modal (sem usar async)
-  _ordemPendente = { ciclo, semLabel, hoje, mondayIso, semFornItens, semPeriodicidade, numSemanasLote, fornIds };
+  _ordemPendente = { ciclo, semLabel, hoje, mondayIso, semFornItens, numSemanasLote, fornIds };
   document.getElementById('overlay-sel-contrato').classList.add('aberto');
 }
 
@@ -5021,13 +5024,6 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
   const _semForn = ((_ordemPendente && _ordemPendente.semFornItens) || []);
   if(_semForn.length){
     montarModalSemForn(_semForn, 'registro');
-    return;
-  }
-
-  // Itens sem periodicidade configurada: bloqueia até configurar
-  const _semPer = ((_ordemPendente && _ordemPendente.semPeriodicidade) || []);
-  if(_semPer.length){
-    alert('Os seguintes itens estão sem periodicidade configurada:\n\n• ' + _semPer.map(x => x.nomeBase).join('\n• ') + '\n\nConfigure a periodicidade na aba Ingredientes e registre a ordem novamente.');
     return;
   }
 
@@ -8380,6 +8376,9 @@ function salvarNovoIngrediente(){
   if(DADOS.ingredientes[nome]){ alert('Este ingrediente já existe.'); return; }
   DADOS.ingredientes[nome] = { unidade: unid, estoque: 0, preco: 0 };
   if(ESTOQUE[nome] === undefined) ESTOQUE[nome] = 0;
+  // Padrão: todo ingrediente novo começa com periodicidade de 1 semana
+  ING_PERIODICIDADE[nome] = '1';
+  salvarIngPeriodicidade();
   const custom = JSON.parse(localStorage.getItem('merenda_ing_custom') || '{}');
   custom[nome] = { unidade: unid };
   localStorage.setItem('merenda_ing_custom', JSON.stringify(custom));
