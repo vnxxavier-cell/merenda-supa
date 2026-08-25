@@ -5166,39 +5166,6 @@ function arredondarEmb(nome, qtd){
   if(changed) localStorage.setItem('merenda_precos', JSON.stringify(saved));
 })();
 
-// Migração: trunca os dias dos itens das ordens antigas para a janela de periodicidade de cada ingrediente
-// (verdura de 1 semana em lote de 4 semanas só deve cobrir a 1ª semana)
-(function(){
-  let mudou = false;
-  ORDENS_EXPEDIDAS.forEach(o => {
-    const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
-    if(!mons.length) return;
-    const _janelaDatas = ing => {
-      const perSem = _perSemanasIng(ing);
-      const covMons = mons.slice(0, Math.min(perSem, mons.length));
-      const set = new Set();
-      covMons.forEach(mon => {
-        const { datas } = getCalWeekDiasAndDatas(mon);
-        datas.forEach(d => { if(d) set.add(d); });
-      });
-      return set;
-    };
-    (o.itens||[]).forEach(it => {
-      if(!Array.isArray(it.dias) || !it.dias.length) return;
-      const ok = _janelaDatas(it.ingrediente);
-      const novo = it.dias.filter(e => ok.has(e.data));
-      if(novo.length !== it.dias.length){ it.dias = novo; mudou = true; }
-    });
-    (o.removidos||[]).forEach(r => {
-      if(!Array.isArray(r.dias) || !r.dias.length) return;
-      const ok = _janelaDatas(r.ingrediente);
-      const novo = r.dias.filter(e => ok.has(e.data));
-      if(novo.length !== r.dias.length){ r.dias = novo; mudou = true; }
-    });
-  });
-  if(mudou) salvarOrdens();
-})();
-
 // CALENDÁRIO 2026 E CÁLCULO DE CICLOS
 // ══════════════════════════════════════════════════════
 const FERIADOS_DEFAULT = [
@@ -5375,6 +5342,39 @@ function buildCalendarWeeks() {
 }
 // SEMANAS_CAL declarado antes de atualizarCiclos(); inicializa aqui após buildCalendarWeeks estar disponível
 SEMANAS_CAL = buildCalendarWeeks();
+
+// Migração: trunca os dias dos itens das ordens antigas para a janela de periodicidade de cada ingrediente
+// (verdura de 1 semana em lote de 4 semanas só deve cobrir a 1ª semana)
+(function(){
+  let mudou = false;
+  ORDENS_EXPEDIDAS.forEach(o => {
+    const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
+    if(!mons.length) return;
+    const _janelaDatas = ing => {
+      const perSem = _perSemanasIng(ing);
+      const covMons = mons.slice(0, Math.min(perSem, mons.length));
+      const set = new Set();
+      covMons.forEach(mon => {
+        const { datas } = getCalWeekDiasAndDatas(mon);
+        datas.forEach(d => { if(d) set.add(d); });
+      });
+      return set;
+    };
+    (o.itens||[]).forEach(it => {
+      if(!Array.isArray(it.dias) || !it.dias.length) return;
+      const ok = _janelaDatas(it.ingrediente);
+      const novo = it.dias.filter(e => ok.has(e.data));
+      if(novo.length !== it.dias.length){ it.dias = novo; mudou = true; }
+    });
+    (o.removidos||[]).forEach(r => {
+      if(!Array.isArray(r.dias) || !r.dias.length) return;
+      const ok = _janelaDatas(r.ingrediente);
+      const novo = r.dias.filter(e => ok.has(e.data));
+      if(novo.length !== r.dias.length){ r.dias = novo; mudou = true; }
+    });
+  });
+  if(mudou) salvarOrdens();
+})();
 
 function getCalWeekDiasAndDatas(mondayIso) {
   const calWeek = SEMANAS_CAL.find(w => w.monday === mondayIso);
