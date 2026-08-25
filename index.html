@@ -6585,6 +6585,9 @@ function getItensMercado(ciclo, mondayIso){
   }
 
   const ajuste = getMercAjuste();
+  // Semana da ordem (1-based): 1ª semana selecionada no ano letivo
+  const _semIdxOrdem = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
+  const semanaOrdem = (_semIdxOrdem >= 0 ? _semIdxOrdem : 0) + 1;
   const af_items=[], mc_items=[];
   let totalKg = 0;
 
@@ -6610,13 +6613,18 @@ function getItensMercado(ciclo, mondayIso){
     const nec = totaisAcum[chave] || 0;
 
     const est = ESTOQUE[nomeBase] || 0;
-    const coberto = _mercDescontarEstoque && nec > 0 && est >= nec;
-    const comprarBase = _mercDescontarEstoque ? Math.max(0, nec - est) : nec;
+    // Item é "devido" na semana W se (W-1) % P === 0 (P = periodicidade em semanas)
+    const due = ((semanaOrdem - 1) % numSemanas) === 0;
+    // Não-due: fora da ordem (comprar 0, exibido como coberto/"já pedido")
+    // Due e W>1: estoque NÃO considerado no cálculo (estoque físico permanece intacto)
+    const estCalc = due ? (semanaOrdem > 1 ? 0 : est) : 0;
+    const coberto = !due || (_mercDescontarEstoque && nec > 0 && est >= nec);
+    const comprarBase = due ? (_mercDescontarEstoque ? Math.max(0, nec - estCalc) : nec) : 0;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
 
     if(comprar <= 0 && ajuste.overrides[nomeBase] == null && !coberto) return;
-    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto};
+    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto, jaPedido: !due};
     (isAF(nomeBase) ? af_items : mc_items).push(obj);
   });
 
@@ -6639,6 +6647,10 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     return calcularTotaisNiveis(wdFilt).totais;
   });
   const numSemanasSel = semanas.length || 1;
+  // Semana da ordem (1-based): 1ª semana selecionada no ano letivo
+  const _firstMon = (semanas && semanas.length) ? semanas[0] : mondayIso;
+  const _semIdxOrdem2 = SEMANAS_CAL.findIndex(w => w.monday === _firstMon);
+  const semanaOrdem = (_semIdxOrdem2 >= 0 ? _semIdxOrdem2 : 0) + 1;
   // Em reposição, expande com semanas futuras para respeitar a periodicidade
   if(_MERC_MODO === 'reposicao' && semanas.length > 0 && semanas.length < 4){
     const lastMon = semanas[semanas.length - 1];
@@ -6687,12 +6699,17 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     const totaisAcum = numSemanas === 1 ? totais1 : _acum(numSemanas);
     const nec = totaisAcum[chave] || 0;
     const est = ESTOQUE[nomeBase] || 0;
-    const coberto = _mercDescontarEstoque && nec > 0 && est >= nec;
-    const comprarBase = _mercDescontarEstoque ? Math.max(0, nec - est) : nec;
+    // Item é "devido" na semana W se (W-1) % P === 0 (P = periodicidade em semanas)
+    const due = ((semanaOrdem - 1) % numSemanas) === 0;
+    // Não-due: fora da ordem (comprar 0, exibido como coberto/"já pedido")
+    // Due e W>1: estoque NÃO considerado no cálculo (estoque físico permanece intacto)
+    const estCalc = due ? (semanaOrdem > 1 ? 0 : est) : 0;
+    const coberto = !due || (_mercDescontarEstoque && nec > 0 && est >= nec);
+    const comprarBase = due ? (_mercDescontarEstoque ? Math.max(0, nec - estCalc) : nec) : 0;
     const comprar = ajuste.overrides[nomeBase] != null ? ajuste.overrides[nomeBase] : comprarBase;
     totalKg += necSem1;
     if(comprar <= 0 && ajuste.overrides[nomeBase] == null && !coberto) return;
-    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto};
+    const obj = {nomeBase, displayNome, nec, est, comprar, unid: DADOS.ingredientes[nomeBase]?.unidade||'kg', manual: ajuste.overrides[nomeBase] != null, periodicidade: per, numSemanas, coberto, jaPedido: !due};
     (isAF(nomeBase) ? af_items : mc_items).push(obj);
   });
   (ajuste.extras||[]).forEach(ex => {
@@ -7026,7 +7043,7 @@ function renderMercado(){
         if(it.coberto){
           return `<tr style="background:#f0fdf4">
             <td style="text-align:center;font-weight:700;color:#aaa">${i+1}</td>
-            <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}</td>
+            <td><b style="color:#6b7280">${it.displayNome}</b>${_perBadge(it)}${it.jaPedido ? ' <span style="font-size:9px;color:#64748b;background:#e2e8f0;border-radius:4px;padding:1px 6px;font-weight:700">já pedido</span>' : ''}</td>
             <td style="text-align:center">${contratoTag}</td>
             <td class="no-print">
               <input type="text" class="no-print" placeholder="Observação…" value="${obsAtual}"
