@@ -3925,10 +3925,20 @@ function renderEstoqueLotes(){
   const demanda = _matrizDemandas();
   const cells = _matrizCobertura(demanda);
   const ordens = ORDENS_EXPEDIDAS.slice().sort((a,b) => (a.data_expedicao||'').localeCompare(b.data_expedicao||''));
+  // Cor fixa por fornecedor: todos os lotes do mesmo fornecedor compartilham a mesma cor
   const loteCor = {};
-  ordens.forEach((o, idx) => { loteCor[o.id] = LOTES_CORES[idx % LOTES_CORES.length]; });
   const loteTxtCor = {};
-  ordens.forEach((o, idx) => { loteTxtCor[o.id] = LOTES_CORES_TXT[idx % LOTES_CORES_TXT.length]; });
+  {
+    const _fornIdx = {};
+    let _paletaIdx = 0;
+    ordens.forEach(o => {
+      const key = o.fornecedor_id || ('__sem_' + o.id);
+      if(_fornIdx[key] === undefined){ _fornIdx[key] = _paletaIdx++; }
+      const ci = _fornIdx[key] % LOTES_CORES.length;
+      loteCor[o.id] = LOTES_CORES[ci];
+      loteTxtCor[o.id] = LOTES_CORES_TXT[ci];
+    });
+  }
   // Banda vertical: lote mais antigo cujo período (semanas do lote) cobre cada dia
   const diaBanda = {};
   ordens.forEach(o => {
