@@ -3586,6 +3586,11 @@ function _matrizCobertura(demandaMap){
         datas.forEach(d => { if(d && dias.includes(d)) winDays.push(d); });
       });
       winDays.sort();
+      // Marca a janela de cobertura do lote (dias fora de qualquer janela ficam em branco na matriz)
+      winDays.forEach(d => {
+        const cell = c[d] = c[d] || {cov:0,pend:0,man:0,rem:0,fontes:[],snap:0};
+        cell.jan = true;
+      });
       const rec = RECEBIMENTOS.find(r => r.ordem_id === o.id && r.ingrediente === ing);
       const recQtd = rec && rec.status !== 'nao_recebido' ? (rec.qtd_recebida || 0) : 0;
       const item = (o.itens||[]).find(it => it.ingrediente === ing);
@@ -3802,7 +3807,7 @@ function renderEstoqueLotes(){
         <input type="checkbox" ${_matrizFiltroStatus[k] ? 'checked' : ''} onchange="_matrizFiltroStatus['${k}']=this.checked;renderEstoqueLotes()" style="accent-color:var(--azul2)">
         <span style="width:11px;height:11px;border-radius:3px;border:1px solid ${swBd};background:${sw};flex-shrink:0"></span>${label}
       </label>`;
-    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Vazia = sem demanda · tom claro = período do lote (banda)</span>`;
+    }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Vazia = sem demanda ou fora do período do lote · tom claro = período do lote (banda)</span>`;
   }
   if(rangeEl) rangeEl.textContent = _lotesJanelaLabel(dias);
 
@@ -3866,11 +3871,15 @@ function renderEstoqueLotes(){
     const cellsHtml = dias.map(iso => {
       const dem = (demanda.get(iso)||{})[ing] || 0;
       const cell = cells[ing][iso];
-      const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:[], snap:0};
+      const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:false, snap:0};
       const st = _matrizStatusCell(cc, dem);
+      // Demanda fora da janela de qualquer lote → célula em branco (semana a semana)
+      if(st === 'sem' && !cc.jan){
+        return `<td title="${esc('Demanda fora do período do lote — registre nova ordem para esta semana')}" style="border:1px solid #E5EAF1;background:#fbfcfd;min-width:56px"></td>`;
+      }
       if(!st){
         const b = diaBanda[iso];
-        if(b){
+        if(cc.jan && b){
           const cj = loteCor[b.id] || '#94A3B8';
           return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #E5EAF1;background:${cj}26;min-width:56px"></td>`;
         }
