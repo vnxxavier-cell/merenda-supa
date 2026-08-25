@@ -3993,7 +3993,7 @@ function renderEstoqueLotes(){
       }
       if(!st){
         const b = diaBanda[iso];
-        if(cc.jan && b){
+        if(b){
           const cj = loteCor[b.id] || '#94A3B8';
           return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #E5EAF1;background:${cj}26;min-width:56px"></td>`;
         }
