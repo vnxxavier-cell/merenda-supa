@@ -3878,6 +3878,16 @@ function atualizarPrecoSemLic(fid, nome, idx, val, qtd){
 const LOTES_CORES = ['#93C5FD','#86EFAC','#FCD34D','#FCA5A5','#C4B5FD','#5EEAD4','#F9A8D4','#BEF264','#A5B4FC','#FDBA74'];
 const LOTES_CORES_TXT = ['#1D4ED8','#15803D','#A16207','#B91C1C','#6D28D9','#0F766E','#BE185D','#4D7C0F','#4338CA','#C2410C'];
 
+function _escurecerCor(hex){
+  if(!hex) return '#1e293b';
+  let h = (hex||'').replace('#','');
+  if(h.length === 3) h = h.split('').map(c=>c+c).join('');
+  if(h.length !== 6) return '#1e293b';
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  const d = v => Math.max(0, Math.round(v*0.55)).toString(16).padStart(2,'0');
+  return '#'+d(r)+d(g)+d(b);
+}
+
 function renderEstoqueLotes(){
   const tbody  = document.getElementById('tbody-lotes');
   const thead  = document.getElementById('tabela-lotes')?.querySelector('thead');
@@ -3925,18 +3935,20 @@ function renderEstoqueLotes(){
   const demanda = _matrizDemandas();
   const cells = _matrizCobertura(demanda);
   const ordens = ORDENS_EXPEDIDAS.slice().sort((a,b) => (a.data_expedicao||'').localeCompare(b.data_expedicao||''));
-  // Cor fixa por fornecedor: todos os lotes do mesmo fornecedor compartilham a mesma cor
+  // Cor por fornecedor: usa a cor escolhida pelo usuário em Fornecedores Cadastrados
   const loteCor = {};
   const loteTxtCor = {};
   {
-    const _fornIdx = {};
-    let _paletaIdx = 0;
+    let _paleta = 0;
     ordens.forEach(o => {
-      const key = o.fornecedor_id || ('__sem_' + o.id);
-      if(_fornIdx[key] === undefined){ _fornIdx[key] = _paletaIdx++; }
-      const ci = _fornIdx[key] % LOTES_CORES.length;
-      loteCor[o.id] = LOTES_CORES[ci];
-      loteTxtCor[o.id] = LOTES_CORES_TXT[ci];
+      let cor = null;
+      if(o.fornecedor_id){
+        const f = FORNECEDORES_CADASTRO.find(x => x.id === o.fornecedor_id);
+        if(f && f.cor) cor = f.cor;
+      }
+      if(!cor){ cor = LOTES_CORES[_paleta % LOTES_CORES.length]; _paleta++; }
+      loteCor[o.id] = cor;
+      loteTxtCor[o.id] = _escurecerCor(cor);
     });
   }
   // Banda vertical: lote mais antigo cujo período (semanas do lote) cobre cada dia
