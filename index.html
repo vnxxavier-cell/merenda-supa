@@ -7042,7 +7042,7 @@ function renderMercado(){
   const _obsMap = getMercAjuste().obs || {};
   const _perBadge = (it) => {
     if(it.numSemanas <= 1) return '';
-    const label = 'máx. ' + it.numSemanas + ' sem.';
+    const label = it.numSemanas + ' sem.';
     const bg  = it.coberto ? '#bbf7d0' : '#bfdbfe';
     const cor = it.coberto ? '#14532d' : '#1e40af';
     return `<span style="font-size:9px;font-weight:700;background:${bg};color:${cor};border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle">${label}</span>`;
