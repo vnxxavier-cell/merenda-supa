@@ -3190,11 +3190,13 @@ function salvarPercapta(){
 // Retorna o valor per capita efetivo (custom se existir, senão PNAE)
 function getPC(prato, ingName, nivel_id, ing){
   const c = PERCAPTA_CUSTOM[prato]?.[ingName];
-  if(nivel_id === 'f1')    return c?.f1    ?? ing.f1    ?? ing.g;
-  if(nivel_id === 'f2')    return c?.f2    ?? ing.g;
-  if(nivel_id === 'medio') return c?.medio ?? ing.medio ?? ing.g;
-  if(nivel_id === 'eja')   return c?.eja   ?? ing.eja   ?? ing.g;
-  return ing.g;
+  let r;
+  if(nivel_id === 'f1')    r = c?.f1    ?? ing.f1    ?? ing.g;
+  else if(nivel_id === 'f2')    r = c?.f2    ?? ing.g;
+  else if(nivel_id === 'medio') r = c?.medio ?? ing.medio ?? ing.g;
+  else if(nivel_id === 'eja')   r = c?.eja   ?? ing.eja   ?? ing.g;
+  else r = ing.g;
+  return (typeof r === 'number' && isFinite(r)) ? r : 0;
 }
 
 // Retorna true se o valor foi customizado
@@ -7940,10 +7942,11 @@ function renderFichaTable(prato){
     const anyIngCustom = nivelCols.some(nv => isCustom(prato, ing.i, nv));
     const isAdicionado = origNomes && !origNomes.has(ing.i);
     const cells = nivelCols.map(nv => {
-      const pdfVal = nv==='f1' ? (ing.f1??ing.g) : nv==='f2' ? ing.g : nv==='medio' ? (ing.medio??ing.g) : (ing.eja??ing.g);
+      const _pdfVal = nv==='f1' ? (ing.f1??ing.g) : nv==='f2' ? ing.g : nv==='medio' ? (ing.medio??ing.g) : (ing.eja??ing.g);
+      const pdfVal = (typeof _pdfVal === 'number' && isFinite(_pdfVal)) ? _pdfVal : 0;
       const curVal = getPC(prato, ing.i, nv, ing);
       const custom = isCustom(prato, ing.i, nv);
-      const ingEnc = ing.i.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const ingEnc = (ing.i||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       return `<td class="num"><input type="number" min="0" step="0.1" value="${curVal.toFixed(1)}"
         title="PNAE: ${pdfVal.toFixed(1)}g"
         oninput="editarPercapta('${pratoEnc}','${ingEnc}','${nv}',this.value,this)"
@@ -8082,7 +8085,8 @@ function adicionarIngAFicha(prato){
 function editarPercapta(prato, ingName, nivel, val, el){
   const ing = (DADOS.ficha[prato]||[]).find(x => x.i === ingName);
   if(!ing) return;
-  const pdfVal = nivel==='f1' ? (ing.f1??ing.g) : nivel==='f2' ? ing.g : nivel==='medio' ? (ing.medio??ing.g) : (ing.eja??ing.g);
+  const _pdfVal = nivel==='f1' ? (ing.f1??ing.g) : nivel==='f2' ? ing.g : nivel==='medio' ? (ing.medio??ing.g) : (ing.eja??ing.g);
+  const pdfVal = (typeof _pdfVal === 'number' && isFinite(_pdfVal)) ? _pdfVal : 0;
   const numVal = parseFloat(val);
   if(isNaN(numVal) || numVal < 0) return;
 
