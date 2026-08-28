@@ -5705,6 +5705,17 @@ function fmtEspUnid(nome, val, unid){
   if(c) return c.qtd + ' ' + c.un;
   return fmtEsp(nome, val) + ' ' + unid;
 }
+// Estoque: valor REAL na unidade base (sem conversão para unidade de venda)
+function fmtEstoque(nome, val){
+  const cfg = ING_UNIDADE_VENDA[nome];
+  const base = cfg ? (cfg.base || '') : (DADOS.ingredientes[nome]?.unidade || 'kg');
+  const ehL = String(base).toLowerCase().trim() === 'l';
+  if(ehL){
+    if(!(val > 0)) return '-';
+    return val.toFixed(2).replace('.', ',') + ' L';
+  }
+  return fmt(val);
+}
 function fmtUnid(unid){
   const m={'un':'Un','unid':'Un','unidade':'Un','und':'Un','unid.':'Un','unida':'Un','und.':'Un',
     'kg':'kg','g':'g','L':'L','l':'L','ml':'ml','mL':'mL','maço':'maço','maco':'maço',
@@ -7080,7 +7091,7 @@ function renderMercado(){
 
     const _enc = it.nomeBase.replace(/'/g,"\\'");
     return `<div style="min-width:160px;padding:2px 0">
-      <div style="font-size:10.5px;font-family:'DM Mono',monospace;color:var(--txt2);text-align:right;margin-bottom:3px">${fmtEsp(it.nomeBase, it.est)}</div>
+      <div style="font-size:10.5px;font-family:'DM Mono',monospace;color:var(--txt2);text-align:right;margin-bottom:3px">${fmtEstoque(it.nomeBase, it.est)}</div>
       <div style="font-size:10px;color:${cor};font-weight:700;text-align:right;margin-top:2px">${diasCob}/${segs.length} dias cobertos</div>
     </div>`;
   };
@@ -7115,7 +7126,7 @@ function renderMercado(){
             </td>
             <td class="no-print" style="text-align:center">${tipoTag}</td>
             <td class="num no-print" style="color:var(--txt2);overflow:hidden;font-size:11px">${fmtEsp(it.nomeBase,it.nec)}</td>
-            <td class="num no-print" style="font-size:11px;color:var(--txt2)">${fmtEsp(it.nomeBase,it.est)}</td>
+            <td class="num no-print" style="font-size:11px;color:var(--txt2)">${fmtEstoque(it.nomeBase,it.est)}</td>
             <td class="num no-print" style="overflow:hidden">
               <span style="color:#16a34a;font-size:12px;font-weight:700;white-space:nowrap">✓ Coberto</span>
             </td>
@@ -7142,7 +7153,7 @@ function renderMercado(){
           </td>
           <td style="text-align:center">${tipoTag}</td>
           <td class="num no-print" style="color:var(--txt2);overflow:hidden;font-size:11px">${fmtEsp(it.nomeBase,it.nec)}</td>
-          <td class="num no-print" style="font-size:11px;color:var(--txt2)">${fmtEsp(it.nomeBase,it.est)}</td>
+          <td class="num no-print" style="font-size:11px;color:var(--txt2)">${fmtEstoque(it.nomeBase,it.est)}</td>
           <td class="num no-print" style="white-space:nowrap;overflow:hidden">
             ${vendaInfo}
             <div style="display:flex;align-items:center;gap:3px;justify-content:flex-end">
