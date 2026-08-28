@@ -7129,7 +7129,7 @@ function renderMercado(){
         const pacInfo = nPacotes ? `<div class="hover-info no-print" style="font-size:10px;color:#666;margin-top:2px">${nPacotes} pct × ${embTamanho} ${fmtUnid(it.unid)}</div>` : '';
         const exInfo  = foiArred ? `<div class="hover-info no-print" style="font-size:10px;color:#aaa">exato: ${it.comprar.toFixed(3).replace('.', ',')} ${fmtUnid(it.unid)}</div>` : '';
         const cv = _converteVenda(it.nomeBase, arred);
-        const vendaInfo = cv ? `<div class="hover-info no-print" style="font-size:11px;color:#B45309;font-weight:700;margin-top:2px">${cv.qtd} ${cv.un} <span style="font-size:9px;color:#94A3B8;font-weight:400">(${esc(_detalheVenda(it.nomeBase))})</span></div>` : '';
+        const vendaInfo = cv ? `<div class="no-print" style="font-weight:800;color:#B45309;font-size:13px;text-align:right;margin-bottom:2px;white-space:nowrap">${cv.qtd} ${cv.un} <span style="font-size:9px;color:#94A3B8;font-weight:400">(${esc(_detalheVenda(it.nomeBase))})</span></div>` : '';
         return `<tr>
           <td style="text-align:center;font-weight:700;color:#666">${i+1}</td>
           <td><b>${it.displayNome}</b>${_perBadge(it)}</td>
@@ -7144,6 +7144,7 @@ function renderMercado(){
           <td class="num no-print" style="color:var(--txt2);overflow:hidden;font-size:11px">${fmtEsp(it.nomeBase,it.nec)}</td>
           <td class="num no-print" style="font-size:11px;color:var(--txt2)">${fmtEsp(it.nomeBase,it.est)}</td>
           <td class="num no-print" style="white-space:nowrap;overflow:hidden">
+            ${vendaInfo}
             <div style="display:flex;align-items:center;gap:3px;justify-content:flex-end">
               <input type="number" min="0" step="0.01" value="${arred}" style="${inputStyle}"
                 onchange="ajustarQtdMerc('${enc}',this.value,${it.extra?'true':'false'})">
@@ -7152,7 +7153,7 @@ function renderMercado(){
                 onclick="removerItemMerc('${enc}',${it.extra?'true':'false'})">✕</button>
               <button class="emb-btn no-print" style="color:#0369a1;border-color:#7dd3fc;padding:1px 4px"
                 onclick="adicionarItemMercForn('${enc}',this)" title="Trocar fornecedor" style="display:inline-flex;align-items:center;justify-content:center">${ico('users',11)}</button>
-            </div>${vendaInfo}${pacInfo}${exInfo}
+            </div>${pacInfo}${exInfo}
           </td>
           <td class="print-only" style="text-align:right;white-space:nowrap">
             <b style="color:var(--azul2)">${fmtEsp(it.nomeBase,arred)}</b>
