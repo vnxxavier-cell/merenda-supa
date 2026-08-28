@@ -6723,10 +6723,15 @@ function getItensMercadoMulti(ciclo, dias, datas, mondayIso){
     return sum;
   };
   const totais1 = _acum(1);
+  // União de todas as chaves das semanas selecionadas: itens com demanda apenas
+  // em semanas 2+ também entram na lista (ex.: FEIJÃO PRETO usado só na 2ª semana)
+  const _chavesMulti = new Set(Object.keys(totais1));
+  weekTotals.forEach(wt => Object.keys(wt).forEach(k => _chavesMulti.add(k)));
   const ajuste = getMercAjuste();
   const af_items=[], mc_items=[];
   let totalKg = 0;
-  Object.entries(totais1).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([chave, necSem1]) => {
+  [..._chavesMulti].sort((a,b)=>a.localeCompare(b)).forEach(chave => {
+    const necSem1 = totais1[chave] || 0;
     const temDetalhe = chave.includes(' ___ ');
     const nomeBase = temDetalhe ? chave.split(' ___ ')[0] : chave;
     if(ajuste.overrides[nomeBase] === null) return;
