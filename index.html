@@ -1439,6 +1439,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <div id="pg-licitacoes" class="pagina">
   <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Contratos</h2>
   <div class="seletor-bar">
+    <button class="btn btn-outline" style="display:flex;align-items:center;gap:5px" onclick="abrirCalculadora()" title="Planejar a contratação com os preços prévios da pesquisa — gera uma Prévia de Contratação">🧮 Calculadora por Orçamento</button>
     <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="abrirNovaLicitacao()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Contrato</button>
   </div>
   <div id="lista-licitacoes"></div>
@@ -1568,7 +1569,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="fecharCalculadora()">Fechar</button>
-          <button class="btn btn-primary" id="btn-aplicar-calc" style="display:flex;align-items:center;gap:5px" onclick="aplicarQuantidadesCalculadora()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Usar no edital → Novo Contrato</button>
+          <button class="btn btn-primary" id="btn-aplicar-calc" style="display:flex;align-items:center;gap:5px" onclick="registrarPreviaCalculadora()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Registrar Prévia de Contratação</button>
         </div>
       </div>
       <div id="calc-vazio" style="text-align:center;color:#aaa;padding:24px;font-size:13px">
@@ -1586,7 +1587,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <button class="modal-close" onclick="fecharOverlayLic()">×</button>
     </div>
     <div class="modal-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="campo">
           <label>Nome / Número</label>
           <input type="text" id="lic-nome" placeholder="Ex: Contrato 001/2026" oninput="_autoSalvarLicitacao()"
@@ -1598,23 +1599,27 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
         </div>
         <div class="campo">
-          <label>Fornecedor</label>
+          <label>Data de Término (vigência)</label>
+          <input type="date" id="lic-data-fim" oninput="_autoSalvarLicitacao()"
+            style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%">
+        </div>
+        <div class="campo">
+          <label>Fornecedor vencedor</label>
           <select id="lic-fornecedor" onchange="_autoSalvarLicitacao()"
             style="font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border:2px solid var(--borda);border-radius:7px;outline:none;width:100%;background:#fff">
             <option value="">— Selecione —</option>
-            ${FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join('')}
           </select>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <span style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--txt2);letter-spacing:.06em">Itens Contratados</span>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm btn-outline" style="display:flex;align-items:center;gap:4px" onclick="fecharOverlayLic();abrirCalculadora()"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Calculadora por Orçamento</button>
+          <button class="btn btn-sm btn-outline" onclick="sugerirItensLicitacao()" title="Calcula as quantidades pelo período do contrato, usando os preços prévios da pesquisa">Sugerir quantidades</button>
           <button class="btn btn-sm btn-verde" onclick="adicionarItemLic()">+ Item</button>
         </div>
       </div>
       <table style="margin-bottom:12px">
-        <thead><tr><th>Ingrediente</th><th class="num">Qtd Contratada</th><th class="num">Preço Unit. (R$)</th><th class="num">Subtotal</th><th></th></tr></thead>
+        <thead><tr><th>Ingrediente</th><th class="num">Qtd Contratada</th><th class="num">Preço vencedor (R$)</th><th class="num" id="lic-th-preco-previo" style="display:none">Preço prévio</th><th class="num">Subtotal</th><th></th></tr></thead>
         <tbody id="tbody-lic-itens"></tbody>
       </table>
       <div style="text-align:right;font-weight:700;font-size:14px;color:var(--azul);margin-bottom:16px">
@@ -2256,7 +2261,7 @@ async function verificarCallbackGoogle(){
     'merenda_subtitulo','merenda_embalagens',
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
     'merenda_fornecedores','merenda_ing_fornecedores',
-    'merenda_licitacoes','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
+    'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
     'merenda_onboarding_visto','merenda_servidores_config'
   ];
   const _isPerfilFixo = user.id === 'usr_admin' || user.id === 'usr_admin_rede';
@@ -2497,7 +2502,7 @@ async function fazerLogin(){
       'merenda_subtitulo','merenda_embalagens',
       'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
       'merenda_fornecedores','merenda_ing_fornecedores',
-      'merenda_licitacoes','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
+      'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
       'merenda_onboarding_visto','merenda_servidores_config'
     ];
     const _isPerfilFixo = res.user.id === 'usr_admin' || res.user.id === 'usr_admin_rede';
@@ -3316,6 +3321,7 @@ function removerModalVenda(){
 
 // Licitações e Estoque — declarados aqui para evitar TDZ (acessados em IIFEs abaixo)
 let LICITACOES       = JSON.parse(localStorage.getItem('merenda_licitacoes')      || '[]');
+let PREVIAS_CONTRATO = JSON.parse(localStorage.getItem('merenda_previas_contrato') || '[]');
 let ORDENS_EXPEDIDAS = JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
 let RECEBIMENTOS     = JSON.parse(localStorage.getItem('merenda_recebimentos')     || '[]');
 let ESTOQUE          = JSON.parse(localStorage.getItem('merenda_estoque')         || '{}');
@@ -3437,6 +3443,7 @@ function salvarObsItemMerc(nome, texto){
 }
 
 function salvarLicitacoes(){ localStorage.setItem('merenda_licitacoes',      JSON.stringify(LICITACOES)); }
+function salvarPreviasContrato(){ localStorage.setItem('merenda_previas_contrato', JSON.stringify(PREVIAS_CONTRATO)); }
 function salvarOrdens(){     localStorage.setItem('merenda_ordens_expedidas', JSON.stringify(ORDENS_EXPEDIDAS)); }
 function salvarRecebimentos(){ localStorage.setItem('merenda_recebimentos',  JSON.stringify(RECEBIMENTOS)); }
 function gerarId(prefix){ return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
@@ -4522,11 +4529,13 @@ function renderLicitacoes(){
       ${semLicOrdens.map(o => _ordemCardHtml(o, it => it.preco_unitario || 0)).join('')}
     </div>
   </div>` : '';
-  if(!LICITACOES.length){
-    el.innerHTML = semLicHtml || '<div style="text-align:center;padding:40px;color:#aaa">Nenhum contrato cadastrado. Clique em "Novo Contrato" para começar.</div>';
-    return;
-  }
-  el.innerHTML = semLicHtml + LICITACOES.map(lic => {
+  const previasHtml = `
+    <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);margin:6px 0 12px">Prévias de Contratação</div>
+    ${PREVIAS_CONTRATO.length ? PREVIAS_CONTRATO.map(p => _previaCardHtml(p)).join('') : '<div style="color:#aaa;font-size:13px;padding:0 0 18px">Nenhuma prévia registrada. Use a Calculadora por Orçamento para planejar a contratação.</div>'}`;
+  el.innerHTML = previasHtml
+    + `<div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);margin:6px 0 12px">Contratos Efetivos</div>`
+    + semLicHtml
+    + (LICITACOES.map(lic => {
     const saldo = calcularSaldoLicitacao(lic.id);
     const totalContratado = lic.itens.reduce((a,it) => a + it.qtd_contratada * it.preco_unitario, 0);
     const totalExpedItems = Object.values(saldo).reduce((a,s) => a + s.expedido, 0);
@@ -4540,7 +4549,7 @@ function renderLicitacoes(){
         <span>${lic.nome}</span>
         <span style="font-weight:400;font-size:12px;opacity:.8">
           ${(()=>{const f=FORNECEDORES_CADASTRO.find(x=>x.id===lic.fornecedor_id);return f?esc(f.nome)+' &nbsp;|&nbsp; ':'';})()}
-          Início: ${fmtDataBR(lic.data_inicio)} &nbsp;|&nbsp; ${ordens.length} ordem(ns) &nbsp;|&nbsp;
+          Início: ${fmtDataBR(lic.data_inicio)}${lic.data_fim ? ' · Término: ' + fmtDataBR(lic.data_fim) : ''} &nbsp;|&nbsp; ${ordens.length} ordem(ns) &nbsp;|&nbsp;
           <span class="badge-${lic.status==='ativa'?'ativa':'encerrada'}">${lic.status==='ativa'?'Ativa':'Encerrada'}</span>
         </span>
         <div style="display:flex;gap:8px" onclick="event.stopPropagation()">
@@ -4577,7 +4586,99 @@ function renderLicitacoes(){
           ordens.map(o => _ordemCardHtml(o, it => { const li = lic.itens.find(x=>x.ingrediente===it.ingrediente); return li ? li.preco_unitario : 0; })).join('')}
       </div>
     </div>`;
-  }).join('');
+    }).join('') || '<div style="text-align:center;padding:24px;color:#aaa">Nenhum contrato efetivo cadastrado. Clique em "Novo Contrato" ou crie a partir de uma prévia.</div>');
+}
+
+function _previaCardHtml(p){
+  const total = p.valor_estimado || 0;
+  const itens = p.itens || [];
+  return `<div class="card" style="margin-bottom:16px">
+    <div class="card-header" style="background:#B45309;cursor:pointer" onclick="togglePrevia('${p.id}')">
+      <span><b class="nome-ing" onclick="event.stopPropagation();renomearPrevia('${p.id}', this)" title="Clique para renomear" style="cursor:pointer">${esc(p.nome || 'Prévia de Contratação')}</b></span>
+      <span style="font-weight:400;font-size:12px;opacity:.8">${p.criado_em || ''} &nbsp;|&nbsp; ${itens.length} item(ns) &nbsp;|&nbsp; Valor estimado: R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" onclick="event.stopPropagation()">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;display:inline-flex;align-items:center;gap:4px" onclick="criarContratoDaPrevia('${p.id}')">📄 Criar contrato a partir desta prévia</button>
+        <button class="btn btn-sm" style="background:rgba(220,38,38,.25);color:#fecaca;border:1px solid rgba(220,38,38,.4);display:inline-flex;align-items:center;gap:4px" onclick="excluirPrevia('${p.id}')">${ico('trash',11)}Excluir</button>
+      </div>
+    </div>
+    <div id="body-previa-${p.id}" style="display:none;padding:20px">
+      <table style="margin-bottom:12px">
+        <thead><tr><th>Ingrediente</th><th>Unidade</th><th class="num">Qtd estimada</th><th class="num">Preço prévio</th><th class="num">Valor estimado</th></tr></thead>
+        <tbody>
+          ${itens.map(it => {
+            const un = it.unidade || (DADOS.ingredientes[it.ingrediente]?.unidade || 'kg');
+            const val = (it.qtd_estimada||0) * (it.preco_previo||0);
+            return `<tr>
+              <td><b>${esc(it.ingrediente)}</b></td>
+              <td>${esc(un)}</td>
+              <td class="num">${fmt(it.qtd_estimada||0)}</td>
+              <td class="num" style="font-family:'DM Mono',monospace">R$ ${(it.preco_previo||0).toFixed(2).replace('.',',')}</td>
+              <td class="num" style="font-family:'DM Mono',monospace">R$ ${val.toFixed(2).replace('.',',')}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div style="font-size:11px;color:var(--txt2)">Valores estimativos (pesquisa prévia de preços) — referência para o edital. Os preços definitivos serão registrados no contrato efetivo.</div>
+    </div>
+  </div>`;
+}
+
+function togglePrevia(id){
+  const b = document.getElementById('body-previa-' + id);
+  if(b) b.style.display = b.style.display === 'none' ? '' : 'none';
+}
+
+function excluirPrevia(id){
+  if(!confirm('Excluir esta prévia de contratação?')) return;
+  PREVIAS_CONTRATO = PREVIAS_CONTRATO.filter(p => p.id !== id);
+  salvarPreviasContrato();
+  renderLicitacoes();
+}
+
+function renomearPrevia(id, el){
+  const p = PREVIAS_CONTRATO.find(x => x.id === id);
+  if(!p) return;
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.value = p.nome || '';
+  inp.style.cssText = 'font-family:inherit;font-size:13px;font-weight:700;padding:2px 6px;border:1.5px solid #93c5fd;border-radius:5px;background:#fff;color:#333;width:230px';
+  el.replaceWith(inp);
+  inp.focus(); inp.select();
+  let salvo = false;
+  const salvar = () => {
+    if(salvo) return;
+    salvo = true;
+    p.nome = inp.value.trim() || ('Prévia de Contratação ' + new Date().getFullYear());
+    salvarPreviasContrato();
+    renderLicitacoes();
+  };
+  inp.addEventListener('keydown', e => {
+    if(e.key === 'Enter') salvar();
+    else if(e.key === 'Escape') renderLicitacoes();
+  });
+  inp.addEventListener('blur', () => { if(!salvo) renderLicitacoes(); });
+}
+
+function criarContratoDaPrevia(prevId){
+  const prev = PREVIAS_CONTRATO.find(p => p.id === prevId);
+  if(!prev) return;
+  _licEditandoId = gerarId('lic');
+  LICITACOES.push({ id: _licEditandoId, nome: '', data_inicio: '', data_fim: '', fornecedor_id: null, status: 'ativa', itens: [] });
+  _licItens = (prev.itens||[]).map(it => ({
+    ingrediente:   it.ingrediente,
+    qtd_contratada: it.qtd_estimada || 0,
+    preco_unitario: 0,
+    preco_previo:  it.preco_previo || 0
+  }));
+  document.getElementById('lic-modal-titulo').textContent = 'Novo Contrato a partir da Prévia';
+  document.getElementById('lic-nome').value = '';
+  document.getElementById('lic-data-inicio').value = '';
+  const df = document.getElementById('lic-data-fim');
+  if(df) df.value = '';
+  const sf = document.getElementById('lic-fornecedor');
+  if(sf){ sf.innerHTML = '<option value="">— Selecione —</option>' + FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join(''); sf.value = ''; }
+  renderTbodyLicItens();
+  document.getElementById('overlay-licitacao').classList.add('aberto');
 }
 
 function toggleLicitacao(id){
@@ -4783,20 +4884,33 @@ function executarCalculadora(){
   resEl.style.display = '';
 }
 
-function aplicarQuantidadesCalculadora(){
+function registrarPreviaCalculadora(){
   const r = window._calcResultado;
   if(!r || !window._calcManualQtd) return;
   const itens = Object.entries(window._calcManualQtd)
     .filter(([nome, qtd]) => qtd > 0 && DADOS.ingredientes[nome])
     .map(([nome, qtd]) => ({
-      ingrediente:    nome,
-      qtd_contratada: qtd,
-      preco_unitario: r.precos[nome] || 0
+      ingrediente:   nome,
+      unidade:       DADOS.ingredientes[nome]?.unidade || 'kg',
+      qtd_estimada:  qtd,
+      preco_previo:  r.precos[nome] || 0
     }));
+  if(!itens.length){ alert('Nenhum item para registrar na prévia.'); return; }
+  const valorEstimado = itens.reduce((a,it) => a + it.qtd_estimada * it.preco_previo, 0);
+  const now = new Date();
+  const dataHora = now.toLocaleDateString('pt-BR') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  PREVIAS_CONTRATO.push({
+    id: gerarId('prv'),
+    nome: 'Prévia de Contratação ' + new Date().getFullYear(),
+    criado_em: dataHora,
+    orcamento: parseFloat(document.getElementById('calc-orcamento')?.value) || 0,
+    itens,
+    valor_estimado: valorEstimado
+  });
+  salvarPreviasContrato();
   fecharCalculadora();
-  abrirNovaLicitacao();
-  _licItens = itens;
-  renderTbodyLicItens();
+  renderLicitacoes();
+  alert('✅ Prévia de contratação registrada!\n\nOs valores são estimativos (pesquisa prévia) e servirão de referência para o edital. Crie o contrato efetivo a partir desta prévia quando houver fornecedor vencedor.');
 }
 
 function renderTabelaCalc(){
@@ -4901,11 +5015,13 @@ function calcAdicionarItem(){
 function abrirNovaLicitacao(){
   _licEditandoId = gerarId('lic');
   // Cria esqueleto imediatamente
-  LICITACOES.push({ id: _licEditandoId, nome: '', data_inicio: '', fornecedor_id: null, status: 'ativa', itens: [] });
+  LICITACOES.push({ id: _licEditandoId, nome: '', data_inicio: '', data_fim: '', fornecedor_id: null, status: 'ativa', itens: [] });
   _licItens = [];
   document.getElementById('lic-modal-titulo').textContent = 'Novo Contrato';
   document.getElementById('lic-nome').value = '';
   document.getElementById('lic-data-inicio').value = '';
+  const df = document.getElementById('lic-data-fim');
+  if(df) df.value = '';
   const sf = document.getElementById('lic-fornecedor');
   if(sf){ sf.innerHTML = '<option value="">— Selecione —</option>' + FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join(''); sf.value = ''; }
   renderTbodyLicItens();
@@ -4920,6 +5036,8 @@ function editarLicitacao(id){
   document.getElementById('lic-modal-titulo').textContent = 'Editar Contrato';
   document.getElementById('lic-nome').value = lic.nome;
   document.getElementById('lic-data-inicio').value = lic.data_inicio;
+  const df = document.getElementById('lic-data-fim');
+  if(df) df.value = lic.data_fim || '';
   const sf = document.getElementById('lic-fornecedor');
   if(sf){ sf.innerHTML = '<option value="">— Selecione —</option>' + FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join(''); sf.value = lic.fornecedor_id || ''; }
   renderTbodyLicItens();
@@ -4964,11 +5082,17 @@ function _autoSalvarLicitacao(){
 function renderTbodyLicItens(){
   const tbody = document.getElementById('tbody-lic-itens');
   if(!tbody) return;
+  const temPrev = _licItens.some(it => it.preco_previo != null);
+  const thPrev = document.getElementById('lic-th-preco-previo');
+  if(thPrev) thPrev.style.display = temPrev ? '' : 'none';
   const opts = Object.keys(DADOS.ingredientes).sort().map(n =>
     `<option value="${n}">${n}</option>`
   ).join('');
   tbody.innerHTML = _licItens.map((it, idx) => {
     const sub = (it.qtd_contratada * it.preco_unitario).toLocaleString('pt-BR',{minimumFractionDigits:2});
+    const prevCol = temPrev
+      ? `<td class="num" style="color:#94a3b8;font-family:'DM Mono',monospace;font-size:12px" title="Preço prévio da pesquisa — não é o preço contratado">R$ ${(it.preco_previo||0).toFixed(2).replace('.',',')}</td>`
+      : '';
     return `<tr>
       <td>
         <select onchange="atualizarItemLic(${idx},'ingrediente',this.value)"
@@ -4987,10 +5111,11 @@ function renderTbodyLicItens(){
           onchange="atualizarItemLic(${idx},'preco_unitario',this.value)"
           style="width:80px;text-align:right;padding:4px;border:1px solid var(--borda);border-radius:4px;font-family:'DM Mono',monospace">
       </td>
+      ${prevCol}
       <td class="num" style="font-family:'DM Mono',monospace">R$ ${sub}</td>
       <td><button onclick="removerItemLic(${idx})" style="background:none;border:none;color:var(--vermelho);cursor:pointer;font-size:16px">×</button></td>
     </tr>`;
-  }).join('') || '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:12px">Nenhum item. Clique em "+ Item" ou "Sugerir quantidades".</td></tr>';
+  }).join('') || `<tr><td colspan="${temPrev ? 6 : 5}" style="text-align:center;color:#aaa;padding:12px">Nenhum item. Clique em "+ Item" ou "Sugerir quantidades".</td></tr>`;
   atualizarTotalContratoLic();
 }
 
@@ -5022,12 +5147,14 @@ function salvarLicitacaoForm(){
 function _salvarLicitacaoSilenciosa(){
   const nome = document.getElementById('lic-nome').value.trim();
   const dataInicio = document.getElementById('lic-data-inicio').value;
+  const dataFim = document.getElementById('lic-data-fim').value;
   const fornecedorId = document.getElementById('lic-fornecedor').value;
   const itensValidos = _licItens.filter(it => it.ingrediente && it.qtd_contratada > 0);
   const lic = LICITACOES.find(l => l.id === _licEditandoId);
   if(!lic) return;
   lic.nome = nome;
   lic.data_inicio = dataInicio;
+  lic.data_fim = dataFim;
   lic.fornecedor_id = fornecedorId || null;
   lic.itens = itensValidos;
   salvarLicitacoes();
@@ -7708,23 +7835,14 @@ function adicionarItemMercForn(nomeBase, btn){
   tr.innerHTML = `<td colspan="7" style="padding:6px 8px">
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <span style="font-size:12px;font-weight:700;color:var(--azul);min-width:80px">${nomeBase}</span>
-      <select class="forn-add-sel" onchange="autoSalvarAddItemForn('${enc}',this)"
+      <select class="forn-add-sel"
         style="flex:1;min-width:140px;padding:4px 6px;font-size:12px;border:1.5px solid #93c5fd;border-radius:6px">
         ${options}
       </select>
+      <button class="btn btn-verde btn-sm" style="font-size:11px" onclick="confirmarAddItemForn('${enc}',this)">Salvar alteração</button>
       <button class="btn btn-outline btn-sm" style="font-size:11px" onclick="renderMercado()">✕</button>
     </div>
   </td>`;
-}
-
-let _salvarAddItemFornTimer = null;
-
-function autoSalvarAddItemForn(nomeBase, sel){
-  clearTimeout(_salvarAddItemFornTimer);
-  _salvarAddItemFornTimer = setTimeout(() => {
-    const fornId = sel?.value || null;
-    setIngFornecedor(nomeBase, fornId);
-  }, 800);
 }
 
 function confirmarAddItemForn(nomeBase, btn){
