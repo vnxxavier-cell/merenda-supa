@@ -1417,6 +1417,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#F8FAFC">
       <input id="lotes-busca" placeholder="Buscar ingrediente..." oninput="_lotesBusca=this.value;renderEstoqueLotes()" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;border:1.5px solid var(--borda);border-radius:6px;width:180px;background:#fff">
+      <select id="lotes-nav" onchange="_lotesIrParaLote(this.value)" title="Ir para um lote (somente navegação)" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;color:#333">
+        <option value="">Ir para lote…</option>
+      </select>
     </div>
     <div id="lotes-status-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#fff"></div>
     <div id="lotes-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#F8FAFC"></div>
@@ -3915,22 +3918,51 @@ function renderEstoqueLotes(){
     });
   });
 
+  // Segmentos de lotes (dias consecutivos do mesmo lote) para a faixa de identificação
+  const lotNum = {};
+  const segments = [];
+  let _nLote = 0;
+  dias.forEach((iso, di) => {
+    const o = diaBanda[iso];
+    const last = segments[segments.length - 1];
+    if(last && last.o === o){
+      last.len++;
+    } else {
+      if(o && !(o.id in lotNum)) lotNum[o.id] = ++_nLote;
+      segments.push({ o, startIdx: di, len: 1 });
+    }
+  });
+  const divIdxs = new Set();
+  segments.forEach((s, i) => {
+    if(i > 0 && s.o && s.o !== segments[i - 1].o) divIdxs.add(s.startIdx);
+  });
+  const lblLote = o => o ? ('LOTE ' + String(lotNum[o.id]).padStart(2,'0')) : '';
+
   // Cabeçalho: dias letivos da janela + barras de cor dos lotes com dias na data
   const thBgPassado = '#64748B', thBgHoje = '#D97706', thBgFuturo = '#1A3A6B';
   const _cellThBg = d => d < hoje ? thBgPassado : (d === hoje ? thBgHoje : thBgFuturo);
   const thBase = 'border:1px solid #C8D0DC;padding:5px 8px;color:#fff;white-space:nowrap';
+  const bandBase = 'border:1px solid #C8D0DC;padding:0 8px;height:26px;line-height:24px;box-sizing:border-box;text-align:center;font-size:11px;font-weight:800;color:#334155;background:#E2E8F0;white-space:nowrap;position:sticky;top:0;z-index:4';
   thead.innerHTML = `<tr>
-    <th style="${thBase};position:sticky;left:0;top:0;z-index:3;text-align:left;background:#1A3A6B">Ingrediente</th>
-    ${dias.map(iso => {
+    <th rowspan="2" style="${thBase};position:sticky;left:0;top:0;z-index:5;text-align:left;background:#1A3A6B">Ingrediente</th>
+    ${segments.map(s => {
+      const divB = divIdxs.has(s.startIdx) ? ';border-left:2.5px solid #334155' : '';
+      const rot = lblLote(s.o);
+      return `<th colspan="${s.len}" style="${bandBase}${divB}" title="${s.o ? esc(rot + ' — Ciclo ' + (s.o.ciclo||'') + ' — ' + (s.o.semana||'')) : ''}">${rot}</th>`;
+    }).join('')}
+    <th rowspan="2" style="${thBase};position:sticky;right:0;top:0;z-index:5;text-align:right;font-size:10px;background:#1A3A6B">Saldo Estoque</th>
+  </tr>
+  <tr>
+    ${dias.map((iso, di) => {
       const dow = new Date(iso + 'T00:00:00').getDay();
       const abrev = ABREV[dow === 0 ? 6 : dow - 1] || '';
       const lotesDia = ordens.filter(o => (o.itens||[]).some(it => (it.dias||[]).some(e => e.data === iso)));
       const bars = lotesDia.length
         ? `<div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">${lotesDia.map(o => `<div style="height:3px;border-radius:2px;background:${loteCor[o.id] || '#94A3B8'}"></div>`).join('')}</div>`
         : '';
-      return `<th style="${thBase};position:sticky;top:0;z-index:2;text-align:center;font-size:10px;min-width:56px;background:${_cellThBg(iso)}" title="${fmtDataBR(iso)} — ${abrev}">${fmtDataCurta(iso)}${bars}</th>`;
+      const divB = divIdxs.has(di) ? ';border-left:2.5px solid #334155' : '';
+      return `<th style="${thBase};position:sticky;top:26px;z-index:3;text-align:center;font-size:10px;min-width:56px;background:${_cellThBg(iso)}${divB}" title="${fmtDataBR(iso)} — ${abrev}">${fmtDataCurta(iso)}${bars}</th>`;
     }).join('')}
-    <th style="${thBase};position:sticky;right:0;top:0;z-index:3;text-align:right;font-size:10px;background:#1A3A6B">Saldo Estoque</th>
   </tr>`;
 
   // Ingredientes: demanda na janela + fontes dos lotes
@@ -3948,21 +3980,22 @@ function renderEstoqueLotes(){
   const rows = ings.map(ing => {
     if(busca && !norm(ing).includes(norm(busca))) return null;
     let any = false;
-    const cellsHtml = dias.map(iso => {
+    const cellsHtml = dias.map((iso, di) => {
+      const divB = divIdxs.has(di) ? ';border-left:2.5px solid #334155' : '';
       const dem = (demanda.get(iso)||{})[ing] || 0;
       const cell = cells[ing][iso];
       const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:false, snap:0};
       const st = _matrizStatusCell(cc, dem);
       // Demanda fora da janela de qualquer lote → célula em branco (semana a semana)
       if(st === 'sem' && !cc.jan){
-        return `<td title="${esc('Demanda fora do período do lote — registre nova ordem para esta semana')}" style="border:1px solid #CBD5E1;background:#fbfcfd;min-width:56px"></td>`;
+        return `<td title="${esc('Demanda fora do período do lote — registre nova ordem para esta semana')}" style="border:1px solid #CBD5E1;background:#fbfcfd;min-width:56px${divB}"></td>`;
       }
       if(!st){
         const b = diaBanda[iso];
         if(cc.jan && b){
-          return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #CBD5E1;background:${MATRIZ_SEM_DEMANDA_COR};min-width:56px"></td>`;
+          return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #CBD5E1;background:${MATRIZ_SEM_DEMANDA_COR};min-width:56px${divB}"></td>`;
         }
-        return `<td style="border:1px solid #CBD5E1;background:#fbfcfd;min-width:56px"></td>`;
+        return `<td style="border:1px solid #CBD5E1;background:#fbfcfd;min-width:56px${divB}"></td>`;
       }
       if(_matrizFiltroStatus[st]) any = true;
       const val = (st === 'manual' && dem <= 0) ? (cc.man || 0) : dem;
@@ -3989,7 +4022,7 @@ function renderEstoqueLotes(){
       const dots = cores.length
         ? `<div style="display:flex;gap:1px;margin-top:2px;justify-content:center">${cores.map(c => `<span style="width:5px;height:5px;border-radius:50%;background:${c}"></span>`).join('')}</div>`
         : '';
-      return `<td title="${esc(_matrizTooltip(ing, iso, cc, dem))}" style="border:1px solid ${bd};background:${bg};color:${txt};text-align:right;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap">${_matrizFmtNum(val)}${dots}</td>`;
+      return `<td title="${esc(_matrizTooltip(ing, iso, cc, dem))}" style="border:1px solid ${bd};background:${bg};color:${txt};text-align:right;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap${divB}">${_matrizFmtNum(val)}${dots}</td>`;
     }).join('');
     if(!any) return null;
     // Saldo Estoque: total dos lotes − consumo dos dias já passados (comportamento original)
@@ -4037,9 +4070,17 @@ function renderEstoqueLotes(){
       const fornNome = o.fornecedor_id ? ((FORNECEDORES_CADASTRO.find(f => f.id === o.fornecedor_id)||{}).nome || '') : '';
       return `<span style="display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;font-size:11px;color:#475569">
         <span style="width:12px;height:12px;border-radius:3px;background:${loteCor[o.id]};flex-shrink:0"></span>
-        <b>Ciclo ${esc(o.ciclo)}</b> — ${esc(o.semana)} — ${lic ? esc(lic.nome) : (fornNome ? esc(fornNome) : 'Sem contrato')} <span style="color:#94a3b8">(exp ${fmtDataBR(o.data_expedicao)})</span>
+        ${lotNum[o.id] ? `<b style="color:#334155">${lblLote(o)}</b> · ` : ''}<b>Ciclo ${esc(o.ciclo)}</b> — ${esc(o.semana)} — ${lic ? esc(lic.nome) : (fornNome ? esc(fornNome) : 'Sem contrato')} <span style="color:#94a3b8">(exp ${fmtDataBR(o.data_expedicao)})</span>
       </span>`;
     }).join('') || '<span style="font-size:11px;color:#94a3b8;padding:4px 0">Nenhuma ordem registrada ainda.</span>';
+  }
+  // Seletor de navegação por lote (somente navegação)
+  const navSel = document.getElementById('lotes-nav');
+  if(navSel){
+    const prev = navSel.value;
+    const opcoes = segments.filter(s => s.o).map(s => `<option value="${s.startIdx}">${lblLote(s.o)}</option>`).join('');
+    navSel.innerHTML = '<option value="">Ir para lote…</option>' + opcoes;
+    if(prev && navSel.querySelector(`option[value="${prev}"]`)) navSel.value = prev;
   }
   }catch(err){
     console.error('Erro na tabela de estoque:', err);
@@ -4068,6 +4109,20 @@ function _lotesCentralizarHoje(){
     const cor = container.getBoundingClientRect();
     container.scrollLeft = Math.max(0, container.scrollLeft + (cr.left - cor.left) - (container.clientWidth / 2 - cell.clientWidth / 2));
   }));
+}
+
+function _lotesIrParaLote(val){
+  if(val === '' || val == null) return;
+  const di = parseInt(val, 10);
+  if(isNaN(di)) return;
+  const container = document.querySelector('#tabela-lotes')?.parentElement;
+  const tbody = document.getElementById('tbody-lotes');
+  if(!container || !tbody || !tbody.rows.length) return;
+  const cell = tbody.rows[0].cells[di + 1];
+  if(!cell) return;
+  const cr = cell.getBoundingClientRect();
+  const cor = container.getBoundingClientRect();
+  container.scrollLeft = Math.max(0, container.scrollLeft + (cr.left - cor.left) - 16);
 }
 
 function _usuarioNomeLogado(){
@@ -5298,6 +5353,18 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
 
   if(!_ordens.length){
     alert('Nenhum item disponível para registrar a ordem.');
+    return;
+  }
+
+  // Bloqueia registro com semanas que já pertencem a qualquer lote existente (sem sobreposição)
+  const _novasSemanas = new Set(semanas);
+  const _conflitos = ORDENS_EXPEDIDAS.filter(o => {
+    const mons = (o.semanas && o.semanas.length) ? o.semanas : (o.mondayIso ? [o.mondayIso] : []);
+    return mons.some(m => _novasSemanas.has(m));
+  });
+  if(_conflitos.length){
+    const lista = _conflitos.map(o => `• Ciclo ${o.ciclo || ''} — ${o.semana || ''}`).join('\n');
+    alert(`❌ Registro bloqueado: as semanas selecionadas já pertencem a outro(s) lote(s).\n\n${lista}\n\nAjuste o período e tente novamente.`);
     return;
   }
 
