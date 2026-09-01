@@ -1414,23 +1414,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="card" style="margin-bottom:24px">
     <div class="card-header" style="background:var(--azul);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <span>Estoque por Lotes</span>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Mês anterior" onclick="lotesNav(-1)">‹</button>
-        <select id="lotes-janela" onchange="_lotesJanelaMeses=parseInt(this.value)||1;_lotesOffsetMeses=0;renderEstoqueLotes()" style="font-size:12px;padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;font-family:inherit">
-          <option value="1" style="color:#333">1 mês</option>
-          <option value="3" style="color:#333">3 meses</option>
-          <option value="12" style="color:#333">Ano inteiro</option>
-        </select>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" title="Próximo mês" onclick="lotesNav(1)">›</button>
-      </div>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#F8FAFC">
       <input id="lotes-busca" placeholder="Buscar ingrediente..." oninput="_lotesBusca=this.value;renderEstoqueLotes()" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;border:1.5px solid var(--borda);border-radius:6px;width:180px;background:#fff">
-      <input type="date" id="lotes-periodo-ini" title="Período — início" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
-      <input type="date" id="lotes-periodo-fim" title="Período — fim" style="font-family:'Inter',sans-serif;font-size:12px;padding:4px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff">
-      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="aplicarPeriodoLotes()">Aplicar período</button>
-      <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="limparPeriodoLotes()">Limpar</button>
-      <span style="font-size:12px;color:var(--txt2);font-weight:600" id="lotes-range-label"></span>
     </div>
     <div id="lotes-status-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#fff"></div>
     <div id="lotes-legenda" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0;background:#F8FAFC"></div>
@@ -3537,10 +3523,7 @@ function aplicarConsumoSemanas(){
 // ══════════════════════════════════════════════════════
 // MATRIZ DE COBERTURA DA DEMANDA (aba Estoque)
 // ══════════════════════════════════════════════════════
-let _lotesJanelaMeses = 1;
-let _lotesOffsetMeses = 0;
 let _lotesBusca = '';
-let _lotesPeriodoIni = '', _lotesPeriodoFim = '';
 let _matrizFiltroStatus = { coberto:true, parcial:true, planejado:true, sem:true, manual:true, removido:true };
 let _removidosPendentes = {}; // licId → { ingrediente: {motivo, usuario} } (modal de registro)
 let _precosSemLicTemp = {}; // ingrediente → preço unit. manual (itens sem contrato)
@@ -3582,44 +3565,13 @@ function _perSemanasIng(ing){
     (perObj ? perObj.semanas : 1));
 }
 
-function _lotesMesesEscolares(){
-  if(!DIAS_LETIVOS_ARRAY.length) return [];
-  const first = DIAS_LETIVOS_ARRAY[0], last = DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1];
-  const fy = +first.slice(0,4), fm = +first.slice(5,7) - 1;
-  const ly = +last.slice(0,4),  lm = +last.slice(5,7) - 1;
-  const out = [];
-  const d = new Date(fy, fm, 1);
-  while(d.getFullYear() < ly || (d.getFullYear() === ly && d.getMonth() <= lm)){
-    out.push({ ano: d.getFullYear(), mes: d.getMonth() });
-    d.setMonth(d.getMonth() + 1);
-  }
-  return out;
-}
+
 
 function _lotesDiasDaJanela(){
-  const meses = _lotesMesesEscolares();
-  if(!meses.length) return [];
-  if(_lotesPeriodoIni || _lotesPeriodoFim){
-    return DIAS_LETIVOS_ARRAY.filter(iso => (!_lotesPeriodoIni || iso >= _lotesPeriodoIni) && (!_lotesPeriodoFim || iso <= _lotesPeriodoFim));
-  }
-  const janela = Math.min(_lotesJanelaMeses, meses.length);
-  const maxOff = Math.max(0, meses.length - janela);
-  _lotesOffsetMeses = Math.max(0, Math.min(_lotesOffsetMeses, maxOff));
-  const sel = meses.slice(_lotesOffsetMeses, _lotesOffsetMeses + janela).map(m => m.ano + '-' + String(m.mes + 1).padStart(2,'0'));
-  return DIAS_LETIVOS_ARRAY.filter(iso => sel.includes(iso.slice(0,7)));
+  return DIAS_LETIVOS_ARRAY;
 }
 
-function _lotesJanelaLabel(dias){
-  if(!dias.length) return 'Nenhum dia letivo no período';
-  const MESES_NOME = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  if(_lotesPeriodoIni || _lotesPeriodoFim){
-    return `Período: ${fmtDataBR(dias[0])} – ${fmtDataBR(dias[dias.length - 1])} · ${dias.length} dias letivos`;
-  }
-  const m1 = +dias[0].slice(5,7) - 1, m2 = +dias[dias.length - 1].slice(5,7) - 1;
-  const ano = dias[0].slice(0,4);
-  const txt = m1 === m2 ? MESES_NOME[m1] : MESES_NOME[m1] + ' – ' + MESES_NOME[m2];
-  return `${txt} ${ano} · ${dias.length} dias letivos`;
-}
+
 
 // Cache de demanda por dia (invalidado quando cardápio/fichas/config mudam)
 let _matrizDemandaCache = null;
@@ -3808,18 +3760,7 @@ function _matrizTooltip(ing, iso, cell, dem){
   return L.join('\n');
 }
 
-function lotesNav(delta){ _lotesOffsetMeses += delta; renderEstoqueLotes(); }
-function aplicarPeriodoLotes(){
-  _lotesPeriodoIni = document.getElementById('lotes-periodo-ini')?.value || '';
-  _lotesPeriodoFim = document.getElementById('lotes-periodo-fim')?.value || '';
-  renderEstoqueLotes();
-}
-function limparPeriodoLotes(){
-  _lotesPeriodoIni = ''; _lotesPeriodoFim = '';
-  const i = document.getElementById('lotes-periodo-ini'), f = document.getElementById('lotes-periodo-fim');
-  if(i) i.value = ''; if(f) f.value = '';
-  renderEstoqueLotes();
-}
+
 
 // Remove/restaura item de ordem já registrada (aba Licitações)
 function removerItemOrdem(ordemId, ingrediente){
@@ -3906,7 +3847,7 @@ function renderEstoqueLotes(){
   const thead  = document.getElementById('tabela-lotes')?.querySelector('thead');
   const legend = document.getElementById('lotes-legenda');
   const stLegend = document.getElementById('lotes-status-legenda');
-  const rangeEl = document.getElementById('lotes-range-label');
+
   if(!tbody || !thead) return;
   try{
   const hoje = new Date().toISOString().split('T')[0];
@@ -3936,7 +3877,7 @@ function renderEstoqueLotes(){
       </label>`;
     }).join('') + `<span style="font-size:11px;color:#94a3b8;align-self:center">⬜ Azul-bebê = sem demanda dentro do período do lote (banda)</span>`;
   }
-  if(rangeEl) rangeEl.textContent = _lotesJanelaLabel(dias);
+
 
   if(!dias.length){
     thead.innerHTML = '';
@@ -4108,6 +4049,27 @@ function renderEstoqueLotes(){
 }
 
 // ── Correção de estoque físico (coluna Saldo Estoque) ──
+function _lotesCentralizarHoje(){
+  const container = document.querySelector('#tabela-lotes')?.parentElement;
+  const tbody = document.getElementById('tbody-lotes');
+  if(!container || !tbody || !tbody.rows.length) return;
+  const dias = _lotesDiasDaJanela();
+  if(!dias.length) return;
+  const hoje = new Date().toISOString().slice(0,10);
+  let idx = dias.indexOf(hoje);
+  if(idx < 0){
+    idx = dias.findIndex(d => d > hoje);
+    if(idx < 0) idx = dias.length - 1;
+  }
+  const cell = tbody.rows[0].cells[idx + 1];
+  if(!cell) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const cr = cell.getBoundingClientRect();
+    const cor = container.getBoundingClientRect();
+    container.scrollLeft = Math.max(0, container.scrollLeft + (cr.left - cor.left) - (container.clientWidth / 2 - cell.clientWidth / 2));
+  }));
+}
+
 function _usuarioNomeLogado(){
   try{
     const sess = window._SESSAO;
@@ -9592,7 +9554,7 @@ function ir(id, btn){
   if(id==='gastos'){ popularMesesGastos(); renderGastos(); }
   if(id==='config') carregarConfig();
   if(id==='admin') abrirAdmin();
-  if(id==='estoque'){ renderEstoqueLotes(); }
+  if(id==='estoque'){ renderEstoqueLotes(); _lotesCentralizarHoje(); }
   if(id==='licitacoes') renderLicitacoes();
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
