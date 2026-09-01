@@ -1101,7 +1101,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <span>Lista de Ingredientes <span style="font-weight:400;font-size:12px;opacity:.8" id="cnt-ings"></span></span>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm" onclick="abrirAssociacaoMassa()" title="Associar fornecedores a vários ingredientes de uma vez" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">🔗 Associar fornecedores</button>
-        <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">📋 Filtrar usados no ciclo</button>
         <button class="btn btn-sm" onclick="imprimirPesquisaPrecos()" title="Gerar e imprimir formulário de pesquisa de preços com os itens da lista (respeita os filtros atuais)" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">🖨️ Pesquisa de Preços</button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -8474,19 +8473,6 @@ function removerPrato(key){
 // INGREDIENTES
 // ══════════════════════════════════════════════════════
 let filtroIngForn = '';
-let _filtroApenasUsados = false;
-
-function toggleFiltrarUsados(){
-  _filtroApenasUsados = !_filtroApenasUsados;
-  const btn = document.getElementById('btn-filtrar-usados');
-  if(btn){
-    btn.style.background = _filtroApenasUsados ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.2)';
-    btn.style.fontWeight = _filtroApenasUsados ? '700' : '';
-    btn.innerHTML = _filtroApenasUsados ? '📋 Todos os ingredientes' : '📋 Filtrar usados no ciclo';
-  }
-  renderIngredientes(document.querySelector('.filtro-input')?.value || '');
-}
-
 function salvarEmbalagensPadrao(){
   const raw = JSON.stringify(EMBALAGENS);
   // Salva fora do proxy (real localStorage, vale para todos os perfis)
@@ -8508,25 +8494,25 @@ function renderIngredientes(filtro=''){
   EMBALAGENS = Object.assign({}, padrao, salvos);
   const precosSalvos = JSON.parse(localStorage.getItem('merenda_precos') || '{}');
   
-  // Pré-computa ingredientes usados no ciclo
+  // Ingredientes usados no ciclo (sempre calculado para a ordenação automática)
   const usadosSet = new Set();
-  if(_filtroApenasUsados){
-    Object.values(CICLOS_PLANOS).forEach(arr => (arr||[]).forEach(p => {
-      if(p && DADOS.ficha[p]) DADOS.ficha[p].forEach(x => usadosSet.add(x.i));
-    }));
-  }
-  
-  const ings = Object.entries(DADOS.ingredientes)
+  Object.values(CICLOS_PLANOS).forEach(arr => (arr||[]).forEach(p => {
+    if(p && DADOS.ficha[p]) DADOS.ficha[p].forEach(x => usadosSet.add(x.i));
+  }));
+
+  const todas = Object.entries(DADOS.ingredientes)
     .filter(([n])=>!filtro||n.toLowerCase().includes(filtro.toLowerCase()))
     .filter(([n])=>!filtroIngForn||(filtroIngForn==='AF'?isAF(n):!isAF(n)))
-    .filter(([n])=>!_filtroApenasUsados||usadosSet.has(n))
     .sort((a,b)=>a[0].localeCompare(b[0]));
+  const usados = todas.filter(([n]) => usadosSet.has(n));
+  const naoUsados = todas.filter(([n]) => !usadosSet.has(n));
 
-  document.getElementById('cnt-ings').textContent = `(${ings.length} itens)`;
-  document.getElementById('tbody-ings').innerHTML = ings.map(([nome,d])=>{
+  document.getElementById('cnt-ings').textContent = `(${todas.length} itens)`;
+  const _rowIng = ([nome,d], cinza) => {
     const preco = precosSalvos[nome] !== undefined ? precosSalvos[nome] : 0;
+    const bgTr = cinza ? ' style="background:#F1F5F9"' : '';
     return `
-    <tr>
+    <tr${bgTr}>
       <td><b class="nome-ing" onclick="editarNomeIng('${nome.replace(/'/g,"\\'")}', this)" title="Clique para editar o nome" style="cursor:pointer">${esc(nome)}</b></td>
       <td>
         <select onchange="salvarUnidade('${nome.replace(/'/g,"\\'")}', this.value)"
@@ -8567,7 +8553,12 @@ function renderIngredientes(filtro=''){
             style="width:80px;text-align:right;padding:4px;border:1px solid var(--borda);border-radius:4px;font-family:'DM Mono',monospace;font-weight:600;color:var(--azul)">
         </div>
       </td>
-    </tr>`}).join('');
+    </tr>`;
+  };
+  const _sepNaoUsados = usados.length && naoUsados.length
+    ? `<tr><td colspan="7" style="background:#E2E8F0;color:#334155;font-size:11px;font-weight:800;padding:5px 8px;letter-spacing:.04em;text-transform:uppercase">Ingredientes não utilizados no ciclo</td></tr>`
+    : '';
+  document.getElementById('tbody-ings').innerHTML = usados.map(u => _rowIng(u, false)).join('') + _sepNaoUsados + naoUsados.map(u => _rowIng(u, true)).join('');
 }
 
 // ── Modo de associação em massa de fornecedores ──
@@ -8661,28 +8652,18 @@ function _cancelarAssociacaoMassa(){
   if(ov) ov.classList.remove('aberto');
 }
 
-// Formulário de pesquisa de preços (respeita os filtros atuais da lista, inclusive "usados no ciclo")
+// Formulário de pesquisa de preços (respeita os filtros atuais da lista)
 function imprimirPesquisaPrecos(){
-  const usadosSet = new Set();
-  if(_filtroApenasUsados){
-    Object.values(CICLOS_PLANOS).forEach(arr => (arr||[]).forEach(p => {
-      if(p && DADOS.ficha[p]) DADOS.ficha[p].forEach(x => usadosSet.add(x.i));
-    }));
-  }
   const filtro = (document.querySelector('#pg-ingredientes .filtro-input')?.value || '').trim();
   const ings = Object.entries(DADOS.ingredientes)
     .filter(([n]) => !filtro || n.toLowerCase().includes(filtro.toLowerCase()))
     .filter(([n]) => !filtroIngForn || (filtroIngForn === 'AF' ? isAF(n) : !isAF(n)))
-    .filter(([n]) => !_filtroApenasUsados || usadosSet.has(n))
     .sort((a,b) => a[0].localeCompare(b[0], 'pt-BR'));
   if(!ings.length){ alert('Nenhum ingrediente com os filtros atuais.'); return; }
 
   const escola = localStorage.getItem('merenda_escola') || '';
   const hojeTxt = fmtDataBR(new Date().toISOString().split('T')[0]);
-  const cicloSel = document.getElementById('plan-ciclo')?.value || '';
-  const filtroTxt = _filtroApenasUsados
-    ? (cicloSel ? 'Itens usados no ciclo: ' + cicloSel : 'Itens usados no ciclo configurado')
-    : 'Lista geral de ingredientes';
+  const filtroTxt = 'Lista geral de ingredientes';
   const rowsHtml = ings.map(([nome, d], i) => `
     <tr>
       <td class="c">${i + 1}</td>
