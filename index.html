@@ -3936,6 +3936,17 @@ function renderEstoqueLotes(){
   segments.forEach((s, i) => {
     if(i > 0 && s.o && s.o !== segments[i - 1].o) divIdxs.add(s.startIdx);
   });
+  // Divisores de semana (primeira coluna de cada semana do calendário letivo)
+  const semIdxs = new Set();
+  const _segDe = iso => {
+    const d = new Date(iso + 'T00:00:00');
+    const w = d.getDay();
+    d.setDate(d.getDate() + (w === 0 ? -6 : 1 - w));
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  };
+  dias.forEach((iso, i) => {
+    if(i > 0 && _segDe(iso) !== _segDe(dias[i - 1])) semIdxs.add(i);
+  });
   const lblLote = o => o ? ('LOTE ' + String(lotNum[o.id]).padStart(2,'0')) : '';
 
   // Cabeçalho: dias letivos da janela + barras de cor dos lotes com dias na data
@@ -3960,7 +3971,7 @@ function renderEstoqueLotes(){
       const bars = lotesDia.length
         ? `<div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">${lotesDia.map(o => `<div style="height:3px;border-radius:2px;background:${loteCor[o.id] || '#94A3B8'}"></div>`).join('')}</div>`
         : '';
-      const divB = divIdxs.has(di) ? ';border-left:2.5px solid #334155' : '';
+      const divB = divIdxs.has(di) ? ';border-left:2.5px solid #334155' : (semIdxs.has(di) ? ';border-left:2px solid #64748B' : '');
       return `<th style="${thBase};position:sticky;top:26px;z-index:3;text-align:center;font-size:10px;min-width:56px;background:${_cellThBg(iso)}${divB}" title="${fmtDataBR(iso)} — ${abrev}">${fmtDataCurta(iso)}${bars}</th>`;
     }).join('')}
   </tr>`;
@@ -3981,7 +3992,7 @@ function renderEstoqueLotes(){
     if(busca && !norm(ing).includes(norm(busca))) return null;
     let any = false;
     const cellsHtml = dias.map((iso, di) => {
-      const divB = divIdxs.has(di) ? ';border-left:2.5px solid #334155' : '';
+      const divB = divIdxs.has(di) ? ';border-left:2.5px solid #334155' : (semIdxs.has(di) ? ';border-left:2px solid #64748B' : '');
       const dem = (demanda.get(iso)||{})[ing] || 0;
       const cell = cells[ing][iso];
       const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:false, snap:0};
