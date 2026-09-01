@@ -2233,7 +2233,7 @@ async function verificarCallbackGoogle(){
     'merenda_subtitulo','merenda_embalagens',
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
     'merenda_fornecedores','merenda_ing_fornecedores',
-    'merenda_licitacoes','merenda_estoque','merenda_merc_ajustes',
+    'merenda_licitacoes','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
     'merenda_onboarding_visto','merenda_servidores_config'
   ];
   const _isPerfilFixo = user.id === 'usr_admin' || user.id === 'usr_admin_rede';
@@ -2474,7 +2474,7 @@ async function fazerLogin(){
       'merenda_subtitulo','merenda_embalagens',
       'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
       'merenda_fornecedores','merenda_ing_fornecedores',
-      'merenda_licitacoes','merenda_estoque','merenda_merc_ajustes',
+      'merenda_licitacoes','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
       'merenda_onboarding_visto','merenda_servidores_config'
     ];
     const _isPerfilFixo = res.user.id === 'usr_admin' || res.user.id === 'usr_admin_rede';
@@ -3296,6 +3296,7 @@ let LICITACOES       = JSON.parse(localStorage.getItem('merenda_licitacoes')    
 let ORDENS_EXPEDIDAS = JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
 let RECEBIMENTOS     = JSON.parse(localStorage.getItem('merenda_recebimentos')     || '[]');
 let ESTOQUE          = JSON.parse(localStorage.getItem('merenda_estoque')         || '{}');
+let CORRECOES_ESTOQUE = JSON.parse(localStorage.getItem('merenda_estoque_correcoes') || '{}');
 
 // Mesclar ingredientes customizados adicionados pelo usuário
 (function(){
@@ -3501,6 +3502,7 @@ function toggleMercadoViewMode(){
 Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
 
 function salvarEstoque(){          localStorage.setItem('merenda_estoque',             JSON.stringify(ESTOQUE)); }
+function salvarCorrecoesEstoque(){ localStorage.setItem('merenda_estoque_correcoes',  JSON.stringify(CORRECOES_ESTOQUE)); }
 function salvarSemanasConsumidas(){ localStorage.setItem('merenda_semanas_consumidas', JSON.stringify(SEMANAS_CONSUMIDAS)); }
 
 // Desconta do estoque o consumo de todas as semanas já encerradas (roda no init)
@@ -4061,10 +4063,27 @@ function renderEstoqueLotes(){
     });
     const saldo = total - consumido;
     const unid = DADOS.ingredientes[ing]?.unidade || 'kg';
+    const encIng = ing.replace(/'/g,"\\'");
+    const corr = CORRECOES_ESTOQUE[ing];
+    const valExib = corr ? corr.valor : saldo;
+    const saldoCor = corr ? '#d97706' : (valExib < 0 ? '#dc2626' : '#16a34a');
+    let saldoCell;
+    if(corr){
+      const hist = (corr.historico||[]).slice(-5).map(x => `• ${x.data} ${x.hora}${x.usuario ? ' — ' + x.usuario : ''}: ${_matrizFmtNum(x.anterior)} ${unid} → ${_matrizFmtNum(x.novo)} ${unid}`).join('\n');
+      saldoCell = `<td style="border:1px solid #C8D0DC;padding:5px 8px;text-align:right;font-weight:800;font-family:'DM Mono',monospace;font-size:12px;color:${saldoCor};position:sticky;right:0;background:#FFF7ED;white-space:nowrap" title="✎ Ajustado manualmente em ${corr.atualizado_em || ''}${corr.usuario ? ' por ' + corr.usuario : ''}${hist ? '\n\nHistórico:\n' + hist : ''}">
+        <span style="cursor:pointer" onclick="editarSaldoEstoque('${encIng}', this)" title="Corrigir saldo">${_matrizFmtNum(valExib)} ✎</span>
+        <span onclick="limparCorrecaoSaldo('${encIng}')" title="Voltar ao saldo automático do sistema" style="cursor:pointer;margin-left:3px;color:#d97706;font-size:11px">↺</span>
+        <span style="font-size:9px;color:#94a3b8;font-weight:600">${esc(unid)}</span>
+      </td>`;
+    } else {
+      saldoCell = `<td style="border:1px solid #C8D0DC;padding:5px 8px;text-align:right;font-weight:800;font-family:'DM Mono',monospace;font-size:12px;color:${saldoCor};position:sticky;right:0;background:#fff;white-space:nowrap" title="Lotes: ${_matrizFmtNum(total)} ${unid} · Consumido: ${_matrizFmtNum(consumido)} ${unid} — clique para corrigir">
+        <span style="cursor:pointer" onclick="editarSaldoEstoque('${encIng}', this)" title="Corrigir saldo">${_matrizFmtNum(valExib)}</span> <span style="font-size:9px;color:#94a3b8;font-weight:600">${esc(unid)}</span>
+      </td>`;
+    }
     return `<tr>
       <td style="border:1px solid #C8D0DC;padding:5px 8px;font-weight:700;font-size:12px;position:sticky;left:0;background:#fff;white-space:nowrap">${esc(ing)}</td>
       ${cellsHtml}
-      <td style="border:1px solid #C8D0DC;padding:5px 8px;text-align:right;font-weight:800;font-family:'DM Mono',monospace;font-size:12px;color:${saldo < 0 ? '#dc2626' : '#16a34a'};position:sticky;right:0;background:#fff;white-space:nowrap" title="Lotes: ${_matrizFmtNum(total)} ${unid} · Consumido: ${_matrizFmtNum(consumido)} ${unid}">${_matrizFmtNum(saldo)} <span style="font-size:9px;color:#94a3b8;font-weight:600">${esc(unid)}</span></td>
+      ${saldoCell}
     </tr>`;
   }).filter(Boolean).join('');
 
@@ -4086,6 +4105,65 @@ function renderEstoqueLotes(){
     if(thead) thead.innerHTML = '';
     if(tbody) tbody.innerHTML = `<tr><td colspan="3" style="padding:16px;color:#b91c1c;font-size:12px;font-family:monospace;white-space:pre-wrap;text-align:left">Erro ao montar a tabela: ${esc(String((err && err.message) || err))}&#10;${esc(String((err && err.stack) || ''))}</td></tr>`;
   }
+}
+
+// ── Correção de estoque físico (coluna Saldo Estoque) ──
+function _usuarioNomeLogado(){
+  try{
+    const sess = window._SESSAO;
+    if(!sess || !sess.user_id) return '';
+    const u = USUARIOS.find(x => x.id === sess.user_id);
+    return u ? (u.nome || '') : '';
+  }catch(e){ return ''; }
+}
+
+function editarSaldoEstoque(nome, el){
+  const td = el ? el.closest('td') : null;
+  if(!td || td.querySelector('input')) return;
+  const corr = CORRECOES_ESTOQUE[nome];
+  const atual = corr ? corr.valor : (parseFloat(String(el.textContent).replace(/[^\d.,-]/g,'').replace(',', '.')) || 0);
+  const unid = DADOS.ingredientes[nome]?.unidade || 'kg';
+  const encIng = nome.replace(/'/g,"\\'");
+  td.innerHTML = `<input type="number" min="0" step="any" value="${atual}"
+    onkeydown="if(event.key==='Enter'){corrigirSaldoEstoque('${encIng}', this.value)}else if(event.key==='Escape'){renderEstoqueLotes()}"
+    onblur="renderEstoqueLotes()"
+    style="width:80px;font-family:'DM Mono',monospace;font-size:12px;text-align:right;padding:2px 4px;border:1.5px solid #d97706;border-radius:4px">
+    <span style="font-size:9px;color:#94a3b8;font-weight:600">${esc(unid)}</span>`;
+  const inp = td.querySelector('input');
+  if(inp){ inp.focus(); inp.select(); }
+}
+
+function corrigirSaldoEstoque(nome, valorStr){
+  const novo = Math.max(0, parseFloat(String(valorStr).replace(',', '.')) || 0);
+  if(!CORRECOES_ESTOQUE[nome]){
+    CORRECOES_ESTOQUE[nome] = { valor: novo, atualizado_em: '', usuario: '', historico: [] };
+  }
+  const corr = CORRECOES_ESTOQUE[nome];
+  const anterior = corr.historico.length ? corr.valor : (ESTOQUE[nome] || 0);
+  const now = new Date();
+  const data = now.toLocaleDateString('pt-BR');
+  const hora = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  const usuario = _usuarioNomeLogado();
+  corr.valor = novo;
+  corr.atualizado_em = `${data} ${hora}`;
+  corr.usuario = usuario;
+  corr.historico.push({ data, hora, anterior, novo, usuario });
+  ESTOQUE[nome] = novo;
+  salvarEstoque();
+  salvarCorrecoesEstoque();
+  renderEstoqueLotes();
+}
+
+function limparCorrecaoSaldo(nome){
+  const corr = CORRECOES_ESTOQUE[nome];
+  if(!corr) return;
+  if(!confirm(`Voltar ao saldo automático do sistema para "${nome}"?`)) return;
+  const hist = corr.historico || [];
+  if(hist.length) ESTOQUE[nome] = hist[0].anterior;
+  delete CORRECOES_ESTOQUE[nome];
+  salvarEstoque();
+  salvarCorrecoesEstoque();
+  renderEstoqueLotes();
 }
 
 // ── Periodicidades ────────────────────────────────────
@@ -8610,6 +8688,7 @@ function renomearIngrediente(nomeAntigo, novoRaw){
   Object.keys(DADOS_FICHA_ORIGINAL).forEach(p => renF(DADOS_FICHA_ORIGINAL[p]));
   // 4) Estoques e configurações por nome
   if(ESTOQUE[nomeAntigo] !== undefined){ ESTOQUE[novo] = ESTOQUE[nomeAntigo]; delete ESTOQUE[nomeAntigo]; salvarEstoque(); }
+  if(CORRECOES_ESTOQUE[nomeAntigo] !== undefined){ CORRECOES_ESTOQUE[novo] = CORRECOES_ESTOQUE[nomeAntigo]; delete CORRECOES_ESTOQUE[nomeAntigo]; salvarCorrecoesEstoque(); }
   if(ING_FORNECEDORES[nomeAntigo] !== undefined){ ING_FORNECEDORES[novo] = ING_FORNECEDORES[nomeAntigo]; delete ING_FORNECEDORES[nomeAntigo]; salvarIngFornecedores(); }
   if(ING_PERIODICIDADE[nomeAntigo] !== undefined){ ING_PERIODICIDADE[novo] = ING_PERIODICIDADE[nomeAntigo]; delete ING_PERIODICIDADE[nomeAntigo]; salvarIngPeriodicidade(); }
   if(ING_UNIDADE_VENDA[nomeAntigo] !== undefined){ ING_UNIDADE_VENDA[novo] = ING_UNIDADE_VENDA[nomeAntigo]; delete ING_UNIDADE_VENDA[nomeAntigo]; salvarIngUnidadeVenda(); }
