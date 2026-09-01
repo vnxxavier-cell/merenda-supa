@@ -1100,6 +1100,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;border-radius:var(--r) var(--r) 0 0">
       <span>Lista de Ingredientes <span style="font-weight:400;font-size:12px;opacity:.8" id="cnt-ings"></span></span>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="abrirAssociacaoMassa()" title="Associar fornecedores a vários ingredientes de uma vez" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">🔗 Associar fornecedores</button>
         <button class="btn btn-sm" id="btn-filtrar-usados" onclick="toggleFiltrarUsados()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">📋 Filtrar usados no ciclo</button>
         <button class="btn btn-sm" onclick="imprimirPesquisaPrecos()" title="Gerar e imprimir formulário de pesquisa de preços com os itens da lista (respeita os filtros atuais)" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:11px;display:inline-flex;align-items:center;gap:4px">🖨️ Pesquisa de Preços</button>
       </div>
@@ -1699,6 +1700,40 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       
       <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:12px">
         <button class="btn btn-outline" onclick="fecharModalNovoPrato()">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-assoc-massa" onclick="if(event.target===this)_cancelarAssociacaoMassa()">
+  <div class="modal" style="max-width:640px;width:100%">
+    <div class="modal-header" style="background:var(--azul2)">
+      <h3 style="display:flex;align-items:center;gap:8px">🔗 Associação de Fornecedores em Massa</h3>
+      <button class="modal-close" onclick="_cancelarAssociacaoMassa()">×</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #E2E8F0;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;user-select:none">
+          <input type="checkbox" id="massa-sel-todos" onchange="_massaToggleTodos(this.checked)" style="width:16px;height:16px;accent-color:var(--azul);cursor:pointer"> Selecionar todos
+        </label>
+        <span id="massa-contador" style="font-size:12px;font-weight:700;color:#64748b">0 ingredientes selecionados</span>
+      </div>
+      <div style="max-height:52vh;overflow:auto">
+        <table style="font-size:12px;width:100%">
+          <thead><tr><th style="width:36px"></th><th>Ingrediente</th><th>Fornecedor atual</th></tr></thead>
+          <tbody id="tbody-assoc-massa"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid #E2E8F0;flex-wrap:wrap">
+        <label style="font-size:12px;font-weight:700;color:#334155">Fornecedor:</label>
+        <select id="massa-forn-sel" style="font-family:'Inter',sans-serif;font-size:12px;padding:6px 8px;border:1.5px solid var(--borda);border-radius:6px;background:#fff;min-width:180px;flex:1">
+          <option value="">Selecionar fornecedor…</option>
+        </select>
+        <button class="btn btn-verde btn-sm" onclick="_aplicarMassaFornecedor()">Aplicar fornecedor</button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #E2E8F0">
+        <button class="btn btn-outline" onclick="_cancelarAssociacaoMassa()">Cancelar</button>
+        <button class="btn btn-verde" onclick="_concluirAssociacaoMassa()">Concluir associação</button>
       </div>
     </div>
   </div>
@@ -8533,6 +8568,97 @@ function renderIngredientes(filtro=''){
         </div>
       </td>
     </tr>`}).join('');
+}
+
+// ── Modo de associação em massa de fornecedores ──
+let _massaSel = new Set();
+let _massaMudou = false;
+
+function abrirAssociacaoMassa(){
+  _massaSel = new Set();
+  _massaMudou = false;
+  const ov = document.getElementById('overlay-assoc-massa');
+  if(ov) ov.classList.add('aberto');
+  const fornSel = document.getElementById('massa-forn-sel');
+  if(fornSel){
+    fornSel.innerHTML = '<option value="">Selecionar fornecedor…</option>' +
+      FORNECEDORES_CADASTRO.map(f => `<option value="${f.id}">${esc(f.nome)}</option>`).join('');
+    fornSel.value = '';
+  }
+  const st = document.getElementById('massa-sel-todos');
+  if(st) st.checked = false;
+  _renderAssociacaoMassa();
+}
+
+function _renderAssociacaoMassa(){
+  const tbody = document.getElementById('tbody-assoc-massa');
+  if(!tbody) return;
+  const ings = Object.keys(DADOS.ingredientes).sort((a,b) => a.localeCompare(b, 'pt-BR'));
+  tbody.innerHTML = ings.map(nome => {
+    const fid = ING_FORNECEDORES[nome];
+    const f = fid ? FORNECEDORES_CADASTRO.find(x => x.id === fid) : null;
+    const fornTxt = f ? esc(f.nome) : '<span style="color:#94a3b8;font-style:italic">Sem fornecedor</span>';
+    const enc = nome.replace(/'/g,"\\'");
+    return `<tr>
+      <td style="text-align:center"><input type="checkbox" ${_massaSel.has(nome)?'checked':''} onchange="_massaToggleIng('${enc}', this.checked)" style="width:16px;height:16px;accent-color:var(--azul);cursor:pointer"></td>
+      <td><b>${esc(nome)}</b></td>
+      <td style="color:#475569">${fornTxt}</td>
+    </tr>`;
+  }).join('');
+  _massaAtualizarContador();
+}
+
+function _massaToggleIng(nome, checked){
+  if(checked) _massaSel.add(nome);
+  else _massaSel.delete(nome);
+  const st = document.getElementById('massa-sel-todos');
+  if(st) st.checked = _massaSel.size === Object.keys(DADOS.ingredientes).length;
+  _massaAtualizarContador();
+}
+
+function _massaToggleTodos(checked){
+  _massaSel = checked ? new Set(Object.keys(DADOS.ingredientes)) : new Set();
+  document.querySelectorAll('#tbody-assoc-massa input[type="checkbox"]').forEach(cb => { cb.checked = checked; });
+  _massaAtualizarContador();
+}
+
+function _massaAtualizarContador(){
+  const el = document.getElementById('massa-contador');
+  if(el) el.textContent = `${_massaSel.size} ${_massaSel.size === 1 ? 'ingrediente selecionado' : 'ingredientes selecionados'}`;
+}
+
+function _aplicarMassaFornecedor(){
+  if(!_massaSel.size){ alert('Selecione pelo menos um ingrediente.'); return; }
+  const fornSel = document.getElementById('massa-forn-sel');
+  const fid = fornSel ? fornSel.value : '';
+  if(!fid){ alert('Selecione um fornecedor para aplicar.'); return; }
+  const comForn = [..._massaSel].filter(n => ING_FORNECEDORES[n] && ING_FORNECEDORES[n] !== fid);
+  if(comForn.length){
+    if(!confirm('Alguns dos ingredientes selecionados já possuem fornecedor associado.\n\nDeseja substituir essas associações pelo fornecedor selecionado?')) return;
+  }
+  [..._massaSel].forEach(n => { ING_FORNECEDORES[n] = fid; });
+  salvarIngFornecedores();
+  _massaMudou = true;
+  _massaSel = new Set();
+  const st = document.getElementById('massa-sel-todos');
+  if(st) st.checked = false;
+  _renderAssociacaoMassa();
+}
+
+function _concluirAssociacaoMassa(){
+  salvarIngFornecedores();
+  const ov = document.getElementById('overlay-assoc-massa');
+  if(ov) ov.classList.remove('aberto');
+  const filtroInput = document.querySelector('#pg-ingredientes .filtro-input');
+  renderIngredientes(filtroInput ? filtroInput.value : '');
+}
+
+function _cancelarAssociacaoMassa(){
+  if(_massaMudou){
+    if(!confirm('Sair do modo de associação?\n\nAs associações já aplicadas serão mantidas.')) return;
+  }
+  const ov = document.getElementById('overlay-assoc-massa');
+  if(ov) ov.classList.remove('aberto');
 }
 
 // Formulário de pesquisa de preços (respeita os filtros atuais da lista, inclusive "usados no ciclo")
