@@ -1569,7 +1569,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="fecharCalculadora()">Fechar</button>
-          <button class="btn btn-primary" id="btn-aplicar-calc" style="display:flex;align-items:center;gap:5px" onclick="registrarPreviaCalculadora()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Registrar Prévia de Contratação</button>
+          <button class="btn btn-primary" id="btn-aplicar-calc" style="display:flex;align-items:center;gap:5px" onclick="registrarPreviaCalculadora()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
         </div>
       </div>
       <div id="calc-vazio" style="text-align:center;color:#aaa;padding:24px;font-size:13px">
@@ -1627,6 +1627,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn btn-outline" onclick="fecharOverlayLic()">Fechar</button>
+        <button class="btn btn-verde" style="display:flex;align-items:center;gap:5px" onclick="salvarLicitacaoModal()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       </div>
     </div>
   </div>
@@ -5047,6 +5048,15 @@ function editarLicitacao(id){
 function fecharOverlayLic(event){
   if(event && event.target !== document.getElementById('overlay-licitacao')) return;
   document.getElementById('overlay-licitacao').classList.remove('aberto');
+  renderLicitacoes();
+}
+
+function salvarLicitacaoModal(){
+  const nome = document.getElementById('lic-nome').value.trim();
+  if(!nome){ alert('Informe o nome/número do contrato antes de salvar.'); return; }
+  _salvarLicitacaoSilenciosa();
+  document.getElementById('overlay-licitacao').classList.remove('aberto');
+  renderLicitacoes();
 }
 
 function adicionarItemLic(){
