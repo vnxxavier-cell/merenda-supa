@@ -1787,6 +1787,7 @@ const _supaSync = {
   _debounceTimer: null,
   _pendingFields: new Set(),
   _userId: null,
+  _configCache: null,
 
   // Mapeamento: chave localStorage → coluna na tabela escola_dados
   keyToColumn: {
@@ -1813,6 +1814,10 @@ const _supaSync = {
     'merenda_subtitulo': 'config',
     'merenda_fornecedores': 'config',
     'merenda_ing_fornecedores': 'config',
+    'merenda_previas_contrato': 'previas_contrato',
+    'merenda_estoque_correcoes': 'estoque_correcoes',
+    'merenda_periodicidades': 'periodicidades',
+    'merenda_ing_periodicidade': 'ing_periodicidade',
   },
 
   // Configura o userId para sync
@@ -1829,16 +1834,37 @@ const _supaSync = {
     this._debounceTimer = setTimeout(() => this._flushSync(), 2000);
   },
 
+  // Semeia o cache de config a partir do estado local completo
+  seedConfigCache() {
+    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
+    const cache = {};
+    configFields.forEach(k => {
+      const val = localStorage.getItem(k);
+      if(val !== null) cache[k] = val;
+    });
+    this._configCache = cache;
+    return cache;
+  },
+
+  // Força o envio do bundle de config completo (repara sobrescrita parcial no banco)
+  forceConfigSync() {
+    if(!this._userId || !_supabase) return;
+    this.seedConfigCache();
+    ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'].forEach(k => this._pendingFields.add(k));
+    this._flushSync();
+  },
+
   // Envia dados pendentes para o Supabase
   async _flushSync() {
     if(!this._userId || !_supabase || this._pendingFields.size === 0) return;
     const updates = {};
     const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
 
-    // Coletar 'config' como um bundle
+    // Coletar 'config' como um bundle completo (merge no cache para nunca sobrescrever parcialmente)
     const hasConfig = [...this._pendingFields].some(k => configFields.includes(k));
     const otherUpdates = {};
-    const configObj = {};
+    if(hasConfig && !this._configCache) this.seedConfigCache();
+    const configObj = hasConfig ? (this._configCache || {}) : {};
 
     this._pendingFields.forEach(k => {
       if(configFields.includes(k)) {
@@ -1855,8 +1881,9 @@ const _supaSync = {
 
     this._pendingFields.clear();
 
-    // Salva configurações (exceto merenda_header_img que é grande demais)
+    // Salva configurações (bundle completo, nunca parcial)
     if(hasConfig) {
+      this._configCache = configObj;
       try {
         const { error } = await _supabase.from('escola_dados').upsert(
           { user_id: this._userId, config: configObj },
@@ -1910,6 +1937,8 @@ const _supaSync = {
       Object.entries(data).forEach(([col, val]) => {
         if(col === 'user_id' || col === 'updated_at' || val === null) return;
         if(col === 'config' && typeof val === 'object') {
+          // Alimenta o cache de config com o estado remoto completo
+          this._configCache = val;
           // Restaurar campos de config individuais
           Object.entries(val).forEach(([k, v]) => {
             if(v === null || v === undefined) return;
@@ -2263,7 +2292,7 @@ async function verificarCallbackGoogle(){
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
     'merenda_fornecedores','merenda_ing_fornecedores',
     'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
-    'merenda_onboarding_visto','merenda_servidores_config'
+    'merenda_periodicidades','merenda_ing_periodicidade','merenda_onboarding_visto','merenda_servidores_config'
   ];
   const _isPerfilFixo = user.id === 'usr_admin' || user.id === 'usr_admin_rede';
   const temDadosLocais = _isPerfilFixo
@@ -2305,7 +2334,7 @@ async function verificarCallbackGoogle(){
     if(!_isPerfilFixo && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
     try { await _supaSync.loadFromSupabase(user.id); } catch(e) { console.warn('Sync load error:', e); }
   } else {
-    setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
+    setTimeout(() => { try { _supaSync.forceConfigSync(); } catch(e){} }, 3000);
   }
   recarregarDados();
   // Esconde tela de login, mostra app
@@ -2504,7 +2533,7 @@ async function fazerLogin(){
       'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
       'merenda_fornecedores','merenda_ing_fornecedores',
       'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
-      'merenda_onboarding_visto','merenda_servidores_config'
+      'merenda_periodicidades','merenda_ing_periodicidade','merenda_onboarding_visto','merenda_servidores_config'
     ];
     const _isPerfilFixo = res.user.id === 'usr_admin' || res.user.id === 'usr_admin_rede';
     // Considera que há dados locais se QUALQUER chave prefixada existir
@@ -2561,7 +2590,7 @@ async function fazerLogin(){
       if(!_isPerfilFixo && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
       try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
     } else {
-      setTimeout(() => { try { _supaSync._flushSync(); } catch(e){} }, 3000);
+      setTimeout(() => { try { _supaSync.forceConfigSync(); } catch(e){} }, 3000);
     }
     _step = 'recarregarDados';
     recarregarDados();
