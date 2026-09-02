@@ -1859,11 +1859,13 @@ const _supaSync = {
     return cache;
   },
 
-  // Força o envio do bundle de config completo (repara sobrescrita parcial no banco)
-  forceConfigSync() {
+  // Força o envio do estado completo (config + todas as colunas) — repara o banco
+  forceFullSync() {
     if(!this._userId || !_supabase) return;
     this.seedConfigCache();
-    ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'].forEach(k => this._pendingFields.add(k));
+    Object.keys(this.keyToColumn).forEach(k => {
+      try { if(localStorage.getItem(k) !== null) this._pendingFields.add(k); } catch(e){}
+    });
     this._flushSync();
   },
 
@@ -1938,7 +1940,7 @@ const _supaSync = {
         return false;
       }
 
-      // Populam localStorage com dados do Supabase
+      // Populam localStorage com dados do Supabase (mesclagem: local não-vazio vence sobre remoto degradado)
       const columnToKey = {};
       Object.entries(this.keyToColumn).forEach(([k, col]) => {
         if(!columnToKey[col]) columnToKey[col] = [];
@@ -1946,23 +1948,64 @@ const _supaSync = {
       });
 
     const configFields = ['merenda_cardapio','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
+    const _PD_PADRAO_IDS = ['per_1','per_2','per_3','per_4','per_5'];
+    const _localVazio = v => v === null || v === undefined || v === '' || v === '{}' || v === '[]';
+    const _localPeriodicidadesPadrao = () => {
+      try {
+        const raw = localStorage.getItem('merenda_periodicidades');
+        if(!raw || raw === 'null') return true;
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr) || arr.length === 0) return true;
+        return arr.every(p => _PD_PADRAO_IDS.includes(p.id));
+      } catch(e){ return true; }
+    };
+    const _localIngPerTudoUm = () => {
+      try {
+        const raw = localStorage.getItem('merenda_ing_periodicidade');
+        if(!raw || raw === 'null' || raw === '{}') return true;
+        const obj = JSON.parse(raw);
+        return Object.keys(obj).every(x => obj[x] === '1');
+      } catch(e){ return true; }
+    };
 
       Object.entries(data).forEach(([col, val]) => {
         if(col === 'user_id' || col === 'updated_at' || val === null) return;
         if(col === 'config' && typeof val === 'object') {
-          // Restaurar campos de config individuais
+          // Restaurar campos de config individuais (local não-vazio vence)
           Object.entries(val).forEach(([k, v]) => {
             if(v === null || v === undefined) return;
-            localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+            const novo = typeof v === 'string' ? v : JSON.stringify(v);
+            const atual = localStorage.getItem(k);
+            if(k === 'merenda_fornecedores'){
+              let usarRemoto = _localVazio(atual);
+              if(!usarRemoto){
+                try {
+                  const rem = JSON.parse(novo), loc = JSON.parse(atual);
+                  usarRemoto = Array.isArray(rem) && Array.isArray(loc) && rem.length > loc.length;
+                } catch(e){}
+              }
+              if(usarRemoto) localStorage.setItem(k, novo);
+              return;
+            }
+            if(_localVazio(atual)) localStorage.setItem(k, novo);
           });
           return;
         }
         const keys = columnToKey[col];
         if(keys) {
           keys.forEach(k => {
-            if(!configFields.includes(k)) {
-              localStorage.setItem(k, typeof val === 'string' ? val : JSON.stringify(val));
+            if(configFields.includes(k)) return;
+            const novo = typeof val === 'string' ? val : JSON.stringify(val);
+            const atual = localStorage.getItem(k);
+            if(k === 'merenda_periodicidades'){
+              if(_localPeriodicidadesPadrao()) localStorage.setItem(k, novo);
+              return;
             }
+            if(k === 'merenda_ing_periodicidade'){
+              if(_localIngPerTudoUm()) localStorage.setItem(k, novo);
+              return;
+            }
+            localStorage.setItem(k, novo);
           });
         }
       });
@@ -2344,7 +2387,7 @@ async function verificarCallbackGoogle(){
   } else {
     if(!_isPerfilFixo && !temDadosLocais && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
     try { await _supaSync.loadFromSupabase(user.id); } catch(e) { console.warn('Sync load error:', e); }
-    setTimeout(() => { try { _supaSync.forceConfigSync(); } catch(e){} }, 3000);
+    setTimeout(() => { try { _supaSync.forceFullSync(); } catch(e){} }, 3000);
   }
   recarregarDados();
   // Esconde tela de login, mostra app
@@ -2600,7 +2643,7 @@ async function fazerLogin(){
       if(!_isPerfilFixo && !temDadosLocais && window._origLS) _chavesPrefixadas.forEach(k => window._origLS.removeItem(prefix + k));
       try { await _supaSync.loadFromSupabase(res.user.id); } catch(e) { console.warn('Sync load error:', e); }
       // Reenvia o bundle de config completo (repara banco degradado)
-      setTimeout(() => { try { _supaSync.forceConfigSync(); } catch(e){} }, 3000);
+      setTimeout(() => { try { _supaSync.forceFullSync(); } catch(e){} }, 3000);
     }
     _step = 'recarregarDados';
     recarregarDados();
@@ -2752,7 +2795,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }
       } catch(e) { console.warn('Sync on resume failed:', e); }
       // Reenvia o bundle de config completo a cada visita (repara banco degradado)
-      setTimeout(() => { try { _supaSync.forceConfigSync(); } catch(e){} }, 3000);
+      setTimeout(() => { try { _supaSync.forceFullSync(); } catch(e){} }, 3000);
     }
     setTimeout(verificarOnboarding, 200);
   })();
