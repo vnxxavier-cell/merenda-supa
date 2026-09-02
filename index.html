@@ -1948,45 +1948,24 @@ const _supaSync = {
       });
 
     const configFields = ['merenda_cardapio','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
-    const _PD_PADRAO_IDS = ['per_1','per_2','per_3','per_4','per_5'];
     const _localVazio = v => v === null || v === undefined || v === '' || v === '{}' || v === '[]';
-    const _localPeriodicidadesPadrao = () => {
-      try {
-        const raw = localStorage.getItem('merenda_periodicidades');
-        if(!raw || raw === 'null') return true;
-        const arr = JSON.parse(raw);
-        if(!Array.isArray(arr) || arr.length === 0) return true;
-        return arr.every(p => _PD_PADRAO_IDS.includes(p.id));
-      } catch(e){ return true; }
-    };
-    const _localIngPerTudoUm = () => {
-      try {
-        const raw = localStorage.getItem('merenda_ing_periodicidade');
-        if(!raw || raw === 'null' || raw === '{}') return true;
-        const obj = JSON.parse(raw);
-        return Object.keys(obj).every(x => obj[x] === '1');
-      } catch(e){ return true; }
-    };
+    const _temMarcador = m => localStorage.getItem(m) === '1';
+    const _marcadorDe = k => k === 'merenda_fornecedores' ? 'merenda_fornecedores_user'
+      : k === 'merenda_ing_fornecedores' ? 'merenda_ing_fornecedores_user'
+      : k === 'merenda_periodicidades' ? 'merenda_periodicidades_user'
+      : k === 'merenda_ing_periodicidade' ? 'merenda_ing_periodicidade_user' : null;
 
       Object.entries(data).forEach(([col, val]) => {
         if(col === 'user_id' || col === 'updated_at' || val === null) return;
         if(col === 'config' && typeof val === 'object') {
-          // Restaurar campos de config individuais (local não-vazio vence)
+          // Restaurar campos de config individuais
           Object.entries(val).forEach(([k, v]) => {
             if(v === null || v === undefined) return;
             const novo = typeof v === 'string' ? v : JSON.stringify(v);
             const atual = localStorage.getItem(k);
-            if(k === 'merenda_fornecedores'){
-              let usarRemoto = _localVazio(atual);
-              if(!usarRemoto){
-                try {
-                  const rem = JSON.parse(novo), loc = JSON.parse(atual);
-                  usarRemoto = Array.isArray(rem) && Array.isArray(loc) && rem.length > loc.length;
-                } catch(e){}
-              }
-              if(usarRemoto) localStorage.setItem(k, novo);
-              return;
-            }
+            const marcador = _marcadorDe(k);
+            if(marcador && _temMarcador(marcador)) return; // usuário configurou aqui: local vence sempre
+            if(marcador){ localStorage.setItem(k, novo); return; } // sem marcador: remoto vence
             if(_localVazio(atual)) localStorage.setItem(k, novo);
           });
           return;
@@ -1996,13 +1975,10 @@ const _supaSync = {
           keys.forEach(k => {
             if(configFields.includes(k)) return;
             const novo = typeof val === 'string' ? val : JSON.stringify(val);
-            const atual = localStorage.getItem(k);
-            if(k === 'merenda_periodicidades'){
-              if(_localPeriodicidadesPadrao()) localStorage.setItem(k, novo);
-              return;
-            }
-            if(k === 'merenda_ing_periodicidade'){
-              if(_localIngPerTudoUm()) localStorage.setItem(k, novo);
+            const marcador = _marcadorDe(k);
+            if(marcador){
+              if(_temMarcador(marcador)) return; // local vence sempre
+              localStorage.setItem(k, novo);
               return;
             }
             localStorage.setItem(k, novo);
@@ -2441,7 +2417,7 @@ function recarregarDados(){
     Object.keys(DADOS.ingredientes).forEach(k => {
       if(!ING_PERIODICIDADE[k]){ ING_PERIODICIDADE[k] = '1'; _perMudou = true; }
     });
-    if(_perMudou) salvarIngPeriodicidade();
+    if(_perMudou){ _ingPerAutoDefault = true; salvarIngPeriodicidade(); _ingPerAutoDefault = false; }
   }
   Object.keys(DADOS.ingredientes).forEach(k => { if(ESTOQUE[k] === undefined) ESTOQUE[k] = 0; });
   // Aplicar unidades customizadas
@@ -3569,8 +3545,8 @@ var _mercMesAtual = 0; // 0=Fev ... 10=Dez
 var _mercInicializado = false;
 var _mercMostrarPreco = false;
 var _mercDescontarEstoque = true;
-function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); autoAssociarFornecedorUnico(); }
-function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); }
+function salvarFornecedoresCadastro(){ localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO)); localStorage.setItem('merenda_fornecedores_user','1'); autoAssociarFornecedorUnico(); }
+function salvarIngFornecedores(){ localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES)); localStorage.setItem('merenda_ing_fornecedores_user','1'); }
 
 // Se houver apenas UM fornecedor cadastrado, associa todos os ingredientes a ele automaticamente
 function autoAssociarFornecedorUnico(){
@@ -3582,8 +3558,9 @@ function autoAssociarFornecedorUnico(){
   });
   if(mudou) salvarIngFornecedores();
 }
-function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); }
-function salvarIngPeriodicidade(){ localStorage.setItem('merenda_ing_periodicidade', JSON.stringify(ING_PERIODICIDADE)); }
+var _ingPerAutoDefault = false;
+function salvarPeriodicidades(){ localStorage.setItem('merenda_periodicidades', JSON.stringify(PERIODICIDADES)); localStorage.setItem('merenda_periodicidades_user','1'); }
+function salvarIngPeriodicidade(){ localStorage.setItem('merenda_ing_periodicidade', JSON.stringify(ING_PERIODICIDADE)); if(!_ingPerAutoDefault) localStorage.setItem('merenda_ing_periodicidade_user','1'); }
 function setIngPeriodicidade(nome, valor){
   if(valor) ING_PERIODICIDADE[nome] = valor;
   else delete ING_PERIODICIDADE[nome];
