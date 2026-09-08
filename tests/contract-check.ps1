@@ -10,6 +10,7 @@ $requiredFiles = @(
   'supabase/migrations/20260903000300_domain_foundation.sql',
   'supabase/migrations/20260903000400_server_first_foundation.sql',
   'supabase/migrations/20260903000500_admin_import_and_integrity.sql',
+  'supabase/migrations/20260903000600_legacy_domain_import.sql',
   'supabase/migrations/20260903990000_auth_rls_cutover.sql',
   'supabase/functions/legacy-login/index.ts',
   'supabase/functions/claim-google-login/index.ts',
@@ -51,6 +52,7 @@ $requiredSqlFunctions = @(
   'edge_admin_google_request_approve',
   'edge_admin_google_request_reject',
   'edge_frontend_v2_verify',
+  'admin_import_legacy_domain',
   'edge_auth_cutover_readiness',
   'edge_auth_cutover_approve'
 )
