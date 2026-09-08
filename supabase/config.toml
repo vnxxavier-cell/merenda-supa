@@ -1,0 +1,18 @@
+project_id = "gphckdoikdfsezqpqglz"
+
+# Edge Functions are deployed separately from the static Vercel site.
+# The legacy-login function must accept an unauthenticated username/password
+# request; it performs its own server-side verification before creating a
+# Supabase Auth session. Every other function validates a bearer token itself.
+
+[functions.legacy-login]
+verify_jwt = false
+
+[functions.claim-google-login]
+verify_jwt = false
+
+[functions.session-status]
+verify_jwt = false
+
+[functions.admin-users]
+verify_jwt = false
