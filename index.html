@@ -747,6 +747,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div style="font-weight:700;color:#92400e;font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Você está usando a configuração de demonstração</div>
     <div style="font-size:12px;color:#78350f">Os dados exibidos são exemplos. Substitua pelas informações reais da sua escola antes de usar o sistema de verdade.</div>
   </div>
+  <button class="btn btn-sm" style="background:#fff;color:#92400e;border:1.5px solid #f59e0b;white-space:nowrap" onclick="fecharBannerDemo()">✕ Entendi</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -10084,6 +10085,13 @@ function atualizarBannerDemo(){
   if(!banner) return;
   const ativo = !!localStorage.getItem('merenda_usando_demo');
   banner.style.display = ativo ? 'flex' : 'none';
+}
+
+function fecharBannerDemo(){
+  // Remove a marcação de demonstração apenas do perfil logado. Os dados
+  // continuam intactos; nada é apagado.
+  localStorage.removeItem('merenda_usando_demo');
+  atualizarBannerDemo();
 }
 
 
