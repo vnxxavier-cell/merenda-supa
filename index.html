@@ -3072,29 +3072,18 @@ function fecharAprovacaoGoogle(){
 }
 
 function abrirNovoUsuario(){
-  const novoId = gerarId('usr');
-  _usuarioEditandoId = novoId;
+  // Nada é criado/salvo enquanto o modal estiver aberto: o usuário só passa a
+  // existir quando "Salvar" é clicado com os dados válidos.
+  _usuarioEditandoId = null;
+  clearTimeout(_salvarUsuarioTimer);
   document.getElementById('usuario-modal-titulo').textContent = 'Novo Usuário';
-  document.getElementById('usuario-id').value = novoId;
+  document.getElementById('usuario-id').value = '';
   document.getElementById('usuario-nome').value = '';
   document.getElementById('usuario-login').value = '';
   document.getElementById('usuario-senha').value = '';
   document.getElementById('usuario-expiracao').value = '';
   document.getElementById('usuario-ativo').checked = true;
   document.getElementById('senha-hint').textContent = '(obrigatória)';
-  USUARIOS.push({
-    id: novoId,
-    nome: '',
-    login: '',
-    senha_hash: '',
-    role: 'escola',
-    data_expiracao: null,
-    data_criacao: new Date().toISOString().split('T')[0],
-    ativo: true,
-    renovacao_solicitada: false,
-    nova_conta: true
-  });
-  salvarUsuarios();
   document.getElementById('overlay-usuario').classList.add('aberto');
 }
 
@@ -3159,20 +3148,25 @@ async function salvarUsuarioForm(){
   const senha = document.getElementById('usuario-senha').value;
   const exp   = document.getElementById('usuario-expiracao').value;
   const ativo = document.getElementById('usuario-ativo').checked;
+  const editando = !!_usuarioEditandoId;
   if(!nome)  { alert('Informe o nome da escola.'); return; }
   if(!login) { alert('Informe o login.'); return; }
-  if(!_usuarioEditandoId && !senha){ alert('Informe a senha inicial.'); return; }
-  // Verifica login duplicado
-  const duplicado = USUARIOS.find(u => u.login === login && u.id !== _usuarioEditandoId);
+  if(['eliazar','admin'].includes(login.toLowerCase())){ alert('Este login é reservado do sistema. Escolha outro.'); return; }
+  if(!editando && !senha){ alert('Informe a senha inicial do usuário.'); return; }
+  if(senha && senha.length < 6){ alert('A senha deve ter ao menos 6 caracteres.'); return; }
+  // Verifica login duplicado (ignora diferença de maiúsculas/minúsculas)
+  const duplicado = USUARIOS.find(u => u.login && u.login.toLowerCase() === login.toLowerCase() && u.id !== _usuarioEditandoId);
   if(duplicado){ alert('Já existe um usuário com este login.'); return; }
 
-  if(_usuarioEditandoId){
+  if(editando){
     const user = USUARIOS.find(u => u.id === _usuarioEditandoId);
+    if(!user){ alert('Usuário não encontrado. Feche e abra o painel novamente.'); return; }
     user.nome  = nome;
     user.login = login;
     user.data_expiracao = exp || null;
     user.ativo = ativo;
     if(senha) user.senha_hash = await hashSenha(senha);
+    if(!user.senha_hash){ alert('Este usuário ainda não tem senha. Informe uma senha antes de salvar.'); return; }
   } else {
     USUARIOS.push({
       id: gerarId('usr'),
@@ -3191,6 +3185,7 @@ async function salvarUsuarioForm(){
   fecharOverlayUsuario();
   renderAdmin();
   atualizarBadgeAdmin();
+  alert(editando ? '✅ Usuário atualizado com sucesso.' : '✅ Usuário criado com sucesso.');
 }
 
 async function excluirUsuario(id){
