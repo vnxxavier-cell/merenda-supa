@@ -271,11 +271,6 @@ tbody tr:hover td{background:#f0f5fc}
   .nav-bottom{padding:12px 16px}
   .btn-logout{width:100%;margin-bottom:6px}
 
-  /* Banner demo */
-  #banner-demo{flex-direction:column;align-items:flex-start;margin:14px 14px 0 14px}
-  #banner-demo > div:last-child{width:100%}
-  #banner-demo button{width:100%;text-align:center}
-
   /* Onboarding modal */
 
   /* Títulos */
@@ -740,15 +735,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 </nav>
 
 <div class="main-content">
-
-<!-- Banner demo — aparece em todas as abas quando modo demo está ativo -->
-<div id="banner-demo" style="display:none;background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;padding:14px 18px;margin:24px 40px 0 40px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-  <div>
-    <div style="font-weight:700;color:#92400e;font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Você está usando a configuração de demonstração</div>
-    <div style="font-size:12px;color:#78350f">Os dados exibidos são exemplos. Substitua pelas informações reais da sua escola antes de usar o sistema de verdade.</div>
-  </div>
-  <button class="btn btn-sm" style="background:#fff;color:#92400e;border:1.5px solid #f59e0b;white-space:nowrap" onclick="fecharBannerDemo()">✕ Entendi</button>
-</div>
 
 <!-- ══════════════════════════════════════════════════════
      CABEÇALHO DE IMPRESSÃO (aparece apenas ao imprimir)
@@ -2408,7 +2394,7 @@ async function verificarCallbackGoogle(){
   if(app2) app2.style.display = '';
   const nav2 = document.getElementById('nav');
   if(nav2) nav2.style.display = '';
-  ir('compras', null);
+  irListaCompras();
 }
 
 function recarregarDados(){
@@ -2668,6 +2654,8 @@ async function fazerLogin(){
     carregarConfig();
     _step = 'initTabAtiva';
     initTabAtiva();
+    _step = 'listaCompras';
+    irListaCompras();
     _step = 'alertaExpiracao';
     renderAlertaExpiracao();
   } catch(e){
@@ -3276,125 +3264,6 @@ function ir2(id){
   if(tab) tab.click();
 }
 
-function carregarDemostracao(){
-  // 1. Níveis de ensino com alunos de exemplo
-  NIVEIS_CONFIG = [
-    { id: 'f1',    alunos: 120, ativo: true  },
-    { id: 'f2',    alunos: 200, ativo: true  },
-    { id: 'medio', alunos: 80,  ativo: false },
-    { id: 'eja',   alunos: 0,   ativo: false },
-  ];
-  localStorage.setItem('merenda_niveis', JSON.stringify(NIVEIS_CONFIG));
-
-  // 2. Preços de exemplo para todos os ingredientes cadastrados
-  const precos = JSON.parse(localStorage.getItem('merenda_precos') || '{}');
-  const precosDemo = {
-    'Arroz': 4.50, 'Feijão': 9.00, 'Macarrão': 5.50, 'Farinha de mandioca': 4.00,
-    'Carne bovina': 32.00, 'Frango': 18.00, 'Peixe': 22.00, 'Ovo': 0.75,
-    'Tomate': 6.00, 'Cebola': 4.50, 'Alho': 25.00, 'Batata': 5.00,
-    'Cenoura': 4.00, 'Abobrinha': 5.50, 'Couve': 4.00, 'Repolho': 3.50,
-    'Óleo': 8.00, 'Sal': 2.50, 'Açúcar': 4.50, 'Tempero': 12.00,
-    'Leite': 4.80, 'Queijo': 45.00, 'Margarina': 12.00,
-  };
-  // Aplica preço demo para ingredientes sem preço definido
-  Object.keys(DADOS.ingredientes).forEach(nome => {
-    if(precos[nome] === undefined){
-      // Tenta match pelo nome demo ou usa preço base por categoria
-      const match = Object.entries(precosDemo).find(([k]) => nome.toLowerCase().includes(k.toLowerCase()));
-      precos[nome] = match ? match[1] : (isAF(nome) ? 7.00 : 5.00);
-    }
-  });
-  localStorage.setItem('merenda_precos', JSON.stringify(precos));
-
-  // 3. Calendário escolar de exemplo (ano atual)
-  const ano = new Date().getFullYear();
-  const calDemo = {
-    inicio: `${ano}-02-03`,
-    fim: `${ano}-12-19`,
-    feriados: [
-      `${ano}-04-18`, `${ano}-04-21`, `${ano}-05-01`,
-      `${ano}-06-19`, `${ano}-09-07`, `${ano}-10-12`,
-      `${ano}-11-02`, `${ano}-11-15`, `${ano}-12-08`
-    ],
-    sabados: []
-  };
-  CAL_CONFIG.inicio   = calDemo.inicio;
-  CAL_CONFIG.fim      = calDemo.fim;
-  CAL_CONFIG.feriados = calDemo.feriados;
-  CAL_CONFIG.sabados  = calDemo.sabados;
-  localStorage.setItem('merenda_cal_config', JSON.stringify(calDemo));
-
-  // 4. Ciclos e distribuição do cardápio no ano todo
-  // Recalcula dias letivos com o calendário demo antes de distribuir
-  const novosDias = getSchoolDays();
-  DIAS_LETIVOS_ARRAY.length = 0;
-  novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
-
-  // Pega os primeiros pratos disponíveis para montar ciclos de 5 pratos cada
-  const todosPratos = Object.keys(DADOS.ficha);
-  const ciclosDemo = {
-    'Ciclo 1': todosPratos.slice(0,  5),
-    'Ciclo 2': todosPratos.slice(5,  10),
-    'Ciclo 3': todosPratos.slice(10, 15),
-    'Ciclo 4': todosPratos.slice(15, 20),
-  };
-  // Garante que ciclos com menos pratos usem o que tiver
-  Object.keys(ciclosDemo).forEach(c => {
-    if(ciclosDemo[c].length === 0) ciclosDemo[c] = todosPratos.slice(0, 5);
-  });
-  CICLOS_PLANOS = { ...ciclosDemo };
-  localStorage.setItem('merenda_ciclos_planos', JSON.stringify(CICLOS_PLANOS));
-
-  // Distribui pratos por todo o ano letivo em rotação (igual a distribuirTodoOAno)
-  if(DIAS_LETIVOS_ARRAY.length){
-    const totalCalWeeks = getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1;
-    // Monta lista plana de todos os pratos dos 4 ciclos em ordem
-    const pratosAno = [
-      ...ciclosDemo['Ciclo 1'],
-      ...ciclosDemo['Ciclo 2'],
-      ...ciclosDemo['Ciclo 3'],
-      ...ciclosDemo['Ciclo 4'],
-    ];
-    let pratoIdx = 0;
-    for(let wi = 0; wi < totalCalWeeks; wi++){
-      const mesIdx  = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
-      const sIdx    = wi % 4;
-      const mesNome = MESES_NOMES[mesIdx];
-      if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
-      if(!DADOS.cardapio[mesNome][sIdx])
-        DADOS.cardapio[mesNome][sIdx] = { dias: ['','','','',''] };
-      for(let dow = 0; dow < 5; dow++){
-        DADOS.cardapio[mesNome][sIdx].dias[dow] = pratosAno[pratoIdx % pratosAno.length];
-        pratoIdx++;
-      }
-    }
-    localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
-  }
-
-  // 5. Fornecedores fictícios de exemplo
-  FORNECEDORES_CADASTRO = [
-    { id: 'forn_demo1', nome: 'Distribuidora Central Alimentos', cor: '#c7d2fe' },
-    { id: 'forn_demo2', nome: 'Cooperativa Vale Verde',          cor: '#a7f3d0' },
-    { id: 'forn_demo3', nome: 'Mercado Bom Preço',               cor: '#fed7aa' },
-  ];
-  localStorage.setItem('merenda_fornecedores', JSON.stringify(FORNECEDORES_CADASTRO));
-
-  // 6. Associa ingredientes aos fornecedores em rodízio proporcional (1/3 cada)
-  const _fornIds = ['forn_demo1','forn_demo2','forn_demo3'];
-  ING_FORNECEDORES = {};
-  Object.keys(DADOS.ingredientes).sort().forEach((nome, i) => {
-    ING_FORNECEDORES[nome] = _fornIds[i % 3];
-  });
-  localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(ING_FORNECEDORES));
-
-  localStorage.setItem('merenda_usando_demo', '1');
-
-  recarregarDados();
-  init();
-  gerarSeletoresPratos();
-  carregarConfig();
-  alert('✅ Configuração de demonstração carregada!\n\nCardápio distribuído para o ano todo com 4 ciclos de 5 pratos cada.\nVocê pode ajustar nas abas correspondentes a qualquer momento.');
-}
 
 function aprovarRenovacao(id){
   const user = USUARIOS.find(u => u.id === id);
@@ -9998,9 +9867,8 @@ function salvarConfig(){
   localStorage.setItem('merenda_cargo', cargo);
   localStorage.setItem('merenda_escola', escola);
   localStorage.setItem('merenda_subtitulo', subtitulo);
-  // Usuário configurou dados reais — remove flag de demonstração
+  // Limpa qualquer marcação antiga de demonstração que ainda exista no perfil
   localStorage.removeItem('merenda_usando_demo');
-  atualizarBannerDemo();
   atualizarPreviews();
   mostrarSalvo();
 }
@@ -10080,23 +9948,7 @@ function atualizarPreviews(){
   });
 }
 
-function atualizarBannerDemo(){
-  const banner = document.getElementById('banner-demo');
-  if(!banner) return;
-  const ativo = !!localStorage.getItem('merenda_usando_demo');
-  banner.style.display = ativo ? 'flex' : 'none';
-}
-
-function fecharBannerDemo(){
-  // Remove a marcação de demonstração apenas do perfil logado. Os dados
-  // continuam intactos; nada é apagado.
-  localStorage.removeItem('merenda_usando_demo');
-  atualizarBannerDemo();
-}
-
-
 function carregarConfig(){
-  atualizarBannerDemo();
   const diretor = localStorage.getItem('merenda_diretor') || '';
   const cargo = localStorage.getItem('merenda_cargo') || 'Diretor(a) Escolar';
   const escola = localStorage.getItem('merenda_escola') || '';
@@ -10116,6 +9968,12 @@ function carregarConfig(){
   const st = document.getElementById('periodo-status');
   if(st && DIAS_LETIVOS_ARRAY.length)
     st.innerHTML = `${ico('check',12)} ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados`;
+}
+
+function irListaCompras(){
+  // Após login (novo ou retomado), o usuário sempre cai na Lista de Compras.
+  const tab = document.querySelector('.nav-tab[onclick*="mercado"]');
+  ir('mercado', tab);
 }
 
 function ir(id, btn){
@@ -10755,6 +10613,7 @@ if(!window._AUTH_BLOCKED){
   gerarSeletoresPratos();
   carregarConfig();
   initTabAtiva();
+  irListaCompras();
 }
 
 // ── Ajuda por aba ──────────────────────────────────────────
