@@ -39,12 +39,14 @@ nav{background:var(--nav-bg);width:220px;min-width:220px;display:flex;flex-direc
 .nav-tab svg{flex-shrink:0;opacity:.7;transition:.2s;width:18px;height:18px}
 .nav-tab:hover svg,.nav-tab.ativo svg{opacity:1}
 
-/* Sub-tabs (usadas em Quantidades por Turno) */
-.sub-tab{transition:.15s;padding:8px 18px;border:1.5px solid transparent;border-radius:999px;background:#f1f5f9;color:var(--txt2);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-.sub-tab.ativo{background:var(--azul);color:#fff;border-color:var(--azul);font-weight:700}
-.sub-tab:hover{background:#e2e8f0;color:var(--azul)}
-.sub-tab.ativo:hover{background:var(--azul);color:#fff}
-.sub-tab-bar{display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--borda);padding-bottom:12px}
+/* Sub-tabs (usadas em Quantidades por Turno) — estilo de abas de navegador */
+.sub-tab{transition:.15s;padding:9px 22px;border:1px solid var(--borda);border-bottom:none;border-radius:10px 10px 0 0;background:#e2e8f0;color:#64748b;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:-1px;position:relative}
+.sub-tab.ativo{background:#fff;color:var(--azul);font-weight:700;z-index:2}
+.sub-tab:hover{background:#cbd5e1;color:#334155}
+.sub-tab.ativo:hover{background:#fff;color:var(--azul)}
+.sub-tab-bar{display:flex;align-items:flex-end;gap:6px;padding:0 6px;margin-bottom:0;border-bottom:1px solid var(--borda)}
+/* A "folha" ativa cola no painel branco logo abaixo, como um arquivo físico */
+#pg-preparo .sub-tab-bar + div > .seletor-bar{margin-top:-1px;border-radius:0 12px 12px 12px}
 
 /* ── PÁGINAS ── */
 .main-content{flex:1;min-width:0;overflow-y:auto;margin-left:220px;height:100vh}
