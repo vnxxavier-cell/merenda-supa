@@ -4164,16 +4164,19 @@ function renderEstoqueLotes(){
       const cell = cells[ing][iso];
       const cc = cell || {cov:0, pend:0, man:0, rem:0, fontes:[], jan:false, snap:0};
       const st = _matrizStatusCell(cc, dem);
+      // Quadrado arredondado com espaço sutil entre as células (tile)
+      const tile = (inner, bg, bd, txt, titulo) =>
+        `<td title="${esc(titulo || '')}" style="border:0;background:transparent;min-width:56px;text-align:center;padding:0${divB}"><div style="margin:2px;border-radius:9px;border:1px solid ${bd};background:${bg};color:${txt};text-align:right;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-height:22px;box-sizing:border-box;white-space:nowrap">${inner}</div></td>`;
       // Demanda fora da janela de qualquer lote → célula em branco (semana a semana)
       if(st === 'sem' && !cc.jan){
-        return `<td title="${esc('Demanda fora do período do lote — registre nova ordem para esta semana')}" style="border:1px solid #CBD5E1;background:#fbfcfd;min-width:56px${divB}"></td>`;
+        return tile('', '#fbfcfd', '#CBD5E1', '#334155', 'Demanda fora do período do lote — registre nova ordem para esta semana');
       }
       if(!st){
         const b = diaBanda[iso];
         if(cc.jan && b){
-          return `<td title="${esc('Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''))}" style="border:1px solid #CBD5E1;background:${MATRIZ_SEM_DEMANDA_COR};min-width:56px${divB}"></td>`;
+          return tile('', MATRIZ_SEM_DEMANDA_COR, '#CBD5E1', '#334155', 'Período do lote ' + (b.ciclo||'') + ' — ' + (b.semana||''));
         }
-        return `<td style="border:1px solid #CBD5E1;background:#fbfcfd;min-width:56px${divB}"></td>`;
+        return tile('', '#fbfcfd', '#CBD5E1', '#334155', '');
       }
       if(_matrizFiltroStatus[st]) any = true;
       const val = (st === 'manual' && dem <= 0) ? (cc.man || 0) : dem;
@@ -4200,7 +4203,7 @@ function renderEstoqueLotes(){
       const dots = cores.length
         ? `<div style="display:flex;gap:1px;margin-top:2px;justify-content:center">${cores.map(c => `<span style="width:5px;height:5px;border-radius:50%;background:${c}"></span>`).join('')}</div>`
         : '';
-      return `<td title="${esc(_matrizTooltip(ing, iso, cc, dem))}" style="border:1px solid ${bd};background:${bg};color:${txt};text-align:right;padding:2px 4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;min-width:56px;white-space:nowrap${divB}">${_matrizFmtNum(val)}${dots}</td>`;
+      return tile(_matrizFmtNum(val) + dots, bg, bd, txt, _matrizTooltip(ing, iso, cc, dem));
     }).join('');
     if(!any) return null;
     // Saldo Estoque: total dos lotes − consumo dos dias já passados (comportamento original)
