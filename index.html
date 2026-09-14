@@ -1848,6 +1848,7 @@ const _supaSync = {
     'merenda_subtitulo': 'config',
     'merenda_fornecedores': 'config',
     'merenda_ing_fornecedores': 'config',
+    'merenda_fichas_custom': 'config',
     'merenda_previas_contrato': 'previas_contrato',
     'merenda_estoque_correcoes': 'estoque_correcoes',
     'merenda_periodicidades': 'periodicidades',
@@ -1871,7 +1872,7 @@ const _supaSync = {
 
   // Semeia o cache de config a partir do estado local completo
   seedConfigCache() {
-    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
+    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom'];
     const cache = {};
     configFields.forEach(k => {
       const val = localStorage.getItem(k);
@@ -1885,7 +1886,7 @@ const _supaSync = {
   async _flushSync() {
     if(!this._userId || !_supabase || this._pendingFields.size === 0) return;
     const updates = {};
-    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
+    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom'];
 
     // Coletar 'config' como um bundle completo (sempre relê o estado local para nunca sobrescrever parcialmente)
     const hasConfig = [...this._pendingFields].some(k => configFields.includes(k));
@@ -1963,7 +1964,7 @@ const _supaSync = {
         columnToKey[col].push(k);
       });
 
-    const configFields = ['merenda_cardapio','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores'];
+    const configFields = ['merenda_cardapio','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom'];
     const _localVazio = v => v === null || v === undefined || v === '' || v === '{}' || v === '[]';
     const _temMarcador = m => localStorage.getItem(m) === '1';
     const _marcadorDe = k => k === 'merenda_fornecedores' ? 'merenda_fornecedores_user'
@@ -2055,23 +2056,6 @@ const _supaSync = {
     } catch(e) { console.warn('loadUsuarios failed:', e.message); return null; }
   },
 
-  // Salva fichas custom (compartilhadas)
-  async saveFichasCustom(fichas) {
-    if(!_supabase) return;
-    try {
-      await _supabase.from('fichas_custom').upsert({ id: 1, dados: fichas }, { onConflict: 'id' });
-    } catch(e) { console.warn('saveFichasCustom error:', e.message); }
-  },
-
-  // Carrega fichas custom
-  async loadFichasCustom() {
-    if(!_supabase) return null;
-    try {
-      const { data, error } = await _supabase.from('fichas_custom').select('dados').eq('id', 1).single();
-      if(error || !data) return null;
-      return data.dados;
-    } catch(e) { return null; }
-  }
 };
 
 // ══════════════════════════════════════════════════════
@@ -2097,6 +2081,7 @@ window._SESSAO = null;
     window._SESSAO = sess;
     window._AUTH_BLOCKED = false;
     setupStorageProxy(sess.user_id);
+    migrarDadosLocais(sess.user_id);
   } catch(e){ console.error('Auth error:', e); }
 })();
 
@@ -2174,7 +2159,7 @@ function setupStorageProxy(userId){
     delete window._origLS;
     delete window._USER_PREFIX;
   }
-  const SHARED = new Set(['merenda_usuarios','merenda_fichas_custom']);
+  const SHARED = new Set(['merenda_usuarios']);
   window._origLS = {
     getItem:    localStorage.getItem.bind(localStorage),
     setItem:    localStorage.setItem.bind(localStorage),
@@ -2347,7 +2332,7 @@ async function verificarCallbackGoogle(){
     'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
     'merenda_subtitulo','merenda_embalagens',
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
-    'merenda_fornecedores','merenda_ing_fornecedores',
+    'merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom',
     'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
     'merenda_periodicidades','merenda_ing_periodicidade','merenda_onboarding_visto','merenda_servidores_config'
   ];
@@ -2365,7 +2350,7 @@ async function verificarCallbackGoogle(){
     const _defNiveis = [{id:'f1',alunos:0,ativo:false},{id:'f2',alunos:0,ativo:false},{id:'medio',alunos:0,ativo:false},{id:'eja',alunos:0,ativo:false}];
     const _defServ  = {ativo:false,cafe_kg:0,acucar_kg:0,qtd_servidores:0,cafe_g_por_serv:16.5,acucar_g_por_serv:45,func_nivel:{},func_total:0};
     const _defCal   = {inicio:'',fim:'',feriados:[],recesso:[],sabados:[]};
-    const _defCfg   = {merenda_cardapio:{},merenda_diretor:'',merenda_cargo:'Diretor(a) Escolar',merenda_escola:'',merenda_subtitulo:'',merenda_fornecedores:[],merenda_ing_fornecedores:{}};
+    const _defCfg   = {merenda_cardapio:{},merenda_diretor:'',merenda_cargo:'Diretor(a) Escolar',merenda_escola:'',merenda_subtitulo:'',merenda_fornecedores:[],merenda_ing_fornecedores:{},merenda_fichas_custom:{}};
     localStorage.removeItem('merenda_header_img');
     localStorage.setItem('merenda_niveis', JSON.stringify(_defNiveis));
     localStorage.setItem('merenda_fornecedores', '[]');
@@ -2374,6 +2359,7 @@ async function verificarCallbackGoogle(){
     localStorage.setItem('merenda_servidores_config', JSON.stringify(_defServ));
     localStorage.setItem('merenda_cal_config', JSON.stringify(_defCal));
     localStorage.setItem('merenda_cardapio', JSON.stringify({}));
+    localStorage.setItem('merenda_fichas_custom', '{}');
     localStorage.setItem('merenda_precos', '{}');
     localStorage.setItem('merenda_embalagens', '{}');
     localStorage.setItem('merenda_ciclos_planos', '{}');
@@ -2535,17 +2521,21 @@ function migrarDadosLocais(userId){
     'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
     'merenda_subtitulo','merenda_embalagens',
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
-    'merenda_fornecedores','merenda_ing_fornecedores'
+    'merenda_fornecedores','merenda_ing_fornecedores',
+    'merenda_fichas_custom'
   ];
   let n = 0;
+  let migrouFichas = false;
   chaves.forEach(k => {
     const semPrefix = window._origLS.getItem(k);
     const comPrefix = window._origLS.getItem(prefix + k);
     if(semPrefix !== null && comPrefix === null){
       window._origLS.setItem(prefix + k, semPrefix);
+      if(k === 'merenda_fichas_custom') migrouFichas = true;
       n++;
     }
   });
+  if(migrouFichas) _supaSync.scheduleSync('merenda_fichas_custom');
   if(n > 0) console.info(`Migração: ${n} chave(s) copiadas para o perfil do usuário`);
 }
 
@@ -2586,7 +2576,7 @@ async function fazerLogin(){
       'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
       'merenda_subtitulo','merenda_embalagens',
       'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
-      'merenda_fornecedores','merenda_ing_fornecedores',
+      'merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom',
       'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
       'merenda_periodicidades','merenda_ing_periodicidade','merenda_onboarding_visto','merenda_servidores_config'
     ];
@@ -2608,7 +2598,7 @@ async function fazerLogin(){
       const _defNiveis = [{id:'f1',alunos:0,ativo:false},{id:'f2',alunos:0,ativo:false},{id:'medio',alunos:0,ativo:false},{id:'eja',alunos:0,ativo:false}];
       const _defServ  = {ativo:false,cafe_kg:0,acucar_kg:0,qtd_servidores:0,cafe_g_por_serv:16.5,acucar_g_por_serv:45,func_nivel:{},func_total:0};
       const _defCal   = {inicio:'',fim:'',feriados:[],recesso:[],sabados:[]};
-      const _defCfg   = {merenda_cardapio:{},merenda_diretor:'',merenda_cargo:'Diretor(a) Escolar',merenda_escola:'',merenda_subtitulo:'',merenda_fornecedores:[],merenda_ing_fornecedores:{}};
+      const _defCfg   = {merenda_cardapio:{},merenda_diretor:'',merenda_cargo:'Diretor(a) Escolar',merenda_escola:'',merenda_subtitulo:'',merenda_fornecedores:[],merenda_ing_fornecedores:{},merenda_fichas_custom:{}};
       localStorage.removeItem('merenda_header_img');
       localStorage.setItem('merenda_niveis', JSON.stringify(_defNiveis));
       localStorage.setItem('merenda_fornecedores', '[]');
@@ -2617,6 +2607,7 @@ async function fazerLogin(){
       localStorage.setItem('merenda_servidores_config', JSON.stringify(_defServ));
       localStorage.setItem('merenda_cal_config', JSON.stringify(_defCal));
       localStorage.setItem('merenda_cardapio', JSON.stringify({}));
+      localStorage.setItem('merenda_fichas_custom', '{}');
       localStorage.setItem('merenda_precos', '{}');
       localStorage.setItem('merenda_embalagens', '{}');
       localStorage.setItem('merenda_ciclos_planos', '{}');
@@ -8450,7 +8441,6 @@ function removerIngDaFicha(prato, ingName){
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
   custom[prato] = DADOS.ficha[prato];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
-  _supaSync.saveFichasCustom(custom);
   document.getElementById('modal-body').innerHTML = renderFichaTable(prato);
   renderFichas();
 }
@@ -8464,7 +8454,6 @@ function restaurarIngDaFicha(prato, ingName){
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
   custom[prato] = DADOS.ficha[prato];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
-  _supaSync.saveFichasCustom(custom);
   abrirFicha(prato);
   renderFichas();
 }
@@ -8502,7 +8491,6 @@ function adicionarIngAFicha(prato){
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
   custom[prato] = DADOS.ficha[prato];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
-  _supaSync.saveFichasCustom(custom);
   abrirFicha(prato);
   renderFichas();
 }
@@ -8567,10 +8555,6 @@ function restaurarFichaOriginal(prato){
   // Restaura per capita
   delete PERCAPTA_CUSTOM[prato];
   salvarPercapta();
-  // Salva Supabase se disponível
-  if(_supabase){
-    _supaSync.saveFichasCustom(custom);
-  }
   document.getElementById('overlay').classList.remove('aberto');
   renderFichas();
   alert(`✅ Prato "${prato}" restaurado para o padrão PNAE.`);
@@ -8589,10 +8573,6 @@ function restaurarTodasFichas(){
   // Restaura per capita de todos os pratos
   PERCAPTA_CUSTOM = {};
   salvarPercapta();
-  // Salva Supabase se disponível
-  if(_supabase){
-    _supaSync.saveFichasCustom(custom);
-  }
   renderFichas();
   alert('✅ Todas as fichas técnicas foram restauradas para o padrão PNAE da secretaria.');
 }

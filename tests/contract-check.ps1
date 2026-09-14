@@ -97,6 +97,15 @@ if ($index -notmatch 'overlay-google-admin' -or $index -notmatch 'aprovarGoogleR
   throw 'index.html does not expose the admin Google approval UI or the explicit user save button.'
 }
 
+if ($index -match "const SHARED = new Set\(\[[^\]]*merenda_fichas_custom" -or
+    $index -match "from\('fichas_custom'\)") {
+  throw 'Technical sheets must not use legacy shared storage or the global fichas_custom row.'
+}
+if ($index -notmatch "'merenda_fichas_custom': 'config'" -or
+    $index -notmatch 'migrarDadosLocais\(sess\.user_id\)') {
+  throw 'Technical sheets must be isolated and synchronized per profile.'
+}
+
 $configPath = Join-Path $root 'supabase/config.toml'
 $tokens = $null
 $configParseErrors = $null
