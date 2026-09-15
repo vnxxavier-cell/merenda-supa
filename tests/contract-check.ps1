@@ -106,6 +106,12 @@ if ($index -notmatch "'merenda_fichas_custom': 'config'" -or
   throw 'Technical sheets must be isolated and synchronized per profile.'
 }
 
+if ($index -notmatch 'mostrarCadastro\(\)' -or $index -notmatch 'cadastrarUsuario\(\)' -or
+    $index -notmatch 'merenda_signup_config' -or $index -notmatch 'salvarSignupConfig\(\)' -or
+    $index -notmatch 'auto-cadastro') {
+  throw 'index.html does not expose the self-signup flow with hidden expiry and admin trial config.'
+}
+
 $configPath = Join-Path $root 'supabase/config.toml'
 $tokens = $null
 $configParseErrors = $null
