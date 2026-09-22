@@ -112,9 +112,9 @@ if ($index -notmatch 'mostrarCadastro\(\)' -or $index -notmatch 'cadastrarUsuari
   throw 'index.html does not expose the self-signup flow with hidden expiry and admin trial config.'
 }
 
-if ($index -notmatch 'pg-primeiros-passos' -or $index -notmatch 'renderPrimeirosPassos' -or
-    $index -notmatch 'merenda_ajuda_vista_') {
-  throw 'index.html does not expose the novice Primeiros passos checklist and one-time tab help.'
+if ($index -match 'pg-primeiros-passos' -or $index -match 'renderPrimeirosPassos' -or
+    $index -match 'AJUDA_ABAS' -or $index -match 'btn-ajuda-tab') {
+  throw 'Checklist Primeiros passos and tab help must stay removed.'
 }
 
 $configPath = Join-Path $root 'supabase/config.toml'
