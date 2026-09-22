@@ -615,11 +615,8 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .login-link:hover{opacity:1}
 .login-divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:11px;color:#aaa;text-transform:uppercase}
 .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:#e2e8f0}
-/* ── ONBOARDING (Comece por aqui) ── */
-#tela-onboarding{position:fixed;inset:0;background:rgba(15,40,80,.55);z-index:10001;display:none;align-items:center;justify-content:center;padding:20px}
-#tela-onboarding.visivel{display:flex}
-.onb-card{background:#fff;border-radius:16px;max-width:540px;width:100%;padding:26px 28px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:92vh;overflow-y:auto}
-.onb-item{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--borda);border-radius:10px;margin-bottom:10px}
+/* ── PRIMEIROS PASSOS (checklist) ── */
+.onb-item{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--borda);border-radius:10px;margin-bottom:10px;background:#fff}
 .onb-item.feito{border-color:var(--verde);background:#f0fdf4}
 .onb-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#e2e8f0;color:#475569;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .onb-item.feito .onb-num{background:var(--verde);color:#fff}
@@ -737,17 +734,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   </div>
 </div>
 
-<!-- Onboarding: Comece por aqui (primeira tela de contas novas) -->
-<div id="tela-onboarding">
-  <div class="onb-card">
-    <h2 style="text-align:center;color:var(--azul);margin:0 0 4px;font-size:20px">Comece por aqui</h2>
-    <p style="text-align:center;font-size:13px;color:var(--txt2);margin:0 0 14px">Siga os passos na ordem — leva poucos minutos.</p>
-    <div style="height:8px;background:#e2e8f0;border-radius:99px;margin-bottom:16px;overflow:hidden"><div id="onb-progresso" style="height:100%;width:0;background:var(--verde);border-radius:99px;transition:.3s"></div></div>
-    <div id="onb-itens"></div>
-    <button class="login-btn" style="margin-top:6px" onclick="pularOnboarding()">Entrar no sistema →</button>
-  </div>
-</div>
-
 <!-- Banner de expiração (aparece abaixo do nav quando assinatura está próxima de expirar) -->
 <div id="banner-expiracao">
   <span id="banner-expiracao-msg"></span>
@@ -777,6 +763,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <button class="nav-tab" onclick="ir('licitacoes',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Contratos</button>
     <button class="nav-tab" onclick="ir('preparo',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Quantidades por Turno</button>
     <button class="nav-tab" onclick="ir('config',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações</button>
+    <button class="nav-tab" id="nav-btn-primeiros-passos" style="display:none" onclick="ir('primeiros-passos',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Primeiros passos</button>
     <button class="nav-tab" id="nav-btn-admin" style="display:none" onclick="ir('admin',this);fecharNavMobile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Admin <span class="badge-admin" id="badge-admin" style="display:none">0</span></button>
   </div>
   <div class="nav-bottom">
@@ -806,7 +793,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 ══════════════════════════════════════════════════════ -->
 <div id="pg-cardapio" class="pagina">
   <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Cardápio Anual 2026</h2>
-  <div id="aviso-base-cardapio" class="no-print"></div>
 
   <!-- Período letivo -->
   <div id="banner-periodo" class="card" style="margin-bottom:18px">
@@ -900,7 +886,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 ══════════════════════════════════════════════════════ -->
 <div id="pg-mercado" class="pagina ativa">
   <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Ordens de Fornecimento</h2>
-  <div id="aviso-base-mercado" class="no-print"></div>
   <div id="merc-preview-bar" class="no-print" style="display:none;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--azul2,#3b82f6);box-shadow:0 2px 8px rgba(0,0,0,.10)">
     <button class="btn" style="background:#e0f2fe;color:#0369a1;border:1.5px solid #7dd3fc;font-weight:700;font-size:14px" onclick="voltarDaPreview()">← Voltar ao Calendário</button>
     <button class="btn btn-primary" style="display:flex;align-items:center;gap:5px" onclick="validarEImprimir()"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
@@ -1155,6 +1140,14 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- ══════════════════════════════════════════════════════
      PÁGINA: CONFIGURAÇÕES
 ══════════════════════════════════════════════════════ -->
+<div id="pg-primeiros-passos" class="pagina">
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Primeiros passos</h2>
+  <p style="font-size:13px;color:var(--txt2);margin:0 0 16px">Siga os passos na ordem — os itens são marcados automaticamente.</p>
+  <div class="card" style="max-width:720px">
+    <div id="onb-itens" style="padding:16px"></div>
+  </div>
+</div>
+
 <div id="pg-config" class="pagina">
   <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações de Impressão</h2>
 
@@ -3447,15 +3440,23 @@ function configuracaoCompleta(){
 }
 
 function verificarOnboarding(){
-  const uid = window._SESSAO && window._SESSAO.user_id;
-  if(uid === 'usr_admin' || uid === 'usr_admin_rede') return;
-  if(localStorage.getItem('merenda_ocultar_boasvindas') === '1') return;
-  mostrarChecklistSePreciso();
+  atualizarNavPrimeirosPassos();
 }
 
-// ── ONBOARDING: COMECE POR AQUI ───────────────────────
-// Primeira tela de contas novas. Ticks automáticos, sem clique manual.
-// Flags por perfil (prefixadas); somente neste dispositivo.
+function atualizarNavPrimeirosPassos(){
+  const btn = document.getElementById('nav-btn-primeiros-passos');
+  if(!btn) return;
+  const sess = window._SESSAO;
+  const ocultoAdmin = !sess || sess.user_id === 'usr_admin' || sess.user_id === 'usr_admin_rede';
+  const feito = localStorage.getItem('merenda_onboarding_visto') === '1' || onbItens().every(i => i.feito);
+  if(feito && localStorage.getItem('merenda_onboarding_visto') !== '1'){
+    localStorage.setItem('merenda_onboarding_visto', '1');
+  }
+  btn.style.display = (ocultoAdmin || feito) ? 'none' : '';
+}
+
+// ── PRIMEIROS PASSOS (checklist) ──────────────────────
+// Aba simples com ticks automáticos; some da nav quando completo.
 function temCardapioDistribuido(){
   try {
     const card = DADOS.cardapio || {};
@@ -3498,24 +3499,14 @@ function precisaOnboarding(){
   const uid = window._SESSAO && window._SESSAO.user_id;
   if(!uid || uid === 'usr_admin' || uid === 'usr_admin_rede') return false;
   if(localStorage.getItem('merenda_onboarding_visto') === '1') return false;
-  const itens = onbItens();
-  if(itens.every(i => i.feito)){
-    localStorage.setItem('merenda_onboarding_visto', '1');
-    return false;
-  }
-  return true;
+  return !onbItens().every(i => i.feito);
 }
 
-function mostrarChecklistSePreciso(){
-  if(!precisaOnboarding()) return;
-  mostrarChecklist(false);
-}
-
-function mostrarChecklist(){
+function renderPrimeirosPassos(){
+  const el = document.getElementById('onb-itens');
+  if(!el) return;
   const itens = onbItens();
-  const feitos = itens.filter(i => i.feito).length;
-  document.getElementById('onb-progresso').style.width = Math.round(feitos / itens.length * 100) + '%';
-  document.getElementById('onb-itens').innerHTML = itens.map((it, idx) => `
+  el.innerHTML = itens.map((it, idx) => `
     <div class="onb-item${it.feito ? ' feito' : ''}">
       <div class="onb-num">${it.feito ? '✓' : (idx + 1)}</div>
       <div style="flex:1;min-width:0">
@@ -3524,21 +3515,11 @@ function mostrarChecklist(){
       </div>
       ${it.feito ? '' : `<button class="btn btn-sm btn-primary" onclick="irChecklist('${it.aba}')">Ir</button>`}
     </div>`).join('');
-  document.getElementById('tela-onboarding').classList.add('visivel');
-}
-
-function checklistVisivel(){
-  return document.getElementById('tela-onboarding')?.classList.contains('visivel');
+  atualizarNavPrimeirosPassos();
 }
 
 function irChecklist(aba){
-  document.getElementById('tela-onboarding')?.classList.remove('visivel');
   ir2(aba);
-}
-
-function pularOnboarding(){
-  try { localStorage.setItem('merenda_onboarding_visto', '1'); } catch(e){}
-  document.getElementById('tela-onboarding')?.classList.remove('visivel');
 }
 
 function ir2(id){
@@ -10208,7 +10189,11 @@ function carregarConfig(){
 }
 
 function irListaCompras(){
-  // Após login (novo ou retomado), o usuário sempre cai na Lista de Compras.
+  // Conta nova sem checklist concluído cai em Primeiros passos; os demais, na Lista de Compras.
+  if(typeof precisaOnboarding === 'function' && precisaOnboarding()){
+    ir2('primeiros-passos');
+    return;
+  }
   const tab = document.querySelector('.nav-tab[onclick*="mercado"]');
   ir('mercado', tab);
 }
@@ -10230,6 +10215,7 @@ function ir(id, btn){
   if(id==='ingredientes'){ renderIngredientes(); renderPeriodicidades(); renderFornecedoresCadastro(); }
   if(id==='ficha'){ CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}'); renderFichas(); }
   if(id==='preparo') renderPreparo();
+  if(id==='primeiros-passos') renderPrimeirosPassos();
   const _tnEl = document.getElementById('mobile-tab-nome');
   if(_tnEl){ const _at = document.querySelector('.nav-tab.ativo'); if(_at){ const _tn = [..._at.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(_tn) _tnEl.textContent = _tn.textContent.trim(); } }
   _abaAtual = id;
@@ -10238,26 +10224,11 @@ function ir(id, btn){
   try {
     if(id === 'ficha' && !localStorage.getItem('merenda_visita_ficha')) localStorage.setItem('merenda_visita_ficha', '1');
     if(id === 'mercado' && !localStorage.getItem('merenda_visita_mercado')) localStorage.setItem('merenda_visita_mercado', '1');
-    if(typeof AJUDA_ABAS !== 'undefined' && AJUDA_ABAS[id] && !localStorage.getItem('merenda_ajuda_vista_' + id) && !checklistVisivel() && !(typeof precisaOnboarding === 'function' && precisaOnboarding())){
+    if(typeof AJUDA_ABAS !== 'undefined' && AJUDA_ABAS[id] && !localStorage.getItem('merenda_ajuda_vista_' + id) && !(typeof precisaOnboarding === 'function' && precisaOnboarding())){
       localStorage.setItem('merenda_ajuda_vista_' + id, '1');
       abrirAjudaTab();
     }
   } catch(e){}
-  atualizarAvisosBase();
-}
-
-// Aviso orientador quando a base (alunos + período) ainda não foi configurada
-function atualizarAvisosBase(){
-  const ok = (typeof onbCfgOk === 'function') ? onbCfgOk() : true;
-  const html = ok ? '' :
-    `<div class="no-print" style="background:#fef3c7;border:1.5px solid var(--amarelo);border-radius:8px;padding:10px 16px;margin-bottom:14px;font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <span>⚠️ <b>Base não configurada.</b> Informe os alunos e o período letivo para os cálculos funcionarem.</span>
-      <button class="btn btn-sm btn-primary" onclick="ir2('config')">Ir para Configurações</button>
-    </div>`;
-  const m = document.getElementById('aviso-base-mercado');
-  const c = document.getElementById('aviso-base-cardapio');
-  if(m) m.innerHTML = html;
-  if(c) c.innerHTML = html;
 }
 
 // ══════════════════════════════════════════════════════
@@ -10999,7 +10970,7 @@ function abrirAjudaTab(){
     '<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">'+
     dados.itens.map(function(i){ return '<li>'+i+'</li>'; }).join('')+
     '</ul>'+
-    '<button onclick="fecharAjudaTab();mostrarChecklist()" style="margin-top:16px;width:100%;padding:10px;background:#eef5ff;border:1.5px solid var(--azul2);color:var(--azul);border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer">Ver guia inicial</button>';
+    '<button onclick="fecharAjudaTab();ir2(\'primeiros-passos\')" style="margin-top:16px;width:100%;padding:10px;background:#eef5ff;border:1.5px solid var(--azul2);color:var(--azul);border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer">Ver Primeiros passos</button>';
   document.getElementById('panel-ajuda-tab').style.right = '0';
   document.getElementById('ajuda-overlay').style.display = 'block';
 }

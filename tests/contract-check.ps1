@@ -112,9 +112,9 @@ if ($index -notmatch 'mostrarCadastro\(\)' -or $index -notmatch 'cadastrarUsuari
   throw 'index.html does not expose the self-signup flow with hidden expiry and admin trial config.'
 }
 
-if ($index -notmatch 'tela-onboarding' -or $index -notmatch 'mostrarChecklist' -or
+if ($index -notmatch 'pg-primeiros-passos' -or $index -notmatch 'renderPrimeirosPassos' -or
     $index -notmatch 'merenda_ajuda_vista_') {
-  throw 'index.html does not expose the novice onboarding checklist and one-time tab help.'
+  throw 'index.html does not expose the novice Primeiros passos checklist and one-time tab help.'
 }
 
 $configPath = Join-Path $root 'supabase/config.toml'
