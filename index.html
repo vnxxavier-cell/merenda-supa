@@ -8520,7 +8520,7 @@ function renderFichas(filtro=''){
     const pratoEnc = p.replace(/'/g,"\\'");
     const diff = modificado ? diffFicha(p) : null;
     const cardBorder = modificado ? 'border:2px solid #f59e0b' : '';
-    const headerExtra = modificado ? 'background:linear-gradient(135deg,#fffbeb,#fef3c7)' : '';
+    const headerExtra = modificado ? 'background:linear-gradient(135deg,#fffbeb,#fef3c7);color:#92400e' : '';
     let diffResumo = '';
     if(diff){
       const partes = [];
