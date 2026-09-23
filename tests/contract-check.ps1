@@ -117,6 +117,17 @@ if ($index -match 'pg-primeiros-passos' -or $index -match 'renderPrimeirosPassos
   throw 'Checklist Primeiros passos and tab help must stay removed.'
 }
 
+if ($index -notmatch 'pg-termos' -or $index -notmatch 'overlay-termos' -or
+    $index -notmatch 'verificarTermos' -or $index -notmatch 'aceitarTermos' -or
+    $index -notmatch "ir\('termos'") {
+  throw 'Terms of Use page, first-login modal and nav entry must stay present.'
+}
+
+if ($index -notmatch 'pg-termos' -or $index -notmatch 'overlay-termos' -or
+    $index -notmatch 'verificarTermos' -or $index -notmatch 'aceitarTermos') {
+  throw 'Terms of Use page, first-login modal and accept flow must stay present.'
+}
+
 $configPath = Join-Path $root 'supabase/config.toml'
 $tokens = $null
 $configParseErrors = $null
