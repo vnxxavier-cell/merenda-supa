@@ -1915,7 +1915,6 @@ const _supaSync = {
     'merenda_recebimentos': 'recebimentos',
     'merenda_estoque': 'estoque',
     'merenda_semanas_consumidas': 'semanas_consumidas',
-    'merenda_merc_ajustes': 'merc_ajustes',
     'merenda_servidores_config': 'servidores_config',
     'merenda_af_custom': 'af_custom',
     'merenda_ciclos_planos': 'ciclos_planos',
@@ -2447,7 +2446,6 @@ async function verificarCallbackGoogle(){
     localStorage.setItem('merenda_embalagens', '{}');
     localStorage.setItem('merenda_ciclos_planos', '{}');
     localStorage.setItem('merenda_licitacoes', '[]');
-    localStorage.setItem('merenda_merc_ajustes', '{}');
     localStorage.setItem('merenda_estoque', '{}');
     if(_supabase){ try { await _supabase.from('escola_dados').upsert({
       user_id: user.id, niveis: _defNiveis, servidores_config: _defServ,
@@ -2488,8 +2486,10 @@ function recarregarDados(){
   ORDENS_EXPEDIDAS= JSON.parse(localStorage.getItem('merenda_ordens_expedidas') || '[]');
   RECEBIMENTOS    = JSON.parse(localStorage.getItem('merenda_recebimentos') || '[]');
   ESTOQUE            = JSON.parse(localStorage.getItem('merenda_estoque') || '{}');
-  SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas') || '[]');
-  MERC_AJUSTES       = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
+  SEMANAS_CONSUMIDAS = JSON.parse(localStorage.getItem('merenda_semanas_consumidas')  || '[]');
+  MERC_AJUSTES       = {};
+  MERC_FORN_TROCAS   = {};
+  try{ localStorage.removeItem('merenda_merc_ajustes'); }catch(e){}
   PERIODICIDADES          = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || PERIODICIDADES;
   // Migração: garante que as periodicidades padrão novas existam para quem já tinha dados salvos
   const _perPadrao = [
@@ -2840,7 +2840,6 @@ async function fazerLogin(){
       localStorage.setItem('merenda_embalagens', '{}');
       localStorage.setItem('merenda_ciclos_planos', '{}');
       localStorage.setItem('merenda_licitacoes', '[]');
-      localStorage.setItem('merenda_merc_ajustes', '{}');
       localStorage.setItem('merenda_estoque', '{}');
       // Grava TODAS as colunas limpas no Supabase imediatamente — evita que defaults de coluna
       // do Supabase apareçam em sessões posteriores (ex: após F5 dentro dos 2s do debounce)
@@ -3708,8 +3707,9 @@ let CORRECOES_ESTOQUE = JSON.parse(localStorage.getItem('merenda_estoque_correco
 })();
 
 // Ajustes manuais da ordem de mercado: { [ciclo_sem]: { overrides:{ing:qtd|null}, extras:[{nome,qtd,af}] } }
-let MERC_AJUSTES = JSON.parse(localStorage.getItem('merenda_merc_ajustes') || '{}');
-function salvarMercAjustes(){ localStorage.setItem('merenda_merc_ajustes', JSON.stringify(MERC_AJUSTES)); }
+let MERC_AJUSTES = {};
+try{ localStorage.removeItem('merenda_merc_ajustes'); }catch(e){}
+function salvarMercAjustes(){}
 function getMondayOf(dateIso){
   const d = new Date(dateIso + 'T00:00:00');
   const day = d.getDay();
@@ -3832,6 +3832,7 @@ let FORNECEDORES_CADASTRO = JSON.parse(localStorage.getItem('merenda_fornecedore
   localStorage.setItem('merenda_ing_fornecedores', JSON.stringify(migrado));
 })();
 let ING_FORNECEDORES = JSON.parse(localStorage.getItem('merenda_ing_fornecedores') || '{}');
+let MERC_FORN_TROCAS = {}; // trocas de fornecedor feitas na Lista de Compras — apenas durante a sessão
 
 // Periodicidades de entrega
 let PERIODICIDADES     = JSON.parse(localStorage.getItem('merenda_periodicidades') || 'null') || [
@@ -3875,8 +3876,10 @@ function setIngPeriodicidade(nome, valor){
 function setIngFornecedor(nome, fornId){
   if(fornId) ING_FORNECEDORES[nome] = fornId;
   else delete ING_FORNECEDORES[nome];
+  delete MERC_FORN_TROCAS[nome];
   salvarIngFornecedores();
 }
+function getFornIng(nome){ return MERC_FORN_TROCAS[nome] !== undefined ? MERC_FORN_TROCAS[nome] : ING_FORNECEDORES[nome]; }
 function updateMercadoViewMode(){
   const analiseEl = document.getElementById('merc-analise');
   const fornGrid  = document.getElementById('forn-grid-dinamico');
@@ -4717,6 +4720,9 @@ function removerFornecedorCadastro(idx){
   FORNECEDORES_CADASTRO.splice(idx,1);
   Object.keys(ING_FORNECEDORES).forEach(k => {
     if(ING_FORNECEDORES[k] === id) delete ING_FORNECEDORES[k];
+  });
+  Object.keys(MERC_FORN_TROCAS).forEach(k => {
+    if(MERC_FORN_TROCAS[k] === id) delete MERC_FORN_TROCAS[k];
   });
   salvarFornecedoresCadastro();
   salvarIngFornecedores();
@@ -5703,7 +5709,7 @@ function registrarOrdemExpedida(){
   const semFornItens = [];
   todosItens.forEach(it => {
     if(it.comprar <= 0) return;
-    const fid = ING_FORNECEDORES[it.nomeBase];
+    const fid = getFornIng(it.nomeBase);
     const forn = fid ? FORNECEDORES_CADASTRO.find(f => f.id === fid) : null;
     if(!fid || !forn){ semFornItens.push(it); return; }
     if(!fornMap[fid]) fornMap[fid] = { nome: forn.nome, itens: [] };
@@ -5866,7 +5872,7 @@ function confirmarOrdemContratoSelecionado(ciclo, semLabel, hoje){
     if(lic) lic.itens.forEach(x => { precoMap[x.ingrediente] = x.preco_unitario || 0; });
     const _remPend = (_removidosPendentes && _removidosPendentes[fid]) || {};
     const itensOrdem = _todos
-      .filter(it => it.comprar > 0 && (ING_FORNECEDORES[it.nomeBase] || '') === fid)
+      .filter(it => it.comprar > 0 && (getFornIng(it.nomeBase) || '') === fid)
       .map(it => {
         const _dias = [];
         const _per = _perSemanasIng(it.nomeBase);
@@ -6843,7 +6849,7 @@ function _gerarXmlFornecedores(escola, label, af_items, mc_items, mondayIso){
   const grupos = {};
   const semForn = [];
   todosItens.forEach(it => {
-    const fid  = ING_FORNECEDORES[it.nomeBase];
+    const fid  = getFornIng(it.nomeBase);
     const forn = fid && FORNECEDORES_CADASTRO.find(f => f.id === fid);
     if(forn){ if(!grupos[fid]) grupos[fid] = []; grupos[fid].push(it); }
     else semForn.push(it);
@@ -7655,7 +7661,7 @@ function renderMercado(){
   const grupos = {}; // { forn_id: [items] }
   const semForn = [];
   todosItens.forEach(it => {
-    const fid = ING_FORNECEDORES[it.nomeBase];
+    const fid = getFornIng(it.nomeBase);
     const forn = fid && FORNECEDORES_CADASTRO.find(f => f.id === fid);
     if(forn){ if(!grupos[fid]) grupos[fid] = []; grupos[fid].push(it); }
     else semForn.push(it);
@@ -7693,7 +7699,7 @@ function renderMercado(){
   _MERC_DATA = { todosItens, mondayIso, weekData };
   const fornFilterEl = document.getElementById('merc-forn-filter');
   if(fornFilterEl){
-    const fornIds = [...new Set(todosItens.map(it => ING_FORNECEDORES[it.nomeBase]).filter(Boolean))];
+    const fornIds = [...new Set(todosItens.map(it => getFornIng(it.nomeBase)).filter(Boolean))];
     const prevVal = fornFilterEl.value;
     fornFilterEl.innerHTML = `<option value="todos">Todos os fornecedores</option>` +
       fornIds.map(fid => {
@@ -7764,7 +7770,7 @@ function renderMercado(){
           ? `<span class="tag-af" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/><path d="M17 13a3 3 0 0 1-5 2.3"/></svg>AF</span>`
           : `<span class="tag-mc" style="font-size:10px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>MC</span>`;
         const contratoOk = (()=>{
-          const fid = ING_FORNECEDORES[it.nomeBase];
+          const fid = getFornIng(it.nomeBase);
           if(!fid) return 0; // sem fornecedor
           const hoje = new Date().toISOString().split('T')[0];
           return LICITACOES.some(l => l.status==='ativa' && l.data_inicio<=hoje && l.fornecedor_id===fid && l.itens.some(x=>x.ingrediente===it.nomeBase)) ? 1 : -1;
@@ -7917,7 +7923,7 @@ function renderMercado(){
   if(selPrint){
     const fornecedoresComItens = new Set();
     todosItens.forEach(it => {
-      const fid = ING_FORNECEDORES[it.nomeBase];
+      const fid = getFornIng(it.nomeBase);
       if(fid) fornecedoresComItens.add(fid);
     });
     const curVal = selPrint.value;
@@ -7938,7 +7944,7 @@ function renderMercadoTabela(){
   let items = [...todosItens];
   if(tipoFilter === 'comprar')      items = items.filter(it => it.comprar > 0);
   else if(tipoFilter !== 'todos')   items = items.filter(it => (it.numSemanas || 1) === parseInt(tipoFilter, 10));
-  if(fornFilter !== 'todos')        items = items.filter(it => (ING_FORNECEDORES[it.nomeBase]||'') === fornFilter);
+  if(fornFilter !== 'todos')        items = items.filter(it => (getFornIng(it.nomeBase)||'') === fornFilter);
 
   const _obsMap = getMercAjuste().obs || {};
   const ABREV = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -8117,7 +8123,7 @@ function abrirDrillDown(nomeBase){
     : diasCobertos > 0 ? S.parcial
     : diasComNec.length > 0 ? S.descoberto : S.sem_consumo;
 
-  const forn = (() => { const fid = ING_FORNECEDORES[nomeBase]; return fid ? FORNECEDORES_CADASTRO.find(f=>f.id===fid) : null; })();
+  const forn = (() => { const fid = getFornIng(nomeBase); return fid ? FORNECEDORES_CADASTRO.find(f=>f.id===fid) : null; })();
   const fornNome = forn ? forn.nome : 'Sem fornecedor definido';
   const periLabel = itemData ? `Máx. ${itemData.numSemanas || 1} sem.` : '—';
   const comprar = itemData ? itemData.comprar : 0;
@@ -8203,7 +8209,7 @@ function adicionarItemMercForn(nomeBase, btn){
   const tr = btn.closest('tr');
   if(tr.querySelector('.forn-add-sel')) return;
 
-  const currentFornId = ING_FORNECEDORES[nomeBase] || '';
+  const currentFornId = getFornIng(nomeBase) || '';
   const enc = nomeBase.replace(/'/g, "\\'");
 
   const options = [
@@ -8228,7 +8234,7 @@ function adicionarItemMercForn(nomeBase, btn){
 function confirmarAddItemForn(nomeBase, btn){
   const sel = btn.closest('td').querySelector('.forn-add-sel');
   const fornId = sel?.value || null;
-  setIngFornecedor(nomeBase, fornId);
+  MERC_FORN_TROCAS[nomeBase] = fornId || '';
   renderMercado();
 }
 
@@ -8239,7 +8245,7 @@ function validarEImprimir(){
   if(!mondayIso){ alert('Selecione o período antes de imprimir.'); return; }
   const { af_items, mc_items } = getItensMercado(ciclo, mondayIso);
   const semForn = [...af_items, ...mc_items].filter(it => {
-    const fid = ING_FORNECEDORES[it.nomeBase];
+    const fid = getFornIng(it.nomeBase);
     return !fid || !FORNECEDORES_CADASTRO.find(f => f.id === fid);
   });
   if(semForn.length === 0){ limparEstadosPrintMerc(); atualizarPrintGlobal(); window.print(); return; }
@@ -8350,8 +8356,7 @@ function imprimirFornecedorSelecionado(){
 function autoSalvarAssocFornModal(sel){
   if(!sel.value) return;
   sel.style.borderColor = '';
-  ING_FORNECEDORES[sel.getAttribute('data-modal-ing')] = sel.value;
-  salvarIngFornecedores();
+  MERC_FORN_TROCAS[sel.getAttribute('data-modal-ing')] = sel.value;
 }
 
 function imprimirModalForn(){
@@ -8474,8 +8479,7 @@ function confirmarAddItemCard(fornId){
   const nome = sel.value;
   const qtd = parseFloat(inp.value) || 0;
   if(qtd <= 0){ alert('Informe uma quantidade válida.'); return; }
-  ING_FORNECEDORES[nome] = fornId;
-  salvarIngFornecedores();
+  MERC_FORN_TROCAS[nome] = fornId;
   const aj = getMercAjuste();
   if(!aj.extras) aj.extras = [];
   aj.extras = aj.extras.filter(e => e.nome !== nome);
@@ -9114,7 +9118,7 @@ function _aplicarMassaFornecedor(){
   if(comForn.length){
     if(!confirm('Alguns dos ingredientes selecionados já possuem fornecedor associado.\n\nDeseja substituir essas associações pelo fornecedor selecionado?')) return;
   }
-  [..._massaSel].forEach(n => { ING_FORNECEDORES[n] = fid; });
+  [..._massaSel].forEach(n => { ING_FORNECEDORES[n] = fid; delete MERC_FORN_TROCAS[n]; });
   salvarIngFornecedores();
   _massaMudou = true;
   _massaSel = new Set();
@@ -9324,6 +9328,7 @@ function renomearIngrediente(nomeAntigo, novoRaw){
   if(ESTOQUE[nomeAntigo] !== undefined){ ESTOQUE[novo] = ESTOQUE[nomeAntigo]; delete ESTOQUE[nomeAntigo]; salvarEstoque(); }
   if(CORRECOES_ESTOQUE[nomeAntigo] !== undefined){ CORRECOES_ESTOQUE[novo] = CORRECOES_ESTOQUE[nomeAntigo]; delete CORRECOES_ESTOQUE[nomeAntigo]; salvarCorrecoesEstoque(); }
   if(ING_FORNECEDORES[nomeAntigo] !== undefined){ ING_FORNECEDORES[novo] = ING_FORNECEDORES[nomeAntigo]; delete ING_FORNECEDORES[nomeAntigo]; salvarIngFornecedores(); }
+  if(MERC_FORN_TROCAS[nomeAntigo] !== undefined){ MERC_FORN_TROCAS[novo] = MERC_FORN_TROCAS[nomeAntigo]; delete MERC_FORN_TROCAS[nomeAntigo]; }
   if(ING_PERIODICIDADE[nomeAntigo] !== undefined){ ING_PERIODICIDADE[novo] = ING_PERIODICIDADE[nomeAntigo]; delete ING_PERIODICIDADE[nomeAntigo]; salvarIngPeriodicidade(); }
   if(ING_UNIDADE_VENDA[nomeAntigo] !== undefined){ ING_UNIDADE_VENDA[novo] = ING_UNIDADE_VENDA[nomeAntigo]; delete ING_UNIDADE_VENDA[nomeAntigo]; salvarIngUnidadeVenda(); }
   if(EMBALAGENS[nomeAntigo] !== undefined){
