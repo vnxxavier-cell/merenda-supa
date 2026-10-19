@@ -569,12 +569,16 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .cal-event{border-radius:5px;padding:6px 8px;font-size:12px;font-weight:700;color:rgba(0,0,0,.72);line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1}
 .cal-event-cancelado{background:#f1f3f5 !important;color:#8b9096;text-decoration:line-through;font-weight:600}
 .cal-anulada-hint{font-size:9px;font-style:italic;font-weight:600;color:#94a3b8;line-height:1.35;display:block;flex:1}
-.cal-event.cal-event-sai{animation:calSai .6s cubic-bezier(.4,0,.2,1) forwards;z-index:3;position:relative}
-.cal-event.cal-event-entra{animation:calEntra .5s cubic-bezier(.2,.8,.3,1) both}
+.cal-event-sai{animation:calSai .6s cubic-bezier(.4,0,.2,1) forwards;z-index:3;position:relative}
+.cal-event-entra{animation:calEntra .5s cubic-bezier(.2,.8,.3,1) both}
 .cal-day.cal-cel-flash{animation:calFlash .8s ease-out}
 @keyframes calSai{0%{opacity:1;transform:none}70%{opacity:1;transform:translateY(110px)}100%{opacity:0;transform:translateY(130px)}}
 @keyframes calEntra{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
 @keyframes calFlash{0%{box-shadow:inset 0 0 0 2px rgba(59,130,246,0)}30%{box-shadow:inset 0 0 0 2px rgba(59,130,246,.65)}100%{box-shadow:inset 0 0 0 2px rgba(59,130,246,0)}}
+.cal-save-bar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:14px;padding:9px 14px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px}
+.cal-save-aviso{font-size:12px;font-weight:800;color:#b45309;margin-right:auto;display:inline-flex;align-items:center;gap:5px}
+.cal-save-btn{background:var(--verde)!important;border-color:var(--verde)!important;color:#fff!important}
+.cal-save-btn:hover:not(:disabled){background:#059669!important;border-color:#059669!important;color:#fff!important}
 .cal-meal-empty{font-size:10px;color:#d1d5db;font-weight:600;flex:1;display:flex;align-items:center;gap:3px}
 .cal-sel{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-family:'Inter',sans-serif;font-size:12px}
 /* Rodapé */
@@ -6224,52 +6228,133 @@ function getDiasSemanaCal(wi){
   return out;
 }
 
-// Checkbox por semana: marcar desloca os pratos da semana 100% de feriado para a semana seguinte
-function getSemanasConsumir(){
+// Checkbox por semana: marcar desloca os pratos da semana 100% de feriado para
+// a semana seguinte. Nada vai ao localStorage até "Salvar alterações".
+let _sconsDraft = null;   // rascunho do mapa de checkboxes (null = usar o salvo)
+let _cardBase   = null;   // clone de DADOS.cardapio capturado no 1º toggle
+
+function _sconsSalvo(){
   try { return JSON.parse(localStorage.getItem('merenda_semanas_consumir') || '{}'); }
   catch(e){ return {}; }
 }
+function getSemanasConsumir(){
+  return _sconsDraft || _sconsSalvo();
+}
 function setSemanaConsumir(wi, checked){
-  const s = getSemanasConsumir();
-  if(checked) s[wi] = 1; else delete s[wi];
-  localStorage.setItem('merenda_semanas_consumir', JSON.stringify(s));
+  if(!_sconsDraft) _sconsDraft = JSON.parse(JSON.stringify(_sconsSalvo()));
+  if(checked) _sconsDraft[wi] = 1; else delete _sconsDraft[wi];
+}
+function temAlteracoesPendentes(){ return !!(_sconsDraft || _cardBase); }
+// Enquanto há pendência o localStorage guarda o estado salvo; o rascunho vive só
+// em memória até "Salvar alterações" (ou é descartado ao recarregar).
+function _persistirCardapio(){
+  if(temAlteracoesPendentes()) return;
+  localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
 }
 
-// Animação de "deslocar pratos": nomes escorregam para a semana seguinte (e a
-// semana anula), ou voltam para a semana de feriado ao desmarcar.
-function _celulasPorIso(isos){
-  const grid = document.getElementById('grid-calendario') || document;
-  return isos.map(iso => grid.querySelector(`.cal-day[data-iso="${iso}"]`)).filter(Boolean);
-}
-function _flashCelulas(celulas){
-  celulas.forEach(c => { c.classList.remove('cal-cel-flash'); void c.offsetWidth; c.classList.add('cal-cel-flash'); });
-}
-function toggleSemanaFeriado(wi, marcado){
-  setSemanaConsumir(wi, marcado);
-  const datasSem = getDiasSemanaCal(wi);
-  const datasProx = getDiasSemanaCal(wi + 1);
-
-  if(marcado){
-    // 1) nomes escorregam para fora da célula (em direção à semana de baixo)
-    _celulasPorIso(datasSem).forEach(c => {
-      const ev = c.querySelector('.cal-event');
-      if(ev) ev.classList.add('cal-event-sai');
-    });
-    // 2) render reconstrói o grid (mostra a dica) — o flash é aplicado depois,
-    //    senão seria destruído junto com o innerHTML antigo
-    setTimeout(() => {
-      renderCardapio();
-      _flashCelulas(_celulasPorIso(datasProx));
-    }, 620);
-  } else {
-    renderCardapio();
-    const novas = _celulasPorIso(datasSem);
-    novas.forEach(c => {
-      const ev = c.querySelector('.cal-event');
-      if(ev) ev.classList.add('cal-event-entra');
-    });
-    _flashCelulas(novas);
+// Espaço de endereçamento semana -> slot do cardápio (mesIdx = floor(wi/4), sIdx = wi%4)
+function _slotSemanaEm(card, wi, criar){
+  const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
+  const sIdx   = wi % 4;
+  const mesNome = MESES_NOMES[mesIdx];
+  if(!card[mesNome]){
+    if(criar === false) return { dias: ['','','','',''] };
+    card[mesNome] = [];
   }
+  if(!card[mesNome][sIdx]){
+    if(criar === false) return { dias: ['','','','',''] };
+    card[mesNome][sIdx] = { dias: ['','','','',''] };
+  }
+  const slot = card[mesNome][sIdx];
+  if(!Array.isArray(slot.dias)) slot.dias = ['','','','',''];
+  while(slot.dias.length < 5) slot.dias.push('');
+  return slot;
+}
+function _totalSemanasCal(){
+  if(!DIAS_LETIVOS_ARRAY.length) return 0;
+  return getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1;
+}
+function _ehSemanaTodaFeriado(wi){
+  const datasSem = getDiasSemanaCal(wi);
+  if(!datasSem.length) return false;
+  const letSet = new Set(DIAS_LETIVOS_ARRAY);
+  return !datasSem.some(dt => letSet.has(dt));
+}
+
+// Recalcula DADOS.cardapio a partir de _cardBase aplicando o deslocamento.
+// Semanas marcadas ficam vazias; as demais consomem a sequência original de
+// forma contínua (mesma semântica de distribuirAPartirDoCiclo: pratoIdx não
+// avança na semana anulada). Deriva sempre da base => idempotente e reversível.
+function recalcularDeslocamento(){
+  if(!_cardBase) return;
+  const sCons = getSemanasConsumir();
+  const total = _totalSemanasCal();
+  const novo = JSON.parse(JSON.stringify(_cardBase));
+  let k = 0;
+  for(let wi = 0; wi < total; wi++){
+    const alvo = _slotSemanaEm(novo, wi, true);
+    if(_ehSemanaTodaFeriado(wi) && sCons[wi]){
+      alvo.dias = ['','','','',''];
+      continue;
+    }
+    alvo.dias = _slotSemanaEm(_cardBase, k, false).dias.slice(0, 5);
+    k++;
+  }
+  DADOS.cardapio = novo;
+}
+
+function salvarAlteracoesCardapio(){
+  if(_sconsDraft) localStorage.setItem('merenda_semanas_consumir', JSON.stringify(_sconsDraft));
+  localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+  _sconsDraft = null; _cardBase = null;
+  renderCardapio();
+}
+function descartarAlteracoesCardapio(){
+  if(_cardBase) DADOS.cardapio = _cardBase;
+  _sconsDraft = null; _cardBase = null;
+  renderCardapio();
+}
+
+// Onda em cascata: todos os pratos do mês saem/entram com stagger de 30ms,
+// da primeira para a última célula da grade.
+function _eventosDoMes(){
+  const grid = document.getElementById('grid-calendario');
+  if(!grid) return [];
+  return Array.from(grid.querySelectorAll('.cal-event, .cal-anulada-hint'));
+}
+function _animarOndaDeslocamento(){
+  const saida = _eventosDoMes();
+  saida.forEach((ev, i) => {
+    ev.style.animationDelay = (i * 30) + 'ms';
+    ev.classList.add('cal-event-sai');
+  });
+  const dur = saida.length ? 600 + (saida.length - 1) * 30 : 0;
+  setTimeout(() => {
+    renderCardapio();
+    const entrada = _eventosDoMes();
+    entrada.forEach((ev, i) => {
+      ev.style.animationDelay = (i * 30) + 'ms';
+      ev.classList.add('cal-event-entra');
+    });
+    const grade = document.getElementById('grid-calendario');
+    if(grade){
+      Array.from(grade.querySelectorAll('.cal-day'))
+        .map(day => day.querySelector('.cal-event, .cal-anulada-hint') ? day : null)
+        .filter(Boolean)
+        .forEach((c, i) => {
+          c.style.animationDelay = (i * 30) + 'ms';
+          c.classList.remove('cal-cel-flash'); void c.offsetWidth;
+          c.classList.add('cal-cel-flash');
+        });
+    }
+  }, dur + 40);
+}
+
+function toggleSemanaFeriado(wi, marcado){
+  if(!_cardBase) _cardBase = JSON.parse(JSON.stringify(DADOS.cardapio));
+  setSemanaConsumir(wi, marcado);
+  recalcularDeslocamento();
+  _animarOndaDeslocamento();
 }
 
 function populateMesesMerc(){
@@ -6337,7 +6422,7 @@ function alterarPrato(ciclo, semIdx, diaIdx, novoPrato, skipRender = false){
   
   if(!DADOS.cardapio[mesNome]) return;
   DADOS.cardapio[mesNome][sIdx].dias[diaIdx] = novoPrato;
-  localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+  _persistirCardapio();
   sincronizarSeletores(ciclo, semIdx + 1, skipRender);
 }
 
@@ -7210,11 +7295,20 @@ function renderCardapio(){
     ? `<button class="cal-nav-btn" onclick="navegarMes(1)">Próximo ›</button>`
     : `<button class="cal-nav-btn" disabled>Próximo ›</button>`;
 
+  const pendente = temAlteracoesPendentes();
+  const barraSalvar = pendente ? `
+    <div class="cal-save-bar">
+      <span class="cal-save-aviso"><span aria-hidden="true">⚠</span> Alterações não salvas neste mês</span>
+      <button class="cal-nav-btn" onclick="descartarAlteracoesCardapio()">Descartar</button>
+      <button class="cal-nav-btn cal-save-btn" onclick="salvarAlteracoesCardapio()">Salvar alterações</button>
+    </div>` : '';
+
   grid.innerHTML = `
     <div class="cal-nav-wrapper">
       ${navPrev}
       ${navNext}
     </div>
+    ${barraSalvar}
     <div class="cal-grid">
       <div class="cal-month">
         <div class="cal-top">
@@ -7241,7 +7335,7 @@ function atualizarPratoCalendario(prato, letIdx){
   const iso = DIAS_LETIVOS_ARRAY[letIdx];
   if(iso) {
     setMealByDate(iso, prato);
-    localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+    _persistirCardapio();
   }
 
   const cell = document.getElementById(`cal-day-${letIdx}`);
@@ -10345,7 +10439,7 @@ function clicarNumDia(iso, e){
       const pratoExistente = getMealByDate(iso);
       const pratoFinal = pratoExistente || getPratoFromCiclo(iso);
       if(pratoFinal) setMealByDate(iso, pratoFinal);
-      localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+      _persistirCardapio();
     } else {
       // Marcar como feriado
       if(!CAL_CONFIG.feriados) CAL_CONFIG.feriados = [];
@@ -10395,7 +10489,7 @@ function aplicarEscolhaDia(valor){
     const pratoExistente = getMealByDate(iso);
     const pratoFinal = valor || pratoExistente || getPratoFromCiclo(iso);
     setMealByDate(iso, pratoFinal);
-    localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+    _persistirCardapio();
     const calWkIdx = getCalWeekIdx(iso);
     const cIdx = Math.floor(calWkIdx / 5);
     const semInCiclo = (calWkIdx % 5) + 1;
@@ -10804,6 +10898,8 @@ function distribuirAPartirDoCiclo(){
     }
   }
 
+  if(_sconsDraft){ localStorage.setItem('merenda_semanas_consumir', JSON.stringify(_sconsDraft)); _sconsDraft = null; }
+  _cardBase = null;
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   renderCardapio();
   sincronizarSeletores(ciclo, 1, true);
@@ -10831,7 +10927,7 @@ function limparCiclo(){
     if(DADOS.cardapio[mesNome]?.[sIdx])
       DADOS.cardapio[mesNome][sIdx].dias = ['','','','',''];
   }
-  localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+  _persistirCardapio();
   renderCardapio();
 }
 
