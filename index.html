@@ -568,6 +568,13 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .cal-day.day-school:hover{background:#f8faff}
 .cal-event{border-radius:5px;padding:6px 8px;font-size:12px;font-weight:700;color:rgba(0,0,0,.72);line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1}
 .cal-event-cancelado{background:#f1f3f5 !important;color:#8b9096;text-decoration:line-through;font-weight:600}
+.cal-anulada-hint{font-size:9px;font-style:italic;font-weight:600;color:#94a3b8;line-height:1.35;display:block;flex:1}
+.cal-event.cal-event-sai{animation:calSai .6s cubic-bezier(.4,0,.2,1) forwards;z-index:3;position:relative}
+.cal-event.cal-event-entra{animation:calEntra .5s cubic-bezier(.2,.8,.3,1) both}
+.cal-day.cal-cel-flash{animation:calFlash .8s ease-out}
+@keyframes calSai{0%{opacity:1;transform:none}70%{opacity:1;transform:translateY(110px)}100%{opacity:0;transform:translateY(130px)}}
+@keyframes calEntra{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
+@keyframes calFlash{0%{box-shadow:inset 0 0 0 2px rgba(59,130,246,0)}30%{box-shadow:inset 0 0 0 2px rgba(59,130,246,.65)}100%{box-shadow:inset 0 0 0 2px rgba(59,130,246,0)}}
 .cal-meal-empty{font-size:10px;color:#d1d5db;font-weight:600;flex:1;display:flex;align-items:center;gap:3px}
 .cal-sel{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-family:'Inter',sans-serif;font-size:12px}
 /* Rodapé */
@@ -6217,7 +6224,7 @@ function getDiasSemanaCal(wi){
   return out;
 }
 
-// Checkbox por semana: se a semana 100% feriado deve consumir preparações na distribuição
+// Checkbox por semana: marcar desloca os pratos da semana 100% de feriado para a semana seguinte
 function getSemanasConsumir(){
   try { return JSON.parse(localStorage.getItem('merenda_semanas_consumir') || '{}'); }
   catch(e){ return {}; }
@@ -6226,6 +6233,43 @@ function setSemanaConsumir(wi, checked){
   const s = getSemanasConsumir();
   if(checked) s[wi] = 1; else delete s[wi];
   localStorage.setItem('merenda_semanas_consumir', JSON.stringify(s));
+}
+
+// Animação de "deslocar pratos": nomes escorregam para a semana seguinte (e a
+// semana anula), ou voltam para a semana de feriado ao desmarcar.
+function _celulasPorIso(isos){
+  const grid = document.getElementById('grid-calendario') || document;
+  return isos.map(iso => grid.querySelector(`.cal-day[data-iso="${iso}"]`)).filter(Boolean);
+}
+function _flashCelulas(celulas){
+  celulas.forEach(c => { c.classList.remove('cal-cel-flash'); void c.offsetWidth; c.classList.add('cal-cel-flash'); });
+}
+function toggleSemanaFeriado(wi, marcado){
+  setSemanaConsumir(wi, marcado);
+  const datasSem = getDiasSemanaCal(wi);
+  const datasProx = getDiasSemanaCal(wi + 1);
+
+  if(marcado){
+    // 1) nomes escorregam para fora da célula (em direção à semana de baixo)
+    _celulasPorIso(datasSem).forEach(c => {
+      const ev = c.querySelector('.cal-event');
+      if(ev) ev.classList.add('cal-event-sai');
+    });
+    // 2) render reconstrói o grid (mostra a dica) — o flash é aplicado depois,
+    //    senão seria destruído junto com o innerHTML antigo
+    setTimeout(() => {
+      renderCardapio();
+      _flashCelulas(_celulasPorIso(datasProx));
+    }, 620);
+  } else {
+    renderCardapio();
+    const novas = _celulasPorIso(datasSem);
+    novas.forEach(c => {
+      const ev = c.querySelector('.cal-event');
+      if(ev) ev.classList.add('cal-event-entra');
+    });
+    _flashCelulas(novas);
+  }
 }
 
 function populateMesesMerc(){
@@ -7033,6 +7077,24 @@ function initTabAtiva(){
   }
 }
 
+// Conteúdo da célula de dia feriado: semana 100% feriado com "Deslocar pratos"
+// marcado fica anulada (sem nomes, com dica); caso contrário mostra o prato riscado.
+function semanaDeslocada(wi, iso){
+  const datasSem = getDiasSemanaCal(wi);
+  if(datasSem.length === 0 || !datasSem.includes(iso)) return false;
+  const letSet = new Set(DIAS_LETIVOS_ARRAY);
+  if(datasSem.some(dt => letSet.has(dt))) return false;
+  return !!getSemanasConsumir()[wi];
+}
+function conteudoDiaFeriado(iso, dow){
+  const wi = getCalWeekIdx(iso);
+  if(semanaDeslocada(wi, iso)) return '<span class="cal-anulada-hint">pratos → próxima semana</span>';
+  const curP = dow === 0 ? '' : (getMealByDate(iso) || (dow <= 5 ? getPratoFromCiclo(iso) : ''));
+  const {nome} = curP ? nomeNum(curP) : {nome:''};
+  if(!nome) return '';
+  return `<div class="cal-event cal-event-cancelado" title="${esc(nome).replace(/"/g,'&quot;')}">${nome}</div>`;
+}
+
 function renderCardapio(){
   const grid = document.getElementById('grid-calendario');
   const legenda = document.getElementById('legenda-ciclos');
@@ -7090,23 +7152,21 @@ function renderCardapio(){
       const isSabLetivo = dow === 6;
       const numBtnClass = isSabLetivo ? 'cal-day-num-btn btn-sabletivo' : 'cal-day-num-btn';
       const numBtnTitle = isSabLetivo ? 'Remover Sábado Letivo' : 'Marcar como Feriado/Recesso';
-      days += `<div class="cal-day day-school" id="cal-day-${letIdx}" onclick="abrirPopupDia('${iso}',event)">
+      days += `<div class="cal-day day-school" id="cal-day-${letIdx}" data-iso="${iso}" onclick="abrirPopupDia('${iso}',event)">
         <span class="${numBtnClass}" onclick="clicarNumDia('${iso}',event)" title="${numBtnTitle}">${day}</span>${badge}
         ${curP ? `<div class="cal-event" style="background:${cor}">${nome}</div>` : ''}
       </div>`;
     } else if(isHoliday){
-      const curP = dow === 0 ? '' : (getMealByDate(iso) || (dow <= 5 ? getPratoFromCiclo(iso) : ''));
-      const {nome} = curP ? nomeNum(curP) : {nome:''};
-      days += `<div class="cal-day day-holiday" onclick="abrirPopupDia('${iso}',event)">
+      days += `<div class="cal-day day-holiday" data-iso="${iso}" onclick="abrirPopupDia('${iso}',event)">
         <span class="cal-day-num-btn btn-feriado" onclick="clicarNumDia('${iso}',event)" title="Remover Feriado/Recesso">${day}</span>${badge}
         <span class="cal-feriado-tag">Feriado/Recesso</span>
-        ${nome ? `<div class="cal-event cal-event-cancelado" title="${esc(nome).replace(/"/g,'&quot;')}">${nome}</div>` : ''}
+        ${conteudoDiaFeriado(iso, dow)}
       </div>`;
     } else if(dow===6){
       const sabClass = isSabLetivoDay ? 'btn-sabletivo' : '';
       const sabTitle = isSabLetivoDay ? 'Remover Sábado Letivo' : 'Marcar como Sábado Letivo';
       const tag = isSabLetivoDay ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--azul2);border-radius:3px;padding:1px 4px;line-height:1.4">SAB.LET.</span>` : '';
-      days += `<div class="cal-day day-off"><span class="cal-day-num-btn ${sabClass}" onclick="clicarNumDia('${iso}',event)" title="${sabTitle}">${day}</span>${tag}${badge}</div>`;
+      days += `<div class="cal-day day-off" data-iso="${iso}"><span class="cal-day-num-btn ${sabClass}" onclick="clicarNumDia('${iso}',event)" title="${sabTitle}">${day}</span>${tag}${badge}</div>`;
     } else if(dow===0){
       const nextDate = new Date(2026, m, day + 1);
       const mondayIso = nextDate.toISOString().split('T')[0];
@@ -7123,8 +7183,8 @@ function renderCardapio(){
           botoesWeek = `
             <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
               <span style="font-size:10px;font-weight:800;color:#dc2626;letter-spacing:.03em">Semana feriado</span>
-              <label style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:#64748b;cursor:pointer" title="Se marcado, a distribuição consome as 5 preparações desta semana">
-                <input type="checkbox" ${checked} onclick="event.stopPropagation();setSemanaConsumir(${wi},this.checked)" style="margin:0"> consumir
+              <label style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#64748b;cursor:pointer" title="Semana 100% de feriado: ao marcar, os pratos desta semana são anulados aqui e passam para a semana seguinte (a rotação é deslocada). Desmarcar mantém os pratos riscados na semana.">
+                <input type="checkbox" ${checked} onclick="event.stopPropagation();toggleSemanaFeriado(${wi},this.checked)" style="margin:0"> Deslocar pratos
               </label>
             </div>`;
         } else {
@@ -7137,9 +7197,9 @@ function renderCardapio(){
           }
         }
       }
-      days += `<div class="cal-day day-off"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
+      days += `<div class="cal-day day-off" data-iso="${iso}"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
     } else {
-      days += `<div class="cal-day day-nletivo" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}</div>`;
+      days += `<div class="cal-day day-nletivo" data-iso="${iso}" onclick="abrirPopupDia('${iso}',event)"><span class="cal-day-num-btn" onclick="clicarNumDia('${iso}',event)" title="Marcar como Feriado/Recesso">${day}</span>${badge}</div>`;
     }
   }
 
@@ -10723,18 +10783,19 @@ function distribuirAPartirDoCiclo(){
   const letSet = new Set(DIAS_LETIVOS_ARRAY);
   const sCons = getSemanasConsumir();
   let pratoIdx = 0;
-  let semanasPreservadas = 0;
+  let semanasAnuladas = 0;
   for(let wi = startWeek; wi < totalCalWeeks; wi++){
     const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
     const sIdx   = wi % 4;
     const mesNome = MESES_NOMES[mesIdx];
     if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
     if(!DADOS.cardapio[mesNome][sIdx]) DADOS.cardapio[mesNome][sIdx] = { dias: ['','','','',''] };
-    // Semana 100% feriado: só consome preparações se o checkbox "consumir" estiver marcado
+    // Semana 100% feriado com "Deslocar pratos" marcado: anula a semana e
+    // não avança o pratoIdx — os pratos caem na semana seguinte
     const datasSem = getDiasSemanaCal(wi);
     const todaFeriado = datasSem.length > 0 && !datasSem.some(dt => letSet.has(dt));
-    if(todaFeriado && !sCons[wi]){
-      semanasPreservadas++;
+    if(todaFeriado && sCons[wi]){
+      semanasAnuladas++;
       continue;
     }
     for(let dow = 0; dow < 5; dow++){
@@ -10746,7 +10807,7 @@ function distribuirAPartirDoCiclo(){
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   renderCardapio();
   sincronizarSeletores(ciclo, 1, true);
-  alert(`✅ ${pratoIdx} posições preenchidas a partir do ${ciclo} com ${pratos.length} prato(s) em rotação!${semanasPreservadas ? `\n${semanasPreservadas} semana(s) de feriado preservada(s) — sem consumir preparações.` : ''}`);
+  alert(`✅ ${pratoIdx} posições preenchidas a partir do ${ciclo} com ${pratos.length} prato(s) em rotação!${semanasAnuladas ? `\n${semanasAnuladas} semana(s) de feriado anulada(s) — pratos deslocados para a semana seguinte.` : ''}`);
 }
 
 function getCorDia(iso, letIdx){
