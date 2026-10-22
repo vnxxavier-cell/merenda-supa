@@ -6317,10 +6317,17 @@ function descartarAlteracoesCardapio(){
 // ao desmarcar) e ficam parados em cima da célula de destino. A grade só é
 // reconstruída DEPOIS — o nome novo nasce exatamente onde o antigo parou, então
 // a troca é invisível. Sem fade na entrada.
-function _eventosDoMes(){
+// Só anima a semana marcada e as de baixo: as acima não mudam nos dados.
+function _semanaDaCelula(cel){
+  const iso = cel && cel.getAttribute ? cel.getAttribute('data-iso') : null;
+  return iso ? getCalWeekIdx(iso) : -1;
+}
+function _eventosDoMes(wi){
   const grid = document.getElementById('grid-calendario');
   if(!grid) return [];
-  return Array.from(grid.querySelectorAll('.cal-event, .cal-anulada-hint'));
+  const eventos = Array.from(grid.querySelectorAll('.cal-event, .cal-anulada-hint'));
+  if(wi == null) return eventos;
+  return eventos.filter(ev => _semanaDaCelula(ev.closest('.cal-day')) >= wi);
 }
 function _alturaCelulaCal(){
   const grid = document.getElementById('grid-calendario');
@@ -6329,12 +6336,12 @@ function _alturaCelulaCal(){
 }
 // Distância real entre a célula de um nome e a célula da semana vizinha (7 colunas
 // = uma semana). Mede cada elemento porque as linhas podem ter alturas diferentes.
-function _aplicarShiftPorNome(marcado){
+function _aplicarShiftPorNome(marcado, wi){
   const grid = document.getElementById('grid-calendario');
   if(!grid) return;
   const dias = Array.from(grid.querySelectorAll('.cal-day'));
   const fallback = _alturaCelulaCal();
-  _eventosDoMes().forEach(ev => {
+  _eventosDoMes(wi).forEach(ev => {
     const cel = ev.closest('.cal-day');
     const idx = cel ? dias.indexOf(cel) : -1;
     const alvo = idx >= 0 ? dias[idx + (marcado ? 7 : -7)] : null;
@@ -6344,9 +6351,9 @@ function _aplicarShiftPorNome(marcado){
     ev.style.setProperty('--cal-shift', dist + 'px');
   });
 }
-function _animarOndaDeslocamento(marcado){
-  const saida = _eventosDoMes();
-  _aplicarShiftPorNome(marcado);
+function _animarOndaDeslocamento(marcado, wi){
+  const saida = _eventosDoMes(wi);
+  _aplicarShiftPorNome(marcado, wi);
   saida.forEach((ev, i) => {
     ev.style.animationDelay = (i * 30) + 'ms';
     ev.classList.add('cal-event-escorrega');
@@ -6357,6 +6364,7 @@ function _animarOndaDeslocamento(marcado){
     const grade = document.getElementById('grid-calendario');
     if(!grade) return;
     Array.from(grade.querySelectorAll('.cal-day'))
+      .filter(c => _semanaDaCelula(c) >= wi)
       .map(day => day.querySelector('.cal-event, .cal-anulada-hint') ? day : null)
       .filter(Boolean)
       .forEach((c, i) => {
@@ -6371,7 +6379,7 @@ function toggleSemanaFeriado(wi, marcado){
   if(!_cardBase) _cardBase = JSON.parse(JSON.stringify(DADOS.cardapio));
   setSemanaConsumir(wi, marcado);
   recalcularDeslocamento();
-  _animarOndaDeslocamento(marcado);
+  _animarOndaDeslocamento(marcado, wi);
 }
 
 function populateMesesMerc(){
