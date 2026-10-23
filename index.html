@@ -615,12 +615,14 @@ h2.titulo::after{content:'';flex:1;height:2px;background:var(--borda)}
 .login-capslock{font-size:11px;color:#92400e;font-weight:600;margin-top:4px;display:none}
 .login-capslock.visivel{display:flex}
 .login-erro{color:var(--vermelho);font-size:13px;font-weight:600;min-height:20px;margin-bottom:8px}
-.login-btn{width:100%;padding:12px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+.login-btn{width:100%;padding:12px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;min-height:44px}
 .login-btn:hover{background:var(--azul2)}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
-.login-google-btn{width:100%;padding:10px;background:#fff;color:#444;border:1.5px solid #dadce0;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.login-google-btn{width:100%;padding:12px;background:#fff;color:#444;border:1.5px solid #dadce0;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
 .login-google-btn:hover{background:#f8f9fa;border-color:#c4c7cc}
 .login-google-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-btn-outline{width:100%;padding:12px;background:transparent;color:var(--azul);border:2px solid var(--azul);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;min-height:44px;margin-top:14px}
+.login-btn-outline:hover{background:var(--azul);color:#fff}
 .login-link{background:none;border:none;color:var(--azul);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;text-decoration:underline;opacity:.9}
 .login-link:hover{opacity:1}
 .login-divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:11px;color:#aaa;text-transform:uppercase}
@@ -711,7 +713,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Entrar com Google
     </button>
-    <button class="login-link" id="login-criar-conta" onclick="mostrarCadastro()" type="button">Criar conta</button>
+    <button class="login-btn-outline" id="login-criar-conta" onclick="mostrarCadastro()" type="button">Criar conta</button>
   </div>
   <div class="login-box" id="cadastro-box" style="display:none">
     <h2 style="display:flex;align-items:center;justify-content:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Criar conta</h2>
