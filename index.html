@@ -3591,9 +3591,33 @@ function salvarPercapta(){
   localStorage.setItem('merenda_percapta', JSON.stringify(PERCAPTA_CUSTOM));
 }
 
+// Chave estável de um ingrediente dentro de PERCAPTA_CUSTOM.
+// Quando o ingrediente tem `d` (componente: 'rosca', 'vitamina'...), a chave
+// recebe o sufixo, para que o MESMO ingrediente usado duas vezes num cardápio
+// (ex.: cardápio 81) tenha customizações per capita independentes.
+// Mesmo formato usado por calcularTotaisNiveis (`${i} ___ ${d}`).
+function pcKey(ingOuNome, comp){
+  const nome = (typeof ingOuNome === 'string') ? ingOuNome : (ingOuNome && ingOuNome.i);
+  const c    = (typeof ingOuNome === 'string') ? comp    : (ingOuNome && ingOuNome.d);
+  return c ? nome + ' ___ ' + c : nome;
+}
+
+// Remove o sufixo de componente de uma chave (`AÇÚCAR ___ rosca` → `AÇÚCAR`)
+function nomeBaseIng(chave){
+  const p = String(chave || '').indexOf(' ___ ');
+  return p === -1 ? String(chave || '') : chave.slice(0, p);
+}
+
+// Formata a chave para exibição (`AÇÚCAR ___ rosca` → `AÇÚCAR (rosca)`)
+function nomeExibIng(chave){
+  const k = String(chave || '');
+  return k.includes(' ___ ') ? k.replace(' ___ ', ' (') + ')' : k;
+}
+
 // Retorna o valor per capita efetivo (custom se existir, senão PNAE)
 function getPC(prato, ingName, nivel_id, ing){
-  const c = PERCAPTA_CUSTOM[prato]?.[ingName];
+  const key = (ing && ing.d) ? pcKey(ing) : ingName;
+  const c = PERCAPTA_CUSTOM[prato]?.[key];
   let r;
   if(nivel_id === 'f1')    r = c?.f1    ?? ing.f1    ?? ing.g;
   else if(nivel_id === 'f2')    r = c?.f2    ?? ing.g;
@@ -3604,8 +3628,8 @@ function getPC(prato, ingName, nivel_id, ing){
 }
 
 // Retorna true se o valor foi customizado
-function isCustom(prato, ingName, nivel_id){
-  return PERCAPTA_CUSTOM[prato]?.[ingName]?.[nivel_id] !== undefined;
+function isCustom(prato, ingKey, nivel_id){
+  return PERCAPTA_CUSTOM[prato]?.[ingKey]?.[nivel_id] !== undefined;
 }
 
 
@@ -5165,7 +5189,7 @@ function calcularPorOrcamento(orcamento){
 
       Object.entries(totais).forEach(([ing, qtd]) => {
         qtdAno[ing]   = (qtdAno[ing] || 0) + qtd;
-        custoTotalAno += qtd * (precos[ing] || 0);
+        custoTotalAno += qtd * (precos[nomeBaseIng(ing)] || 0);
       });
     }
   });
@@ -5187,7 +5211,7 @@ function calcularPorOrcamento(orcamento){
     qtdEdital[ing]  = qtdTotal * ratioEfetivo;
   });
 
-  const semSemPreco = Object.keys(qtdAno).filter(ing => !precos[ing] && qtdAno[ing] > 0);
+  const semSemPreco = Object.keys(qtdAno).filter(ing => !precos[nomeBaseIng(ing)] && qtdAno[ing] > 0);
 
   return { ratio, semanasCobertas, ciclosCompletos, semanasSobra,
            custoTotalAno, custoEdital, sobra, qtdSemanal, qtdEdital,
@@ -5275,12 +5299,12 @@ function registrarPreviaCalculadora(){
   const r = window._calcResultado;
   if(!r || !window._calcManualQtd) return;
   const itens = Object.entries(window._calcManualQtd)
-    .filter(([nome, qtd]) => qtd > 0 && DADOS.ingredientes[nome])
+    .filter(([nome, qtd]) => qtd > 0 && DADOS.ingredientes[nomeBaseIng(nome)])
     .map(([nome, qtd]) => ({
       ingrediente:   nome,
-      unidade:       DADOS.ingredientes[nome]?.unidade || 'kg',
+      unidade:       DADOS.ingredientes[nomeBaseIng(nome)]?.unidade || 'kg',
       qtd_estimada:  qtd,
-      preco_previo:  r.precos[nome] || 0
+      preco_previo:  r.precos[nomeBaseIng(nome)] || 0
     }));
   if(!itens.length){ alert('Nenhum item para registrar na prévia.'); return; }
   const valorEstimado = itens.reduce((a,it) => a + it.qtd_estimada * it.preco_previo, 0);
@@ -5311,8 +5335,8 @@ function renderTabelaCalc(){
     .filter(([, qtd]) => qtd > 0)
     .sort((a,b) => a[0].localeCompare(b[0]))
     .map(([ing, qtd]) => {
-      const un  = DADOS.ingredientes[ing]?.unidade || 'kg';
-      const p   = r.precos[ing] || 0;
+    const un  = DADOS.ingredientes[nomeBaseIng(ing)]?.unidade || 'kg';
+    const p   = r.precos[nomeBaseIng(ing)] || 0;
       const sub = qtd * p;
       custoTotal += sub;
       const precStr = p ? 'R$ ' + p.toFixed(2).replace('.',',') : '<span style="color:#aaa">—</span>';
@@ -5321,7 +5345,7 @@ function renderTabelaCalc(){
       const ri = idx++;
       window._calcIngMap[ing] = { idx: ri, preco: p };
       return `<tr>
-        <td><b>${ing}</b></td>
+        <td><b>${ing.includes(' ___ ') ? ing.replace(' ___ ', ' (') + ')' : ing}</b></td>
         <td style="color:var(--txt2)">${un}</td>
         <td class="num"><input type="number" value="${qtd}" min="0" step="0.01"
           oninput="calcAtualizarQtd('${ingEsc}',this.value)"
@@ -5374,7 +5398,7 @@ function calcAtualizarTotal(){
   const r = window._calcResultado;
   let total = 0;
   Object.entries(window._calcManualQtd || {}).forEach(([ing, qtd]) => {
-    total += (qtd || 0) * (r?.precos[ing] || 0);
+    total += (qtd || 0) * (r?.precos[nomeBaseIng(ing)] || 0);
   });
   const el = document.getElementById('calc-total');
   if(el) el.textContent = 'R$ ' + total.toLocaleString('pt-BR',{minimumFractionDigits:2});
@@ -6548,6 +6572,29 @@ function nomeNum(prato){
   return m?{num:m[1],nome:m[2]}:{num:'',nome:prato};
 }
 
+// ── Cardápio 81: existe no cardapios_data.js, mas não tinha ficha técnica ──
+// Ficha derivada da gramatura PNAE do CD. O campo `d` desambigua os componentes
+// que usam o MESMO ingrediente com quantidades diferentes (rosca x vitamina),
+// permitindo customização per capita independente de cada um.
+if(!DADOS.ingredientes['MORANGO']){
+  DADOS.ingredientes['MORANGO'] = {unidade:'kg', estoque:0, preco:0};
+}
+if(!DADOS.ficha['81 - Rosca Caseira com Vitamina de Morango']){
+  DADOS.ficha['81 - Rosca Caseira com Vitamina de Morango'] = [
+    {i:'AÇÚCAR',          d:'rosca',    g:5.4,  f1:3.75, medio:6.2,  eja:5.4},
+    {i:'CANELA EM PÓ',                  g:0.2,  f1:0.14, medio:0.2,  eja:0.2},
+    {i:'FARINHA DE TRIGO',              g:62.5, f1:43.25,medio:71.4, eja:62.5},
+    {i:'FERMENTO EM PÓ',                g:2.55, f1:1.76, medio:2.9,  eja:2.55},
+    {i:'LEITE',             d:'rosca',  g:20.8, f1:14.4, medio:23.8, eja:20.8},
+    {i:'MARGARINA',                     g:2.5,  f1:1.73, medio:2.9,  eja:2.5},
+    {i:'ÓLEO DE SOJA',                  g:6.7,  f1:4.65, medio:7.6,  eja:6.7},
+    {i:'OVO',                           g:6.25, f1:4.35, medio:7.15, eja:6.25},
+    {i:'AÇÚCAR',          d:'vitamina', g:2.9,  f1:1.5,  medio:3.3,  eja:2.9},
+    {i:'LEITE',            d:'vitamina', g:150,  f1:105,  medio:170,  eja:145},
+    {i:'MORANGO',          d:'vitamina', g:55,   f1:38,   medio:63,   eja:50}
+  ];
+}
+
 // Cópia imutável das fichas originais (padrão PNAE/secretaria) — usada para restauração
 const DADOS_FICHA_ORIGINAL = JSON.parse(JSON.stringify(DADOS.ficha));
 
@@ -6605,6 +6652,8 @@ function init(){
   renderFichas();
   renderIngredientes();
   renderNiveis();
+  // Deriva as gramaturas do CD a partir das Fichas antes de popular os dropdowns
+  sincronizarFichasNoCD();
   // Pré-popula dropdown de cardápios da aba Quantidades por Turno
   if(typeof CD !== 'undefined' && CD && CD.length){
     const sel = document.getElementById('sel-cardapio-print');
@@ -8686,10 +8735,10 @@ function diffFicha(prato){
   const original = DADOS_FICHA_ORIGINAL[prato];
   if(!original) return null;
   const atual = DADOS.ficha[prato]||[];
-  const origNomes = new Set(original.map(i=>i.i));
-  const atualNomes = new Set(atual.map(i=>i.i));
-  const adicionados = atual.filter(i=>!origNomes.has(i.i));
-  const removidos = original.filter(i=>!atualNomes.has(i.i));
+  const origNomes = new Set(original.map(pcKey));
+  const atualNomes = new Set(atual.map(pcKey));
+  const adicionados = atual.filter(i=>!origNomes.has(pcKey(i)));
+  const removidos = original.filter(i=>!atualNomes.has(pcKey(i)));
   const modificadosQtd = Object.keys(PERCAPTA_CUSTOM[prato]||{}).filter(k=>atualNomes.has(k));
   return {adicionados, removidos, modificadosQtd};
 }
@@ -8749,7 +8798,7 @@ function renderFichaTable(prato){
   const pratoEnc = prato.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   const nivelCols = hasLevels ? ['f1','f2','medio','eja'] : ['f2'];
   const nivelLabels = {'f1':'F I','f2':'F II','medio':'Médio','eja':'EJA'};
-  const anyCustom = ings.some(ing => nivelCols.some(nv => isCustom(prato, ing.i, nv)));
+  const anyCustom = ings.some(ing => nivelCols.some(nv => isCustom(prato, pcKey(ing), nv)));
 
   const inpStyle = (custom) => custom
     ? 'width:56px;font-size:12px;padding:3px 4px;border:2px solid #f59e0b;border-radius:5px;background:#fffbeb;color:#92400e;font-weight:700;text-align:right;outline:none;font-family:inherit'
@@ -8785,23 +8834,24 @@ function renderFichaTable(prato){
   </div>`;
 
   // Tabela de ingredientes
-  const origNomes = DADOS_FICHA_ORIGINAL[prato] ? new Set(DADOS_FICHA_ORIGINAL[prato].map(i=>i.i)) : null;
-  const atualNomes = new Set(ings.map(i=>i.i));
+  const origNomes = DADOS_FICHA_ORIGINAL[prato] ? new Set(DADOS_FICHA_ORIGINAL[prato].map(pcKey)) : null;
+  const atualNomes = new Set(ings.map(pcKey));
   const rowsAtuais = ings.map(ing => {
-    const anyIngCustom = nivelCols.some(nv => isCustom(prato, ing.i, nv));
-    const isAdicionado = origNomes && !origNomes.has(ing.i);
+    const ingChave = pcKey(ing);
+    const anyIngCustom = nivelCols.some(nv => isCustom(prato, ingChave, nv));
+    const isAdicionado = origNomes && !origNomes.has(ingChave);
     const cells = nivelCols.map(nv => {
       const _pdfVal = nv==='f1' ? (ing.f1??ing.g) : nv==='f2' ? ing.g : nv==='medio' ? (ing.medio??ing.g) : (ing.eja??ing.g);
       const pdfVal = (typeof _pdfVal === 'number' && isFinite(_pdfVal)) ? _pdfVal : 0;
       const curVal = getPC(prato, ing.i, nv, ing);
-      const custom = isCustom(prato, ing.i, nv);
-      const ingEnc = (ing.i||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const custom = isCustom(prato, ingChave, nv);
+      const ingEnc = (ingChave||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       return `<td class="num"><input type="number" min="0" step="0.1" value="${curVal.toFixed(1)}"
         title="PNAE: ${pdfVal.toFixed(1)}g"
         oninput="editarPercapta('${pratoEnc}','${ingEnc}','${nv}',this.value,this)"
         style="${inpStyle(custom)}"></td>`;
     }).join('');
-    const ingEnc = ing.i.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const ingEnc = ingChave.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const rowBg = isAdicionado ? '#f0fdf4' : anyIngCustom ? '#fffdf0' : '';
     const addedBadge = isAdicionado ? `<span style="font-size:9px;font-weight:700;background:#16a34a;color:#fff;border-radius:8px;padding:1px 6px;margin-left:4px">+ adicionado</span>` : '';
     return `<tr style="background:${rowBg}${isAdicionado?';border-left:3px solid #16a34a':''}">
@@ -8813,11 +8863,11 @@ function renderFichaTable(prato){
       </td>
     </tr>`;
   }).join('');
-  const rowsRemovidos = (DADOS_FICHA_ORIGINAL[prato]||[]).filter(i=>!atualNomes.has(i.i)).map(ing => {
-    const ingEnc = ing.i.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const rowsRemovidos = (DADOS_FICHA_ORIGINAL[prato]||[]).filter(i=>!atualNomes.has(pcKey(i))).map(ing => {
+    const ingEnc = pcKey(ing).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const emptyCells = nivelCols.map(()=>`<td></td>`).join('');
     return `<tr style="background:#fff5f5;border-left:3px solid #dc2626;opacity:.8">
-      <td style="font-size:12px;color:#dc2626;text-decoration:line-through">${ing.i}<span style="font-size:9px;font-weight:700;background:#dc2626;color:#fff;border-radius:8px;padding:1px 6px;margin-left:4px;text-decoration:none;display:inline-block">− removido</span></td>
+      <td style="font-size:12px;color:#dc2626;text-decoration:line-through">${ing.i}${ing.d ? ` <small>(${ing.d})</small>` : ''}<span style="font-size:9px;font-weight:700;background:#dc2626;color:#fff;border-radius:8px;padding:1px 6px;margin-left:4px;text-decoration:none;display:inline-block">− removido</span></td>
       ${emptyCells}
       <td><button onclick="restaurarIngDaFicha('${pratoEnc}','${ingEnc}')" title="Restaurar este ingrediente" style="background:none;border:none;cursor:pointer;font-size:12px;color:#16a34a;font-weight:700">↩</button></td>
     </tr>`;
@@ -8869,8 +8919,8 @@ function abrirFicha(prato){
   document.getElementById('overlay').classList.add('aberto');
 }
 
-function removerIngDaFicha(prato, ingName){
-  DADOS.ficha[prato] = (DADOS.ficha[prato]||[]).filter(i => i.i !== ingName);
+function removerIngDaFicha(prato, ingKey){
+  DADOS.ficha[prato] = (DADOS.ficha[prato]||[]).filter(x => pcKey(x) !== ingKey);
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
   custom[prato] = DADOS.ficha[prato];
   localStorage.setItem('merenda_fichas_custom', JSON.stringify(custom));
@@ -8878,10 +8928,10 @@ function removerIngDaFicha(prato, ingName){
   renderFichas();
 }
 
-function restaurarIngDaFicha(prato, ingName){
-  const original = (DADOS_FICHA_ORIGINAL[prato]||[]).find(i=>i.i===ingName);
+function restaurarIngDaFicha(prato, ingKey){
+  const original = (DADOS_FICHA_ORIGINAL[prato]||[]).find(x=>pcKey(x)===ingKey);
   if(!original) return;
-  if(!(DADOS.ficha[prato]||[]).some(i=>i.i===ingName)){
+  if(!(DADOS.ficha[prato]||[]).some(x=>pcKey(x)===ingKey)){
     DADOS.ficha[prato].push(JSON.parse(JSON.stringify(original)));
   }
   const custom = JSON.parse(localStorage.getItem('merenda_fichas_custom')||'{}');
@@ -8895,7 +8945,7 @@ function adicionarIngAFicha(prato){
   const sel = document.getElementById('ficha-add-ing-sel');
   const ingName = sel ? sel.value : '';
   if(!ingName){ alert('Selecione um ingrediente.'); return; }
-  if((DADOS.ficha[prato]||[]).some(i=>i.i===ingName)){ alert('Este ingrediente já está na ficha.'); return; }
+  if((DADOS.ficha[prato]||[]).some(x=>pcKey(x)===ingName)){ alert('Este ingrediente já está na ficha.'); return; }
 
   // Detecta os níveis do prato
   const ingsAtuais = DADOS.ficha[prato]||[];
@@ -8928,8 +8978,8 @@ function adicionarIngAFicha(prato){
   renderFichas();
 }
 
-function editarPercapta(prato, ingName, nivel, val, el){
-  const ing = (DADOS.ficha[prato]||[]).find(x => x.i === ingName);
+function editarPercapta(prato, ingKey, nivel, val, el){
+  const ing = (DADOS.ficha[prato]||[]).find(x => pcKey(x) === ingKey);
   if(!ing) return;
   const _pdfVal = nivel==='f1' ? (ing.f1??ing.g) : nivel==='f2' ? ing.g : nivel==='medio' ? (ing.medio??ing.g) : (ing.eja??ing.g);
   const pdfVal = (typeof _pdfVal === 'number' && isFinite(_pdfVal)) ? _pdfVal : 0;
@@ -8937,19 +8987,19 @@ function editarPercapta(prato, ingName, nivel, val, el){
   if(isNaN(numVal) || numVal < 0) return;
 
   if(!PERCAPTA_CUSTOM[prato]) PERCAPTA_CUSTOM[prato] = {};
-  if(!PERCAPTA_CUSTOM[prato][ingName]) PERCAPTA_CUSTOM[prato][ingName] = {};
+  if(!PERCAPTA_CUSTOM[prato][ingKey]) PERCAPTA_CUSTOM[prato][ingKey] = {};
 
   const isDefault = Math.abs(numVal - pdfVal) < 0.05;
   if(isDefault){
-    delete PERCAPTA_CUSTOM[prato][ingName][nivel];
-    if(Object.keys(PERCAPTA_CUSTOM[prato][ingName]).length === 0) delete PERCAPTA_CUSTOM[prato][ingName];
+    delete PERCAPTA_CUSTOM[prato][ingKey][nivel];
+    if(Object.keys(PERCAPTA_CUSTOM[prato][ingKey]).length === 0) delete PERCAPTA_CUSTOM[prato][ingKey];
     if(Object.keys(PERCAPTA_CUSTOM[prato]).length === 0) delete PERCAPTA_CUSTOM[prato];
   } else {
-    PERCAPTA_CUSTOM[prato][ingName][nivel] = numVal;
+    PERCAPTA_CUSTOM[prato][ingKey][nivel] = numVal;
   }
   salvarPercapta();
   // Update input style live
-  const custom = isCustom(prato, ingName, nivel);
+  const custom = isCustom(prato, ingKey, nivel);
   if(el) el.style.cssText = custom
     ? 'width:56px;font-size:12px;padding:3px 4px;border:2px solid #f59e0b;border-radius:5px;background:#fffbeb;color:#92400e;font-weight:700;text-align:right;outline:none;font-family:inherit'
     : 'width:56px;font-size:12px;padding:3px 4px;border:1.5px solid var(--borda);border-radius:5px;background:#fff;color:var(--txt);font-weight:400;text-align:right;outline:none;font-family:inherit';
@@ -8957,9 +9007,9 @@ function editarPercapta(prato, ingName, nivel, val, el){
   document.getElementById('modal-body').innerHTML = renderFichaTable(prato);
 }
 
-function resetPercaptaIng(prato, ingName){
+function resetPercaptaIng(prato, ingKey){
   if(PERCAPTA_CUSTOM[prato]) {
-    delete PERCAPTA_CUSTOM[prato][ingName];
+    delete PERCAPTA_CUSTOM[prato][ingKey];
     if(Object.keys(PERCAPTA_CUSTOM[prato]).length === 0) delete PERCAPTA_CUSTOM[prato];
   }
   salvarPercapta();
@@ -9526,7 +9576,14 @@ function renomearIngrediente(nomeAntigo, novoRaw){
   // 5) Percapita custom
   let perMudou = false;
   Object.keys(PERCAPTA_CUSTOM).forEach(p => {
-    if(PERCAPTA_CUSTOM[p][nomeAntigo] !== undefined){ PERCAPTA_CUSTOM[p][novo] = PERCAPTA_CUSTOM[p][nomeAntigo]; delete PERCAPTA_CUSTOM[p][nomeAntigo]; perMudou = true; }
+    Object.keys(PERCAPTA_CUSTOM[p] || {}).forEach(k => {
+      if(nomeBaseIng(k) !== nomeAntigo) return;
+      const novoK = (k === nomeAntigo) ? novo : novo + k.slice(nomeAntigo.length);
+      if(PERCAPTA_CUSTOM[p][novoK] === undefined) PERCAPTA_CUSTOM[p][novoK] = PERCAPTA_CUSTOM[p][k];
+      if(novoK !== k) delete PERCAPTA_CUSTOM[p][k];
+      perMudou = true;
+    });
+    if(Object.keys(PERCAPTA_CUSTOM[p] || {}).length === 0) delete PERCAPTA_CUSTOM[p];
   });
   if(perMudou) localStorage.setItem('merenda_percapta', JSON.stringify(PERCAPTA_CUSTOM));
   // 6) Ajustes de mercado
@@ -9652,6 +9709,7 @@ function popularSemanasGastos(){
 }
 
 function renderGastos(){
+  sincronizarFichasNoCD();
   const mesNome = document.getElementById('sel-mes-gastos')?.value;
   const semSel  = parseInt(document.getElementById('sel-sem-gastos')?.value || 0);
   if(!mesNome) return;
@@ -9677,20 +9735,21 @@ function renderGastos(){
     }
     if(semSel === 0 || semSel === idx + 1){
       for(const [ing, qtd] of Object.entries(totais)){
-        custoSemana += qtd * (precos[ing] || 0);
+        custoSemana += qtd * (precos[nomeBaseIng(ing)] || 0);
       }
     }
   });
 
   let custoMes = 0;
   const rows = Object.entries(totaisMes).sort((a,b)=>a[0].localeCompare(b[0])).map(([nome, nec]) => {
-    const p   = precos[nome] || 0;
+    const p   = precos[nomeBaseIng(nome)] || 0;
     const sub = nec * p;
     custoMes += sub;
     if(nec === 0 && p === 0) return '';
+    const nomeExib = nome.includes(' ___ ') ? nome.replace(' ___ ', ' (') + ')' : nome;
     return `<tr>
-      <td><b>${nome}</b></td>
-      <td>${DADOS.ingredientes[nome]?.unidade || 'kg'}</td>
+      <td><b>${nomeExib}</b></td>
+      <td>${DADOS.ingredientes[nomeBaseIng(nome)]?.unidade || 'kg'}</td>
       <td class="num">${nec.toFixed(2).replace('.', ',')}</td>
       <td class="num">R$ ${p.toFixed(2).replace('.', ',')}</td>
       <td class="num">R$ ${sub.toFixed(2).replace('.', ',')}</td>
@@ -9708,7 +9767,7 @@ function renderGastos(){
         totais['AÇÚCAR'] = (totais['AÇÚCAR'] || 0) + SERVIDORES_CONFIG.acucar_kg;
       }
       for(const [ing, qtd] of Object.entries(totais)){
-        custoAno += qtd * (precos[ing] || 0);
+        custoAno += qtd * (precos[nomeBaseIng(ing)] || 0);
       }
     });
   });
@@ -9737,7 +9796,7 @@ function renderGastos(){
       });
     });
     for(const [ing, qtd] of Object.entries(totaisCiclo)){
-      custoCiclo += qtd * (precos[ing] || 0);
+      custoCiclo += qtd * (precos[nomeBaseIng(ing)] || 0);
     }
   }
 
@@ -9782,8 +9841,8 @@ function renderRegistroSaidas(){
     const id=c[0], nome=c[1], ings=c[4];
     let rows = '';
     for(let i=0;i<ings.length;i+=5){
-      const inome=ings[i];
-      rows += '<tr><td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:13px;font-weight:400;background:#fff;color:#000">'+inome+'</td>'
+    const inome=nomeExibIng(ings[i]);
+    rows += '<tr><td style="border:1px solid #000;padding:5px 8px;text-align:center;font-size:13px;font-weight:400;background:#fff;color:#000">'+inome+'</td>'
         + '<td style="border:1px solid #000;padding:5px 8px;font-size:13px;background:#fff"></td>'
         + '<td style="border:1px solid #000;padding:5px 8px;font-size:13px;background:#fff"></td>'
         + '<td style="border:1px solid #000;padding:5px 8px;font-size:13px;background:#fff"></td>'
@@ -9822,7 +9881,95 @@ function renderRegistroSaidas(){
   el.innerHTML = html;
 }
 
+// ── SINCRONIA FICHA TÉCNICA → CD ─────────────────────────────────────────────
+// A Ficha Técnica (DADOS.ficha) é a fonte editável; o CD traz apenas metadados
+// fixos (id, nome, tipo, grupo, modo de preparo). Aqui só o campo de
+// ingredientes (c[4]) é derivado da ficha, para que alterações feitas na aba
+// Fichas reflitam em Quantidades por Turno, Registro de Saídas e Gastos.
+// O array flat mantém o formato do CD: [nome, f1, f2, medio, eja, ...] por ingrediente.
+const _avisoNumDuplicado = new Set();
+function sincronizarFichasNoCD(){
+  if(typeof CD === 'undefined' || !CD || !CD.length) return false;
+  if(typeof DADOS === 'undefined' || !DADOS || !DADOS.ficha) return false;
+
+  // 1) Remove entradas de pratos do usuário anexadas em rodadas anteriores
+  //    (reanexadas adiante) — evita duplicatas após renomeação/exclusão.
+  for(let k = CD.length - 1; k >= 0; k--){
+    if(CD[k] && CD[k].__user) CD.splice(k, 1);
+  }
+
+  // 2) Indexa as fichas por número do cardápio (um número pode ter >1 chave)
+  const porNum = {};
+  Object.keys(DADOS.ficha).forEach(k => {
+    const n = parseInt(nomeNum(k).num, 10);
+    if(isNaN(n)) return;
+    (porNum[n] = porNum[n] || []).push(k);
+  });
+
+  // 3) Deriva c[4] de cada entrada do CD a partir da ficha PNAE correspondente
+  const numsNoCD = new Set();
+  CD.forEach(c => {
+    const num = parseInt(c[0], 10);
+    numsNoCD.add(num);
+    const candidatas = porNum[num] || [];
+    if(!candidatas.length) return;                     // sem ficha → mantém os dados do CD
+    const chavePnae = candidatas.find(k => DADOS_FICHA_ORIGINAL[k] !== undefined);
+    if(!chavePnae){                                     // nº já usado por cardápio PNAE
+      candidatas.forEach(k => {
+        if(_avisoNumDuplicado.has(k)) return;
+        _avisoNumDuplicado.add(k);
+        alert('O prato "' + k + '" usa o número ' + num + ', que já pertence a um cardápio do padrão PNAE.\n\nEle NÃO será exibido na aba "Quantidades por Turno".\nAltere o número do prato para um livre (ex.: 99, 100...).');
+      });
+      return;
+    }
+    const ficha = DADOS.ficha[chavePnae];
+    if(!ficha || !ficha.length) return;                 // ficha vazia → mantém os dados do CD
+    const flat = [];
+    ficha.forEach(x => {
+      flat.push(pcKey(x),
+        getPC(chavePnae, x.i, 'f1', x),
+        getPC(chavePnae, x.i, 'f2', x),
+        getPC(chavePnae, x.i, 'medio', x),
+        getPC(chavePnae, x.i, 'eja', x));
+    });
+    c[4] = flat;
+  });
+
+  // 4) Anexa pratos criados pelo usuário cujo número não existe no CD
+  let anexou = false;
+  Object.keys(DADOS.ficha).forEach(k => {
+    const num = parseInt(nomeNum(k).num, 10);
+    if(isNaN(num) || numsNoCD.has(num)) return;         // exige número livre
+    const ficha = DADOS.ficha[k];
+    if(!ficha || !ficha.length) return;
+    const flat = [];
+    ficha.forEach(x => {
+      flat.push(pcKey(x),
+        getPC(k, x.i, 'f1', x),
+        getPC(k, x.i, 'f2', x),
+        getPC(k, x.i, 'medio', x),
+        getPC(k, x.i, 'eja', x));
+    });
+    const grupo = (typeof PRATO_PARA_GRUPO !== 'undefined' && PRATO_PARA_GRUPO[String(num)]) || 2;
+    const entrada = [num, nomeNum(k).nome, 'lanche', grupo, flat, '', ''];
+    entrada.__user = true;
+    CD.push(entrada);
+    numsNoCD.add(num);
+    anexou = true;
+  });
+
+  // 5) Cardápios novos exigem repovoar os dropdowns
+  if(anexou){
+    ['sel-cardapio-print', 'sel-cardapio-rs'].forEach(id => {
+      const sel = document.getElementById(id);
+      if(sel) delete sel.dataset.populated;
+    });
+  }
+  return anexou;
+}
+
 function renderPreparo(filtro){
+  sincronizarFichasNoCD();
   const el = document.getElementById('prep-conteudo');
   if(!CD||!CD.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa">Nenhum cardápio carregado.</div>'; return; }
   
@@ -9872,7 +10019,7 @@ function renderPreparo(filtro){
     hdr2 += '</tr>';
     let rows = '';
     for(let i=0;i<ings.length;i+=5){
-      const inome=ings[i], vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
+      const inome=nomeExibIng(ings[i]), vF1=ings[i+1], vF2=ings[i+2], vMed=ings[i+3], vEja=ings[i+4];
       const vals=[vF1,vF2,vMed,vEja];
       const isLiq = /\b(óleo|leite|molho|água|suco|café|achocolatado|iogurte|coco)\b/i.test(inome);
       let somaTotal = 0;
@@ -9943,6 +10090,7 @@ function imprimirPrepAtual(){
 }
 
 function imprimirRegistroSaidas(){
+  sincronizarFichasNoCD();
   const sel = document.getElementById('sel-cardapio-rs') || document.getElementById('sel-cardapio-print');
   const filtroTexto = (document.querySelector('.filtro-input')?.value||'').toLowerCase();
   const isCiclo = sel && sel.value === 'ciclo';
@@ -9961,8 +10109,8 @@ function imprimirRegistroSaidas(){
     const id=c[0], nome=c[1], ings=c[4];
     let rows = '';
     for(let i=0;i<ings.length;i+=5){
-      const inome=ings[i];
-      rows += '<tr><td>'+inome+'</td><td></td><td></td><td></td><td></td></tr>';
+    const inome=nomeExibIng(ings[i]);
+    rows += '<tr><td>'+inome+'</td><td></td><td></td><td></td><td></td></tr>';
     }
     for(let e=0;e<BLANK_ROWS;e++){
       rows += '<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>';
