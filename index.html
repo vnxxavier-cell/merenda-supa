@@ -876,7 +876,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
           <button class="btn btn-outline btn-sm" style="display:flex;align-items:center;gap:5px" onclick="limparCiclo()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Limpar Ciclo</button>
         </div>
         <p style="font-size:12px;color:var(--txt2);margin-bottom:16px">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;flex-shrink:0"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Os pratos são distribuídos em rotação pelos dias letivos do ciclo selecionado. Após escolher os pratos, selecione o ciclo de início e clique em <strong>Salvar preparações</strong> para aplicar ao calendário.
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;flex-shrink:0"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>Os pratos são distribuídos pelos dias letivos e o plano se repete a cada ciclo: toda <strong>Semana 1</strong> recebe os pratos 1-5, a <strong>Semana 2</strong> os pratos 6-10, e assim por diante — em todos os ciclos. Ao editar os pratos, o ciclo é reaplicado ao calendário automaticamente. Clique em <strong>Salvar preparações</strong> para redistribuir a partir do ciclo selecionado até o fim do ano.
         </p>
       </div>
 
@@ -6380,23 +6380,28 @@ function _ehSemanaTodaFeriado(wi){
 }
 
 // Recalcula DADOS.cardapio a partir de _cardBase aplicando o deslocamento.
-// Semanas marcadas ficam vazias; as demais consomem a sequência original de
-// forma contínua (mesma semântica de distribuirAPartirDoCiclo: pratoIdx não
-// avança na semana anulada). Deriva sempre da base => idempotente e reversível.
+// Semanas marcadas ficam vazias; as demais consomem a sequência original
+// ancorada NO INÍCIO DE CADA CICLO (semana 1 de todo ciclo = slot 1 da base,
+// etc.) — o deslocamento por feriado não vaza para o ciclo seguinte.
+// Deriva sempre da base => idempotente e reversível.
 function recalcularDeslocamento(){
   if(!_cardBase) return;
   const sCons = getSemanasConsumir();
   const total = _totalSemanasCal();
   const novo = JSON.parse(JSON.stringify(_cardBase));
-  let k = 0;
+  let desloc = 0;
   for(let wi = 0; wi < total; wi++){
+    const wCiclo = wi % 5;
+    if(wCiclo === 0) desloc = 0; // reancora na semana 1 do ciclo
     const alvo = _slotSemanaEm(novo, wi, true);
     if(_ehSemanaTodaFeriado(wi) && sCons[wi]){
       alvo.dias = ['','','','',''];
+      desloc++;
       continue;
     }
-    alvo.dias = _slotSemanaEm(_cardBase, k, false).dias.slice(0, 5);
-    k++;
+    // Posição de origem DENTRO do mesmo ciclo (nunca cruza a fronteira)
+    const src = (wi - wCiclo) + Math.max(0, wCiclo - desloc);
+    alvo.dias = _slotSemanaEm(_cardBase, src, false).dias.slice(0, 5);
   }
   DADOS.cardapio = novo;
 }
@@ -7423,13 +7428,10 @@ function renderCardapio(){
               </label>
             </div>`;
         } else {
-          const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
-          if(semanaIdx >= 0){
-            botoesWeek = `
-              <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
-                <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(semanaIdx % 5) + 1}</span>
-              </div>`;
-          }
+          botoesWeek = `
+            <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+              <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(wi % 5) + 1}</span>
+            </div>`;
         }
       }
       days += `<div class="cal-day day-off" data-iso="${iso}"><span class="cal-day-num">${day}</span>${botoesWeek}</div>`;
@@ -10713,7 +10715,10 @@ function getPratoFromCiclo(iso){
   if(dayInWeek < 0 || dayInWeek > 5) return '';
   const cicloNome  = `Ciclo ${cicloIdx + 1}`;
   const plano      = CICLOS_PLANOS[cicloNome] || [];
-  return plano[weekInCiclo * 5 + dayInWeek] || '';
+  // Sábado letivo (dayInWeek=5) usa o último prato da semana — sem o clamp,
+  // o índice 5*ciclo+5 caía na segunda-feira da semana seguinte.
+  const posDia     = Math.min(dayInWeek, 4);
+  return plano[weekInCiclo * 5 + posDia] || '';
 }
 
 // Chamado pelo select principal do popup (prato ou feriado)
@@ -11082,6 +11087,8 @@ function salvarPlanoTemp(){
   const ciclo = document.getElementById('plan-ciclo').value;
   CICLOS_PLANOS[ciclo] = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value);
   localStorage.setItem('merenda_ciclos_planos', JSON.stringify(CICLOS_PLANOS));
+  // Opção 2: o calendário acompanha o plano — reaplica este ciclo na hora
+  aplicarCicloNoCalendario(ciclo);
 }
 
 function abrirFichaPlano(idx){
@@ -11105,54 +11112,114 @@ function carregarPlanoCiclo(){
   gerarSeletoresPratos();
 }
 
+// Distribui os pratos numa faixa de semanas [startWeek, endWeek) SOBRE o
+// objeto `card` informado. A rotação é ANCORADA NO INÍCIO DE CADA CICLO:
+// toda semana 1 de todo ciclo recebe os pratos 1-5 do plano, a semana 2
+// recebe 6-10, e assim por diante — independentemente do total de pratos.
+// O deslocamento por feriado ("Deslocar pratos") é contido DENTRO do ciclo
+// e nunca vaza para o ciclo seguinte.
+function _distribuirFaixa(card, startWeek, endWeek, pratos){
+  if(!pratos || !pratos.length) return { preenchidas: 0, anuladas: 0 };
+  const sCons = getSemanasConsumir();
+  let preenchidas = 0, anuladas = 0, desloc = 0;
+  for(let wi = startWeek; wi < endWeek; wi++){
+    const wCiclo = wi % 5;
+    if(wCiclo === 0) desloc = 0; // reancora na semana 1 do ciclo
+    const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
+    const sIdx   = wi % 4;
+    const mesNome = MESES_NOMES[mesIdx];
+    if(!card[mesNome]) card[mesNome] = [];
+    if(!card[mesNome][sIdx]) card[mesNome][sIdx] = { dias: ['','','','',''] };
+    // Semana 100% feriado com "Deslocar pratos" marcado: anula a semana,
+    // desloca o conteúdo para a semana seguinte DENTRO do ciclo e não
+    // avança a posição do plano.
+    if(_ehSemanaTodaFeriado(wi) && sCons[wi]){
+      anuladas++;
+      desloc++;
+      card[mesNome][sIdx].dias = ['','','','',''];
+      continue;
+    }
+    const posBase = Math.max(0, wCiclo - desloc) * 5;
+    for(let dow = 0; dow < 5; dow++){
+      card[mesNome][sIdx].dias[dow] = pratos[(posBase + dow) % pratos.length] || '';
+      preenchidas++;
+    }
+  }
+  return { preenchidas, anuladas };
+}
+
 function distribuirAPartirDoCiclo(){
   if(!verificarPeriodo()) return;
   const ciclo = document.getElementById('plan-ciclo').value;
-  const pratos = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value).filter(p => p);
-  if(pratos.length === 0){ alert('Defina ao menos um prato para distribuir.'); return; }
+  // Slots vazios são MANTIDOS ('') — filtrá-los comprimiria a rotação e
+  // desalinhasse as semanas do ciclo em relação ao plano.
+  const pratos = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value);
+  if(!pratos.some(p => p)){ alert('Defina ao menos um prato para distribuir.'); return; }
 
   const cIdx = parseInt(ciclo.split(' ')[1]) - 1;
   const msg = cIdx === 0
-    ? `Distribuir ${pratos.length} prato(s) em rotação por todo o ano letivo?\n\nIsso substituirá todos os pratos já definidos no calendário.`
-    : `Distribuir ${pratos.length} prato(s) em rotação do ${ciclo} até o fim do ano?\n\nOs ciclos anteriores não serão alterados.`;
+    ? `Distribuir ${pratos.filter(p=>p).length} prato(s) por todo o ano letivo?\n\nO plano se repetirá em todos os ciclos (semana 1 = pratos 1-5, semana 2 = pratos 6-10 …) e substituirá os pratos já definidos no calendário.`
+    : `Distribuir ${pratos.filter(p=>p).length} prato(s) do ${ciclo} até o fim do ano?\n\nO plano se repetirá a cada ciclo. Os ciclos anteriores não serão alterados.`;
   if(!confirm(msg)) return;
 
-  CICLOS_PLANOS[ciclo] = Array.from(document.querySelectorAll('.plan-sel')).map(s => s.value);
+  CICLOS_PLANOS[ciclo] = pratos;
   localStorage.setItem('merenda_ciclos_planos', JSON.stringify(CICLOS_PLANOS));
 
   if(!DIAS_LETIVOS_ARRAY.length) return;
   const totalCalWeeks = getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1;
   const startWeek = cIdx * 5;
-  const letSet = new Set(DIAS_LETIVOS_ARRAY);
-  const sCons = getSemanasConsumir();
-  let pratoIdx = 0;
-  let semanasAnuladas = 0;
-  for(let wi = startWeek; wi < totalCalWeeks; wi++){
-    const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
-    const sIdx   = wi % 4;
-    const mesNome = MESES_NOMES[mesIdx];
-    if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
-    if(!DADOS.cardapio[mesNome][sIdx]) DADOS.cardapio[mesNome][sIdx] = { dias: ['','','','',''] };
-    // Semana 100% feriado com "Deslocar pratos" marcado: anula a semana e
-    // não avança o pratoIdx — os pratos caem na semana seguinte
-    const datasSem = getDiasSemanaCal(wi);
-    const todaFeriado = datasSem.length > 0 && !datasSem.some(dt => letSet.has(dt));
-    if(todaFeriado && sCons[wi]){
-      semanasAnuladas++;
-      continue;
-    }
-    for(let dow = 0; dow < 5; dow++){
-      DADOS.cardapio[mesNome][sIdx].dias[dow] = pratos[pratoIdx % pratos.length];
-      pratoIdx++;
-    }
-  }
+  const { preenchidas, anuladas } = _distribuirFaixa(DADOS.cardapio, startWeek, totalCalWeeks, pratos);
 
   if(_sconsDraft){ localStorage.setItem('merenda_semanas_consumir', JSON.stringify(_sconsDraft)); _sconsDraft = null; }
   _cardBase = null;
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   renderCardapio();
   sincronizarSeletores(ciclo, 1, true);
-  alert(`✅ ${pratoIdx} posições preenchidas a partir do ${ciclo} com ${pratos.length} prato(s) em rotação!${semanasAnuladas ? `\n${semanasAnuladas} semana(s) de feriado anulada(s) — pratos deslocados para a semana seguinte.` : ''}`);
+  alert(`✅ ${preenchidas} posições preenchidas a partir do ${ciclo} — as semanas 1-5 agora se repetem alinhadas em TODOS os ciclos!${anuladas ? `\n${anuladas} semana(s) de feriado anulada(s) — pratos deslocados dentro do ciclo.` : ''}`);
+}
+
+// Reaplica APENAS o ciclo informado no calendário (usado ao editar o plano).
+// Atualiza só as células deste ciclo — sem renderCardapio() para não perder
+// o foco do campo que o usuário está digitando.
+function aplicarCicloNoCalendario(ciclo){
+  if(!DIAS_LETIVOS_ARRAY.length) return;
+  const pratos = CICLOS_PLANOS[ciclo];
+  if(!pratos || !pratos.some(p => p)) return; // plano vazio: não toca no calendário
+  const m = /^Ciclo (\d+)$/.exec(ciclo || '');
+  if(!m) return;
+  const startWeek = (parseInt(m[1], 10) - 1) * 5;
+  const totalCalWeeks = _totalSemanasCal();
+  if(startWeek >= totalCalWeeks) return;
+  const endWeek = Math.min(startWeek + 5, totalCalWeeks);
+  _distribuirFaixa(DADOS.cardapio, startWeek, endWeek, pratos);
+  // Se há rascunho de "Deslocar pratos" pendente, a base também recebe o
+  // plano deste ciclo — assim "Descartar" não desfaz a edição do plano.
+  if(_cardBase) _distribuirFaixa(_cardBase, startWeek, endWeek, pratos);
+  localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+  for(let wk = 0; wk < 5; wk++){
+    getDiasSemanaCal(startWeek + wk).forEach(iso => _atualizarCelulaCal(iso));
+  }
+}
+
+// Atualiza o evento (prato + cor) de uma célula do calendário sem re-render
+function _atualizarCelulaCal(iso){
+  const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
+  if(letIdx < 0) return;
+  const cel = document.getElementById('cal-day-' + letIdx);
+  if(!cel) return;
+  const curP = getMealByDate(iso) || getPratoFromCiclo(iso);
+  const {nome} = curP ? nomeNum(curP) : {nome:''};
+  const ev = cel.querySelector('.cal-event');
+  if(!nome){ if(ev) ev.remove(); return; }
+  const cor = getCorDia(iso, letIdx);
+  if(ev){ ev.textContent = nome; ev.style.background = cor; }
+  else {
+    const d = document.createElement('div');
+    d.className = 'cal-event';
+    d.style.background = cor;
+    d.textContent = nome;
+    cel.appendChild(d);
+  }
 }
 
 function getCorDia(iso, letIdx){
