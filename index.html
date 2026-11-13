@@ -5251,9 +5251,7 @@ function calcularPorOrcamento(orcamento){
   DADOS.ciclos.forEach((_, ci) => {
     for(let s = 0; s < 5; s++){
       const weekIdx = ci * 5 + s;
-      const mesIdx  = Math.min(Math.floor(weekIdx / 4), MESES_NOMES.length - 1);
-      const sIdx    = weekIdx % 4;
-      const mesNome = MESES_NOMES[mesIdx];
+      const { sIdx, mesNome } = _slotSemana(weekIdx);
       const semData = DADOS.cardapio[mesNome]?.[sIdx];
       if(!semData) continue;
 
@@ -6200,9 +6198,7 @@ function getMealByDate(iso) {
   if(dayIdx === 5) return (CAL_CONFIG.sabadosPratos || {})[iso] || '';
   if(dayIdx > 4) return '';
   const calWeekIdx = getCalWeekIdx(iso);
-  const mesIdx = Math.min(Math.floor(calWeekIdx / 4), MESES_NOMES.length - 1);
-  const semIdx = calWeekIdx % 4;
-  const mesNome = MESES_NOMES[mesIdx];
+  const { sIdx: semIdx, mesNome } = _slotSemana(calWeekIdx);
   return DADOS.cardapio[mesNome]?.[semIdx]?.dias[dayIdx] || '';
 }
 
@@ -6219,9 +6215,7 @@ function setMealByDate(iso, novoPrato) {
   }
   if(dayIdx > 4) return;
   const calWeekIdx = getCalWeekIdx(iso);
-  const mesIdx = Math.min(Math.floor(calWeekIdx / 4), MESES_NOMES.length - 1);
-  const semIdx = calWeekIdx % 4;
-  const mesNome = MESES_NOMES[mesIdx];
+  const { sIdx: semIdx, mesNome } = _slotSemana(calWeekIdx);
   // Cria o slot se não existir (ex: dia era feriado e nunca teve slot inicializado)
   if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
   if(!DADOS.cardapio[mesNome][semIdx]){
@@ -6350,11 +6344,21 @@ function _persistirCardapio(){
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
 }
 
-// Espaço de endereçamento semana -> slot do cardápio (mesIdx = floor(wi/4), sIdx = wi%4)
-function _slotSemanaEm(card, wi, criar){
-  const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
-  const sIdx   = wi % 4;
+// Espaço de endereçamento semana -> slot do cardápio.
+// O "mês" é um bucket de 4 semanas (mesIdx = floor(wi/4)) e há 11 buckets
+// (Fevereiro…Dezembro) = 44 slots. Anos letivos com mais de 44 semanas
+// (ex: 04/02/2026 → 18/12/2026 = 46 semanas) estouravam o clamp do mesIdx:
+// wi>=44 colidia com wi-4 (dezembro sobrescrevia novembro).
+// Correção: sIdx = wi - mesIdx*4 — idêntico a wi%4 para wi<44 (dados
+// preservados) e 4,5,6… para wi>=44 (slot único, sem colisão).
+function _slotSemana(wi){
+  const mesIdx  = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
+  const sIdx    = wi - mesIdx * 4;
   const mesNome = MESES_NOMES[mesIdx];
+  return { mesIdx, sIdx, mesNome };
+}
+function _slotSemanaEm(card, wi, criar){
+  const { sIdx, mesNome } = _slotSemana(wi);
   if(!card[mesNome]){
     if(criar === false) return { dias: ['','','','',''] };
     card[mesNome] = [];
@@ -6533,9 +6537,7 @@ function fmtDataCurta(iso) {
 }
 
 function getWeekData(weekIndex) {
-  const mesIdx = Math.min(Math.floor(weekIndex / 4), 10);
-  const semIdx = weekIndex % 4;
-  const mesNome = MESES_NOMES[mesIdx];
+  const { sIdx: semIdx, mesNome } = _slotSemana(weekIndex);
   if(!DADOS.cardapio[mesNome]) return {dias:["","","","",""], alunos:200};
   return DADOS.cardapio[mesNome][semIdx];
 }
@@ -6546,10 +6548,7 @@ function getWeekIndex(ciclo, sem) {
 
 function alterarPrato(ciclo, semIdx, diaIdx, novoPrato, skipRender = false){
   const weekIdx = getWeekIndex(ciclo, semIdx + 1);
-  const mesIdx = Math.min(Math.floor(weekIdx / 4), 10);
-  const sIdx = weekIdx % 4;
-  const mesNome = MESES_NOMES[mesIdx];
-  
+  const { sIdx, mesNome } = _slotSemana(weekIdx);
   if(!DADOS.cardapio[mesNome]) return;
   DADOS.cardapio[mesNome][sIdx].dias[diaIdx] = novoPrato;
   _persistirCardapio();
@@ -11125,9 +11124,7 @@ function _distribuirFaixa(card, startWeek, endWeek, pratos){
   for(let wi = startWeek; wi < endWeek; wi++){
     const wCiclo = wi % 5;
     if(wCiclo === 0) desloc = 0; // reancora na semana 1 do ciclo
-    const mesIdx = Math.min(Math.floor(wi / 4), MESES_NOMES.length - 1);
-    const sIdx   = wi % 4;
-    const mesNome = MESES_NOMES[mesIdx];
+    const { sIdx, mesNome } = _slotSemana(wi);
     if(!card[mesNome]) card[mesNome] = [];
     if(!card[mesNome][sIdx]) card[mesNome][sIdx] = { dias: ['','','','',''] };
     // Semana 100% feriado com "Deslocar pratos" marcado: anula a semana,
@@ -11237,9 +11234,7 @@ function limparCiclo(){
   // Limpa todos os 5 slots (Seg–Sex) das 5 semanas de calendário do ciclo
   for(let wk = 0; wk < 5; wk++){
     const globalWeekIdx = (cIdx * 5) + wk;
-    const mesIdx = Math.min(Math.floor(globalWeekIdx / 4), MESES_NOMES.length - 1);
-    const sIdx = globalWeekIdx % 4;
-    const mesNome = MESES_NOMES[mesIdx];
+    const { sIdx, mesNome } = _slotSemana(globalWeekIdx);
     if(DADOS.cardapio[mesNome]?.[sIdx])
       DADOS.cardapio[mesNome][sIdx].dias = ['','','','',''];
   }
