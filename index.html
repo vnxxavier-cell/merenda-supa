@@ -709,11 +709,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     <div class="login-erro" id="login-erro"></div>
     <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
     <div class="login-divider">ou</div>
+    <button class="login-btn-outline" id="login-criar-conta" onclick="mostrarCadastro()" type="button">Criar conta</button>
     <button class="login-google-btn" id="login-google-btn" onclick="loginComGoogle()" type="button">
       <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Entrar com Google
     </button>
-    <button class="login-btn-outline" id="login-criar-conta" onclick="mostrarCadastro()" type="button">Criar conta</button>
   </div>
   <div class="login-box" id="cadastro-box" style="display:none">
     <h2 style="display:flex;align-items:center;justify-content:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Criar conta</h2>
@@ -2253,19 +2253,21 @@ function setupStorageProxy(userId){
     delete window._origLS;
     delete window._USER_PREFIX;
   }
+  // Chaves compartilhadas: dados globais + chaves de sessão do Supabase Auth (sb-*)
   const SHARED = new Set(['merenda_usuarios','merenda_signup_config']);
+  const isSharedKey = k => SHARED.has(k) || (typeof k === 'string' && k.startsWith('sb-'));
   window._origLS = {
     getItem:    localStorage.getItem.bind(localStorage),
     setItem:    localStorage.setItem.bind(localStorage),
     removeItem: localStorage.removeItem.bind(localStorage)
   };
-  localStorage.getItem    = k => window._origLS.getItem(SHARED.has(k) ? k : prefix + k);
+  localStorage.getItem    = k => window._origLS.getItem(isSharedKey(k) ? k : prefix + k);
   localStorage.setItem    = (k,v) => {
-    window._origLS.setItem(SHARED.has(k) ? k : prefix + k, v);
+    window._origLS.setItem(isSharedKey(k) ? k : prefix + k, v);
     // Sync com Supabase (debounced)
     _supaSync.scheduleSync(k);
   };
-  localStorage.removeItem = k => window._origLS.removeItem(SHARED.has(k) ? k : prefix + k);
+  localStorage.removeItem = k => window._origLS.removeItem(isSharedKey(k) ? k : prefix + k);
   window._USER_PREFIX = prefix;
   // Inicializa sync
   _supaSync.init(userId);
@@ -2306,8 +2308,80 @@ window.addEventListener('error', function(e){
 // Backup automático a cada 30s para o Supabase
 setInterval(() => { try{ _supaSync._flushSync(); }catch(_){} }, 30000);
 
+// ── LOGIN SERVER-SIDE (Fase 3 — Supabase Auth via Edge Function) ──
+// POST /functions/v1/legacy-login → valida hash antiga no servidor, cria/atualiza
+// usuário no Supabase Auth com a MESMA senha e devolve a sessão + perfil.
+async function _autenticarViaEdgeFunction(login, senha){
+  try{
+    const resp = await fetch(SUPABASE_URL + '/functions/v1/legacy-login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      },
+      body: JSON.stringify({ username: login.trim(), password: senha })
+    });
+    const data = await resp.json().catch(() => null);
+    if(!resp.ok || !data || !data.ok){
+      console.warn('legacy-login recusou (HTTP ' + resp.status + ') — usando validação local (transição)');
+      return null;
+    }
+    return data;
+  }catch(e){
+    console.warn('legacy-login indisponível (' + (e.message || e) + ') — usando validação local (transição)');
+    return null;
+  }
+}
+
+// Monta/Atualiza o registro local a partir do perfil EF, PRESERVANDO o id legado
+// (os prefixos u_<id>_ e escola_dados.user_id dependem do id antigo).
+function _usuarioDoPerfilEF(perfil){
+  let user = USUARIOS.find(u => u.login === perfil.login)
+          || USUARIOS.find(u => u.id === perfil.id || u.id === perfil.authUserId);
+  if(user){
+    if(perfil.name) user.nome = perfil.name;
+    if(perfil.role) user.role = perfil.role;
+    user.ativo = !!perfil.active;
+    user.data_expiracao = perfil.expiresAt ? perfil.expiresAt.split('T')[0] : null;
+  } else {
+    // Usuário novo neste dispositivo: servidor é a fonte; sem senha no cliente
+    user = {
+      id: perfil.dataOwnerId || perfil.id,
+      nome: perfil.name || perfil.login,
+      login: perfil.login,
+      role: perfil.role,
+      data_expiracao: perfil.expiresAt ? perfil.expiresAt.split('T')[0] : null,
+      data_criacao: new Date().toISOString().split('T')[0],
+      ativo: !!perfil.active,
+      renovacao_solicitada: false,
+      nova_conta: false
+    };
+    USUARIOS.push(user);
+  }
+  salvarUsuarios();
+  return user;
+}
+
 async function autenticar(login, senha){
-  // Tenta carregar do Supabase se disponível e ainda não carregado
+  // 1º) Tentativa server-side (Fase 3): senha validada fora do navegador
+  const ef = await _autenticarViaEdgeFunction(login, senha);
+  if(ef && ef.profile){
+    if(ef.session && ef.session.access_token && ef.session.refresh_token && _supabase){
+      try {
+        await _supabase.auth.setSession({
+          access_token: ef.session.access_token,
+          refresh_token: ef.session.refresh_token
+        });
+      } catch(e){ console.warn('setSession falhou (não fatal):', e.message); }
+    }
+    const user = _usuarioDoPerfilEF(ef.profile);
+    if(!user.ativo) return { ok: false, motivo: 'inativo' };
+    const hoje = new Date().toISOString().split('T')[0];
+    if(user.data_expiracao && user.data_expiracao < hoje) return { ok: false, motivo: 'expirado', user };
+    return { ok: true, user };
+  }
+  // 2º) Fallback legado (transição): validação local SHA-256 até a EF estar validada
   if(_supabase && !window._supaUsersLoaded){
     try {
       const su = await _supaSync.loadUsuarios();

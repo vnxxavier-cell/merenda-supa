@@ -1,14 +1,11 @@
 # Edge Functions
 
-## Required secrets
+## Environment variables
 
-Set these in Supabase Edge Function secrets only:
-
-```text
-SUPABASE_URL
-SUPABASE_ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY
-```
+`SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are
+injected automatically by the Supabase platform in every Edge Function. They
+cannot be set as secrets (the `SUPABASE_` prefix is reserved by the CLI) and
+no manual configuration is required.
 
 Do not add a service role key to `index.html`, `app_v2.js`, Vercel variables
 available to the browser, Git, logs or support messages.
