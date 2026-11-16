@@ -2497,7 +2497,7 @@ async function verificarCallbackGoogle(){
   const prefix = 'u_' + user.id + '_';
   const _chavesPrefixadas = [
     'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
-    'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
+    'merenda_cardapio','merenda_cardapio_base','merenda_escola','merenda_diretor','merenda_cargo',
     'merenda_subtitulo','merenda_embalagens',
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
     'merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom',
@@ -2558,6 +2558,9 @@ async function verificarCallbackGoogle(){
 
 function recarregarDados(){
   // Re-lê todas as variáveis globais do localStorage (agora com proxy ativo)
+  // Troca de perfil: a base do cardápio é POR PERFIL — zera antes de recarregar
+  // para que _inicializarBaseCardapio carregue a base do perfil novo.
+  DADOS.cardapioBase = null;
   NIVEIS_CONFIG = JSON.parse(localStorage.getItem('merenda_niveis') || 'null') || [
     { id:'f1', alunos:0, ativo:false, margem:0 },
     { id:'f2', alunos:0, ativo:false, margem:0 },
@@ -2629,6 +2632,7 @@ function recarregarDados(){
   AF_LIST = JSON.parse(localStorage.getItem('merenda_af_custom')) || AF_LIST;
   CICLOS_PLANOS = JSON.parse(localStorage.getItem('merenda_ciclos_planos') || '{}');
   { const card = localStorage.getItem('merenda_cardapio'); if(card) DADOS.cardapio = JSON.parse(card); }
+  _inicializarBaseCardapio(); // materializa/carrega a base e deriva o display
   SERVIDORES_CONFIG = JSON.parse(localStorage.getItem('merenda_servidores_config') || 'null') || { ativo: false, cafe_kg: 1.5, acucar_kg: 5, qtd_servidores: 10, cafe_g_por_serv: 16.5, acucar_g_por_serv: 45 };
   if(SERVIDORES_CONFIG.qtd_servidores === undefined) SERVIDORES_CONFIG.qtd_servidores = 10;
   if(SERVIDORES_CONFIG.cafe_g_por_serv === undefined) SERVIDORES_CONFIG.cafe_g_por_serv = 16.5;
@@ -2887,7 +2891,7 @@ async function fazerLogin(){
     const prefix = 'u_' + res.user.id + '_';
     const _chavesPrefixadas = [
       'merenda_niveis','merenda_precos','merenda_cal_config','merenda_ciclos_planos',
-      'merenda_cardapio','merenda_escola','merenda_diretor','merenda_cargo',
+      'merenda_cardapio','merenda_cardapio_base','merenda_escola','merenda_diretor','merenda_cargo',
       'merenda_subtitulo','merenda_embalagens',
       'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
       'merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom',
@@ -6122,6 +6126,12 @@ let DIAS_LETIVOS_ARRAY = getSchoolDays();
 let SEMANAS_CAL = []; // preenchido por buildCalendarWeeks() após sua definição
 const MESES_NOMES = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
+// Recalcula o display a partir da base quando ela já existe. Sem persistência:
+// roda também no meio de trocas de perfil, onde gravar poderia misturar dados
+// de um perfil em outro (a materialização da base é feita só após o load).
+function _recalcSeNecessario(){
+  if(DADOS.cardapioBase) recalcularDeslocamento();
+}
 function atualizarCiclos(){
   let n = 8;
   if(DIAS_LETIVOS_ARRAY.length) {
@@ -6148,6 +6158,8 @@ function atualizarCiclos(){
     SEMANAS_CAL = buildCalendarWeeks();
     // populateMesesMerc/Semanas removidos — agora usa date picker
   }
+  // Dias/ciclos mudaram: o display é sempre derivado da base (só memória)
+  _recalcSeNecessario();
 }
 atualizarCiclos();
 
@@ -6215,13 +6227,14 @@ function setMealByDate(iso, novoPrato) {
   }
   if(dayIdx > 4) return;
   const calWeekIdx = getCalWeekIdx(iso);
-  const { sIdx: semIdx, mesNome } = _slotSemana(calWeekIdx);
-  // Cria o slot se não existir (ex: dia era feriado e nunca teve slot inicializado)
-  if(!DADOS.cardapio[mesNome]) DADOS.cardapio[mesNome] = [];
-  if(!DADOS.cardapio[mesNome][semIdx]){
-    DADOS.cardapio[mesNome][semIdx] = { dias: ['','','','',''] };
-  }
-  DADOS.cardapio[mesNome][semIdx].dias[dayIdx] = novoPrato;
+  const base = _inicializarBaseCardapio();
+  if(!base) return;
+  // A célula exibe o conteúdo da posição de ORIGEM na base (deslocada pelos
+  // feriados): gravar na origem faz a edição sobreviver a qualquer recálculo.
+  const src = Math.max(0, calWeekIdx - _deslocAte(calWeekIdx));
+  _slotSemanaEm(base, src, true).dias[dayIdx] = novoPrato;
+  recalcularDeslocamento();
+  _persistirBase();
 }
 
 function getMealByLetIdx(letIdx) {
@@ -6321,9 +6334,10 @@ function getDiasSemanaCal(wi){
 }
 
 // Checkbox por semana: marcar desloca os pratos da semana 100% de feriado para
-// a semana seguinte. Nada vai ao localStorage até "Salvar alterações".
+// a semana seguinte. O deslocamento é GLOBAL: atravessa ciclos e meses até o
+// fim do ano letivo. Nada vai ao localStorage até "Salvar alterações".
 let _sconsDraft = null;   // rascunho do mapa de checkboxes (null = usar o salvo)
-let _cardBase   = null;   // clone de DADOS.cardapio capturado no 1º toggle
+let _cardBase   = null;   // clone de DADOS.cardapioBase capturado no 1º toggle
 
 function _sconsSalvo(){
   try { return JSON.parse(localStorage.getItem('merenda_semanas_consumir') || '{}'); }
@@ -6342,6 +6356,13 @@ function temAlteracoesPendentes(){ return !!(_sconsDraft || _cardBase); }
 function _persistirCardapio(){
   if(temAlteracoesPendentes()) return;
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
+}
+// A base (fonte SEM deslocamento) é local e NÃO sincroniza com a nuvem —
+// mesmo gate do display: enquanto há rascunho pendente, só a memória muda.
+function _persistirBase(){
+  if(temAlteracoesPendentes()) return;
+  if(!DADOS.cardapioBase) return; // nunca gravar {} por cima de uma base real
+  localStorage.setItem('merenda_cardapio_base', JSON.stringify(DADOS.cardapioBase));
 }
 
 // Espaço de endereçamento semana -> slot do cardápio.
@@ -6383,42 +6404,139 @@ function _ehSemanaTodaFeriado(wi){
   return !datasSem.some(dt => letSet.has(dt));
 }
 
-// Recalcula DADOS.cardapio a partir de _cardBase aplicando o deslocamento.
-// Semanas marcadas ficam vazias; as demais consomem a sequência original
-// ancorada NO INÍCIO DE CADA CICLO (semana 1 de todo ciclo = slot 1 da base,
-// etc.) — o deslocamento por feriado não vaza para o ciclo seguinte.
-// Deriva sempre da base => idempotente e reversível.
-function recalcularDeslocamento(){
-  if(!_cardBase) return;
+// ── Base do cardápio × deslocamento ──────────────────────────────────
+// DADOS.cardapioBase é a fonte VERDADEIRA (posição de plano, sem deslocar);
+// DADOS.cardapio (display) é sempre derivido por recalcularDeslocamento().
+// O deslocamento por feriado é GLOBAL: cada semana anulada empurra todo o
+// restante do ano uma posição para baixo, cruzando ciclos e meses.
+
+// Semana 100% de feriado com "Deslocar pratos" marcado?
+function _ehAnulada(wi, sCons){
+  return _ehSemanaTodaFeriado(wi) && !!(sCons && sCons[wi]);
+}
+// Semanas anuladas antes de wi = deslocamento acumulado nesse ponto.
+function _deslocAte(wi){
+  const sCons = getSemanasConsumir();
+  let d = 0;
+  for(let k = 0; k < wi; k++) if(_ehAnulada(k, sCons)) d++;
+  return d;
+}
+// Deslocamento acumulado antes de cada semana — o rótulo "Semana N" usa isto
+// para acompanhar o conteúdo exibido (a semana de PLANO da origem deslocada).
+function _deslocPrefixo(){
   const sCons = getSemanasConsumir();
   const total = _totalSemanasCal();
-  const novo = JSON.parse(JSON.stringify(_cardBase));
+  const arr = new Array(total).fill(0);
+  let d = 0;
+  for(let wi = 0; wi < total; wi++){
+    arr[wi] = d;
+    if(_ehAnulada(wi, sCons)) d++;
+  }
+  return arr;
+}
+function _contarAnuladas(startWeek, endWeek){
+  const sCons = getSemanasConsumir();
+  let n = 0;
+  for(let wi = startWeek; wi < endWeek; wi++) if(_ehAnulada(wi, sCons)) n++;
+  return n;
+}
+
+// Reconstrói a base a partir de um display legado (gerado com deslocamento
+// CONTIDO — reancorava no início de cada ciclo, como a versão antiga fazia).
+// Inverso exato da transformação antiga: cada semana exibida devolve o
+// conteúdo à sua posição de origem dentro do ciclo. Posições que o
+// deslocamento contido nunca exibiu (cauda do ciclo) são completadas com o
+// plano do ciclo, quando existir.
+function _baseLegado(display){
+  const sCons = getSemanasConsumir();
+  const total = _totalSemanasCal();
+  const base = {};
+  const lidos = {};
   let desloc = 0;
   for(let wi = 0; wi < total; wi++){
     const wCiclo = wi % 5;
-    if(wCiclo === 0) desloc = 0; // reancora na semana 1 do ciclo
+    if(wCiclo === 0) desloc = 0; // o legado reancorava no início do ciclo
+    if(_ehAnulada(wi, sCons)){ desloc++; continue; }
+    const src = (wi - wCiclo) + Math.max(0, wCiclo - desloc);
+    _slotSemanaEm(base, src, true).dias = _slotSemanaEm(display, wi, false).dias.slice(0, 5);
+    lidos[src] = 1;
+  }
+  // Lacunas do legado ← plano do ciclo (posição de plano = (wi%5)*5).
+  // A distribuição "do Ciclo 1" grava o plano em TODOS os ciclos, mas o
+  // CICLOS_PLANOS só guarda o ciclo de origem: procura do ciclo da posição
+  // para TRÁS até achar o plano que cobriu aquela região do ano.
+  for(let p = 0; p < total; p++){
+    if(lidos[p]) continue;
+    let plano = null;
+    for(let c = Math.floor(p / 5) + 1; c >= 1 && !plano; c--){
+      const cand = CICLOS_PLANOS[`Ciclo ${c}`];
+      if(cand && cand.some(x => x)) plano = cand;
+    }
+    if(!plano) continue;
+    const slot = _slotSemanaEm(base, p, true);
+    const posBase = (p % 5) * 5;
+    for(let dow = 0; dow < 5; dow++) slot.dias[dow] = plano[(posBase + dow) % plano.length] || '';
+  }
+  return base;
+}
+
+// Materializa DADOS.cardapioBase: carrega a chave local se existir; senão
+// reconstrói do display atual (migração de dados legados) e persiste na hora —
+// sem persistir, a base seria re-materializada do display já deslocado na
+// próxima sessão e o deslocamento aplicaria em cima (dobra). Sem período
+// letivo calculado ainda não faz nada: será materializada depois.
+function _inicializarBaseCardapio(){
+  if(DADOS.cardapioBase) return DADOS.cardapioBase;
+  if(!DIAS_LETIVOS_ARRAY.length) return null;
+  let base = null;
+  try {
+    const raw = localStorage.getItem('merenda_cardapio_base');
+    if(raw) base = JSON.parse(raw);
+  } catch(e){ base = null; }
+  if(!base || typeof base !== 'object') base = _baseLegado(DADOS.cardapio || {});
+  DADOS.cardapioBase = base;
+  localStorage.setItem('merenda_cardapio_base', JSON.stringify(base));
+  recalcularDeslocamento();
+  return DADOS.cardapioBase;
+}
+
+// Recalcula DADOS.cardapio (display) a partir de DADOS.cardapioBase aplicando
+// o deslocamento GLOBAL: semanas anuladas ficam vazias e as demais consomem a
+// sequência da base na ordem — cada anulada empurra todo o conteúdo abaixo
+// uma posição, sem reancorar nos ciclos. Deriva sempre da base =>
+// idempotente e reversível (desmarcar restaura exatamente).
+function recalcularDeslocamento(){
+  const base = DADOS.cardapioBase;
+  if(!base) return;
+  const sCons = getSemanasConsumir();
+  const total = _totalSemanasCal();
+  const novo = JSON.parse(JSON.stringify(base));
+  let desloc = 0;
+  for(let wi = 0; wi < total; wi++){
     const alvo = _slotSemanaEm(novo, wi, true);
-    if(_ehSemanaTodaFeriado(wi) && sCons[wi]){
+    if(_ehAnulada(wi, sCons)){
       alvo.dias = ['','','','',''];
       desloc++;
       continue;
     }
-    // Posição de origem DENTRO do mesmo ciclo (nunca cruza a fronteira)
-    const src = (wi - wCiclo) + Math.max(0, wCiclo - desloc);
-    alvo.dias = _slotSemanaEm(_cardBase, src, false).dias.slice(0, 5);
+    const src = Math.max(0, wi - desloc); // origem global (não reancora no ciclo)
+    alvo.dias = _slotSemanaEm(base, src, false).dias.slice(0, 5);
   }
   DADOS.cardapio = novo;
 }
 
 function salvarAlteracoesCardapio(){
   if(_sconsDraft) localStorage.setItem('merenda_semanas_consumir', JSON.stringify(_sconsDraft));
-  localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   _sconsDraft = null; _cardBase = null;
+  recalcularDeslocamento(); // deriva o display da base com o estado salvo
+  _persistirBase();
+  _persistirCardapio();
   renderCardapio();
 }
 function descartarAlteracoesCardapio(){
-  if(_cardBase) DADOS.cardapio = _cardBase;
+  if(_cardBase) DADOS.cardapioBase = _cardBase; // restaura a base pré-rascunho
   _sconsDraft = null; _cardBase = null;
+  recalcularDeslocamento(); // recalca com o mapa de semanas SALVO (não o rascunho)
   renderCardapio();
 }
 
@@ -6485,7 +6603,8 @@ function _animarOndaDeslocamento(marcado, wi){
 }
 
 function toggleSemanaFeriado(wi, marcado){
-  if(!_cardBase) _cardBase = JSON.parse(JSON.stringify(DADOS.cardapio));
+  _inicializarBaseCardapio();
+  if(DADOS.cardapioBase && !_cardBase) _cardBase = JSON.parse(JSON.stringify(DADOS.cardapioBase));
   setSemanaConsumir(wi, marcado);
   recalcularDeslocamento();
   _animarOndaDeslocamento(marcado, wi);
@@ -6683,6 +6802,7 @@ function init(){
   // Carregar customização do cardápio
   const customCard = localStorage.getItem('merenda_cardapio');
   if(customCard) DADOS.cardapio = JSON.parse(customCard);
+  _inicializarBaseCardapio(); // materializa a base (no-op se o período ainda não foi calculado)
 
   // Carregar pratos customizados
   const customFichas = localStorage.getItem('merenda_fichas_custom');
@@ -7338,6 +7458,9 @@ function renderCardapio(){
   const grid = document.getElementById('grid-calendario');
   const legenda = document.getElementById('legenda-ciclos');
   if(!grid) return;
+  // Deslocamento acumulado por semana — o rótulo "Semana N" do domingo
+  // acompanha o conteúdo exibido (semana de PLANO da origem deslocada)
+  const _desloc = _deslocPrefixo();
 
   const elIni = document.getElementById('cal-inicio');
   const elFim = document.getElementById('cal-fim');
@@ -7422,14 +7545,15 @@ function renderCardapio(){
           botoesWeek = `
             <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
               <span style="font-size:10px;font-weight:800;color:#dc2626;letter-spacing:.03em">Semana feriado</span>
-              <label style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#64748b;cursor:pointer" title="Semana 100% de feriado: ao marcar, os pratos desta semana são anulados aqui e passam para a semana seguinte (a rotação é deslocada). Desmarcar mantém os pratos riscados na semana.">
+              <label style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#64748b;cursor:pointer" title="Semana 100% de feriado: ao marcar, os pratos desta semana são anulados aqui e passam para a semana seguinte — o deslocamento é global e vale até o fim do ano letivo, cruzando ciclos e meses. Desmarcar mantém os pratos riscados na semana.">
                 <input type="checkbox" ${checked} onclick="event.stopPropagation();toggleSemanaFeriado(${wi},this.checked)" style="margin:0"> Deslocar pratos
               </label>
             </div>`;
         } else {
+          // Rótulo acompanha o conteúdo: semana de PLANO da origem deslocada
           botoesWeek = `
             <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
-              <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(wi % 5) + 1}</span>
+              <span style="font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.03em">Semana ${(Math.max(0, wi - (_desloc[wi] || 0)) % 5) + 1}</span>
             </div>`;
         }
       }
@@ -11112,37 +11236,25 @@ function carregarPlanoCiclo(){
 }
 
 // Distribui os pratos numa faixa de semanas [startWeek, endWeek) SOBRE o
-// objeto `card` informado. A rotação é ANCORADA NO INÍCIO DE CADA CICLO:
-// toda semana 1 de todo ciclo recebe os pratos 1-5 do plano, a semana 2
-// recebe 6-10, e assim por diante — independentemente do total de pratos.
-// O deslocamento por feriado ("Deslocar pratos") é contido DENTRO do ciclo
-// e nunca vaza para o ciclo seguinte.
+// objeto `card` informado (a BASE, sem deslocamento). A rotação é um plano
+// PURO ancorado no início de cada ciclo: toda semana 1 de todo ciclo recebe
+// os pratos 1-5 do plano, a semana 2 recebe 6-10, e assim por diante —
+// independentemente do total de pratos. O deslocamento por feriado NÃO é
+// aplicado aqui: quem aplica é recalcularDeslocamento(), sobre a base.
 function _distribuirFaixa(card, startWeek, endWeek, pratos){
   if(!pratos || !pratos.length) return { preenchidas: 0, anuladas: 0 };
-  const sCons = getSemanasConsumir();
-  let preenchidas = 0, anuladas = 0, desloc = 0;
+  let preenchidas = 0;
   for(let wi = startWeek; wi < endWeek; wi++){
-    const wCiclo = wi % 5;
-    if(wCiclo === 0) desloc = 0; // reancora na semana 1 do ciclo
     const { sIdx, mesNome } = _slotSemana(wi);
     if(!card[mesNome]) card[mesNome] = [];
     if(!card[mesNome][sIdx]) card[mesNome][sIdx] = { dias: ['','','','',''] };
-    // Semana 100% feriado com "Deslocar pratos" marcado: anula a semana,
-    // desloca o conteúdo para a semana seguinte DENTRO do ciclo e não
-    // avança a posição do plano.
-    if(_ehSemanaTodaFeriado(wi) && sCons[wi]){
-      anuladas++;
-      desloc++;
-      card[mesNome][sIdx].dias = ['','','','',''];
-      continue;
-    }
-    const posBase = Math.max(0, wCiclo - desloc) * 5;
+    const posBase = (wi % 5) * 5;
     for(let dow = 0; dow < 5; dow++){
       card[mesNome][sIdx].dias[dow] = pratos[(posBase + dow) % pratos.length] || '';
       preenchidas++;
     }
   }
-  return { preenchidas, anuladas };
+  return { preenchidas, anuladas: _contarAnuladas(startWeek, endWeek) };
 }
 
 function distribuirAPartirDoCiclo(){
@@ -11165,14 +11277,18 @@ function distribuirAPartirDoCiclo(){
   if(!DIAS_LETIVOS_ARRAY.length) return;
   const totalCalWeeks = getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1;
   const startWeek = cIdx * 5;
-  const { preenchidas, anuladas } = _distribuirFaixa(DADOS.cardapio, startWeek, totalCalWeeks, pratos);
+  const base = _inicializarBaseCardapio();
+  if(!base) return;
+  const { preenchidas, anuladas } = _distribuirFaixa(base, startWeek, totalCalWeeks, pratos);
+  recalcularDeslocamento();
 
   if(_sconsDraft){ localStorage.setItem('merenda_semanas_consumir', JSON.stringify(_sconsDraft)); _sconsDraft = null; }
   _cardBase = null;
+  localStorage.setItem('merenda_cardapio_base', JSON.stringify(DADOS.cardapioBase));
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   renderCardapio();
   sincronizarSeletores(ciclo, 1, true);
-  alert(`✅ ${preenchidas} posições preenchidas a partir do ${ciclo} — as semanas 1-5 agora se repetem alinhadas em TODOS os ciclos!${anuladas ? `\n${anuladas} semana(s) de feriado anulada(s) — pratos deslocados dentro do ciclo.` : ''}`);
+  alert(`✅ ${preenchidas} posições preenchidas a partir do ${ciclo} — as semanas 1-5 agora se repetem alinhadas em TODOS os ciclos!${anuladas ? `\n${anuladas} semana(s) de feriado anulada(s) — os pratos são deslocados globalmente para as semanas seguintes.` : ''}`);
 }
 
 // Reaplica APENAS o ciclo informado no calendário (usado ao editar o plano).
@@ -11188,10 +11304,15 @@ function aplicarCicloNoCalendario(ciclo){
   const totalCalWeeks = _totalSemanasCal();
   if(startWeek >= totalCalWeeks) return;
   const endWeek = Math.min(startWeek + 5, totalCalWeeks);
-  _distribuirFaixa(DADOS.cardapio, startWeek, endWeek, pratos);
-  // Se há rascunho de "Deslocar pratos" pendente, a base também recebe o
-  // plano deste ciclo — assim "Descartar" não desfaz a edição do plano.
+  const base = _inicializarBaseCardapio();
+  if(!base) return;
+  _distribuirFaixa(base, startWeek, endWeek, pratos);
+  // Se há rascunho de "Deslocar pratos" pendente, a base do rascunho também
+  // recebe o plano deste ciclo — assim "Descartar" não desfaz a edição do plano.
   if(_cardBase) _distribuirFaixa(_cardBase, startWeek, endWeek, pratos);
+  recalcularDeslocamento();
+  // Base grava sempre (a edição de plano é imediata e sobrevive ao "Descartar")
+  localStorage.setItem('merenda_cardapio_base', JSON.stringify(DADOS.cardapioBase));
   localStorage.setItem('merenda_cardapio', JSON.stringify(DADOS.cardapio));
   for(let wk = 0; wk < 5; wk++){
     getDiasSemanaCal(startWeek + wk).forEach(iso => _atualizarCelulaCal(iso));
@@ -11231,13 +11352,25 @@ function limparCiclo(){
   if(!confirm('Limpar todos os pratos deste ciclo?')) return;
   const ciclo = document.getElementById('plan-ciclo').value;
   const cIdx = parseInt(ciclo.split(' ')[1]) - 1;
-  // Limpa todos os 5 slots (Seg–Sex) das 5 semanas de calendário do ciclo
+  const base = _inicializarBaseCardapio();
+  if(!base) return;
+  const sCons = getSemanasConsumir();
+  const startWeek = cIdx * 5;
+  // Limpa as posições da base que alimentam a exibição deste ciclo (origem
+  // deslocada, pode estar antes do ciclo) e as posições próprias do ciclo —
+  // inclui semanas anuladas, cujo conteúdo desborda para a semana seguinte.
+  const alvos = new Set();
   for(let wk = 0; wk < 5; wk++){
-    const globalWeekIdx = (cIdx * 5) + wk;
-    const { sIdx, mesNome } = _slotSemana(globalWeekIdx);
-    if(DADOS.cardapio[mesNome]?.[sIdx])
-      DADOS.cardapio[mesNome][sIdx].dias = ['','','','',''];
+    const wi = startWeek + wk;
+    alvos.add(wi);
+    if(!_ehAnulada(wi, sCons)) alvos.add(Math.max(0, wi - _deslocAte(wi)));
   }
+  alvos.forEach(wi => {
+    const { sIdx, mesNome } = _slotSemana(wi);
+    if(base[mesNome]?.[sIdx]) base[mesNome][sIdx].dias = ['','','','',''];
+  });
+  recalcularDeslocamento();
+  _persistirBase();
   _persistirCardapio();
   renderCardapio();
 }
