@@ -11341,7 +11341,11 @@ function _atualizarCelulaCal(iso){
 }
 
 function getCorDia(iso, letIdx){
-  return CORES_CICLOS[Math.floor(getCalWeekIdx(iso) / 5)] || '#e2e8f0';
+  // A cor acompanha o conteúdo exibido: usa a semana de ORIGEM (deslocada),
+  // não a posição no calendário — senão os pratos mudam de ciclo e a cor fica.
+  const wi = getCalWeekIdx(iso);
+  const orig = Math.max(0, wi - (_deslocPrefixo()[wi] || 0));
+  return CORES_CICLOS[Math.floor(orig / 5)] || '#e2e8f0';
 }
 
 function getPlanQtd(){
