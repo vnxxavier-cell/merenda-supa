@@ -798,7 +798,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
      PÁGINA: CARDÁPIO
 ══════════════════════════════════════════════════════ -->
 <div id="pg-cardapio" class="pagina">
-  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Cardápio Anual 2026</h2>
+  <h2 class="titulo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Cardápio Anual <span id="titulo-cardapio-ano">2026</span></span>
+    <select id="sel-ano" onchange="seletorAnoMudou(this)" title="Ano letivo" style="font-size:14px;font-weight:700;padding:4px 10px;border:1.5px solid var(--borda);border-radius:8px;background:#f8fafc;color:var(--txt2);cursor:pointer">
+      <option value="">2026</option>
+    </select></h2>
 
   <!-- Período letivo -->
   <div id="banner-periodo" class="card" style="margin-bottom:18px">
@@ -1303,7 +1306,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
     <div class="stat laranja">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><div class="stat-val" id="gasto-ano">R$ 0,00</div><div class="stat-lbl">Gasto Estimado no Ano (2026)</div></div>
+        <div><div class="stat-val" id="gasto-ano">R$ 0,00</div><div class="stat-lbl" id="lbl-gasto-ano">Gasto Estimado no Ano (2026)</div></div>
         <svg style="opacity:.18;flex-shrink:0;margin-top:2px" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--laranja)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
       </div>
     </div>
@@ -1943,6 +1946,8 @@ const _supaSync = {
     'merenda_ing_fornecedores': 'config',
     'merenda_fichas_custom': 'config',
     'merenda_signup_config': 'config',
+    'merenda_arquivo_anos': 'config',
+    'merenda_ano_ativo': 'config',
     'merenda_previas_contrato': 'previas_contrato',
     'merenda_estoque_correcoes': 'estoque_correcoes',
     'merenda_periodicidades': 'periodicidades',
@@ -1966,7 +1971,7 @@ const _supaSync = {
 
   // Semeia o cache de config a partir do estado local completo
   seedConfigCache() {
-    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom','merenda_signup_config'];
+    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom','merenda_signup_config','merenda_arquivo_anos','merenda_ano_ativo'];
     const cache = {};
     configFields.forEach(k => {
       const val = localStorage.getItem(k);
@@ -1980,7 +1985,7 @@ const _supaSync = {
   async _flushSync() {
     if(!this._userId || !_supabase || this._pendingFields.size === 0) return;
     const updates = {};
-    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom','merenda_signup_config'];
+    const configFields = ['merenda_cardapio','merenda_header_img','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom','merenda_signup_config','merenda_arquivo_anos','merenda_ano_ativo'];
 
     // Coletar 'config' como um bundle completo (sempre relê o estado local para nunca sobrescrever parcialmente)
     const hasConfig = [...this._pendingFields].some(k => configFields.includes(k));
@@ -2058,7 +2063,7 @@ const _supaSync = {
         columnToKey[col].push(k);
       });
 
-    const configFields = ['merenda_cardapio','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom','merenda_signup_config'];
+    const configFields = ['merenda_cardapio','merenda_diretor','merenda_cargo','merenda_escola','merenda_subtitulo','merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom','merenda_signup_config','merenda_arquivo_anos','merenda_ano_ativo'];
     const _localVazio = v => v === null || v === undefined || v === '' || v === '{}' || v === '[]';
     const _temMarcador = m => localStorage.getItem(m) === '1';
     const _marcadorDe = k => k === 'merenda_fornecedores' ? 'merenda_fornecedores_user'
@@ -2502,7 +2507,7 @@ async function verificarCallbackGoogle(){
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
     'merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom',
     'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
-    'merenda_periodicidades','merenda_ing_periodicidade','merenda_servidores_config'
+    'merenda_periodicidades','merenda_ing_periodicidade','merenda_servidores_config','merenda_arquivo_anos','merenda_ano_ativo','merenda_semanas_consumir'
   ];
   const _isPerfilFixo = user.id === 'usr_admin' || user.id === 'usr_admin_rede';
   const temDadosLocais = _isPerfilFixo
@@ -2624,6 +2629,9 @@ function recarregarDados(){
     CAL_CONFIG.recesso  = [];
     CAL_CONFIG.sabados  = [];
   }
+  // Re-ler o ano ativo (chave nova; ausente => deriva do período salvo, sem
+  // gravar — para que o valor remoto ainda possa restaurá-lo depois do sync)
+  ANO_ATIVO = localStorage.getItem('merenda_ano_ativo') || (CAL_CONFIG.inicio || '').slice(0, 4) || String(new Date().getFullYear());
   const novosDias = getSchoolDays();
   DIAS_LETIVOS_ARRAY.length = 0;
   novosDias.forEach(d => DIAS_LETIVOS_ARRAY.push(d));
@@ -2832,7 +2840,8 @@ function migrarDadosLocais(userId){
     'merenda_subtitulo','merenda_embalagens',
     'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
     'merenda_fornecedores','merenda_ing_fornecedores',
-    'merenda_fichas_custom'
+    'merenda_fichas_custom',
+    'merenda_arquivo_anos','merenda_ano_ativo'
   ];
   let n = 0;
   let migrouFichas = false;
@@ -2896,7 +2905,7 @@ async function fazerLogin(){
       'merenda_af_custom','merenda_unidades','merenda_header_img','merenda_usando_demo',
       'merenda_fornecedores','merenda_ing_fornecedores','merenda_fichas_custom',
       'merenda_licitacoes','merenda_previas_contrato','merenda_estoque','merenda_estoque_correcoes','merenda_merc_ajustes',
-      'merenda_periodicidades','merenda_ing_periodicidade','merenda_servidores_config'
+      'merenda_periodicidades','merenda_ing_periodicidade','merenda_servidores_config','merenda_arquivo_anos','merenda_ano_ativo','merenda_semanas_consumir'
     ];
     const _isPerfilFixo = res.user.id === 'usr_admin' || res.user.id === 'usr_admin_rede';
     // Considera que há dados locais se QUALQUER chave prefixada existir
@@ -6085,7 +6094,7 @@ function arredondarEmb(nome, qtd){
   if(changed) localStorage.setItem('merenda_precos', JSON.stringify(saved));
 })();
 
-// CALENDÁRIO 2026 E CÁLCULO DE CICLOS
+// CALENDÁRIO LETIVO E CÁLCULO DE CICLOS
 // ══════════════════════════════════════════════════════
 const FERIADOS_DEFAULT = [
   "2026-02-16","2026-02-17","2026-02-18","2026-04-02","2026-04-03","2026-04-20","2026-04-21",
@@ -6097,6 +6106,26 @@ const FERIADOS_DEFAULT = [
 ];
 const SABADOS_DEFAULT = ["2026-04-11","2026-05-23","2026-08-22"];
 
+// ── ANO LETIVO ATIVO + ARQUIVO DE ANOS ─────────────────────────────
+// Modelo "ano ativo + arquivo": as 4 chaves de dados por ano mantêm formato
+// e sync exatamente como sempre; merenda_arquivo_anos guarda a cópia CRUA
+// dos anos INATIVOS (ano -> { chave -> valor crua }). Os demais dados
+// (ciclos/pratos, estoque, preços, licitações, mercado) são globais.
+// Migração zero: sem merenda_ano_ativo salvo, o ano é derivado do período
+// letivo existente sem tocar em nenhum dado.
+const CHAVES_ANO = ['merenda_cal_config','merenda_cardapio','merenda_cardapio_base','merenda_semanas_consumir'];
+function _valorVazioAno(chave){
+  return chave === 'merenda_cal_config'
+    ? JSON.stringify({ inicio:'', fim:'', feriados:[], recesso:[], sabados:[] })
+    : '{}';
+}
+function lerArquivoAnos(){
+  try { return JSON.parse(localStorage.getItem('merenda_arquivo_anos') || '{}') || {}; }
+  catch(e){ return {}; }
+}
+function gravarArquivoAnos(arq){ localStorage.setItem('merenda_arquivo_anos', JSON.stringify(arq)); }
+let ANO_ATIVO = localStorage.getItem('merenda_ano_ativo') || '';
+
 let CAL_CONFIG = JSON.parse(localStorage.getItem('merenda_cal_config') || 'null') || {
   inicio: '',
   fim: '',
@@ -6105,6 +6134,9 @@ let CAL_CONFIG = JSON.parse(localStorage.getItem('merenda_cal_config') || 'null'
   sabados: []
 };
 if(!CAL_CONFIG.recesso) CAL_CONFIG.recesso = [];
+// Migração zero: deriva o ano do período salvo (sem gravar — a gravação
+// explícita da chave só acontece na troca de ano)
+if(!ANO_ATIVO) ANO_ATIVO = (CAL_CONFIG.inicio || '').slice(0, 4) || String(new Date().getFullYear());
 
 function getSchoolDays() {
   const days = [];
@@ -6870,6 +6902,9 @@ function init(){
   carregarConfig();
   aplicarConsumoSemanas();
   restaurarPeriodoMercado();
+  // Seletor e rótulos do ano letivo ativo
+  renderSeletorAno();
+  atualizarRotulosAno();
 }
 
 // ══════════════════════════════════════════════════════
@@ -6915,7 +6950,7 @@ function imprimirPoster(){
   const MESES = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
   const DIAS_SEMANA = ['D','S','T','Q','Q','S','S'];
   const escola = document.getElementById('cfg-escola')?.value || 'Cardápio Escolar';
-  const ano    = document.getElementById('cfg-ano')?.value   || '2026';
+  const ano    = document.getElementById('cfg-ano')?.value   || ANO_ATIVO;
   // A3 landscape a 150dpi: 4961 × 3508 / 2 ≈ 1587 × 1123 px (leve para html2canvas)
   const PW = 1587, PH = 1123;
 
@@ -6923,8 +6958,8 @@ function imprimirPoster(){
   let mesesHtml = '';
   for(let m = 2; m < 11; m++){
     const mesNome    = MESES[m-1];
-    const firstDow   = new Date(2026, m, 1).getDay();
-    const daysInMonth= new Date(2026, m+1, 0).getDate();
+    const firstDow   = new Date(ANO_ATIVO, m, 1).getDay();
+    const daysInMonth= new Date(ANO_ATIVO, m+1, 0).getDate();
     const corMes     = '#1A3A6B';
 
     let cellsHtml = DIAS_SEMANA.map(d =>
@@ -6935,8 +6970,8 @@ function imprimirPoster(){
       cellsHtml += `<div></div>`;
 
     for(let day = 1; day <= daysInMonth; day++){
-      const iso    = new Date(2026, m, day).toISOString().split('T')[0];
-      const dow    = new Date(2026, m, day).getDay();
+      const iso    = new Date(ANO_ATIVO, m, day).toISOString().split('T')[0];
+      const dow    = new Date(ANO_ATIVO, m, day).getDay();
       const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
       const isHol  = CAL_CONFIG.feriados.includes(iso);
 
@@ -7082,7 +7117,7 @@ function exportarExcel(){
   const MESES = ["Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
   const DIAS_HDR = ['D','S','T','Q','Q','S','S'];
   const escola = document.getElementById('cfg-escola')?.value || 'Cardápio Escolar';
-  const ano    = document.getElementById('cfg-ano')?.value   || '2026';
+  const ano    = document.getElementById('cfg-ano')?.value   || ANO_ATIVO;
 
   const esc = s => String(s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'&#10;');
@@ -7160,12 +7195,12 @@ function exportarExcel(){
     for(let gc = 0; gc < 3; gc++){
       const mi = gridRow * 3 + gc;
       const m  = mi + 2; // 2=Março … 10=Novembro
-      const firstDow    = new Date(2026, m, 1).getDay();
-      const daysInMonth = new Date(2026, m+1, 0).getDate();
+      const firstDow    = new Date(ANO_ATIVO, m, 1).getDay();
+      const daysInMonth = new Date(ANO_ATIVO, m+1, 0).getDate();
       const weeks = Array.from({length:6}, () => new Array(7).fill(null));
       let wr = 0, dc = firstDow;
       for(let day = 1; day <= daysInMonth; day++){
-        const d   = new Date(2026, m, day);
+        const d   = new Date(ANO_ATIVO, m, day);
         const iso = d.toISOString().split('T')[0];
         const dow = d.getDay();
         const letIdx = DIAS_LETIVOS_ARRAY.indexOf(iso);
@@ -7424,6 +7459,74 @@ function _getMesAtualDefault(){
   const m = new Date().getMonth(); // 0=Jan ... 11=Dez
   return Math.max(0, Math.min(10, m - 1)); // Fev(1)=0 ... Dez(11)=10; Jan→0
 }
+// ── SELETOR DE ANO LETIVO (arquivo de anos) ────────────────────────
+function _anosConhecidos(){
+  const anos = new Set(Object.keys(lerArquivoAnos()));
+  anos.add(String(ANO_ATIVO));
+  return [...anos].filter(a => /^\d{4}$/.test(a)).sort((a, b) => b - a);
+}
+function renderSeletorAno(){
+  const sel = document.getElementById('sel-ano');
+  if(!sel) return;
+  sel.innerHTML = _anosConhecidos()
+    .map(a => `<option value="${a}"${a === String(ANO_ATIVO) ? ' selected' : ''}>${a}</option>`).join('')
+    + '<option value="__novo__">＋ Ano novo</option>';
+}
+function atualizarRotulosAno(){
+  const t = document.getElementById('titulo-cardapio-ano');
+  if(t) t.textContent = ANO_ATIVO;
+  const g = document.getElementById('lbl-gasto-ano');
+  if(g) g.textContent = `Gasto Estimado no Ano (${ANO_ATIVO})`;
+  document.querySelectorAll('.cal-ano').forEach(el => el.textContent = ANO_ATIVO);
+}
+function seletorAnoMudou(sel){
+  const v = sel.value;
+  if(v !== '__novo__'){ trocarAno(v); return; }
+  const proximo = String(Math.max(..._anosConhecidos().map(Number)) + 1);
+  const novo = (prompt('Criar novo ano letivo:', proximo) || '').trim();
+  if(!/^\d{4}$/.test(novo)){ renderSeletorAno(); return; }
+  trocarAno(novo);
+}
+// Troca o ano de trabalho: arquiva as 4 chaves do ano atual e carrega as do
+// destino (ou defaults vazios, para um ano novo). Bloqueia se há rascunho de
+// cardápio pendente. Ciclos/pratos/estoque/etc. são globais e não mudam.
+function trocarAno(novoAno){
+  novoAno = String(novoAno);
+  if(!/^\d{4}$/.test(novoAno) || novoAno === String(ANO_ATIVO)){ renderSeletorAno(); return; }
+  if(temAlteracoesPendentes()){
+    alert('Salve (ou descarte, recarregando) as alterações do cardápio antes de trocar de ano.');
+    renderSeletorAno(); // volta o select para o ano atual
+    return;
+  }
+  // 1) Arquiva o estado do ano que está saindo (snapshot cru)
+  const arquivo = lerArquivoAnos();
+  const snapshot = {};
+  CHAVES_ANO.forEach(k => {
+    const v = localStorage.getItem(k);
+    snapshot[k] = (v === null || v === '') ? _valorVazioAno(k) : v;
+  });
+  arquivo[String(ANO_ATIVO)] = snapshot;
+  gravarArquivoAnos(arquivo);
+  // 2) Carrega o destino: snapshot arquivado ou defaults vazios (ano novo)
+  const alvo = arquivo[novoAno];
+  CHAVES_ANO.forEach(k => {
+    const v = alvo ? alvo[k] : null;
+    localStorage.setItem(k, (v !== null && v !== undefined && v !== '') ? v : _valorVazioAno(k));
+  });
+  ANO_ATIVO = novoAno;
+  localStorage.setItem('merenda_ano_ativo', ANO_ATIVO);
+  // 3) Recarrega cal/dias/base/display e redesenha tudo
+  recarregarDados();
+  _calMesAtual = _getMesAtualDefault();
+  renderCardapio();
+  const st = document.getElementById('periodo-status');
+  if(st) st.innerHTML = DIAS_LETIVOS_ARRAY.length
+    ? `${ico('check',12)} ${DIAS_LETIVOS_ARRAY.length} dias letivos calculados`
+    : `${ico('alert',12)} Defina início e término válidos`;
+  renderSeletorAno();
+  atualizarRotulosAno();
+  console.info(`Ano letivo alterado: ${novoAno}`);
+}
 function initTabAtiva(){
   const ativa = document.querySelector('.pagina.ativa');
   if(ativa && ativa.id === 'pg-mercado'){
@@ -7464,8 +7567,8 @@ function renderCardapio(){
 
   const elIni = document.getElementById('cal-inicio');
   const elFim = document.getElementById('cal-fim');
-  if(elIni && CAL_CONFIG.inicio) elIni.value = CAL_CONFIG.inicio;
-  if(elFim && CAL_CONFIG.fim) elFim.value = CAL_CONFIG.fim;
+  if(elIni) elIni.value = CAL_CONFIG.inicio || '';
+  if(elFim) elFim.value = CAL_CONFIG.fim || '';
   renderListasEspeciais();
   gerarSeletoresPratos();
 
@@ -7485,14 +7588,14 @@ function renderCardapio(){
   const m = _calMesAtual + 1; // 1=Fev ... 11=Dez (Date usa mês 0-indexado, +1 desloca para Fev)
   const mesNome = MESES_DISPLAY[_calMesAtual];
   const mesId = `cal-mes-${mesNome.replace(/\s/g,'')}`;
-  const firstDow = new Date(2026, m, 1).getDay();
-  const daysInMonth = new Date(2026, m+1, 0).getDate();
+  const firstDow = new Date(ANO_ATIVO, m, 1).getDay();
+  const daysInMonth = new Date(ANO_ATIVO, m+1, 0).getDate();
 
   let days = '';
   for(let i=0; i<firstDow; i++) days += '<div class="cal-day day-off"></div>';
 
   for(let day=1; day<=daysInMonth; day++){
-    const date = new Date(2026, m, day);
+    const date = new Date(ANO_ATIVO, m, day);
     const iso = date.toISOString().split('T')[0];
     const dow = date.getDay();
     const isHoliday = CAL_CONFIG.feriados.includes(iso);
@@ -7530,7 +7633,7 @@ function renderCardapio(){
       const tag = isSabLetivoDay ? `<span style="font-size:8px;font-weight:800;color:#fff;background:var(--azul2);border-radius:3px;padding:1px 4px;line-height:1.4">SAB.LET.</span>` : '';
       days += `<div class="cal-day day-off" data-iso="${iso}"><span class="cal-day-num-btn ${sabClass}" onclick="clicarNumDia('${iso}',event)" title="${sabTitle}">${day}</span>${tag}${badge}</div>`;
     } else if(dow===0){
-      const nextDate = new Date(2026, m, day + 1);
+      const nextDate = new Date(ANO_ATIVO, m, day + 1);
       const mondayIso = nextDate.toISOString().split('T')[0];
       const wi = getCalWeekIdx(mondayIso);
       const totalCalWeeks = DIAS_LETIVOS_ARRAY.length ? getCalWeekIdx(DIAS_LETIVOS_ARRAY[DIAS_LETIVOS_ARRAY.length - 1]) + 1 : 0;
@@ -7588,7 +7691,7 @@ function renderCardapio(){
       <div class="cal-month">
         <div class="cal-top">
           <span class="cal-mes-nome">${mesNome}</span>
-          <span class="cal-ano">2026</span>
+          <span class="cal-ano">${ANO_ATIVO}</span>
         </div>
         <div id="${mesId}">
           <div class="cal-body">
@@ -7905,14 +8008,14 @@ function renderCalendarioMercado(){
 
   const m = _mercMesAtual + 1;
   const mesNome = MESES_DISPLAY[_mercMesAtual];
-  const firstDow = new Date(2026, m, 1).getDay();
-  const daysInMonth = new Date(2026, m+1, 0).getDate();
+  const firstDow = new Date(ANO_ATIVO, m, 1).getDay();
+  const daysInMonth = new Date(ANO_ATIVO, m+1, 0).getDate();
 
   let days = '';
   for(let i=0; i<firstDow; i++) days += '<div class="cal-day day-off" style="min-height:80px"></div>';
 
   for(let day=1; day<=daysInMonth; day++){
-    const date = new Date(2026, m, day);
+    const date = new Date(ANO_ATIVO, m, day);
     const iso = date.toISOString().split('T')[0];
     const dow = date.getDay();
     const isHoliday = CAL_CONFIG.feriados.includes(iso);
@@ -7930,7 +8033,7 @@ function renderCalendarioMercado(){
     } else if(dow===6){
       days += `<div class="cal-day day-off" style="min-height:80px"><span style="font-size:11px;font-weight:700;color:#d1d5db">${day}</span></div>`;
     } else if(dow===0){
-      const nextDate = new Date(2026, m, day + 1);
+      const nextDate = new Date(ANO_ATIVO, m, day + 1);
       const mondayIso = nextDate.toISOString().split('T')[0];
       const semanaIdx = SEMANAS_CAL.findIndex(w => w.monday === mondayIso);
       const semana = semanaIdx >= 0 ? SEMANAS_CAL[semanaIdx] : null;
@@ -7965,7 +8068,7 @@ function renderCalendarioMercado(){
       <div class="cal-month">
         <div class="cal-top" style="padding:12px 18px 10px">
           <span class="cal-mes-nome" style="font-size:20px">${mesNome}</span>
-          <span class="cal-ano" style="font-size:12px">2026</span>
+          <span class="cal-ano" style="font-size:12px">${ANO_ATIVO}</span>
         </div>
     <div style="overflow-x:auto;padding:0">
           <div style="display:flex;min-height:0">
